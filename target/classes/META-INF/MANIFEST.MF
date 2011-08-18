@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Built-By: Magnus
-Build-Jdk: 1.7.0
-Created-By: Maven Integration for Eclipse
-Tapestry-Module-Classes: dk.kvalheim.cdi.tapestry.services.CDIModule
-

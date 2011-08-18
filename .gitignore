@@ -2,4 +2,4 @@
 .metadata
 .classpath
 .settings/
-target/**
+target/

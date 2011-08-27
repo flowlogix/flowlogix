@@ -6,9 +6,11 @@
  */
 package com.flowlogix.services.internal;
 
+import java.util.regex.Pattern;
 import javax.ejb.EJB;
 import javax.naming.NamingException;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.tapestry5.model.MutableComponentModel;
 import org.apache.tapestry5.plastic.PlasticClass;
@@ -20,6 +22,7 @@ import org.apache.tapestry5.services.transform.TransformationSupport;
  * Inject an EJB into tapestry sources
  * 
  * @author Magnus
+ * Enhancements by Lenny Primak
  */
 public class EJBAnnotationWorker implements ComponentClassTransformWorker2
 {
@@ -52,6 +55,14 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             if (lookupname == null)
             {
                 lookupname = fieldType.substring(fieldType.lastIndexOf(".") + 1);
+                // support naming convention that strips Local/Remote from the
+                // end of an interface class to try to determine the actual bean name,
+                // to avoid @EJB(beanName="myBeanName"), and just use plain old @EJB
+                String uc = lookupname.toUpperCase();
+                if(uc.endsWith(LOCAL) || uc.endsWith(REMOTE))
+                {
+                    lookupname = stripLocalPattern.matcher(lookupname).replaceFirst("");
+                }
             }
 
             //convert to jndi name
@@ -78,4 +89,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     
 
     private final JNDIObjectLocator locator = new JNDIObjectLocator();
+    private final String REMOTE = "REMOTE";
+    private final String LOCAL = "LOCAL";
+    private @Getter final Pattern stripLocalPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
 }

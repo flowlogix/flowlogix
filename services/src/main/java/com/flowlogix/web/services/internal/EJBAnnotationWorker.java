@@ -4,7 +4,7 @@
  * Copyright 2009 by Movellas ApS
  * All rights reserved. 
  */
-package com.flowlogix.services.internal;
+package com.flowlogix.web.services.internal;
 
 import java.util.regex.Pattern;
 import javax.ejb.EJB;

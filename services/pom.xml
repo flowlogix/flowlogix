@@ -19,5 +19,22 @@
         <relativePath>../build-core</relativePath>
         <version>1.0-SNAPSHOT</version>
     </parent>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Tapestry-Module-Classes>${project.groupId}.web.services.ServicesModule, ${project.groupId}.web.services.EjbModule</Tapestry-Module-Classes>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

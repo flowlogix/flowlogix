@@ -4,7 +4,7 @@
  */
 package com.flowlogix.services.test;
 
-import com.flowlogix.services.internal.EJBAnnotationWorker;
+import com.flowlogix.web.services.internal.EJBAnnotationWorker;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

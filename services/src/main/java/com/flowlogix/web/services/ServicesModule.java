@@ -6,6 +6,7 @@ package com.flowlogix.web.services;
 
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.annotations.Contribute;
+import org.apache.tapestry5.ioc.annotations.SubModule;
 import org.apache.tapestry5.services.ComponentClassResolver;
 import org.apache.tapestry5.services.LibraryMapping;
 
@@ -13,6 +14,7 @@ import org.apache.tapestry5.services.LibraryMapping;
  *
  * @author lprimak
  */
+@SubModule({ EjbModule.class, GwtModule.class })
 public class ServicesModule 
 {
     @Contribute(ComponentClassResolver.class)

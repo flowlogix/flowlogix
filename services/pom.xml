@@ -29,7 +29,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Tapestry-Module-Classes>${project.groupId}.web.services.ServicesModule, ${project.groupId}.web.services.EjbModule</Tapestry-Module-Classes>
+                            <Tapestry-Module-Classes>${project.groupId}.web.services.ServicesModule</Tapestry-Module-Classes>
                         </manifestEntries>
                     </archive>
                 </configuration>

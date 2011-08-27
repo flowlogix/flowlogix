@@ -52,7 +52,7 @@
                     <artifactId>jdtcore</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.validation</groupId>
+                    <groupId>javax.alidation</groupId>
                     <artifactId>validation-api</artifactId>
                 </exclusion>
             </exclusions>
@@ -234,6 +234,14 @@
             <scope>${war-deps.scope}</scope>
         </dependency>
         <dependency>
+            <groupId>com.flowlogix</groupId>
+            <artifactId>flowlogix-services</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>jar</type>
+<!--            <scope>${war-deps.scope}</scope>-->
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.inet</groupId>
             <artifactId>Merlia</artifactId>
             <version>4.0</version>
@@ -308,6 +316,12 @@
                                 <artifactItem>
                                     <groupId>com.inet</groupId>
                                     <artifactId>Merlia</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.flowlogix</groupId>
+                                    <artifactId>flowlogix-services</artifactId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>

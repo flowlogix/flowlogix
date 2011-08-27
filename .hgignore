@@ -3,4 +3,4 @@
 \.chg\..*$
 \.rej$
 \.conflict\~$
-^target$
+/target$

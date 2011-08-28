@@ -23,7 +23,10 @@ public class PersistenceRegistry
         {
             @Override
             public void configure(final TapestryPersistenceUnitInfo unitInfo)
-            {                
+            {
+                // Tap-JPA module makes you include entities one-by-one
+                // so excludeUnlistedFiles has to be overridden and set to true
+                unitInfo.excludeUnlistedClasses(true);
                 String packageName = entitySample.getPackage().getName();
                 log.fine("Registering JPA Package: " + packageName);
                 for (String className : locator.locateClassNames(packageName))

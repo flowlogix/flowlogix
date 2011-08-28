@@ -27,7 +27,7 @@ public class GwtModule
             public void advise(MethodInvocation invocation)
             {
                 invocation.proceed();
-                if(invocation.getReturnType().equals(String.class))
+                if(invocation.getMethod().getReturnType().equals(String.class))
                 {
                     String result = invocation.getReturnValue().toString();
                     
@@ -54,5 +54,4 @@ public class GwtModule
     
     
     private static final Logger log = Logger.getLogger(GwtModule.class.getName());
-
 }

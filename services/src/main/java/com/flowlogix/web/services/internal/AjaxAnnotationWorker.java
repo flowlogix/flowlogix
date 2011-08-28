@@ -33,6 +33,7 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
     {
         for(final PlasticMethod method : plasticClass.getMethodsWithAnnotation(AJAX.class))
         {
+            final AJAX annotation = method.getAnnotation(AJAX.class);
             if(method.isVoid() == false)
             {
                 method.addAdvice(new MethodAdvice() 
@@ -46,7 +47,7 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
                         {
                             result = defaultForReturnType(result.getClass());
                         }
-                        else
+                        else if(annotation.discardAfter())
                         {
                             cs.getActivePage().getComponentResources().discardPersistentFieldChanges();
                         }

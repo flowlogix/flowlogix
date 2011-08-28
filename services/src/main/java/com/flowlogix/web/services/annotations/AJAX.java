@@ -20,5 +20,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME) 
 public @interface AJAX 
 { 
-    // intentionally left blank
+    boolean discardAfter() default false;
 } 

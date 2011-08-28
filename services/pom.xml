@@ -16,7 +16,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>build-core</artifactId>
-        <relativePath>../build-core</relativePath>
+        <relativePath>../build-core/pom.xml</relativePath>
         <version>1.0-SNAPSHOT</version>
     </parent>
     

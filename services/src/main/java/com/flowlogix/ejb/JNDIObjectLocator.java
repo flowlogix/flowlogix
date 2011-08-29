@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.flowlogix.web.services.internal;
+package com.flowlogix.ejb;
 
+import com.flowlogix.web.services.internal.EJBAnnotationWorker;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,21 @@ public class JNDIObjectLocator
     public JNDIObjectLocator()
     {
         initialContext = new InitialContext();
+    }
+    
+    
+    @SneakyThrows(NamingException.class)
+    public<T> T getObject(Class<T> beanClass)
+    {
+        String name = EJBAnnotationWorker.guessByType(beanClass.getName());
+        return getObject(EJBAnnotationWorker.prependPortableName(name));
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    public<T> T getObject(String jndiName) throws NamingException
+    {
+        return (T)getJNDIObject(jndiName);
     }
 
     

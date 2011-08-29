@@ -19,7 +19,7 @@ public class ReplaceLocalTests
     public void stripLocal()
     {
         EJBAnnotationWorker worker = new EJBAnnotationWorker();
-        assertEquals("java:module/WebusersFacade", worker.getStripLocalPattern().matcher("java:module/WebusersFacadeLocal").replaceFirst(""));
-        assertEquals("java:module/WebusersFacade", worker.getStripLocalPattern().matcher("java:module/WebusersFacadeRemote").replaceFirst(""));
+        assertEquals("java:module/WebusersFacade", EJBAnnotationWorker.StripLocalPattern.matcher("java:module/WebusersFacadeLocal").replaceFirst(""));
+        assertEquals("java:module/WebusersFacade", EJBAnnotationWorker.StripLocalPattern.matcher("java:module/WebusersFacadeRemote").replaceFirst(""));
     }
 }

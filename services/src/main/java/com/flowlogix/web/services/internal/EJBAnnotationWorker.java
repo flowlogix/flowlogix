@@ -6,11 +6,11 @@
  */
 package com.flowlogix.web.services.internal;
 
+import com.flowlogix.ejb.JNDIObjectLocator;
 import java.util.regex.Pattern;
 import javax.ejb.EJB;
 import javax.naming.NamingException;
 
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.tapestry5.model.MutableComponentModel;
 import org.apache.tapestry5.plastic.PlasticClass;
@@ -54,22 +54,10 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             //use type
             if (lookupname == null)
             {
-                lookupname = fieldType.substring(fieldType.lastIndexOf(".") + 1);
-                // support naming convention that strips Local/Remote from the
-                // end of an interface class to try to determine the actual bean name,
-                // to avoid @EJB(beanName="myBeanName"), and just use plain old @EJB
-                String uc = lookupname.toUpperCase();
-                if(uc.endsWith(LOCAL) || uc.endsWith(REMOTE))
-                {
-                    lookupname = stripLocalPattern.matcher(lookupname).replaceFirst("");
-                }
+                lookupname = guessByType(fieldType);
             }
 
-            //convert to jndi name
-            if (!lookupname.startsWith("java:"))
-            {
-                lookupname = "java:module/" + lookupname;
-            }
+            lookupname = prependPortableName(lookupname);
 
             Object injectionValue = locator.getJNDIObject(lookupname);
 
@@ -81,6 +69,31 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         }
     }
     
+    
+    public static String guessByType(String type) 
+    {
+        String lookupname = type.substring(type.lastIndexOf(".") + 1);
+        // support naming convention that strips Local/Remote from the
+        // end of an interface class to try to determine the actual bean name,
+        // to avoid @EJB(beanName="myBeanName"), and just use plain old @EJB
+        String uc = lookupname.toUpperCase();
+        if (uc.endsWith(LOCAL) || uc.endsWith(REMOTE)) {
+            lookupname = StripLocalPattern.matcher(lookupname).replaceFirst("");
+        }
+        return lookupname;
+    }
+    
+    
+    public static String prependPortableName(String lookupname)
+    {
+        //convert to jndi name
+        if (!lookupname.startsWith("java:")) 
+        {
+            lookupname = "java:module/" + lookupname;
+        }
+        return lookupname;
+    }
+    
 
     private boolean isBlankOrNull(String s)
     {
@@ -89,7 +102,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     
 
     private final JNDIObjectLocator locator = new JNDIObjectLocator();
-    private final String REMOTE = "REMOTE";
-    private final String LOCAL = "LOCAL";
-    private @Getter final Pattern stripLocalPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
+    private static final String REMOTE = "REMOTE";
+    private static final String LOCAL = "LOCAL";
+    public static final Pattern StripLocalPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
 }

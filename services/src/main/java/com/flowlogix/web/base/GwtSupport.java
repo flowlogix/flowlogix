@@ -4,6 +4,7 @@
  */
 package com.flowlogix.web.base;
 
+import com.flowlogix.web.pages.js.GwtSupportVariable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -14,6 +15,7 @@ import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.AssetSource;
+import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -39,13 +41,17 @@ public abstract class GwtSupport
     
     @SetupRender
     public void addScript()
-    {
-        gwtModule = getModuleName();
-        gwtModulePath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
-
+    {        
         jsSupport.addScript("GWTComponentController.add('%s','%s')", getEntryPoint().getName(), 
                 addParameters(resources.getCompleteId(), getGWTParameters()));
-        jsSupport.importJavaScriptLibrary("flowlogix/js/GwtSupportVariable:action?value=" + gwtModule + "/sc/");
+     
+        final String gwtModule = getModuleName();
+        final String supportVariablePath = "flowlogix/js/GwtSupportVariable";
+        final String contextPath = requestGlobals.getRequest().getContextPath();
+        jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s/%s/sc/", 
+                contextPath, supportVariablePath, contextPath, gwtModule));
+
+        final String gwtModulePath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
         jsSupport.importJavaScriptLibrary(assetSource.getExpandedAsset(gwtModulePath));
     }    
 
@@ -63,9 +69,8 @@ public abstract class GwtSupport
     
     
     private @Environmental JavaScriptSupport jsSupport;
-    private String gwtModule;
-    private String gwtModulePath;
     private @Inject AssetSource assetSource;
     private @Getter @Inject ComponentResources resources;
+    private @Inject RequestGlobals requestGlobals;
     private static final Logger log = Logger.getLogger(GwtSupport.class.getName());
 }

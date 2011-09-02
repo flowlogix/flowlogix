@@ -22,5 +22,5 @@ public class GwtSupportVariable
     }
             
     
-    @Getter @ActivationRequestParameter(value = "value") private String value;
+    @Getter @ActivationRequestParameter private String value;
 }

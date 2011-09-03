@@ -414,7 +414,7 @@
     <repositories>
         <repository>
             <id>tapestry-repo</id>
-            <url>http://repository.apache.org/snapshots</url>
+            <url>https://repository.apache.org/content/groups/staging</url>
         </repository>
         <repository>
             <id>baw-maven2</id>
@@ -433,7 +433,7 @@
     
     <properties>
         <war-deps.scope>provided</war-deps.scope>
-        <tap.version>5.3-SNAPSHOT</tap.version>
+        <tap.version>5.3-beta-2</tap.version>
         <gwt.version>2.3.0</gwt.version>
     </properties>
     

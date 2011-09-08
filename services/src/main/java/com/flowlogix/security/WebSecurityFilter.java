@@ -35,7 +35,7 @@ public class WebSecurityFilter implements Filter
     @Override
     public void doFilter(final ServletRequest sr, final ServletResponse sr1, final FilterChain fc) throws IOException, ServletException
     {
-        if (ThreadContext.getSecurityManager() != null && ThreadContext.getSubject() == null)
+        if (ThreadContext.getSecurityManager() != null && (SecurityUtils.getSubject() instanceof WebSubject) == false)
         {
             WebSubject subject = new WebSubject.Builder(SecurityUtils.getSecurityManager(), sr, sr1).buildWebSubject();
             subject.execute(new Callable<Void>() {

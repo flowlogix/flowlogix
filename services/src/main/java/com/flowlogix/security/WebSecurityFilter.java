@@ -58,6 +58,5 @@ public class WebSecurityFilter implements Filter
     public void destroy()
     {
         // blank
-    }
-    
+    }    
 }

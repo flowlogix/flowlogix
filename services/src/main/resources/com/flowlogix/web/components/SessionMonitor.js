@@ -6,20 +6,16 @@
 
 var SessionMonitor = Class.create();
 
-function notImplemented(notImplemented) {
-    alert("Not yet implemented " + notImplemented);
-}
 
 SessionMonitor.prototype = {
-    initialize: function(baseURI, defaultURIparameters, keepAlive, endOnClose, idleCheckSeconds, warnBeforeSeconds, 
+    initialize: function(contextPath, baseURI, defaultURIparameters, keepAlive, endOnClose, idleCheckSeconds, warnBeforeSeconds, 
         warnBeforeHandler, endedHandler) {
+        this.contextPath = contextPath;
         this.baseURI = baseURI;
         this.defaultURIparameters = defaultURIparameters;
         this.keepAlive = keepAlive;
         this.endOnClose = endOnClose;
         this.idleCheckSeconds = idleCheckSeconds;
-        this.warnBeforeSeconds = warnBeforeSeconds;
-        this.warnBeforeHandler = warnBeforeHandler;
         this.endedHandler = endedHandler;
         this.idleCheckId = null;
 		
@@ -27,11 +23,12 @@ SessionMonitor.prototype = {
     },
 
     checkIdle: function() {
-        new Ajax.Request(this.baseURI + "checkidle" + this.defaultURIparameters + this.keepAlive + '&warn=' + this.warnBeforeSeconds
+        new Ajax.Request(this.baseURI + "checkidle" + this.defaultURIparameters + this.keepAlive
             +'&timestamp='+(new Date()).getTime(), {
                 method: 'get',
                 evalJSON:true,
-                onSuccess: this.handleIdleCheckResult.bind(this)
+                onSuccess: this.handleIdleCheckResult.bind(this),
+                onFailure: this.endHandler.bind(this)
             });
     },
 
@@ -41,7 +38,17 @@ SessionMonitor.prototype = {
             method: 'get'
         });
     },
-	
+    
+    endHandler : function() {
+        if (this.endedHandler != null) {
+                this.callHandler(this.endedHandler);
+            }
+            else {
+                alert('Your Session Has Expired');
+                window.location.reload();
+            }
+    },
+    
     refresh: function() {
         new Ajax.Request(this.baseURI + "refresh" + this.defaultURIparameters + 'true', {
             method: 'get'
@@ -55,36 +62,21 @@ SessionMonitor.prototype = {
     },
 	
     callHandler : function(handlerName, arg) {
-        // handlerName should be a string identifier of form "obj.property.function"
-        var pos = handlerName.lastIndexOf('.');
-        var context = null;
-        if (pos > 0 ) context = eval(handlerName.substring(0,pos));
-        if (handlerName.substr(handlerName.length-2,2) == '()' ) handlerName = handlerName.substring(0,handlerName.length - 2);
+        handlerName = "SessionMonitor." + handlerName;
         var operation = eval(handlerName);
-        // FIXME should log something if operation doesn't exist
-        if (typeof(operation) == 'function') {
-            if (context == null) operation(arg);
-            else operation.bind(context)(arg);
-        }
+        operation(arg);
     },
-	
-    warnOfEnd : function(inSeconds) {
-        if (this.warnBeforeHandler != null) {
-            this.callHandler(this.warnBeforeHandler, inSeconds);
-        }
-        else alert('The page will become idle soon...');
-    },
-	
+		
     handleIdleCheckResult: function(transport) {
-        var nextCheck = transport.responseJSON.nextCheck;
+        var nextCheck = -1;
+        if(transport.responseJSON != null) {
+            nextCheck = transport.responseJSON.nextCheck;        
+        }            
         if (isNaN(nextCheck)) nextCheck = -1; 
         if (nextCheck <= 0 ) {
-            if (this.endedHandler != null) this.callHandler(this.endedHandler);
+            this.endHandler();
             return;
         }
-        var warnFor = transport.responseJSON.warn;
-        if (!isNaN(warnFor)) if (warnFor > 0) this.warnOfEnd(warnFor);
-
         this.checkIdleNext(nextCheck);
     }
 }

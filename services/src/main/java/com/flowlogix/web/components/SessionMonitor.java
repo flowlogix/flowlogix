@@ -11,10 +11,10 @@ import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.Request;
-import org.apache.tapestry5.services.Session;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -28,33 +28,48 @@ public class SessionMonitor
     private static final String KEEPALIVE_NAME = "keepAlive";
     
     @Inject private ComponentResources componentResources;
-    @Environmental private JavaScriptSupport renderSupport;
+    @Environmental private JavaScriptSupport jsSupport;
     
     @Inject private Request request;
 
     @Parameter("15") private int idleCheck;
-    @Parameter("30") private int warnBefore;
-    @Parameter(defaultPrefix = BindingConstants.LITERAL) private String warnBeforeHandler;
     @Parameter(defaultPrefix = BindingConstants.LITERAL) private String endedHandler;
     @Parameter("false") private boolean keepAlive;
+    
+    private String _endedHandler;
 
     JSONObject onCheckidle() 
     {
-        Session session = request.getSession(false);
-        // FIXME check if keepalive is set
+        if(keepAlive && request.isRequestedSessionIdValid())
+        {
+            onRefresh();
+        }
         JSONObject object = new JSONObject();
-        object.put("nextCheck", 15);
+        if(request.isRequestedSessionIdValid())
+        {
+            object.put("nextCheck", idleCheck);
+        }
         return object;
     }
 
     JSONObject onRefresh() 
     {
+        request.setAttribute("__keepalive_SessionMonitor", "abc");
         return null;
     }
 
     JSONObject onEnd() 
     {
         return new JSONObject();
+    }
+    
+    @SetupRender
+    public void init()
+    {
+        if(endedHandler != null)
+        {
+            _endedHandler = "'" + endedHandler + "'";
+        }
     }
 
     
@@ -69,8 +84,8 @@ public class SessionMonitor
         defaultURIparameters += KEEPALIVE_NAME + "=";
         baseURI = baseURI.substring(0, index + 1);
 
-        // System.out.println("Active conversation is " + conversationManager.getActiveConversation());
-        renderSupport.addScript(String.format("%s = new SessionMonitor('%s', '%s', %s, true, %s, %s, '%s', '%s');", componentResources.getId(), baseURI,
-                defaultURIparameters, keepAlive, idleCheck, warnBefore, warnBeforeHandler, endedHandler));
+        jsSupport.addScript(String.format("%s = new SessionMonitor('%s', '%s', '%s', %s, true, %s, %s);", 
+                componentResources.getId(), request.getContextPath(), baseURI, defaultURIparameters, 
+                keepAlive, idleCheck, _endedHandler));
     }
 }

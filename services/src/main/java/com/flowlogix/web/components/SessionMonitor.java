@@ -71,7 +71,7 @@ public class SessionMonitor
     public void afterRender() 
     {
         Link link = componentResources.createEventLink(eventName);
-        String baseURI = link.toAbsoluteURI();
+        String baseURI = link.toAbsoluteURI(request.isSecure());
         int index = baseURI.indexOf(":" + eventName);
         String defaultURIparameters = baseURI.substring(index + eventName.length() + 1);
         defaultURIparameters += "".equals(defaultURIparameters) ? "?" : "&";
@@ -103,7 +103,7 @@ public class SessionMonitor
     @Inject private ComponentResources componentResources;
     @Environmental private JavaScriptSupport jsSupport;    
     @Inject private Request request;
-    private @Inject RequestGlobals rg;
+    private @Inject RequestGlobals rg;    
     
     private @Persist Boolean hasSession;
     private String _endedHandler;

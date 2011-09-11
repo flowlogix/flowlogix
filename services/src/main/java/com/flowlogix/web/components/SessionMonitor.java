@@ -4,7 +4,6 @@
  */
 package com.flowlogix.web.components;
 
-import javax.servlet.http.HttpSession;
 import org.apache.shiro.SecurityUtils;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
@@ -19,7 +18,6 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
-import org.apache.tapestry5.services.Session;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -29,36 +27,18 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 @Import(library = "SessionMonitor.js")
 public class SessionMonitor 
 {
-    private static final String eventName = "checkidle";
-    private static final String KEEPALIVE_NAME = "keepAlive";
-    
-    @Inject private ComponentResources componentResources;
-    @Environmental private JavaScriptSupport jsSupport;
-    
-    @Inject private Request request;
-
-    @Parameter("15") private int idleCheck;
-    @Parameter(defaultPrefix = BindingConstants.LITERAL) private String endedHandler;
-    @Parameter("false") private boolean keepAlive;
-    
-    private String _endedHandler;
-    private @Persist Integer currentSssionId;
-    private @Inject RequestGlobals rg;
-    private @Persist Boolean hasSession;
-    
-
     JSONObject onCheckidle() 
     {
-        if(keepAlive && request.isRequestedSessionIdValid())
+        if(keepAlive && isValidSession())
         {
             onRefresh();
         }
         JSONObject object = new JSONObject();
-        if(request.isRequestedSessionIdValid() && verifyEqualId())
+        if(isValidSession())
         {
             object.put("nextCheck", idleCheck);
         }
-        if(SecurityUtils.getSubject().isRemembered())
+        else if(SecurityUtils.getSubject().isRemembered())
         {
             object.put("reloadPageOnly", true);
         }
@@ -79,6 +59,7 @@ public class SessionMonitor
     @SetupRender
     public void init()
     {
+        setSession();
         if(endedHandler != null)
         {
             _endedHandler = "'" + endedHandler + "'";
@@ -101,19 +82,32 @@ public class SessionMonitor
                 componentResources.getId(), request.getContextPath(), baseURI, defaultURIparameters, 
                 keepAlive, idleCheck, _endedHandler));
     }
-
     
-    private boolean verifyEqualId() 
+    
+    private void setSession()
     {
-        HttpSession _id = rg.getHTTPServletRequest().getSession(false);
-        Integer id = _id != null? _id.hashCode() : null;
-        boolean rv = id != null;
-        if(currentSssionId != null)
-        {
-            rv = (currentSssionId.equals(id));
-        }
-        currentSssionId = id;
-        
-        return rv;
+        hasSession = rg.getHTTPServletRequest().getSession(false) != null;
     }
+    
+    
+    private boolean isValidSession() 
+    {
+        return Boolean.TRUE.equals(hasSession);
+    }
+
+
+    @Parameter("15") private int idleCheck;
+    @Parameter(defaultPrefix = BindingConstants.LITERAL) private String endedHandler;
+    @Parameter("false") private boolean keepAlive;
+    
+    @Inject private ComponentResources componentResources;
+    @Environmental private JavaScriptSupport jsSupport;    
+    @Inject private Request request;
+    private @Inject RequestGlobals rg;
+    
+    private @Persist Boolean hasSession;
+    private String _endedHandler;
+
+    private static final String eventName = "checkidle";
+    private static final String KEEPALIVE_NAME = "keepAlive";
 }

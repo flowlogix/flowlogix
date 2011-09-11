@@ -18,6 +18,7 @@ SessionMonitor.prototype = {
         this.idleCheckSeconds = idleCheckSeconds;
         this.endedHandler = endedHandler;
         this.idleCheckId = null;
+        this.reloadPageOnly = false;
 		
         if (idleCheckSeconds != null && idleCheckSeconds > 0) this.checkIdleNext(idleCheckSeconds);
     },
@@ -44,7 +45,9 @@ SessionMonitor.prototype = {
                 this.callHandler(this.endedHandler);
             }
             else {
-                alert('Your Session Has Expired');
+                if(this.reloadPageOnly == false) {
+                    alert('Your Session Has Expired');
+                }
                 window.location.reload();
             }
     },
@@ -69,8 +72,11 @@ SessionMonitor.prototype = {
 		
     handleIdleCheckResult: function(transport) {
         var nextCheck = -1;
+        this.reloadPageOnly = false;
         if(transport.responseJSON != null) {
-            nextCheck = transport.responseJSON.nextCheck;        
+            nextCheck = transport.responseJSON.nextCheck;  
+            this.reloadPageOnly = transport.responseJSON.reloadPageOnly;
+            if (isNaN(this.reloadPageOnly)) this.reloadPageOnly = false; 
         }            
         if (isNaN(nextCheck)) nextCheck = -1; 
         if (nextCheck <= 0 ) {

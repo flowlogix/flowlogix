@@ -4,6 +4,8 @@
  */
 package com.flowlogix.web.components;
 
+import javax.servlet.http.HttpSession;
+import org.apache.shiro.SecurityUtils;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Link;
@@ -11,10 +13,13 @@ import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.Request;
+import org.apache.tapestry5.services.RequestGlobals;
+import org.apache.tapestry5.services.Session;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -37,6 +42,10 @@ public class SessionMonitor
     @Parameter("false") private boolean keepAlive;
     
     private String _endedHandler;
+    private @Persist Integer currentSssionId;
+    private @Inject RequestGlobals rg;
+    private @Persist Boolean hasSession;
+    
 
     JSONObject onCheckidle() 
     {
@@ -45,16 +54,20 @@ public class SessionMonitor
             onRefresh();
         }
         JSONObject object = new JSONObject();
-        if(request.isRequestedSessionIdValid())
+        if(request.isRequestedSessionIdValid() && verifyEqualId())
         {
             object.put("nextCheck", idleCheck);
+        }
+        if(SecurityUtils.getSubject().isRemembered())
+        {
+            object.put("reloadPageOnly", true);
         }
         return object;
     }
 
     JSONObject onRefresh() 
     {
-        request.setAttribute("__keepalive_SessionMonitor", "abc");
+        SecurityUtils.getSubject().getSession(false).touch();
         return null;
     }
 
@@ -87,5 +100,20 @@ public class SessionMonitor
         jsSupport.addScript(String.format("%s = new SessionMonitor('%s', '%s', '%s', %s, true, %s, %s);", 
                 componentResources.getId(), request.getContextPath(), baseURI, defaultURIparameters, 
                 keepAlive, idleCheck, _endedHandler));
+    }
+
+    
+    private boolean verifyEqualId() 
+    {
+        HttpSession _id = rg.getHTTPServletRequest().getSession(false);
+        Integer id = _id != null? _id.hashCode() : null;
+        boolean rv = id != null;
+        if(currentSssionId != null)
+        {
+            rv = (currentSssionId.equals(id));
+        }
+        currentSssionId = id;
+        
+        return rv;
     }
 }

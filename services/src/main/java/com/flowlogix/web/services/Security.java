@@ -13,7 +13,9 @@ import org.apache.shiro.io.SerializationException;
 import org.apache.shiro.mgt.AbstractRememberMeManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Match;
+import org.tynamo.security.SecuritySymbols;
 import org.tynamo.security.services.TapestryRealmSecurityManager;
 
 /**
@@ -25,6 +27,15 @@ import org.tynamo.security.services.TapestryRealmSecurityManager;
  */
 public class Security 
 {
+    public static void contributeApplicationDefaults(MappedConfiguration<String, String> configuration)
+    {
+        configuration.add(SecuritySymbols.LOGIN_URL, "/" + SECURITY_PATH_PREFIX + "/login");
+//        configuration.add(SecuritySymbols.SUCCESS_URL, "/index");
+//        configuration.add(SecuritySymbols.UNAUTHORIZED_URL, "/"
+//                + SECURITY_PATH_PREFIX + "/unauthorized");
+    }
+    
+    
     @Match("WebSecurityManager")
     public static WebSecurityManager decorateWebSecurityManager(WebSecurityManager _manager)
     {
@@ -72,4 +83,7 @@ public class Security
             }
         }
     }    
+    
+    
+    private static final String SECURITY_PATH_PREFIX = "flowlogix/security";
 }

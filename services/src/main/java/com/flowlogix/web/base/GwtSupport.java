@@ -4,7 +4,6 @@
  */
 package com.flowlogix.web.base;
 
-import com.flowlogix.web.pages.js.GwtSupportVariable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;

@@ -46,6 +46,7 @@ public class SessionMonitor
         }
         return object;
     }
+    
 
     JSONObject onRefresh() 
     {
@@ -53,10 +54,12 @@ public class SessionMonitor
         return null;
     }
 
+    
     JSONObject onEnd() 
     {
         return new JSONObject();
     }
+    
     
     @SetupRender
     public void init()
@@ -86,17 +89,17 @@ public class SessionMonitor
     }
     
     
+    public boolean isValidSession() 
+    {
+        return Boolean.TRUE.equals(hasSession);
+    }
+
+    
     private void setSession()
     {
         hasSession = rg.getHTTPServletRequest().getSession(false) != null;
     }
     
-    
-    private boolean isValidSession() 
-    {
-        return Boolean.TRUE.equals(hasSession);
-    }
-
 
     @Parameter("15") private int idleCheck;
     @Parameter(defaultPrefix = BindingConstants.LITERAL) private String endedHandler;

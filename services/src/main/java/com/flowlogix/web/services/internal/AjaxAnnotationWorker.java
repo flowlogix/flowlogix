@@ -45,7 +45,10 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
                         Object result = invocation.getReturnValue();
                         if (!request.isXHR())
                         {
-                            result = defaultForReturnType(result.getClass());
+                            if(result != null)
+                            {
+                                result = defaultForReturnType(result.getClass());
+                            }
                         }
                         else if(annotation.discardAfter())
                         {

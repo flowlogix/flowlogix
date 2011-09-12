@@ -13,8 +13,12 @@ import org.apache.shiro.io.SerializationException;
 import org.apache.shiro.mgt.AbstractRememberMeManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.apache.tapestry5.MetaDataConstants;
+import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.ioc.MappedConfiguration;
+import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Match;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.tynamo.security.SecuritySymbols;
 import org.tynamo.security.services.TapestryRealmSecurityManager;
 
@@ -33,6 +37,12 @@ public class Security
 //        configuration.add(SecuritySymbols.SUCCESS_URL, "/index");
 //        configuration.add(SecuritySymbols.UNAUTHORIZED_URL, "/"
 //                + SECURITY_PATH_PREFIX + "/unauthorized");
+    }
+    
+    
+    public void contributeMetaDataLocator(MappedConfiguration<String, String> configuration)
+    {
+        configuration.add(MetaDataConstants.SECURE_PAGE, Boolean.toString(isSecure));
     }
     
     
@@ -86,4 +96,5 @@ public class Security
     
     
     private static final String SECURITY_PATH_PREFIX = "flowlogix/security";
+    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
 }

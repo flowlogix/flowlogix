@@ -16,7 +16,7 @@ import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.ioc.services.SymbolSource;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.runtime.Component;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
@@ -31,7 +31,6 @@ public class UpdateEvent
     @SetupRender
     public void init()
     {
-        isSecure = Boolean.valueOf(symbolProvider.valueForSymbol(SymbolConstants.SECURE_ENABLED));
         if(isInitialized == null)
         {
             isInitialized = false;
@@ -58,7 +57,6 @@ public class UpdateEvent
             defaultPrefix = BindingConstants.LITERAL) String updateEvent;
     private @InjectContainer Component zone;
     private @Environmental JavaScriptSupport js;
-    private @Inject SymbolSource symbolProvider;    
-    private @Persist Boolean isSecure;
+    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     private @Persist Boolean isInitialized;
 }

@@ -47,7 +47,7 @@ public class LoginForm extends LoginFormBase
             loginMessage = "Authentication Error";
             return null;
         }
-   }
+    }
 
     public String getLoginMessage()
     {

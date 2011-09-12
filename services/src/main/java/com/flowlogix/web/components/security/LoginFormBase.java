@@ -5,12 +5,15 @@
 package com.flowlogix.web.components.security;
 
 import java.io.IOException;
+import lombok.Getter;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
+import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
 import org.slf4j.Logger;
@@ -57,11 +60,13 @@ public class LoginFormBase
             return pageService.getSuccessPage();
         }
     }
-
+    
 
     @Inject private Response response;
     @Inject private RequestGlobals requestGlobals;
     @Inject private SecurityService securityService;
     @Inject private PageService pageService;
+    private @Getter @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
+
     private static final Logger logger = LoggerFactory.getLogger(LoginForm.class);
 }

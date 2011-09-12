@@ -9,8 +9,6 @@ import java.io.PrintWriter;
 import org.apache.tapestry5.Link;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.BeginRender;
-import org.apache.tapestry5.annotations.Persist;
-import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.services.SymbolSource;
 import org.apache.tapestry5.services.PageRenderLinkSource;
@@ -22,13 +20,7 @@ import org.apache.tapestry5.services.Response;
  * @author lprimak
  */
 public class LoginBase
-{
-    @SetupRender
-    public void init()
-    {
-        isSecure = Boolean.valueOf(symbolProvider.valueForSymbol(SymbolConstants.SECURE_ENABLED));
-    }
-        
+{        
     /**
      * when a user is redirected to the Logon page through a AJAX
      * request after their session has expired,
@@ -45,7 +37,7 @@ public class LoginBase
             // redirect to the same page
             Link link = linkSource.createPageRenderLink(request.getPath().replaceFirst("\\..*", "").substring(1));
             writer.write("{\n\t\"redirectURL\" : \""
-                    + link.toAbsoluteURI(isSecure) + "\"\n}");
+                    + link.toAbsoluteURI(Boolean.valueOf(symbolProvider.valueForSymbol(SymbolConstants.SECURE_ENABLED))) + "\"\n}");
             writer.close();
         }
         return null;
@@ -55,5 +47,4 @@ public class LoginBase
     private @Inject Response response;
     private @Inject PageRenderLinkSource linkSource;
     private @Inject SymbolSource symbolProvider;  
-    private @Persist Boolean isSecure;
 }

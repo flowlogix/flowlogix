@@ -16,7 +16,7 @@ import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.ioc.services.SymbolSource;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -61,7 +61,6 @@ public class SessionMonitor
     @SetupRender
     public void init()
     {
-        isSecure = Boolean.valueOf(symbolProvider.valueForSymbol(SymbolConstants.SECURE_ENABLED));
         setSession();
         if(endedHandler != null)
         {
@@ -107,9 +106,8 @@ public class SessionMonitor
     @Environmental private JavaScriptSupport jsSupport;    
     @Inject private Request request;
     private @Inject RequestGlobals rg;  
-    private @Inject SymbolSource symbolProvider;
     
-    private @Persist Boolean isSecure;
+    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     private @Persist Boolean hasSession;
     private String _endedHandler;
 

@@ -60,7 +60,7 @@ public class LoginFormBase
         {
             // try an external page
             
-            successLink = new URL(String.format("%s/%s/%s", 
+            successLink = new URL(String.format("%s%s/%s", 
                     urlSource.getBaseURL(isSecure), request.getContextPath(),
                     pageService.getSuccessPage()));
         }

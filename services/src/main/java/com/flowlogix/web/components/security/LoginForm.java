@@ -61,12 +61,9 @@ public class LoginForm extends LoginFormBase
     }
 
 
-    @Property
-    private String tynamoLogin;
-    @Property
-    private String tynamoPassword;
-    @Property
-    private boolean tynamoRememberMe;
+    @Property private String tynamoLogin;
+    @Property private String tynamoPassword;
+    @Property private boolean tynamoRememberMe;
     @Persist(PersistenceConstants.FLASH)
     private @Setter String loginMessage;
 }

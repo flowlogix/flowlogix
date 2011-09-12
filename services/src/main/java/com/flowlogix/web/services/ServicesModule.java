@@ -18,7 +18,7 @@ import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
  *
  * @author lprimak
  */
-@SubModule({ EjbModule.class, GwtModule.class, Security.class })
+@SubModule({ EjbModule.class, GwtModule.class, SecurityModule.class })
 public class ServicesModule 
 {
     @Contribute(ComponentClassResolver.class)

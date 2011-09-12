@@ -5,12 +5,21 @@
 package com.flowlogix.web.components.security;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import lombok.SneakyThrows;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
+import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
+import org.apache.tapestry5.ioc.util.UnknownValueException;
+import org.apache.tapestry5.services.BaseURLSource;
+import org.apache.tapestry5.services.PageRenderLinkSource;
+import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
 import org.slf4j.Logger;
@@ -24,7 +33,8 @@ import org.tynamo.security.services.SecurityService;
  */
 public class LoginFormBase
 {
-    public String login(String tynamoLogin, String tynamoPassword, boolean tynamoRememberMe, String host) throws ShiroException
+    @SneakyThrows(MalformedURLException.class)
+    public Object login(String tynamoLogin, String tynamoPassword, boolean tynamoRememberMe, String host) throws ShiroException
     {
         Subject currentUser = securityService.getSubject();
 
@@ -41,6 +51,20 @@ public class LoginFormBase
 
         SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(requestGlobals.getHTTPServletRequest());
 
+        Object successLink;
+        try
+        {
+            successLink = linkSource.createPageRenderLink(pageService.getSuccessPage());
+        }
+        catch(UnknownValueException e)
+        {
+            // try an external page
+            
+            successLink = new URL(String.format("%s/%s/%s", 
+                    urlSource.getBaseURL(isSecure), request.getContextPath(),
+                    pageService.getSuccessPage()));
+        }
+
         if (savedRequest != null && savedRequest.getMethod().equalsIgnoreCase("GET"))
         {
             try
@@ -50,19 +74,25 @@ public class LoginFormBase
             } catch (IOException e)
             {
                 logger.warn("Can't redirect to saved request.");
-                return pageService.getSuccessPage();
+                return successLink;
             }
         } else
         {
-            return pageService.getSuccessPage();
+            return successLink;
         }
     }
     
 
     @Inject private Response response;
+    @Inject private Request request;
     @Inject private RequestGlobals requestGlobals;
     @Inject private SecurityService securityService;
     @Inject private PageService pageService;
+    private @Inject PageRenderLinkSource linkSource;
+    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
+    private @Inject BaseURLSource urlSource;
+
+
 
     private static final Logger logger = LoggerFactory.getLogger(LoginForm.class);
 }

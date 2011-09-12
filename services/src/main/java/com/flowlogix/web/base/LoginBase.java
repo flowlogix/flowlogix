@@ -10,7 +10,7 @@ import org.apache.tapestry5.Link;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.BeginRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.ioc.services.SymbolSource;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
@@ -37,7 +37,7 @@ public class LoginBase
             // redirect to the same page
             Link link = linkSource.createPageRenderLink(request.getPath().replaceFirst("\\..*", "").substring(1));
             writer.write("{\n\t\"redirectURL\" : \""
-                    + link.toAbsoluteURI(Boolean.valueOf(symbolProvider.valueForSymbol(SymbolConstants.SECURE_ENABLED))) + "\"\n}");
+                    + link.toAbsoluteURI(isSecure) + "\"\n}");
             writer.close();
         }
         return null;
@@ -46,5 +46,5 @@ public class LoginBase
     private @Inject Request request;
     private @Inject Response response;
     private @Inject PageRenderLinkSource linkSource;
-    private @Inject SymbolSource symbolProvider;  
+    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
 }

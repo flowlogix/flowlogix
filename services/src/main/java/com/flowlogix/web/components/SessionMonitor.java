@@ -4,6 +4,7 @@
  */
 package com.flowlogix.web.components;
 
+import com.flowlogix.web.mixins.SessionTracker;
 import org.apache.shiro.SecurityUtils;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
@@ -13,13 +14,11 @@ import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Parameter;
-import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.Request;
-import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -27,7 +26,7 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * @author lprimak
  */
 @Import(library = "SessionMonitor.js")
-public class SessionMonitor 
+public class SessionMonitor extends SessionTracker
 {
     JSONObject onCheckidle() 
     {
@@ -64,7 +63,6 @@ public class SessionMonitor
     @SetupRender
     public void init()
     {
-        setSession();
         if(endedHandler != null)
         {
             _endedHandler = "'" + endedHandler + "'";
@@ -89,18 +87,6 @@ public class SessionMonitor
     }
     
     
-    public boolean isValidSession() 
-    {
-        return Boolean.TRUE.equals(hasSession);
-    }
-
-    
-    private void setSession()
-    {
-        hasSession = rg.getHTTPServletRequest().getSession(false) != null;
-    }
-    
-
     @Parameter("15") private int idleCheck;
     @Parameter(defaultPrefix = BindingConstants.LITERAL) private String endedHandler;
     @Parameter("false") private boolean keepAlive;
@@ -108,10 +94,8 @@ public class SessionMonitor
     @Inject private ComponentResources componentResources;
     @Environmental private JavaScriptSupport jsSupport;    
     @Inject private Request request;
-    private @Inject RequestGlobals rg;  
     
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
-    private @Persist Boolean hasSession;
     private String _endedHandler;
 
     private static final String eventName = "checkidle";

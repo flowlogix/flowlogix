@@ -5,12 +5,14 @@
 package com.flowlogix.web.services.internal;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.security.auth.Subject;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.shiro.SecurityUtils;
@@ -71,7 +73,7 @@ public class SecurityInterceptorFilter implements ComponentRequestFilter
     }
     
     
-    public static class SubjectWrapper implements Principal
+    public @EqualsAndHashCode static class SubjectWrapper implements Principal, Serializable
     {
         private SubjectWrapper(org.apache.shiro.subject.Subject subject)
         {
@@ -87,6 +89,7 @@ public class SecurityInterceptorFilter implements ComponentRequestFilter
         
         
         private @Getter org.apache.shiro.subject.Subject subject;
+        private static final long serialVersionUID = 1L;
     }
 
     

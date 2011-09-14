@@ -37,7 +37,6 @@ public class ShiroSecurityInterceptor
         {
             return subject.execute(new Callable<Object>()
             {
-
                 @Override
                 public Object call() throws Exception
                 {

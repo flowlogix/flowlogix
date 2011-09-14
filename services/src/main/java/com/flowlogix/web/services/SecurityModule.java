@@ -5,6 +5,7 @@
 package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.PageServiceOverride;
+import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
@@ -22,6 +23,7 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.ioc.services.ServiceOverride;
+import org.apache.tapestry5.services.ComponentRequestFilter;
 import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.TapestryRealmSecurityManager;
 
@@ -54,6 +56,13 @@ public class SecurityModule
         configuration.add(MetaDataConstants.SECURE_PAGE, Boolean.toString(isSecure));
     }
     
+    
+    @Match("ComponentRequestFilter")
+    public static ComponentRequestFilter decorateComponentRequestFilter(ComponentRequestFilter filter)
+    {
+        return new SecurityInterceptorFilter(filter);
+    }
+
     
     @Match("WebSecurityManager")
     public static WebSecurityManager decorateWebSecurityManager(WebSecurityManager _manager)

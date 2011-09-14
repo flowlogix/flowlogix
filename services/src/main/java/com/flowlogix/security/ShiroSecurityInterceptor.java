@@ -21,7 +21,7 @@ import org.apache.shiro.subject.Subject;
 public class ShiroSecurityInterceptor
 {
     @AroundInvoke
-    public Object patchSecurity(final InvocationContext ctx) throws Exception
+    public Object propagateShiroSecurity(final InvocationContext ctx) throws Exception
     {
         Subject subject = null;
         try

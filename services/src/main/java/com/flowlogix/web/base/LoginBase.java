@@ -4,16 +4,14 @@
  */
 package com.flowlogix.web.base;
 
+import com.flowlogix.session.SessionTrackerSSO;
 import java.io.IOException;
-import java.io.PrintWriter;
-import org.apache.tapestry5.Link;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.BeginRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.PageRenderLinkSource;
-import org.apache.tapestry5.services.Request;
-import org.apache.tapestry5.services.Response;
+import org.apache.tapestry5.services.RequestGlobals;
 
 /**
  *
@@ -31,20 +29,11 @@ public class LoginBase
     @BeginRender
     private Object checkForAjax() throws IOException
     {
-        if (request.isXHR())
-        {
-            PrintWriter writer = response.getPrintWriter("application/json");
-            // redirect to the same page
-            Link link = linkSource.createPageRenderLink(request.getPath().replaceFirst("\\..*", "").substring(1));
-            writer.write("{\n\t\"redirectURL\" : \""
-                    + link.toAbsoluteURI(isSecure) + "\"\n}");
-            writer.close();
-        }
+        SessionTrackerSSO.redirectToSelf(null, linkSource, isSecure);
         return null;
     }
    
-    private @Inject Request request;
-    private @Inject Response response;
+    private @Inject RequestGlobals rg;
     private @Inject PageRenderLinkSource linkSource;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
 }

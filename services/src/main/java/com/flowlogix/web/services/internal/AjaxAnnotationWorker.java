@@ -4,15 +4,23 @@
  */
 package com.flowlogix.web.services.internal;
 
+import com.flowlogix.session.SessionTrackerSSO;
 import com.flowlogix.web.services.annotations.AJAX;
+import java.io.IOException;
+import lombok.SneakyThrows;
+import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.model.MutableComponentModel;
 import org.apache.tapestry5.plastic.MethodAdvice;
 import org.apache.tapestry5.plastic.MethodInvocation;
 import org.apache.tapestry5.plastic.PlasticClass;
 import org.apache.tapestry5.plastic.PlasticMethod;
+import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.ComponentSource;
+import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
+import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
 import org.apache.tapestry5.services.transform.TransformationSupport;
 
@@ -27,46 +35,58 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
         this.request = request;
     }
 
-    
+
     @Override
     public void transform(final PlasticClass plasticClass, TransformationSupport support, MutableComponentModel model)
     {
         for(final PlasticMethod method : plasticClass.getMethodsWithAnnotation(AJAX.class))
         {
             final AJAX annotation = method.getAnnotation(AJAX.class);
-            if(method.isVoid() == false)
+            method.addAdvice(new MethodAdvice()
             {
-                method.addAdvice(new MethodAdvice() 
+                @Override
+                @SneakyThrows(IOException.class)
+                public void advise(MethodInvocation invocation)
                 {
-                    @Override
-                    public void advise(MethodInvocation invocation)
+                    if (!request.isXHR() || annotation.requireSession() == false)
                     {
                         invocation.proceed();
-                        Object result = invocation.getReturnValue();
-                        if (!request.isXHR())
+                    } else
+                    {
+                        // do not invoke on bad sessions
+                        SessionTrackerSSO sso = stateMgr.getIfExists(SessionTrackerSSO.class);
+                        if (sso != null && sso.isValidSession(rg.getActivePageName()))
                         {
-                            if(result != null)
-                            {
-                                result = defaultForReturnType(result.getClass());
-                            }
+                            invocation.proceed();
+                        } else
+                        {
+                            SessionTrackerSSO.redirectToSelf(rg, linkSource, isSecure);
+                            invocation.setReturnValue(null);
+                            return;
                         }
-                        else if(annotation.discardAfter())
+                    }
+
+                    Object result = invocation.getReturnValue();
+                    if (!request.isXHR())
+                    {
+                        if (result != null)
+                        {
+                            result = defaultForReturnType(result.getClass());
+                        }
+                    } else
+                    {
+                        if (annotation.discardAfter())
                         {
                             cs.getActivePage().getComponentResources().discardPersistentFieldChanges();
                         }
-                        invocation.setReturnValue(result);
                     }
-                });
-            }
-            else
-            {
-                throw new RuntimeException(
-                "@AJAX can be applied to non-void event handlers only"); 
-            }
-        }        
-    } 
+                    invocation.setReturnValue(result);
+                }
+            });
+        }
+    }
 
-    
+
 
     private Object defaultForReturnType(Class<?> returnType)
     {
@@ -80,8 +100,12 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
         }
         return 0;
     }
-    
-    
+
+
     private final Request request;
     private @Inject ComponentSource cs;
+    private @Inject ApplicationStateManager stateMgr;
+    private @Inject RequestGlobals rg;
+    private @Inject PageRenderLinkSource linkSource;
+    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
 }

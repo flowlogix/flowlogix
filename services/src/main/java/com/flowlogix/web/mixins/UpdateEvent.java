@@ -4,6 +4,7 @@
  */
 package com.flowlogix.web.mixins;
 
+import com.flowlogix.web.services.annotations.AJAX;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Link;
@@ -16,7 +17,6 @@ import org.apache.tapestry5.annotations.OnEvent;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
-import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.runtime.Component;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
@@ -36,19 +36,18 @@ public class UpdateEvent extends SessionTracker
         {
             createEvent(cr, updateEvent);
         }
-        createEvent(cr, CHECK_SESSION_EVENT);
+        else
+        {
+            createEvent(cr, CHECK_SESSION_EVENT);
+        }
     }
     
     
     @OnEvent(value = CHECK_SESSION_EVENT)
-    private JSONObject checkSession()
+    @AJAX
+    private void checkSession()
     {
-        JSONObject rv = new JSONObject();
-        if(isValidSession() == false)
-        {
-            rv.put("reloadPage", true);
-        }
-        return rv;
+        // placeholder for auto-reload page
     }
     
 

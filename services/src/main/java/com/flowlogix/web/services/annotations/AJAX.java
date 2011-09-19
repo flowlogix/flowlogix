@@ -21,4 +21,5 @@ import java.lang.annotation.Target;
 public @interface AJAX 
 { 
     boolean discardAfter() default false;
+    boolean requireSession() default true;
 } 

@@ -29,7 +29,7 @@ public class LoginBase
     @BeginRender
     private Object checkForAjax() throws IOException
     {
-        SessionTrackerSSO.redirectToSelf(null, linkSource, isSecure);
+        SessionTrackerSSO.redirectToSelf(rg, linkSource, isSecure);
         return null;
     }
    

@@ -37,11 +37,12 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
 
 
     @Override
-    public void transform(final PlasticClass plasticClass, TransformationSupport support, MutableComponentModel model)
+    public void transform(PlasticClass plasticClass, TransformationSupport support, MutableComponentModel model)
     {
-        for(final PlasticMethod method : plasticClass.getMethodsWithAnnotation(AJAX.class))
+        for(PlasticMethod method : plasticClass.getMethodsWithAnnotation(AJAX.class))
         {
             final AJAX annotation = method.getAnnotation(AJAX.class);
+            final boolean isVoid = method.isVoid();
             method.addAdvice(new MethodAdvice()
             {
                 @Override
@@ -61,12 +62,19 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
                         } else
                         {
                             SessionTrackerSSO.redirectToSelf(rg, linkSource, isSecure);
-                            invocation.setReturnValue(null);
+                            if(!isVoid)
+                            {
+                                invocation.setReturnValue(null);
+                            }
                             return;
                         }
                     }
 
-                    Object result = invocation.getReturnValue();
+                    Object result = null;
+                    if(!isVoid)
+                    {
+                        result = invocation.getReturnValue();
+                    }
                     if (!request.isXHR())
                     {
                         if (result != null)
@@ -80,7 +88,10 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
                             cs.getActivePage().getComponentResources().discardPersistentFieldChanges();
                         }
                     }
-                    invocation.setReturnValue(result);
+                    if(!isVoid)
+                    {
+                        invocation.setReturnValue(result);
+                    }
                 }
             });
         }

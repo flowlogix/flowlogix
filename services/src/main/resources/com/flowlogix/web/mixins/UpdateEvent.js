@@ -19,11 +19,20 @@ UpdateEvent.prototype = {
         new Ajax.Request(this.uri, {
             method: 'get', 
             evalJSON:true,
+            onSuccess: this.checkSession.bind(this),
             onFailure: this.reloadHandler.bind(this)
             });
         $(this.elementId).stopObserving(Tapestry.ZONE_UPDATED_EVENT, this.handler);
     },
     
+    checkSession: function(transport) {
+        this.reloadPageOnly = false;
+        if(transport.responseJSON != null) {
+            reloadPage = transport.responseJSON.reloadPage;  
+            if (!isNaN(reloadPage)) this.reloadHandler();
+        }            
+    },
+
     reloadHandler : function() {
         window.location.reload();
     }

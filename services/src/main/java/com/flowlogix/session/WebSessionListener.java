@@ -25,6 +25,6 @@ public class WebSessionListener implements HttpSessionListener
     @Override
     public void sessionDestroyed(HttpSessionEvent hse)
     {
-        SessionTrackerHolder.get().purge();
+        SessionTrackerHolder.get().purge(hse.getSession());
     }
 }

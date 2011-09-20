@@ -7,12 +7,11 @@ package com.flowlogix.session;
 import com.flowlogix.web.mixins.SessionTracker;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpSession;
+import lombok.Data;
 import org.apache.tapestry5.Link;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -43,7 +42,7 @@ public class SessionTrackerHolder
         }
         else if(trackers.containsKey(pageName) && trackers.get(pageName).containsKey(session.hashCode()))
         {
-            return trackers.get(pageName).get(session.hashCode()).isValidSession();
+            return trackers.get(pageName).get(session.hashCode()).getTracker().isValidSession();
         }
         else
         {
@@ -54,13 +53,13 @@ public class SessionTrackerHolder
     
     public void setPageSession(String pageName, HttpSession session, SessionTracker tracker)
     {
-        Map<Integer, SessionTrackerBase> map = trackers.get(pageName);
+        Map<Integer, Value> map = trackers.get(pageName);
         if(map == null)
         {
-            map = Collections.synchronizedMap(new HashMap<Integer, SessionTrackerBase>());
+            map = Collections.synchronizedMap(new HashMap<Integer, Value>());
             trackers.put(pageName, map);        
         }
-        map.put(session.hashCode(), tracker);
+        map.put(session.hashCode(), new Value(tracker, session));
     }
     
     
@@ -80,33 +79,29 @@ public class SessionTrackerHolder
     }
     
     
-    public void purge()
+    public void purge(HttpSession session)
     {
-        for(Map<Integer, SessionTrackerBase> map : trackers.values())
+        for(Map<Integer, Value> map : trackers.values())
         {
-            List<Integer> toRemove = new ArrayList<Integer>();
-            for(Map.Entry<Integer, SessionTrackerBase> entry : map.entrySet())
-            {
-                boolean isValidSession = false;
-                try
-                {
-                    isValidSession = entry.getValue().isValidSession();
-                }
-                finally { }
-                
-                if(isValidSession == false)
-                {
-                    toRemove.add(entry.getKey());
-                }
-            }
-            for(Integer key : toRemove)
-            {
-                map.remove(key);
-            }
+            map.remove(session.hashCode());
         }
     }
     
+    
+    private static @Data class Value
+    {
+        public Value(SessionTrackerBase tracker, HttpSession session)
+        {
+            this.tracker = tracker;
+            this.session = session;
+        }
+        
+        
+        private final SessionTrackerBase tracker;
+        private final HttpSession session;
+    }
+    
 
-    private Map<String, Map<Integer, SessionTrackerBase>> trackers = Collections.synchronizedMap(new HashMap<String, Map<Integer, SessionTrackerBase>>());
+    private Map<String, Map<Integer, Value>> trackers = Collections.synchronizedMap(new HashMap<String, Map<Integer, Value>>());
     private static final SessionTrackerHolder holder = new SessionTrackerHolder();
 }

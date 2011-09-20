@@ -7,8 +7,10 @@ package com.flowlogix.session;
 import com.flowlogix.web.mixins.SessionTracker;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpSession;
 import org.apache.tapestry5.Link;
@@ -75,6 +77,26 @@ public class SessionTrackerHolder
         writer.write("{\n\t\"redirectURL\" : \""
                 + link.toAbsoluteURI(isSecure) + "\"\n}");
         writer.close();
+    }
+    
+    
+    public void purge()
+    {
+        for(Map<Integer, SessionTrackerBase> map : trackers.values())
+        {
+            List<Integer> toRemove = new ArrayList<Integer>();
+            for(Map.Entry<Integer, SessionTrackerBase> entry : map.entrySet())
+            {
+                if(entry.getValue().isValidSession() == false)
+                {
+                    toRemove.add(entry.getKey());
+                }
+            }
+            for(Integer key : toRemove)
+            {
+                map.remove(key);
+            }
+        }
     }
     
 

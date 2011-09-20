@@ -18,6 +18,11 @@
                 <t:checkbox t:id="tynamoRememberMe" />
                 <t:label for="tynamoRememberMe">Remember Me</t:label>
             </div>
+            <br/>
+            <div>
+                <t:checkbox t:id="disableJS" />
+                <t:label for="disableJS">JavaScript Disabled</t:label>
+            </div>
         </div>
 
         <div id="tynamoEnterContainer">

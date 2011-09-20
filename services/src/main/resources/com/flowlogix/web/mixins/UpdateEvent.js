@@ -11,8 +11,10 @@ UpdateEvent.prototype = {
         this.uri = uri;
         this.handler = this.triggerEvent.bindAsEventListener(this);
         
-        Event.observe($(elementId), Tapestry.ZONE_UPDATED_EVENT, 
-            this.handler);
+        if(document.getElementById(elementId) != null) {
+            Event.observe($(elementId), Tapestry.ZONE_UPDATED_EVENT, 
+                this.handler);    
+        }
     },
     
     triggerEvent : function() {

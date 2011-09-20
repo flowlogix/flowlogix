@@ -13,6 +13,7 @@ import org.apache.shiro.util.StringUtils;
 import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
+import org.apache.tapestry5.annotations.SessionAttribute;
 
 /**
  *
@@ -28,7 +29,9 @@ public class LoginForm extends LoginFormBase
     {
         try
         {
-            return login(tynamoLogin, tynamoPassword, tynamoRememberMe, null);
+            Object rv = login(tynamoLogin, tynamoPassword, tynamoRememberMe, null);
+            disableJavaScript = disableJS;
+            return rv;
         }
         catch (UnknownAccountException e)
         {
@@ -66,4 +69,6 @@ public class LoginForm extends LoginFormBase
     @Property private boolean tynamoRememberMe;
     @Persist(PersistenceConstants.FLASH)
     private @Setter String loginMessage;
+    @Property private boolean disableJS;
+    @SessionAttribute private Boolean disableJavaScript;
 }

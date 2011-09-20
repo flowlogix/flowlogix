@@ -6,6 +6,7 @@ package com.flowlogix.web.components;
 
 import com.flowlogix.web.mixins.SessionTracker;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Link;
@@ -49,7 +50,11 @@ public class SessionMonitor extends SessionTracker
 
     JSONObject onRefresh() 
     {
-        SecurityUtils.getSubject().getSession(false).touch();
+        Session session = SecurityUtils.getSubject().getSession(false);
+        if(session != null)
+        {
+            session.touch();
+        }
         return null;
     }
 

@@ -57,5 +57,5 @@ public class SessionTrackerSSO implements Serializable
     }
     
 
-    private Map<String, SessionTrackerBase> trackers = Collections.synchronizedMap(new HashMap<String, SessionTrackerBase>());
+    private transient Map<String, SessionTrackerBase> trackers = Collections.synchronizedMap(new HashMap<String, SessionTrackerBase>());
 }

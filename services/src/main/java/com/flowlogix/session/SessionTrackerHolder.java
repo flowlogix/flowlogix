@@ -87,7 +87,14 @@ public class SessionTrackerHolder
             List<Integer> toRemove = new ArrayList<Integer>();
             for(Map.Entry<Integer, SessionTrackerBase> entry : map.entrySet())
             {
-                if(entry.getValue().isValidSession() == false)
+                boolean isValidSession = false;
+                try
+                {
+                    isValidSession = entry.getValue().isValidSession();
+                }
+                finally { }
+                
+                if(isValidSession == false)
                 {
                     toRemove.add(entry.getKey());
                 }

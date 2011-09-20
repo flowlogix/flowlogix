@@ -4,7 +4,7 @@
  */
 package com.flowlogix.web.base;
 
-import com.flowlogix.session.SessionTrackerSSO;
+import com.flowlogix.session.SessionTrackerHolder;
 import java.io.IOException;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.BeginRender;
@@ -29,7 +29,7 @@ public class LoginBase
     @BeginRender
     private Object checkForAjax() throws IOException
     {
-        SessionTrackerSSO.redirectToSelf(rg, linkSource, isSecure);
+        SessionTrackerHolder.redirectToSelf(rg, linkSource, isSecure);
         return null;
     }
    

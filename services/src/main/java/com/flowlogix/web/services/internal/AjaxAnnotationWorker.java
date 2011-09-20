@@ -4,7 +4,7 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.session.SessionTrackerSSO;
+import com.flowlogix.session.SessionTrackerHolder;
 import com.flowlogix.web.services.annotations.AJAX;
 import java.io.IOException;
 import lombok.SneakyThrows;
@@ -16,7 +16,6 @@ import org.apache.tapestry5.plastic.MethodAdvice;
 import org.apache.tapestry5.plastic.MethodInvocation;
 import org.apache.tapestry5.plastic.PlasticClass;
 import org.apache.tapestry5.plastic.PlasticMethod;
-import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.ComponentSource;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
@@ -55,13 +54,12 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
                     } else
                     {
                         // do not invoke on bad sessions
-                        SessionTrackerSSO sso = stateMgr.getIfExists(SessionTrackerSSO.class);
-                        if (sso != null && sso.isValidSession(rg.getActivePageName()))
+                        if (SessionTrackerHolder.get().isValidSession(rg.getActivePageName(), rg.getHTTPServletRequest().getSession(false)))
                         {
                             invocation.proceed();
                         } else
                         {
-                            SessionTrackerSSO.redirectToSelf(rg, linkSource, isSecure);
+                            SessionTrackerHolder.redirectToSelf(rg, linkSource, isSecure);
                             if(!isVoid)
                             {
                                 invocation.setReturnValue(null);
@@ -115,7 +113,6 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
 
     private final Request request;
     private @Inject ComponentSource cs;
-    private @Inject ApplicationStateManager stateMgr;
     private @Inject RequestGlobals rg;
     private @Inject PageRenderLinkSource linkSource;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  

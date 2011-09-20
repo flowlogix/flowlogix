@@ -7,10 +7,10 @@ package com.flowlogix.session;
 import com.flowlogix.web.mixins.SessionTracker;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 import org.apache.tapestry5.Link;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -19,14 +19,29 @@ import org.apache.tapestry5.services.RequestGlobals;
  *
  * @author lprimak
  */
-@SuppressWarnings(value = "serial")
-public class SessionTrackerSSO implements Serializable 
+public class SessionTrackerHolder
 {
-    public boolean isValidSession(String pageName)
+    private SessionTrackerHolder()
     {
-        if(trackers.containsKey(pageName))
+        // singleton
+    }
+    
+    
+    public static SessionTrackerHolder get()
+    {
+        return holder;
+    }
+    
+    
+    public boolean isValidSession(String pageName, HttpSession session)
+    {
+        if(session == null)
         {
-            return trackers.get(pageName).isValidSession();
+            return false;
+        }
+        else if(trackers.containsKey(pageName) && trackers.get(pageName).containsKey(session.hashCode()))
+        {
+            return trackers.get(pageName).get(session.hashCode()).isValidSession();
         }
         else
         {
@@ -35,9 +50,15 @@ public class SessionTrackerSSO implements Serializable
     }
     
     
-    public void setPageSession(String pageName, SessionTracker tracker)
+    public void setPageSession(String pageName, HttpSession session, SessionTracker tracker)
     {
-        trackers.put(pageName, tracker);
+        Map<Integer, SessionTrackerBase> map = trackers.get(pageName);
+        if(map == null)
+        {
+            map = Collections.synchronizedMap(new HashMap<Integer, SessionTrackerBase>());
+            trackers.put(pageName, map);        
+        }
+        map.put(session.hashCode(), tracker);
     }
     
     
@@ -57,5 +78,6 @@ public class SessionTrackerSSO implements Serializable
     }
     
 
-    private transient Map<String, SessionTrackerBase> trackers = Collections.synchronizedMap(new HashMap<String, SessionTrackerBase>());
+    private Map<String, Map<Integer, SessionTrackerBase>> trackers = Collections.synchronizedMap(new HashMap<String, Map<Integer, SessionTrackerBase>>());
+    private static final SessionTrackerHolder holder = new SessionTrackerHolder();
 }

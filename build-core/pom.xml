@@ -145,6 +145,10 @@
                     <groupId>rhino</groupId>
                     <artifactId>js</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.yahoo.platform.yui</groupId>
+                    <artifactId>yuicompressor</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

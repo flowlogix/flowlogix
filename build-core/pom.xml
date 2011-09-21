@@ -136,6 +136,19 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
+            <artifactId>tapestry-yuicompressor</artifactId>
+            <version>${tap.version}</version>
+            <type>jar</type>
+            <scope>${war-deps.scope}</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>rhino</groupId>
+                    <artifactId>js</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tapestry</groupId>
             <artifactId>tapestry-jpa</artifactId>
             <version>${tap.version}</version>
             <type>jar</type>
@@ -188,6 +201,12 @@
             <version>1.6.1</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+            <version>${rhino.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
@@ -349,6 +368,19 @@
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                                 <artifactItem>
+                                    <groupId>org.apache.tapestry</groupId>
+                                    <artifactId>tapestry-yuicompressor</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.yahoo.platform.yui</groupId>
+                                    <artifactId>yuicompressor</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <version>2.4.6</version>
+                                </artifactItem>
+                                <artifactItem>
                                     <groupId>org.tynamo</groupId>
                                     <artifactId>tapestry-security</artifactId>
                                     <type>jar</type>
@@ -364,6 +396,13 @@
                                 <artifactItem>
                                     <groupId>org.json</groupId>
                                     <artifactId>json</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>rhino</groupId>
+                                    <artifactId>js</artifactId>
+                                    <version>${rhino.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -433,6 +472,7 @@
     
     <properties>
         <war-deps.scope>provided</war-deps.scope>
+        <rhino.version>1.7R2</rhino.version>
         <tap.version>5.3-beta-5</tap.version>
         <gwt.version>2.3.0</gwt.version>
     </properties>

@@ -210,7 +210,7 @@
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
             <version>${rhino.version}</version>
-            <scope>runtime</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>

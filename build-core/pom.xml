@@ -501,7 +501,7 @@
     
     <properties>
         <war-deps.scope>provided</war-deps.scope>
-        <rhino.version>1.7R2</rhino.version>
+        <rhino.version>1.6R7</rhino.version>
         <yuicompressor.version>2.4.6</yuicompressor.version>
         <tap.version>5.3-beta-5</tap.version>
         <gwt.version>2.3.0</gwt.version>

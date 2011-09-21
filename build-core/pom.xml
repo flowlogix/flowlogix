@@ -382,7 +382,7 @@
                                     <artifactId>yuicompressor</artifactId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
-                                    <version>2.4.6</version>
+                                    <version>${yuicompressor.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.tynamo</groupId>
@@ -418,6 +418,31 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <configuration>
+                            <target>
+                                <unjar dest="target/_rhino_tmp" src="target/deps/js-${rhino.version}.jar" />
+                                <unjar dest="target/_rhino_tmp" src="target/deps/yuicompressor-${yuicompressor.version}.jar" />
+                                <delete file="target/deps/js-${rhino.version}.jar"/>
+                                <delete file="target/deps/yuicompressor-${yuicompressor.version}.jar"/>
+                                <jar destfile="target/deps/js-yuicompressor-cust-${rhino.version}.jar" basedir="target/_rhino_tmp"
+									manifest="target/_rhino_tmp/META-INF/MANIFEST.MF" />
+                                <delete dir="target/_rhino_tmp" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
@@ -477,6 +502,7 @@
     <properties>
         <war-deps.scope>provided</war-deps.scope>
         <rhino.version>1.7R2</rhino.version>
+        <yuicompressor.version>2.4.6</yuicompressor.version>
         <tap.version>5.3-beta-5</tap.version>
         <gwt.version>2.3.0</gwt.version>
     </properties>

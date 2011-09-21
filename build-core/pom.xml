@@ -431,7 +431,7 @@
                                 <unjar dest="target/_rhino_tmp" src="target/deps/yuicompressor-${yuicompressor.version}.jar" />
                                 <delete file="target/deps/js-${rhino.version}.jar"/>
                                 <delete file="target/deps/yuicompressor-${yuicompressor.version}.jar"/>
-                                <jar destfile="target/deps/js-yuicompressor-cust-${rhino.version}.jar" basedir="target/_rhino_tmp"
+                                <jar destfile="target/deps/js-${rhino.version}-yuicompressor-${yuicompressor.version}-cust-combined.jar" basedir="target/_rhino_tmp"
 									manifest="target/_rhino_tmp/META-INF/MANIFEST.MF" />
                                 <delete dir="target/_rhino_tmp" />
                             </target>

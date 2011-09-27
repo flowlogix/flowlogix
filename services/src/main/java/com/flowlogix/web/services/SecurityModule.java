@@ -12,8 +12,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 import org.apache.shiro.io.DefaultSerializer;
 import org.apache.shiro.io.SerializationException;
-import org.apache.shiro.mgt.AbstractRememberMeManager;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.tapestry5.MetaDataConstants;
 import org.apache.tapestry5.SymbolConstants;
@@ -41,8 +41,9 @@ public class SecurityModule
         configuration.add(Symbols.LOGIN_URL, "/" + SECURITY_PATH_PREFIX + "/login");
         configuration.add(Symbols.SUCCESS_URL, "/index");
         configuration.add(Symbols.UNAUTHORIZED_URL, "");
+        configuration.add(Symbols.REMEMBER_ME_DURATION, Integer.toString(2 * 7)); // 2 weeks
     }
-     
+
 
     @Contribute(ServiceOverride.class)
     public static void overrideLoginScreen(MappedConfiguration<Class<?>, Object> configuration)
@@ -65,12 +66,14 @@ public class SecurityModule
 
     
     @Match("WebSecurityManager")
-    public static WebSecurityManager decorateWebSecurityManager(WebSecurityManager _manager)
+    public static WebSecurityManager decorateWebSecurityManager(WebSecurityManager _manager, 
+        @Symbol(Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)
     {
         if (_manager instanceof TapestryRealmSecurityManager)
         {
             TapestryRealmSecurityManager manager = (TapestryRealmSecurityManager)_manager;
-            AbstractRememberMeManager mgr = (AbstractRememberMeManager)manager.getRememberMeManager();
+            CookieRememberMeManager mgr = (CookieRememberMeManager)manager.getRememberMeManager();
+            mgr.getCookie().setMaxAge(daysToRemember * 24 * 60 * 60);
             
             mgr.setSerializer(new Serialize<PrincipalCollection>());
         }
@@ -118,6 +121,7 @@ public class SecurityModule
         public static final String LOGIN_URL = "flowlogix.security.loginurl";
         public static final String SUCCESS_URL = "flowlogix.security.successurl";
         public static final String UNAUTHORIZED_URL = "flowlogix.security.unauthorizedurl";        
+        public static final String REMEMBER_ME_DURATION = "flowlogix.security.remembermeduration";        
     }
     
     

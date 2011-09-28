@@ -41,8 +41,12 @@ public class WebSecurityFilter implements Filter
             subject.execute(new Callable<Void>() {
 
                 @Override
-                public Void call() throws Exception {
-                    fc.doFilter(sr, sr1);
+                public Void call() throws Exception 
+                {
+                    if(fc != null)
+                    {
+                        fc.doFilter(sr, sr1);
+                    }
                     return null;
                 }
             });

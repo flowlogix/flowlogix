@@ -13,7 +13,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.2</version>
+            <version>4.9</version>
             <scope>test</scope>
             <optional>true</optional>
         </dependency>
@@ -202,7 +202,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>1.6.1</version>
+            <version>1.6.2</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
@@ -228,7 +228,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
+            <version>1.6.2</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
@@ -503,7 +503,7 @@
         <war-deps.scope>provided</war-deps.scope>
         <rhino.version>1.6R7</rhino.version>
         <yuicompressor.version>2.4.6</yuicompressor.version>
-        <tap.version>5.3-beta-5</tap.version>
+        <tap.version>5.3-beta-13</tap.version>
         <gwt.version>2.3.0</gwt.version>
     </properties>
     

@@ -42,6 +42,7 @@ public class SecurityModule
         configuration.add(Symbols.SUCCESS_URL, "/index");
         configuration.add(Symbols.UNAUTHORIZED_URL, "");
         configuration.add(Symbols.REMEMBER_ME_DURATION, Integer.toString(2 * 7)); // 2 weeks
+        configuration.add(Symbols.INVALID_AUTH_DELAY, Integer.toString(3));
     }
 
 
@@ -122,6 +123,7 @@ public class SecurityModule
         public static final String SUCCESS_URL = "flowlogix.security.successurl";
         public static final String UNAUTHORIZED_URL = "flowlogix.security.unauthorizedurl";        
         public static final String REMEMBER_ME_DURATION = "flowlogix.security.remembermeduration";        
+        public static final String INVALID_AUTH_DELAY = "flowlogix.security.invalid-auth-delay";
     }
     
     

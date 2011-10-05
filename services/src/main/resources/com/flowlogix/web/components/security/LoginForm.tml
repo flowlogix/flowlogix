@@ -1,0 +1,32 @@
+<div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter" 
+     id="tynamoLoginFormContainer" >
+
+    <t:form t:id="tynamoLoginForm">
+        <div id="tynamoLoginMessage" >${loginMessage}</div>
+        <div id="tynamoLoginContainer">
+            <div><t:label for="tynamoLogin">login:</t:label></div>
+            <div><t:textfield t:id="tynamoLogin" validate="required"/></div>
+        </div>
+
+        <div id="tynamoPasswordContainer">
+            <div><t:label for="tynamoPassword">password:</t:label></div>
+            <div><t:passwordfield t:id="tynamoPassword" validate="required"/></div>
+        </div>
+
+        <div id="tynamoRememberMeContainer">
+            <div>
+                <t:checkbox t:id="tynamoRememberMe" />
+                <t:label for="tynamoRememberMe">Remember Me</t:label>
+            </div>
+            <br/>
+            <div>
+                <t:checkbox t:id="disableJS" />
+                <t:label for="disableJS">JavaScript Disabled</t:label>
+            </div>
+        </div>
+
+        <div id="tynamoEnterContainer">
+            <input type="submit" id="tynamoEnter" value="Enter" />
+        </div>
+    </t:form>
+</div>

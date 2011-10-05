@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd">
+
+    <head>
+        <title>Please Log In</title>
+        <style type="text/css">
+            #tynamoLoginFormContainer {
+                background: url(${asset:classpath:org/tynamo/security/img/login-bg.png}) no-repeat;
+                width:778px;
+                height:600px;
+                margin:0 auto;
+            }
+
+            #tynamoLoginForm {
+                padding: 90px 110px;
+            }
+
+            #tynamoLoginMessage {
+                color:red;
+                margin-bottom: 10px;	
+            }
+
+            input {
+                font-size: 220%;
+            }
+
+            input[type="text"], input[type="password"] {
+                font-size: 220%; width: 400px;
+            }
+
+            #tynamoLoginContainer {
+                margin-bottom: 50px;
+            }
+
+            #tynamoPasswordContainer {
+                margin-bottom: 50px;
+            }
+
+            #tynamoRememberMeContainer {
+                margin-bottom: 40px;
+            }
+
+            .tynamoMessage {
+                margin:0 auto;
+            }
+        </style>	
+    </head>
+
+    <body style="text-align:center;font-family:'lucida grande','lucida sans unicode','bitstream vera sans', 'trebuchet ms',arial,sans-serif;">
+        <div class="tynamoMessage">
+            ${message}
+        </div>
+
+        <t:flowlogix.security.loginform />
+
+    </body>
+</html>

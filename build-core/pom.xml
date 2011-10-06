@@ -7,7 +7,7 @@
     <groupId>com.flowlogix</groupId>
     <artifactId>build-core</artifactId>
     <packaging>pom</packaging>
-    <version>0.5.1</version>
+    <version>0.5.2</version>
 
     <dependencies>
         <dependency>
@@ -425,7 +425,7 @@
                                 <unjar dest="target/_rhino_tmp" src="target/deps/yuicompressor-${yuicompressor.version}.jar" />
                                 <delete file="target/deps/js-${rhino.version}.jar"/>
                                 <delete file="target/deps/yuicompressor-${yuicompressor.version}.jar"/>
-                                <jar destfile="target/deps/js-${rhino.version}-yuicompressor-${yuicompressor.version}-cust-combined.jar" basedir="target/_rhino_tmp"
+                                <jar destfile="target/deps/js-${rhino.version}-cust-yuicompressor-${yuicompressor.version}-combined.jar" basedir="target/_rhino_tmp"
 									manifest="target/_rhino_tmp/META-INF/MANIFEST.MF" />
                                 <delete dir="target/_rhino_tmp" />
                             </target>

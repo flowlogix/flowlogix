@@ -232,14 +232,6 @@
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>com.inet</groupId>
-            <artifactId>Merlia</artifactId>
-            <version>4.0</version>
-            <type>jar</type>
-            <optional>true</optional>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

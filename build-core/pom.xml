@@ -237,6 +237,7 @@
             <artifactId>Merlia</artifactId>
             <version>4.0</version>
             <type>jar</type>
+            <optional>true</optional>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -295,12 +296,6 @@
                                 <artifactItem>
                                     <groupId>org.projectlombok</groupId>
                                     <artifactId>lombok</artifactId>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.inet</groupId>
-                                    <artifactId>Merlia</artifactId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -477,10 +472,6 @@
         <repository>
             <id>tapestry-repo</id>
             <url>https://repository.apache.org/content/groups/staging</url>
-        </repository>
-        <repository>
-            <id>baw-maven2</id>
-            <url>http://bawweb:8088/repo</url>
         </repository>
         <repository>
             <id>projectlombok.org</id>

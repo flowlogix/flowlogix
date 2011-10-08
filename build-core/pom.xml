@@ -8,6 +8,13 @@
     <artifactId>build-core</artifactId>
     <packaging>pom</packaging>
     <version>0.6-SNAPSHOT</version>
+    
+    <parent>
+        <groupId>com.flowlogix</groupId>
+        <artifactId>flowlogix</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>0.6-SNAPSHOT</version>
+    </parent>
 
     <dependencies>
         <dependency>
@@ -473,6 +480,11 @@
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/glassfish</url>
+        </repository>
+        <repository>
+            <id>flowlogix-repo.googlecode.com</id>
+            <name>Flow Logix Repository</name>
+            <url>http://flowlogix-repo.googlecode.com/svn/releases</url>
         </repository>
     </repositories>
     

@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.flowlogix</groupId>
+    <artifactId>flowlogix</artifactId>
+    <version>0.6</version>
+    <packaging>pom</packaging>
+    <name>Flow Logix Root</name>
+  
+    <modules>
+        <module>build-core</module>
+        <module>services</module>
+    </modules>
+
+    <build>
+        <extensions>
+            <extension>
+                <groupId>com.google.code.maven-svn-wagon</groupId>
+                <artifactId>maven-svn-wagon</artifactId>
+                <version>1.4</version>
+            </extension>
+        </extensions>
+    </build>
+    
+    <distributionManagement>
+        <repository>
+            <id>flowlogix-repo.googlecode.com</id>
+            <url>svn:https://flowlogix-repo.googlecode.com/svn/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>flowlogix-repo.googlecode.com</id>
+            <url>svn:https://flowlogix-repo.googlecode.com/svn/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>

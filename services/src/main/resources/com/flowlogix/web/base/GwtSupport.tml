@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
+      xmlns:p="tapestry:parameter">
+<body>
+
+<t:content>
+    <div>
+        <t:extension-point id="beforeGwtComponent"/>
+        <div id="${resources.completeId}"/>
+        <t:extension-point id="afterGwtComponent"/>
+    </div>
+</t:content>
+
+</body>
+</html>

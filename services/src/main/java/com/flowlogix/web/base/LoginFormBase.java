@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.flowlogix.web.components.security;
+package com.flowlogix.web.base;
 
+import com.flowlogix.web.components.security.LoginForm;
 import com.flowlogix.web.services.SecurityModule;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -15,7 +16,14 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
+import org.apache.tapestry5.ComponentResources;
+import org.apache.tapestry5.Link;
 import org.apache.tapestry5.SymbolConstants;
+import org.apache.tapestry5.annotations.AfterRender;
+import org.apache.tapestry5.annotations.Environmental;
+import org.apache.tapestry5.annotations.OnEvent;
+import org.apache.tapestry5.annotations.SessionAttribute;
+import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.ioc.util.UnknownValueException;
@@ -24,6 +32,7 @@ import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
+import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tynamo.security.services.PageService;
@@ -94,6 +103,30 @@ public class LoginFormBase
         }
     }
     
+    
+    @SetupRender
+    public void resetJavaScriptDisabled()
+    {
+        javaScriptDisabled = true;
+    }
+    
+    
+    @AfterRender
+    public void detectJavaScript()
+    {
+        Link link = componentResources.createEventLink(ENABLE_JS_EVENT);
+        String eventURI = link.toAbsoluteURI(isSecure);
+
+        jsSupport.addScript("new Ajax.Request('%s', { method: 'get' });", eventURI);
+    }
+    
+    
+    @OnEvent(value = ENABLE_JS_EVENT)
+    public void enableJavaScriptAvail()
+    {
+        javaScriptDisabled = false;
+    }
+    
 
     @Inject private Response response;
     @Inject private Request request;
@@ -104,8 +137,11 @@ public class LoginFormBase
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
     private @Inject @Symbol(SecurityModule.Symbols.INVALID_AUTH_DELAY) int authDelayInterval;
     private @Inject BaseURLSource urlSource;
+    
+    private @Environmental JavaScriptSupport jsSupport;
+    private @Inject ComponentResources componentResources;
+    private @SessionAttribute Boolean javaScriptDisabled;
 
-
-
+    public static final String ENABLE_JS_EVENT = "enableJSOnLogin";
     private static final Logger logger = LoggerFactory.getLogger(LoginForm.class);
 }

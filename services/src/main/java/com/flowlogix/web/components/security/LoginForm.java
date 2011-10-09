@@ -4,6 +4,7 @@
  */
 package com.flowlogix.web.components.security;
 
+import com.flowlogix.web.base.LoginFormBase;
 import lombok.Setter;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -13,7 +14,6 @@ import org.apache.shiro.util.StringUtils;
 import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
-import org.apache.tapestry5.annotations.SessionAttribute;
 
 /**
  *
@@ -30,7 +30,6 @@ public class LoginForm extends LoginFormBase
         try
         {
             Object rv = login(tynamoLogin, tynamoPassword, tynamoRememberMe, null);
-            disableJavaScript = disableJS;
             return rv;
         }
         catch (UnknownAccountException e)
@@ -69,6 +68,4 @@ public class LoginForm extends LoginFormBase
     @Property private boolean tynamoRememberMe;
     @Persist(PersistenceConstants.FLASH)
     private @Setter String loginMessage;
-    @Property private boolean disableJS;
-    @SessionAttribute private Boolean disableJavaScript;
 }

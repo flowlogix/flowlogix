@@ -5,6 +5,7 @@
 package com.flowlogix.security;
 
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
+import java.io.Serializable;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.concurrent.Callable;
@@ -18,7 +19,7 @@ import org.apache.shiro.subject.Subject;
  * @author lprimak
  */
 @Interceptor
-public class ShiroSecurityInterceptor
+public class ShiroSecurityInterceptor implements Serializable
 {
     @AroundInvoke
     public Object propagateShiroSecurity(final InvocationContext ctx) throws Exception
@@ -49,4 +50,7 @@ public class ShiroSecurityInterceptor
             return ctx.proceed();
         }
     }
+
+    
+    private static final long serialVersionUID = 1L;
 }

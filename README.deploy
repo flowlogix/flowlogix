@@ -1,0 +1,3 @@
+# How to Deploy Flow Logix Library 
+
+mvn -Prelease-flowlogix clean source:jar javadoc:jar deploy

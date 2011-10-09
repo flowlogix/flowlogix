@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>0.6</version>
+    <version>0.6.1</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
   
@@ -22,14 +22,20 @@
         </extensions>
     </build>
     
-    <distributionManagement>
-        <repository>
-            <id>flowlogix-repo.googlecode.com</id>
-            <url>svn:https://flowlogix-repo.googlecode.com/svn/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>flowlogix-repo.googlecode.com</id>
-            <url>svn:https://flowlogix-repo.googlecode.com/svn/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>release-flowlogix</id>
+            <distributionManagement>
+                <repository>
+                    <id>flowlogix-repo.googlecode.com</id>
+                    <url>svn:https://flowlogix-repo.googlecode.com/svn/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>flowlogix-repo.googlecode.com</id>
+                    <url>svn:https://flowlogix-repo.googlecode.com/svn/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
 </project>

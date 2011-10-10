@@ -16,6 +16,14 @@
         <version>0.7-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <war-deps.scope>provided</war-deps.scope>
+        <rhino.version>1.6R7</rhino.version>
+        <yuicompressor.version>2.4.6</yuicompressor.version>
+        <tap.version>5.3-beta-19</tap.version>
+        <gwt.version>2.3.0</gwt.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -487,15 +495,7 @@
             <url>http://flowlogix-repo.googlecode.com/svn/releases</url>
         </repository>
     </repositories>
-    
-    <properties>
-        <war-deps.scope>provided</war-deps.scope>
-        <rhino.version>1.6R7</rhino.version>
-        <yuicompressor.version>2.4.6</yuicompressor.version>
-        <tap.version>5.3-beta-13</tap.version>
-        <gwt.version>2.3.0</gwt.version>
-    </properties>
-    
+        
     <profiles>
         <profile>
             <id>self-contained-war</id>

@@ -21,7 +21,7 @@
         <rhino.version>1.6R7</rhino.version>
         <yuicompressor.version>2.4.6</yuicompressor.version>
         <tap.version>5.3-beta-19</tap.version>
-        <gwt.version>2.3.0</gwt.version>
+        <gwt.version>2.4.0</gwt.version>
     </properties>
 
     <dependencies>

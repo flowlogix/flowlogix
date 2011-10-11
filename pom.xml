@@ -47,7 +47,6 @@
                         <version>2.2.1</version>
                         <configuration>
                             <goals>source:jar javadoc:jar deploy</goals>
-                            <pushChanges>false</pushChanges>
                             <tagNameFormat>VERS_@{project.version}-TODAY</tagNameFormat>
                         </configuration>
                     </plugin>

@@ -1,5 +1,4 @@
 # How to Deploy Flow Logix Library 
 
-mvn -Prelease-flowlogix release:prepare
-hg push
-mvn -Prelease-flowlogix release:perform
+mvn -Prelease-flowlogix release:prepare # -DdryRun=true
+mvn -Prelease-flowlogix release:perform # -DdryRun=true

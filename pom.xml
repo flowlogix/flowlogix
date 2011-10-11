@@ -19,8 +19,12 @@
                 <artifactId>maven-svn-wagon</artifactId>
                 <version>1.4</version>
             </extension>
-        </extensions>
+        </extensions>        
     </build>
+     
+    <scm>
+        <developerConnection>scm:hg:https://code.google.com/p/flowlogix/</developerConnection>
+    </scm>
     
     <profiles>
         <profile>
@@ -35,6 +39,21 @@
                     <url>svn:https://flowlogix-repo.googlecode.com/svn/snapshots/</url>
                 </snapshotRepository>
             </distributionManagement>
+           
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <configuration>
+                            <goals>source:jar javadoc:jar deploy</goals>
+                            <pushChanges>false</pushChanges>
+                            <tagNameFormat>VERS_@{project.version}-TODAY</tagNameFormat>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+
         </profile>
     </profiles>
 

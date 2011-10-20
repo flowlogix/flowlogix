@@ -18,7 +18,7 @@ public class GwtModule
 {        
     @Match("AssetPathConverter")
     @SuppressWarnings("unchecked")
-    public void adviseJsPathMethod(MethodAdviceReceiver receiver)
+    public void adviseGwtJsPathMethod(MethodAdviceReceiver receiver)
             throws SecurityException, NoSuchMethodException
     {
         MethodAdvice advice = new MethodAdvice()

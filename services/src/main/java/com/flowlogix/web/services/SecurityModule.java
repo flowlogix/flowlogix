@@ -8,6 +8,7 @@ import com.flowlogix.web.services.internal.PageServiceOverride;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 import org.apache.shiro.io.DefaultSerializer;
@@ -17,13 +18,19 @@ import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.tapestry5.MetaDataConstants;
 import org.apache.tapestry5.SymbolConstants;
+import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.ioc.MappedConfiguration;
+import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Contribute;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.ioc.services.ServiceOverride;
 import org.apache.tapestry5.services.ComponentRequestFilter;
+import org.apache.tapestry5.services.Request;
+import org.apache.tapestry5.services.RequestFilter;
+import org.apache.tapestry5.services.RequestHandler;
+import org.apache.tapestry5.services.Response;
 import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.TapestryRealmSecurityManager;
 
@@ -58,6 +65,31 @@ public class SecurityModule
         configuration.add(MetaDataConstants.SECURE_PAGE, Boolean.toString(isSecure));
     }
     
+    
+    @Contribute(RequestHandler.class)
+    public void disableAssetDirListing(OrderedConfiguration<RequestFilter> configuration,
+                    @Symbol(SymbolConstants.APPLICATION_VERSION) final String applicationVersion)
+    {
+        configuration.add("DisableDirListing", new RequestFilter() {
+
+            @Override
+            public boolean service(Request request, Response response, RequestHandler handler) throws IOException
+            {
+                final String assetFolder = RequestConstants.ASSET_PATH_PREFIX + applicationVersion + "/" + 
+                        RequestConstants.CONTEXT_FOLDER;
+                System.err.println("Folder: " + assetFolder + ", path: " + request.getPath());
+                if(request.getPath().startsWith(assetFolder) && request.getPath().endsWith("/"))
+                {
+                    return false;
+                }
+                else
+                {
+                    return handler.service(request, response);
+                }
+            }
+        }, "before:AssetDispatcher");
+    }      
+
     
     @Match("ComponentRequestFilter")
     public static ComponentRequestFilter decorateComponentRequestFilter(ComponentRequestFilter filter)

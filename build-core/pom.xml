@@ -495,7 +495,7 @@
         
     <profiles>
         <profile>
-            <id>self-contained-war</id>
+            <id>self-contained</id>
             <properties>
                 <war-deps.scope>compile</war-deps.scope>
             </properties>

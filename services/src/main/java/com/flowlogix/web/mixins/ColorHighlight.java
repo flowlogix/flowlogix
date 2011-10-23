@@ -1,11 +1,8 @@
 package com.flowlogix.web.mixins;
 
-import com.flowlogix.util.Streams;
-import java.io.IOException;
-import java.io.InputStream;
+import com.flowlogix.web.services.AssetMinimizer;
 import javax.validation.constraints.NotNull;
 
-import lombok.Cleanup;
 import org.apache.tapestry5.Asset;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.annotations.Environmental;
@@ -17,24 +14,17 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 public class ColorHighlight
 {
-    public ColorHighlight() throws IOException
-    {
-        @Cleanup InputStream strm = scriptAsset.getResource().openStream();
-        script = Streams.readString(strm);
-    }
-    
-    
     @SetupRender
-    void init() throws IOException
+    void init()
     {
         js.addScript(script, color);
     }
     
     
-    @Environmental private JavaScriptSupport js;
-    @Parameter(required=true, defaultPrefix=BindingConstants.LITERAL) @NotNull 
-    private String color;
-    @Inject @Path("ColorHighlight.js")
-    private Asset scriptAsset;
-    private final String script;
+    private @Environmental JavaScriptSupport js;
+    private @Parameter(required=true, defaultPrefix=BindingConstants.LITERAL) 
+            @NotNull String color;
+    private @Inject @Path("ColorHighlight.js") Asset scriptAsset;
+    private @Inject AssetMinimizer minimizer;
+    private final String script = minimizer.minimize(scriptAsset);
 }

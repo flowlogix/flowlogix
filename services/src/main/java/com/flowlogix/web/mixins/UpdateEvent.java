@@ -57,8 +57,10 @@ public class UpdateEvent extends SessionTracker
         Link link = cr.createEventLink(event);
         String uri = link.toAbsoluteURI(isSecure);
 
-        js.addScript("new UpdateEvent('%s', '%s');",
-                cr.getId(), uri);
+        JSONObject spec = new JSONObject();
+        spec.put("elementId", cr.getId());
+        spec.put("uri", uri);
+        js.addInitializerCall("updateEvent", spec);
     }
 
     

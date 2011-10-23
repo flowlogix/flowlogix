@@ -39,3 +39,8 @@ UpdateEvent.prototype = {
         window.location.reload();
     }
 };
+
+// Extend the Tapestry.Initializer with a static method that instantiates us
+Tapestry.Initializer.updateEvent = function(spec) {
+    new UpdateEvent(spec.elementId, spec.uri);
+};

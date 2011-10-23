@@ -6,21 +6,19 @@
 
 var SessionMonitor = Class.create();
 
-
 SessionMonitor.prototype = {
-    initialize: function(contextPath, baseURI, defaultURIparameters, keepAlive, endOnClose, idleCheckSeconds, warnBeforeSeconds, 
-        warnBeforeHandler, endedHandler) {
-        this.contextPath = contextPath;
-        this.baseURI = baseURI;
-        this.defaultURIparameters = defaultURIparameters;
-        this.keepAlive = keepAlive;
-        this.endOnClose = endOnClose;
-        this.idleCheckSeconds = idleCheckSeconds;
-        this.endedHandler = endedHandler;
+    initialize: function(spec) {
+        this.contextPath = spec.contextPath;
+        this.baseURI = spec.baseURI;
+        this.defaultURIparameters = spec.defaultURIparameters;
+        this.keepAlive = spec.keepAlive;
+        this.endOnClose = spec.endOnClose;
+        this.idleCheckSeconds = spec.idleCheckSeconds;
+        this.endedHandler = spec.endedHandler;
         this.idleCheckId = null;
         this.reloadPageOnly = false;
 		
-        if (idleCheckSeconds != null && idleCheckSeconds > 0) this.checkIdleNext(idleCheckSeconds);
+        if (spec.idleCheckSeconds != null && spec.idleCheckSeconds > 0) this.checkIdleNext(spec.idleCheckSeconds);
     },
 
     checkIdle: function() {
@@ -86,3 +84,8 @@ SessionMonitor.prototype = {
         this.checkIdleNext(nextCheck);
     }
 }
+
+// Extend the Tapestry.Initializer with a static method that instantiates us
+Tapestry.Initializer.sessionMonitor = function(spec) {
+    new SessionMonitor(spec);
+};

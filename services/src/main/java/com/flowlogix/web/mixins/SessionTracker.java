@@ -7,8 +7,8 @@ package com.flowlogix.web.mixins;
 import com.flowlogix.session.SessionTrackerBase;
 import com.flowlogix.session.SessionTrackerHolder;
 import javax.servlet.http.HttpSession;
+import org.apache.tapestry5.annotations.CleanupRender;
 import org.apache.tapestry5.annotations.Persist;
-import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.RequestGlobals;
 
@@ -25,7 +25,7 @@ public class SessionTracker implements SessionTrackerBase
     }    
     
         
-    @SetupRender
+    @CleanupRender
     private void setSession()
     {
         if (rg.getRequest().isXHR() == false)

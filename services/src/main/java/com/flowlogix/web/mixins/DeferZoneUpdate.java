@@ -18,7 +18,7 @@ public class DeferZoneUpdate
     @AfterRender
     void addStatusReset()
     {
-        js.addScript("new DeferUpdate('%s');", container.getClientId());
+        js.addInitializerCall("deferUpdate", container.getClientId());
     }
     
     

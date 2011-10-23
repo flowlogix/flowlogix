@@ -27,3 +27,9 @@ DisableAfterSubmit.prototype = {
         $(this.elementId).enable();
     }
 };
+
+
+// Extend the Tapestry.Initializer with a static method that instantiates us
+Tapestry.Initializer.disableAfterSubmit = function(spec) {
+    new DisableAfterSubmit(spec.elementId, spec.formId);
+};

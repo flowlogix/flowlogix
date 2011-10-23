@@ -86,9 +86,16 @@ public class SessionMonitor extends SessionTracker
         defaultURIparameters += KEEPALIVE_NAME + "=";
         baseURI = baseURI.substring(0, index + 1);
 
-        jsSupport.addScript(String.format("%s = new SessionMonitor('%s', '%s', '%s', %s, true, %s, %s);", 
-                componentResources.getId(), request.getContextPath(), baseURI, defaultURIparameters, 
-                keepAlive, idleCheck, _endedHandler));
+        
+        JSONObject spec = new JSONObject();
+        spec.put("contextPath", request.getContextPath());
+        spec.put("baseURI", baseURI);
+        spec.put("defaultURIparameters", defaultURIparameters);
+        spec.put("keepAlive", keepAlive);
+        spec.put("endOnClose", true);
+        spec.put("idleCheckSeconds", idleCheck);
+        spec.put("endedHandler", _endedHandler);
+        jsSupport.addInitializerCall("sessionMonitor", spec);
     }
     
     

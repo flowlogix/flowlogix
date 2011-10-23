@@ -23,3 +23,9 @@ DeferUpdate.prototype = {
         }
     }
 };
+
+
+// Extend the Tapestry.Initializer with a static method that instantiates us
+Tapestry.Initializer.deferUpdate = function(zoneId) {
+    new DeferUpdate(zoneId);
+};

@@ -7,6 +7,7 @@ import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.InjectContainer;
 import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.FormSupport;
+import org.apache.tapestry5.services.javascript.InitializationPriority;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 @Import(library="DisableAfterSubmit.js")
@@ -18,7 +19,7 @@ public class DisableAfterSubmit
         JSONObject spec = new JSONObject();
         spec.put("elementId", submitButton.getClientId());
         spec.put("formId", fs.getClientId());
-        js.addInitializerCall("disableAfterSubmit", spec);
+        js.addInitializerCall(InitializationPriority.LATE, "disableAfterSubmit", spec);
     }
     
     

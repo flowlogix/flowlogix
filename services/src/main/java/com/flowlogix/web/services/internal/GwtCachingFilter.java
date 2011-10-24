@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.Service;
 import org.apache.tapestry5.internal.InternalConstants;
-import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.internal.services.RequestImpl;
 import org.apache.tapestry5.internal.services.ResourceStreamer;
 import org.apache.tapestry5.internal.services.ResponseImpl;
@@ -36,7 +35,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         this.carh = new ContextAssetRequestHandler(streamer, contextAssetFactory.getRootResource());
         this.sessionFactory = sessionFactory;
         this.rg = rg;
-        }
+    }
 
     
     @Override
@@ -45,61 +44,29 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         String path = request.getServletPath();
 
         boolean neverExpire = false;
-        boolean neverCache = false;
-        boolean doProcess = false;
         if (path.endsWith(".cache.html"))
         {
             neverExpire = true;
-            doProcess = true;
         } 
-        else
+        else if (path.endsWith(".nocache.js"))
         {
-            if (!path.startsWith(RequestConstants.ASSET_PATH_PREFIX))
-            {
-                if (path.endsWith(".css"))
-                {
-                    doProcess = true;
-                }
-                else if (path.endsWith(".js"))
-                {
-                    if(path.endsWith("ISC_Core.js"))
-                    {
-                        // nothing
-                    }
-                    else if(path.endsWith(".nocache.js"))
-                    {
-                        doProcess = true;
-                        neverCache = true;
-                    }
-                    else
-                    {
-                        doProcess = true;
-                    }
-                }
-            }
-        }
+            response.setHeader("Cache-Control","no-cache"); //HTTP 1.1
+            response.setHeader("Pragma","no-cache");        //HTTP 1.0
+            response.setDateHeader("Expires", 0);            
+        } 
 
-        if (doProcess == false)
+        if (neverExpire == false)
         {
             return chainHandler.service(request, response);
         }
 
-        log.finer("TapFilter: Processing " + path);
+        log.finer("GwtCachingFilter: Processing " + path);
 
         Request rq = new RequestImpl(request, applicationCharset, sessionFactory);
         Response rsp = new ResponseImpl(request, response);
         rg.storeRequestResponse(rq, rsp);
 
-        if (neverExpire)
-        {
-            rsp.setDateHeader("Expires", new Date().getTime() + InternalConstants.TEN_YEARS);
-        }
-        else if(neverCache)
-        {
-            rsp.setHeader("Cache-Control","no-cache"); //HTTP 1.1
-            rsp.setHeader("Pragma","no-cache");        //HTTP 1.0
-            rsp.setDateHeader("Expires", 0);            
-        }
+        rsp.setDateHeader("Expires", new Date().getTime() + InternalConstants.TEN_YEARS);
 
         try
         {

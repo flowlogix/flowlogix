@@ -4,18 +4,28 @@
  */
 package com.flowlogix.web.services;
 
+import com.flowlogix.web.services.internal.GwtCachingFilter;
 import java.util.logging.Logger;
 import org.apache.tapestry5.ioc.MethodAdviceReceiver;
+import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.plastic.MethodAdvice;
 import org.apache.tapestry5.plastic.MethodInvocation;
+import org.apache.tapestry5.services.HttpServletRequestFilter;
 
 /**
  *
  * @author lprimak
  */
 public class GwtModule 
-{        
+{    
+    public void contributeHttpServletRequestHandler(OrderedConfiguration<HttpServletRequestFilter> config)
+    {
+        // add GWT html caching and gzip compression
+        config.addInstance("GwtHtmlCompressor", GwtCachingFilter.class, "after:*");
+    }
+    
+
     @Match("AssetPathConverter")
     @SuppressWarnings("unchecked")
     public void adviseGwtJsPathMethod(MethodAdviceReceiver receiver)

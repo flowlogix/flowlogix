@@ -6,11 +6,7 @@ package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.AjaxAnnotationWorker;
 import com.flowlogix.web.services.internal.AssetMinimizerImpl;
-import com.flowlogix.web.services.internal.GwtCachingFilter;
 import com.flowlogix.web.services.internal.Html5DocTypeFilter;
-import com.flowlogix.web.services.internal.ResourceChangeTrackerOverride;
-import org.apache.tapestry5.SymbolConstants;
-import org.apache.tapestry5.internal.services.assets.ResourceChangeTracker;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
@@ -18,12 +14,9 @@ import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Contribute;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.SubModule;
-import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.ioc.services.FactoryDefaults;
-import org.apache.tapestry5.ioc.services.ServiceOverride;
 import org.apache.tapestry5.ioc.services.SymbolProvider;
 import org.apache.tapestry5.services.ComponentClassResolver;
-import org.apache.tapestry5.services.HttpServletRequestFilter;
 import org.apache.tapestry5.services.LibraryMapping;
 import org.apache.tapestry5.services.MarkupRenderer;
 import org.apache.tapestry5.services.MarkupRendererFilter;
@@ -63,15 +56,7 @@ public class ServicesModule
     {
         binder.bind(AssetMinimizer.class, AssetMinimizerImpl.class);
     }
-    
-    
-    public void contributeHttpServletRequestHandler(OrderedConfiguration<HttpServletRequestFilter> config)
-    {
-        // add GWT html caching and gzip compression
-        config.addInstance("GwtHtmlCompressor", GwtCachingFilter.class, "after:*");
-    }
 
-    
     
     @Contribute(MarkupRenderer.class)
     public void forceHTML5DocType(OrderedConfiguration<MarkupRendererFilter> configuration) 
@@ -79,19 +64,6 @@ public class ServicesModule
         // +++ remove this when Tapestry fixes HTML5 doctype in the browser output,
         // along with the filter class itself
         configuration.addInstance("Html5DocType", Html5DocTypeFilter.class, "after:MarkupRenderer");
-    }
-    
-    
-    @Contribute(ServiceOverride.class)
-    public void fixNullTimestamps(MappedConfiguration<Class<?>, Object> configuration,
-                                  @Symbol(SymbolConstants.PRODUCTION_MODE)
-                                  boolean productionMode)
-    {
-        // +++ remove this when Tapestry correctly sends expire headers (not null) in production mode
-        if(productionMode)
-        {
-            configuration.addInstance(ResourceChangeTracker.class, ResourceChangeTrackerOverride.class);
-        }
     }
     
     

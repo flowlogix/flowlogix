@@ -36,7 +36,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         this.carh = new ContextAssetRequestHandler(streamer, contextAssetFactory.getRootResource());
         this.sessionFactory = sessionFactory;
         this.rg = rg;
-    }
+        }
 
     
     @Override
@@ -45,6 +45,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         String path = request.getServletPath();
 
         boolean neverExpire = false;
+        boolean neverCache = false;
         boolean doProcess = false;
         if (path.endsWith(".cache.html"))
         {
@@ -55,9 +56,25 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         {
             if (!path.startsWith(RequestConstants.ASSET_PATH_PREFIX))
             {
-                if (path.endsWith(".js") || path.endsWith(".css"))
+                if (path.endsWith(".css"))
                 {
                     doProcess = true;
+                }
+                else if (path.endsWith(".js"))
+                {
+                    if(path.endsWith("ISC_Core.js"))
+                    {
+                        // nothing
+                    }
+                    else if(path.endsWith(".nocache.js"))
+                    {
+                        doProcess = true;
+                        neverCache = true;
+                    }
+                    else
+                    {
+                        doProcess = true;
+                    }
                 }
             }
         }
@@ -77,8 +94,19 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         {
             rsp.setDateHeader("Expires", new Date().getTime() + InternalConstants.TEN_YEARS);
         }
+        else if(neverCache)
+        {
+            rsp.setDateHeader("Expires", 0);            
+        }
 
-        return carh.handleAssetRequest(rq, rsp, path);
+        try
+        {
+            return carh.handleAssetRequest(rq, rsp, path);
+        }
+        catch(Exception e)
+        {
+            return chainHandler.service(request, response);
+        }
     }
     
     

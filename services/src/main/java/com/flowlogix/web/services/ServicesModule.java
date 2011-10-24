@@ -61,7 +61,7 @@ public class ServicesModule
     @Contribute(MarkupRenderer.class)
     public void forceHTML5DocType(OrderedConfiguration<MarkupRendererFilter> configuration) 
     {
-        // +++ remove this when Tapestry fixes HTML5 doctype in the browser output,
+        // We can remove this when Tapestry fixes HTML5 doctype in the browser output,
         // along with the filter class itself
         configuration.addInstance("Html5DocType", Html5DocTypeFilter.class, "after:MarkupRenderer");
     }

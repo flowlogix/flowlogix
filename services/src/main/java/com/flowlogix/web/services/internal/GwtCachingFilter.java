@@ -96,6 +96,8 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         }
         else if(neverCache)
         {
+            rsp.setHeader("Cache-Control","no-cache"); //HTTP 1.1
+            rsp.setHeader("Pragma","no-cache");        //HTTP 1.0
             rsp.setDateHeader("Expires", 0);            
         }
 

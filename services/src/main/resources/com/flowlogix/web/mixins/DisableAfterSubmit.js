@@ -17,10 +17,11 @@ DisableAfterSubmit.prototype = {
         $(this.elementId).disable();
 
         if($(this.formId).getStorage().zoneId != null) {
-            this.zoneId = Tapestry.findZoneManager(this.formId).element;
-            Event.observe($(this.zoneId), Tapestry.ZONE_UPDATED_EVENT, 
-              this.handler);    
+            this.zoneElement = Tapestry.findZoneManager(this.formId).element;
+            Event.observe(this.zoneElement, Tapestry.ZONE_UPDATED_EVENT, 
+                this.handler);    
 
+            $(this.formId).setSubmittingElement($(this.elementId));
             $(this.formId).onsubmit();
         }
         else {
@@ -29,10 +30,10 @@ DisableAfterSubmit.prototype = {
     },
 		
     doEnable: function() {
-        $(this.zoneId).stopObserving(Tapestry.ZONE_UPDATED_EVENT, this.handler);
+        this.zoneElement.stopObserving(Tapestry.ZONE_UPDATED_EVENT, this.handler);
         var element = $(this.elementId);
         if(element != null) {            
-            $(this.elementId).enable();
+            element.enable();
         }
     }
 };

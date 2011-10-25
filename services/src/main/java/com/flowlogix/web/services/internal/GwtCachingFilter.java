@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.tapestry5.SymbolConstants;
@@ -33,21 +34,35 @@ import org.apache.tapestry5.services.Response;
 public class GwtCachingFilter implements HttpServletRequestFilter
 {
     public GwtCachingFilter(ResourceStreamer streamer, @Service("ContextAssetFactory") AssetFactory contextAssetFactory,
-            TapestrySessionFactory sessionFactory, RequestGlobals rg)
+            TapestrySessionFactory sessionFactory, RequestGlobals rg,
+            @Symbol(Symbols.NEVER_EXPIRE) String rawNeverExpires,
+            @Symbol(Symbols.NEVER_CACHE) String rawNeverCache)
     {
         this.carh = new ContextAssetRequestHandler(streamer, contextAssetFactory.getRootResource());
         this.sessionFactory = sessionFactory;
         this.rg = rg;
-        configure();
+        configure(rawNeverExpires, rawNeverCache);
     }
     
     
-    private void configure()
+    private void configure(String rawNeverExpires, String rawNeverCache)
     {
-        neverExpireExtensions.add(".cache.html");
-        neverCachedExtensions.add(".nocache.js");
-    }
+        if(rawNeverExpires != null)
+        {
+            for(String ext : extSplitPattern.split(rawNeverExpires))
+            {
+                neverExpireExtensions.add(ext);
+            }
+        }
 
+        if(rawNeverCache != null)
+        {
+            for(String ext : extSplitPattern.split(rawNeverCache))
+            {
+                neverCachedExtensions.add(ext);
+            }
+        }
+    }
 
     
     @Override
@@ -106,12 +121,20 @@ public class GwtCachingFilter implements HttpServletRequestFilter
     }
     
     
+    public static class Symbols
+    {
+        public static final String NEVER_EXPIRE = "flowlogix.gwt-never-expire";
+        public static final String NEVER_CACHE = "flowlogix.gwt-never-cache";
+    }
+    
+    
     private final ContextAssetRequestHandler carh;
     private final TapestrySessionFactory sessionFactory;
     private @Inject @Symbol(SymbolConstants.CHARSET) String applicationCharset;
     private final RequestGlobals rg;
     private final List<String> neverExpireExtensions = new LinkedList<String>();
     private final List<String> neverCachedExtensions = new LinkedList<String>();
+    private static final Pattern extSplitPattern = Pattern.compile("[;, \t\n\f\r]+");
     
     private static final Logger log = Logger.getLogger(GwtCachingFilter.class.getName());
 }

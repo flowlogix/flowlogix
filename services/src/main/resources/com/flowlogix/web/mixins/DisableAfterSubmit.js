@@ -15,12 +15,17 @@ DisableAfterSubmit.prototype = {
 
     doDisable: function() {
         $(this.elementId).disable();
-        
-        this.zoneId = Tapestry.findZoneManager(this.formId).element;
-        Event.observe($(this.zoneId), Tapestry.ZONE_UPDATED_EVENT, 
-            this.handler);    
 
-        $(this.formId).onsubmit();
+        if($(this.formId).getStorage().zoneId != null) {
+            this.zoneId = Tapestry.findZoneManager(this.formId).element;
+            Event.observe($(this.zoneId), Tapestry.ZONE_UPDATED_EVENT, 
+              this.handler);    
+
+            $(this.formId).onsubmit();
+        }
+        else {
+            $(this.formId).submit();
+        }
     },
 		
     doEnable: function() {

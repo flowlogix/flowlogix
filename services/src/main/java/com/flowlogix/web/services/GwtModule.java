@@ -6,9 +6,13 @@ package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.GwtCachingFilter;
 import java.util.logging.Logger;
+import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.MethodAdviceReceiver;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
+import org.apache.tapestry5.ioc.annotations.Contribute;
 import org.apache.tapestry5.ioc.annotations.Match;
+import org.apache.tapestry5.ioc.services.FactoryDefaults;
+import org.apache.tapestry5.ioc.services.SymbolProvider;
 import org.apache.tapestry5.plastic.MethodAdvice;
 import org.apache.tapestry5.plastic.MethodInvocation;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
@@ -23,6 +27,17 @@ public class GwtModule
     {
         // add GWT html caching and gzip compression
         config.addInstance("GwtHtmlCompressor", GwtCachingFilter.class, "after:*");
+    }
+    
+
+    @Contribute(SymbolProvider.class)
+    @FactoryDefaults
+    public void configureFilter(MappedConfiguration<String, String> config)
+    {
+        // syntax: ".ext1,.ext2;.ext4
+        // commas, semicolns. are the separators
+        config.add(GwtCachingFilter.Symbols.NEVER_CACHE, ".nocache.js");
+        config.add(GwtCachingFilter.Symbols.NEVER_EXPIRE, ".cache.html");
     }
     
 

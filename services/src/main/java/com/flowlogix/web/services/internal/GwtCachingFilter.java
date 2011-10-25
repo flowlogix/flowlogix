@@ -2,6 +2,8 @@ package com.flowlogix.web.services.internal;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +38,16 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         this.carh = new ContextAssetRequestHandler(streamer, contextAssetFactory.getRootResource());
         this.sessionFactory = sessionFactory;
         this.rg = rg;
+        configure();
     }
+    
+    
+    private void configure()
+    {
+        neverExpireExtensions.add(".cache.html");
+        neverCachedExtensions.add(".nocache.js");
+    }
+
 
     
     @Override
@@ -47,19 +58,28 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         boolean neverExpire = false;
         if (!path.startsWith(RequestConstants.ASSET_PATH_PREFIX))
         {
-            if (path.endsWith(".cache.html"))
+            for(String ext : neverExpireExtensions)
             {
-                neverExpire = true;
-            } 
-            else
-            {
-                if (path.endsWith(".nocache.js"))
+                if(path.endsWith(ext))
                 {
-                    response.setHeader("Cache-Control", "no-cache"); //HTTP 1.1
-                    response.setHeader("Pragma", "no-cache");        //HTTP 1.0
-                    response.setDateHeader("Expires", 0);
+                    neverExpire = true;
+                    break;
                 }
             }
+            
+            if (neverExpire == false)
+            {
+                for (String ext : neverCachedExtensions)
+                {
+                    if (path.endsWith(ext))
+                    {
+                        response.setHeader("Cache-Control", "no-cache"); //HTTP 1.1
+                        response.setHeader("Pragma", "no-cache");        //HTTP 1.0
+                        response.setDateHeader("Expires", 0);
+                        break;
+                    }
+                }
+            }            
         }
 
         if (neverExpire == false)
@@ -90,6 +110,8 @@ public class GwtCachingFilter implements HttpServletRequestFilter
     private final TapestrySessionFactory sessionFactory;
     private @Inject @Symbol(SymbolConstants.CHARSET) String applicationCharset;
     private final RequestGlobals rg;
+    private final List<String> neverExpireExtensions = new LinkedList<String>();
+    private final List<String> neverCachedExtensions = new LinkedList<String>();
     
     private static final Logger log = Logger.getLogger(GwtCachingFilter.class.getName());
 }

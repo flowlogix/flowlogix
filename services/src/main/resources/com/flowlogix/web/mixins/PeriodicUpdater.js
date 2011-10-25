@@ -50,7 +50,8 @@ Tapestry.PeriodicUpdater = Class.create({
     }
 });
  
-Tapestry.Initializer.PeriodicUpdater = function(spec)
+ 
+Tapestry.Initializer.periodicUpdater = function(spec)
 {
     var elementId = spec.elementId;
     var uri = spec.uri;

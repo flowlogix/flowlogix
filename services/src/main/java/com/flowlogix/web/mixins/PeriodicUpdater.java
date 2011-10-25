@@ -72,6 +72,6 @@ public class PeriodicUpdater
         spec.put("elementId", id);
         spec.put("uri", link.toAbsoluteURI());
 
-        jsSupport.addInitializerCall("PeriodicUpdater", spec);
+        jsSupport.addInitializerCall("periodicUpdater", spec);
     }
 }

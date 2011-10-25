@@ -7,6 +7,7 @@ DisableAfterSubmit.prototype = {
     initialize: function(elementId, formId) {
         this.formId = formId;
         this.elementId = elementId;
+        this.handler = this.doEnable.bindAsEventListener(this);
 
         Event.observe($(elementId), 'click',
             this.doDisable.bindAsEventListener(this));			
@@ -14,17 +15,20 @@ DisableAfterSubmit.prototype = {
 
     doDisable: function() {
         $(this.elementId).disable();
-        if(this.zoneId == null) {	
-            this.zoneId = Tapestry.findZoneManager(this.formId).element;
-            Event.observe($(this.zoneId), Tapestry.ZONE_UPDATED_EVENT,
-                this.doEnable.bindAsEventListener(this));
-        }
+        
+        this.zoneId = Tapestry.findZoneManager(this.formId).element;
+        Event.observe($(this.zoneId), Tapestry.ZONE_UPDATED_EVENT, 
+            this.handler);    
 
         $(this.formId).onsubmit();
     },
 		
     doEnable: function() {
-        $(this.elementId).enable();
+        $(this.zoneId).stopObserving(Tapestry.ZONE_UPDATED_EVENT, this.handler);
+        var element = $(this.elementId);
+        if(element != null) {            
+            $(this.elementId).enable();
+        }
     }
 };
 

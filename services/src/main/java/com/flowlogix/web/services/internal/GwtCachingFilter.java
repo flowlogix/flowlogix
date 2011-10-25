@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.Service;
 import org.apache.tapestry5.internal.InternalConstants;
+import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.internal.services.RequestImpl;
 import org.apache.tapestry5.internal.services.ResourceStreamer;
 import org.apache.tapestry5.internal.services.ResponseImpl;
@@ -44,16 +45,22 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         String path = request.getServletPath();
 
         boolean neverExpire = false;
-        if (path.endsWith(".cache.html"))
+        if (!path.startsWith(RequestConstants.ASSET_PATH_PREFIX))
         {
-            neverExpire = true;
-        } 
-        else if (path.endsWith(".nocache.js"))
-        {
-            response.setHeader("Cache-Control","no-cache"); //HTTP 1.1
-            response.setHeader("Pragma","no-cache");        //HTTP 1.0
-            response.setDateHeader("Expires", 0);            
-        } 
+            if (path.endsWith(".cache.html"))
+            {
+                neverExpire = true;
+            } 
+            else
+            {
+                if (path.endsWith(".nocache.js"))
+                {
+                    response.setHeader("Cache-Control", "no-cache"); //HTTP 1.1
+                    response.setHeader("Pragma", "no-cache");        //HTTP 1.0
+                    response.setDateHeader("Expires", 0);
+                }
+            }
+        }
 
         if (neverExpire == false)
         {

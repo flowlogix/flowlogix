@@ -50,6 +50,7 @@ public class SecurityModule
         configuration.add(Symbols.UNAUTHORIZED_URL, "");
         configuration.add(Symbols.REMEMBER_ME_DURATION, Integer.toString(2 * 7)); // 2 weeks
         configuration.add(Symbols.INVALID_AUTH_DELAY, Integer.toString(3));
+        configuration.add(Symbols.SESSION_EXPIRED_MESSAGE, "Your Session Has Expired");
     }
 
 
@@ -154,6 +155,7 @@ public class SecurityModule
         public static final String UNAUTHORIZED_URL = "flowlogix.security.unauthorizedurl";        
         public static final String REMEMBER_ME_DURATION = "flowlogix.security.remembermeduration";        
         public static final String INVALID_AUTH_DELAY = "flowlogix.security.invalid-auth-delay";
+        public static final String SESSION_EXPIRED_MESSAGE = "flowlogix.security.session-expired-message";
     }
     
     

@@ -5,6 +5,7 @@
 package com.flowlogix.web.components;
 
 import com.flowlogix.web.mixins.SessionTracker;
+import com.flowlogix.web.services.SecurityModule.Symbols;
 import javax.validation.constraints.NotNull;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
@@ -65,7 +66,7 @@ public class SessionMonitor extends SessionTracker
     {
         if(sessionExpired)
         {
-            loginSessionExpiredMessage = "Your Session Has Expired";
+            loginSessionExpiredMessage = loginExpiredMessage;
         }
         return new JSONObject();
     }
@@ -110,6 +111,7 @@ public class SessionMonitor extends SessionTracker
     @Parameter("false") private boolean keepAlive;
     @Parameter("false") private boolean sessionExpired;
     private @SessionAttribute String loginSessionExpiredMessage;
+    private @Inject @Symbol(Symbols.SESSION_EXPIRED_MESSAGE) String loginExpiredMessage;
     
     @Inject private ComponentResources componentResources;
     @Environmental private JavaScriptSupport jsSupport;    

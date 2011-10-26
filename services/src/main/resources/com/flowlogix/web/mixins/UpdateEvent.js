@@ -24,7 +24,6 @@ UpdateEvent.prototype = {
             onSuccess: this.checkSession.bind(this),
             onFailure: this.reloadHandler.bind(this)
             });
-        $(this.elementId).stopObserving(Tapestry.ZONE_UPDATED_EVENT, this.handler);
     },
     
     checkSession: function(transport) {

@@ -14,10 +14,10 @@ import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.InjectContainer;
 import org.apache.tapestry5.annotations.OnEvent;
 import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.corelib.components.Zone;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.json.JSONObject;
-import org.apache.tapestry5.runtime.Component;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -31,12 +31,11 @@ public class UpdateEvent extends SessionTracker
     @AfterRender
     private void addUpdater()
     {
-        ComponentResources cr = zone.getComponentResources();
         if(updateEvent != null)
         {
-            createEvent(cr, updateEvent);
+            createEvent(updateEvent);
         }
-        createEvent(cr, CHECK_SESSION_EVENT);
+        createEvent(CHECK_SESSION_EVENT);
     }
     
     
@@ -52,21 +51,22 @@ public class UpdateEvent extends SessionTracker
     }
     
 
-    private void createEvent(ComponentResources cr, String event)
+    private void createEvent(String event)
     {
         Link link = cr.createEventLink(event);
         String uri = link.toAbsoluteURI(isSecure);
 
         JSONObject spec = new JSONObject();
-        spec.put("elementId", cr.getId());
+        spec.put("elementId", zone.getClientId());
         spec.put("uri", uri);
         js.addInitializerCall("updateEvent", spec);
     }
 
     
     private @Parameter(allowNull = false, defaultPrefix = BindingConstants.LITERAL) String updateEvent;
-    private @InjectContainer Component zone;
+    private @InjectContainer Zone zone;
     private @Environmental JavaScriptSupport js;
+    private @Inject ComponentResources cr;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     public static final String CHECK_SESSION_EVENT = "checkSessionEvent";
 }

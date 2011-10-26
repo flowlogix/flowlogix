@@ -29,7 +29,7 @@ public class LoginForm extends LoginFormBase
     {
         try
         {
-            Object rv = login(tynamoLogin, tynamoPassword, tynamoRememberMe, null);
+            Object rv = login(login, password, tynamoRememberMe, null);
             return rv;
         }
         catch (UnknownAccountException e)
@@ -63,8 +63,8 @@ public class LoginForm extends LoginFormBase
     }
 
 
-    @Property private String tynamoLogin;
-    @Property private String tynamoPassword;
+    @Property private String login;
+    @Property private String password;
     @Property private boolean tynamoRememberMe;
     @Persist(PersistenceConstants.FLASH)
     private @Setter String loginMessage;

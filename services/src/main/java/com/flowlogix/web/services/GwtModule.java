@@ -23,7 +23,7 @@ public class GwtModule
     public void contributeHttpServletRequestHandler(OrderedConfiguration<HttpServletRequestFilter> config)
     {
         // add GWT html caching and gzip compression
-        config.addInstance("GwtHtmlCompressor", GwtCachingFilter.class, "after:*");
+        config.addInstance("GwtCachingFilter", GwtCachingFilter.class, "after:*");
     }
     
 

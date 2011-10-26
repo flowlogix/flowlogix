@@ -5,6 +5,7 @@
 package com.flowlogix.web.components;
 
 import com.flowlogix.web.mixins.SessionTracker;
+import javax.validation.constraints.NotNull;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.tapestry5.BindingConstants;
@@ -15,6 +16,7 @@ import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
@@ -61,6 +63,10 @@ public class SessionMonitor extends SessionTracker
     
     JSONObject onEnd() 
     {
+        if(sessionExpired)
+        {
+            loginSessionExpiredMessage = "Your Session Has Expired";
+        }
         return new JSONObject();
     }
     
@@ -68,7 +74,7 @@ public class SessionMonitor extends SessionTracker
     @SetupRender
     public void init()
     {
-        if(endedHandler != null)
+        if(!endedHandler.isEmpty())
         {
             _endedHandler = "'" + endedHandler + "'";
         }
@@ -100,8 +106,10 @@ public class SessionMonitor extends SessionTracker
     
     
     @Parameter("15") private int idleCheck;
-    @Parameter(defaultPrefix = BindingConstants.LITERAL) private String endedHandler;
+    @Parameter(defaultPrefix = BindingConstants.LITERAL, value = "end") @NotNull private String endedHandler;
     @Parameter("false") private boolean keepAlive;
+    @Parameter("false") private boolean sessionExpired;
+    private @SessionAttribute String loginSessionExpiredMessage;
     
     @Inject private ComponentResources componentResources;
     @Environmental private JavaScriptSupport jsSupport;    

@@ -33,21 +33,20 @@ SessionMonitor.prototype = {
 
     end: function() {
         if (!this.endOnClose) return;
-        new Ajax.Request(this.baseURI + "end" + this.defaultURIparameters + false, {
+        var params = this.baseURI + "end" + this.defaultURIparameters + false;
+        if(this.reloadPageOnly == false) {
+            params = params + "&sessionExpired=true";
+        }        
+        new Ajax.Request(params, {
             method: 'post'
         });
+        window.location.reload();
     },
     
     endHandler : function() {
         if (this.endedHandler != null) {
-                this.callHandler(this.endedHandler);
-            }
-            else {
-                if(this.reloadPageOnly == false) {
-                    alert('Your Session Has Expired');
-                }
-                window.location.reload();
-            }
+            this.callHandler(this.endedHandler);
+        }
     },
     
     refresh: function() {

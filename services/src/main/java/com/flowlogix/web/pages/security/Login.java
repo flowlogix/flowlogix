@@ -5,8 +5,13 @@
 package com.flowlogix.web.pages.security;
 
 import com.flowlogix.web.base.LoginBase;
-import org.apache.tapestry5.annotations.SessionAttribute;
+import com.flowlogix.web.services.SecurityModule.Symbols;
+import org.apache.tapestry5.annotations.Persist;
+import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
+import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.ExceptionReporter;
+import org.apache.tapestry5.services.Request;
 
 /**
  *
@@ -29,22 +34,40 @@ public class Login extends LoginBase implements ExceptionReporter
     
     public String getMessage()
     {
-        if (exception != null)
+        if (exception != null && !checkExpiredMessage())
         {
             return exception.getMessage() + " Try login.";
         } else
         {
-            if(loginSessionExpiredMessage != null && (!loginSessionExpiredMessage.isEmpty()))
+            if(checkExpiredMessage())
             {
-                String rv = loginSessionExpiredMessage;
-                loginSessionExpiredMessage = null;
-                return rv;
+                String msg = loginSessionExpiredMessage;
+                if(request.isXHR() == false)
+                {
+                    loginSessionExpiredMessage = null;
+                }
+                return msg;
             }
             return "";
         }
     }
+    
+    
+    public boolean checkExpiredMessage()
+    {
+        return loginSessionExpiredMessage != null && (!loginSessionExpiredMessage.isEmpty());
+    }
+    
+    
+    JSONObject onSessionExpired() 
+    {
+        loginSessionExpiredMessage = loginExpiredMessage;
+        return new JSONObject();
+    }
+    
 
-
-    private @SessionAttribute String loginSessionExpiredMessage;
+    private @Persist String loginSessionExpiredMessage;
     private Throwable exception;
+    private @Inject @Symbol(Symbols.SESSION_EXPIRED_MESSAGE) String loginExpiredMessage;
+    private @Inject Request request;
 }

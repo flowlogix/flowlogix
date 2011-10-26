@@ -21,6 +21,7 @@ import org.apache.tapestry5.Link;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
+import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.OnEvent;
 import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.annotations.SetupRender;
@@ -42,6 +43,7 @@ import org.tynamo.security.services.SecurityService;
  *
  * @author lprimak
  */
+@Import(library = "DetectJS.js")
 public class LoginFormBase
 {
     @SneakyThrows({MalformedURLException.class, InterruptedException.class})
@@ -116,8 +118,7 @@ public class LoginFormBase
     {
         Link link = componentResources.createEventLink(ENABLE_JS_EVENT);
         String eventURI = link.toAbsoluteURI(isSecure);
-
-        jsSupport.addScript("new Ajax.Request('%s', { method: 'get' });", eventURI);
+        jsSupport.addInitializerCall("detectJS", eventURI);
     }
     
     

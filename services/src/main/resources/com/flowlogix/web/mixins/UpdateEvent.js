@@ -19,7 +19,7 @@ UpdateEvent.prototype = {
     
     triggerEvent : function() {
         new Ajax.Request(this.uri, {
-            method: 'get', 
+            method: 'post', 
             evalJSON:true,
             onSuccess: this.checkSession.bind(this),
             onFailure: this.reloadHandler.bind(this)

@@ -24,7 +24,7 @@ SessionMonitor.prototype = {
     checkIdle: function() {
         new Ajax.Request(this.baseURI + "checkidle" + this.defaultURIparameters + this.keepAlive
             +'&timestamp='+(new Date()).getTime(), {
-                method: 'get',
+                method: 'post',
                 evalJSON:true,
                 onSuccess: this.handleIdleCheckResult.bind(this),
                 onFailure: this.endHandler.bind(this)
@@ -34,7 +34,7 @@ SessionMonitor.prototype = {
     end: function() {
         if (!this.endOnClose) return;
         new Ajax.Request(this.baseURI + "end" + this.defaultURIparameters + false, {
-            method: 'get'
+            method: 'post'
         });
     },
     
@@ -52,7 +52,7 @@ SessionMonitor.prototype = {
     
     refresh: function() {
         new Ajax.Request(this.baseURI + "refresh" + this.defaultURIparameters + 'true', {
-            method: 'get'
+            method: 'post'
         });
     },
 

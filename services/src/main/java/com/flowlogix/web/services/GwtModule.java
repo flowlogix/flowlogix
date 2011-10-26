@@ -6,12 +6,10 @@ package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.GwtCachingFilter;
 import java.util.logging.Logger;
-import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Contribute;
-import org.apache.tapestry5.ioc.services.ApplicationDefaults;
 import org.apache.tapestry5.ioc.services.FactoryDefaults;
 import org.apache.tapestry5.ioc.services.SymbolProvider;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
@@ -38,17 +36,8 @@ public class GwtModule
         config.add(GwtCachingFilter.Symbols.NEVER_CACHE, "");
         config.add(GwtCachingFilter.Symbols.NEVER_EXPIRE, ".cache.html");
     }
-    
-    
-    @Contribute(SymbolProvider.class)
-    @ApplicationDefaults
-    public void disableMinimizationPatch(MappedConfiguration<String, String> config)
-    {
-        // +++ remove when JS minificatino of SmartGWT if fixed
-        config.add(SymbolConstants.MINIFICATION_ENABLED, "false");
-    }
-    
 
+    
     public static class PathProcessor
     {
         public static String removeAssetPathPart(String path)

@@ -6,12 +6,12 @@ package com.flowlogix.web.pages.security;
 
 import com.flowlogix.web.base.LoginBase;
 import com.flowlogix.web.services.SecurityModule.Symbols;
+import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.ExceptionReporter;
-import org.apache.tapestry5.services.Request;
 
 /**
  *
@@ -41,12 +41,7 @@ public class Login extends LoginBase implements ExceptionReporter
         {
             if(checkExpiredMessage())
             {
-                String msg = loginSessionExpiredMessage;
-                if(request.isXHR() == false)
-                {
-                    loginSessionExpiredMessage = null;
-                }
-                return msg;
+                return loginSessionExpiredMessage;
             }
             return "";
         }
@@ -66,8 +61,7 @@ public class Login extends LoginBase implements ExceptionReporter
     }
     
 
-    private @Persist String loginSessionExpiredMessage;
+    private @Persist(PersistenceConstants.FLASH) String loginSessionExpiredMessage;
     private Throwable exception;
     private @Inject @Symbol(Symbols.SESSION_EXPIRED_MESSAGE) String loginExpiredMessage;
-    private @Inject Request request;
 }

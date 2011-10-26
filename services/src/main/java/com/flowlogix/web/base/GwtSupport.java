@@ -12,9 +12,11 @@ import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.SetupRender;
+import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.AssetSource;
 import org.apache.tapestry5.services.RequestGlobals;
+import org.apache.tapestry5.services.assets.AssetPathConstructor;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -46,12 +48,12 @@ public abstract class GwtSupport
      
         final String gwtModule = getModuleName();
         final String supportVariablePath = "flowlogix/js/GwtSupportVariable";
-        final String contextPath = requestGlobals.getRequest().getContextPath();
-        jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s/%s/sc/", 
-                contextPath, supportVariablePath, contextPath, gwtModule));
+        final String gwtModulePath = contextRoot.constructAssetPath(RequestConstants.CONTEXT_FOLDER, gwtModule);
+        jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s/sc/", 
+                requestGlobals.getRequest().getContextPath(), supportVariablePath, gwtModulePath));
 
-        final String gwtModulePath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
-        jsSupport.importJavaScriptLibrary(assetSource.getExpandedAsset(gwtModulePath));
+        final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
+        jsSupport.importJavaScriptLibrary(assetSource.getExpandedAsset(gwtModuleJSPath));
     }    
 
     
@@ -71,5 +73,6 @@ public abstract class GwtSupport
     private @Inject AssetSource assetSource;
     private @Getter @Inject ComponentResources resources;
     private @Inject RequestGlobals requestGlobals;
+    private @Inject AssetPathConstructor contextRoot;
     private static final Logger log = Logger.getLogger(GwtSupport.class.getName());
 }

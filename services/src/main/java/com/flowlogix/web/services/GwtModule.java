@@ -6,15 +6,14 @@ package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.GwtCachingFilter;
 import java.util.logging.Logger;
+import org.apache.tapestry5.SymbolConstants;
+import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.ioc.MappedConfiguration;
-import org.apache.tapestry5.ioc.MethodAdviceReceiver;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Contribute;
-import org.apache.tapestry5.ioc.annotations.Match;
+import org.apache.tapestry5.ioc.services.ApplicationDefaults;
 import org.apache.tapestry5.ioc.services.FactoryDefaults;
 import org.apache.tapestry5.ioc.services.SymbolProvider;
-import org.apache.tapestry5.plastic.MethodAdvice;
-import org.apache.tapestry5.plastic.MethodInvocation;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
 
 /**
@@ -36,45 +35,30 @@ public class GwtModule
     {
         // syntax: ".ext1,.ext2;.ext4
         // commas, semicolns. are the separators
-        config.add(GwtCachingFilter.Symbols.NEVER_CACHE, ".nocache.js");
+        config.add(GwtCachingFilter.Symbols.NEVER_CACHE, "");
         config.add(GwtCachingFilter.Symbols.NEVER_EXPIRE, ".cache.html");
     }
     
-
-    @Match("AssetPathConverter")
-    @SuppressWarnings("unchecked")
-    public void adviseGwtJsPathMethod(MethodAdviceReceiver receiver)
-            throws SecurityException, NoSuchMethodException
+    
+    @Contribute(SymbolProvider.class)
+    @ApplicationDefaults
+    public void disableMinimizationPatch(MappedConfiguration<String, String> config)
     {
-        MethodAdvice advice = new MethodAdvice()
-        {
-            @Override
-            public void advise(MethodInvocation invocation)
-            {
-                invocation.proceed();
-                if(invocation.getMethod().getReturnType().equals(String.class))
-                {
-                    String result = invocation.getReturnValue().toString();
-                    
-                    if (result.matches(".*\\.nocache\\.js"))
-                    {                      
-                        log.fine(String.format("Converting GWT Path: %s", result));
-                        // remove assets/<version>/ctx from GWT path - interferes with servlets
-                        invocation.setReturnValue(PathProcessor.removeAssetPathPart(result));
-                    }
-                }
-            }
-        };
-        receiver.adviseMethod(receiver.getInterface().getMethod("convertAssetPath", String.class), advice);
+        // +++ remove when JS minificatino of SmartGWT if fixed
+        config.add(SymbolConstants.MINIFICATION_ENABLED, "false");
     }
     
-    
+
     public static class PathProcessor
     {
         public static String removeAssetPathPart(String path)
         {
-            return path.replaceFirst("\\/assets\\/.*\\/ctx", "");
+            return path.replaceFirst(filter, "");
         }
+        
+        
+        private static final String filter = String.format("%s.*\\/%s", 
+                RequestConstants.ASSET_PATH_PREFIX, RequestConstants.CONTEXT_FOLDER);
     }
     
     

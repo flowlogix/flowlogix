@@ -1,5 +1,6 @@
 package com.flowlogix.web.services.internal;
 
+import com.flowlogix.web.services.GwtModule.PathProcessor;
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.Service;
 import org.apache.tapestry5.internal.InternalConstants;
-import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.internal.services.RequestImpl;
 import org.apache.tapestry5.internal.services.ResourceStreamer;
 import org.apache.tapestry5.internal.services.ResponseImpl;
@@ -61,7 +61,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
             {
                 neverCachedExtensions.add(ext);
             }
-        }
+        }        
     }
 
     
@@ -71,37 +71,34 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         String path = request.getServletPath();
 
         boolean neverExpire = false;
-        if (!path.startsWith(RequestConstants.ASSET_PATH_PREFIX))
+        for (String ext : neverExpireExtensions)
         {
-            for(String ext : neverExpireExtensions)
+            if (path.endsWith(ext))
             {
-                if(path.endsWith(ext))
-                {
-                    neverExpire = true;
-                    break;
-                }
+                neverExpire = true;
+                break;
             }
-            
-            if (neverExpire == false)
-            {
-                for (String ext : neverCachedExtensions)
-                {
-                    if (path.endsWith(ext))
-                    {
-                        response.setHeader("Cache-Control", "no-cache"); //HTTP 1.1
-                        response.setHeader("Pragma", "no-cache");        //HTTP 1.0
-                        response.setDateHeader("Expires", 0);
-                        break;
-                    }
-                }
-            }            
         }
 
         if (neverExpire == false)
         {
+            for (String ext : neverCachedExtensions)
+            {
+                if (path.endsWith(ext))
+                {
+                    response.setHeader("Cache-Control", "no-cache"); //HTTP 1.1
+                    response.setHeader("Pragma", "no-cache");        //HTTP 1.0
+                    response.setDateHeader("Expires", 0);
+                    break;
+                }
+            }
+        }
+        
+        if (neverExpire == false)
+        {
             return chainHandler.service(request, response);
         }
-
+        
         log.finer("GwtCachingFilter: Processing " + path);
 
         Request rq = new RequestImpl(request, applicationCharset, sessionFactory);
@@ -112,7 +109,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
 
         try
         {
-            return carh.handleAssetRequest(rq, rsp, path);
+            return carh.handleAssetRequest(rq, rsp, PathProcessor.removeAssetPathPart(path));
         }
         catch(Exception e)
         {

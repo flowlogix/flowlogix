@@ -5,6 +5,7 @@
 package com.flowlogix.web.pages.security;
 
 import com.flowlogix.web.base.LoginBase;
+import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.services.ExceptionReporter;
 
 /**
@@ -33,10 +34,17 @@ public class Login extends LoginBase implements ExceptionReporter
             return exception.getMessage() + " Try login.";
         } else
         {
+            if(loginSessionExpiredMessage != null && (!loginSessionExpiredMessage.isEmpty()))
+            {
+                String rv = loginSessionExpiredMessage;
+                loginSessionExpiredMessage = null;
+                return rv;
+            }
             return "";
         }
     }
 
-    
+
+    private @SessionAttribute String loginSessionExpiredMessage;
     private Throwable exception;
 }

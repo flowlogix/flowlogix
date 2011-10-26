@@ -17,6 +17,7 @@ SessionMonitor.prototype = {
         this.endedHandler = spec.endedHandler;
         this.idleCheckId = null;
         this.reloadPageOnly = false;
+        this.sessionExpiredEvent = spec.sessionExpiredEvent
 		
         if (spec.idleCheckSeconds != null && spec.idleCheckSeconds > 0) this.checkIdleNext(spec.idleCheckSeconds);
     },
@@ -31,18 +32,24 @@ SessionMonitor.prototype = {
             });
     },
 
-    end: function() {
-        if (!this.endOnClose) return;
-        var params = this.baseURI + "end" + this.defaultURIparameters + false;
-        if(this.reloadPageOnly == false) {
-            params = params + "&sessionExpired=true";
-        }        
-        new Ajax.Request(params, {
-            method: 'post'
-        });
-        window.location.reload();
+    end: function(self) {
+        if (self.endOnClose == false) return;
+        if(self.reloadPageOnly == false) {
+            new Ajax.Request(self.sessionExpiredEvent, {
+                method: 'post',
+                onSuccess: self.reloadWindow.bind(self),
+                onFailure: self.reloadWindow.bind(self)
+            });
+        }
+        else {
+            self.reloadWindow();
+        }
     },
     
+    reloadWindow : function() {
+        window.location.reload();
+    },
+
     endHandler : function() {
         if (this.endedHandler != null) {
             this.callHandler(this.endedHandler);
@@ -62,9 +69,9 @@ SessionMonitor.prototype = {
     },
 	
     callHandler : function(handlerName, arg) {
-        handlerName = "SessionMonitor." + handlerName;
+        handlerName = "this." + handlerName;
         var operation = eval(handlerName);
-        operation(arg);
+        operation(this);
     },
 		
     handleIdleCheckResult: function(transport) {

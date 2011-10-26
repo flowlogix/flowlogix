@@ -5,7 +5,7 @@
 package com.flowlogix.web.components;
 
 import com.flowlogix.web.mixins.SessionTracker;
-import com.flowlogix.web.services.SecurityModule.Symbols;
+import com.flowlogix.web.services.SecurityModule;
 import javax.validation.constraints.NotNull;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
@@ -17,7 +17,6 @@ import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Parameter;
-import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
@@ -61,23 +60,13 @@ public class SessionMonitor extends SessionTracker
         return null;
     }
 
-    
-    JSONObject onEnd() 
-    {
-        if(sessionExpired)
-        {
-            loginSessionExpiredMessage = loginExpiredMessage;
-        }
-        return new JSONObject();
-    }
-    
-    
+        
     @SetupRender
     public void init()
     {
         if(!endedHandler.isEmpty())
         {
-            _endedHandler = "'" + endedHandler + "'";
+            _endedHandler = endedHandler;
         }
     }
 
@@ -87,6 +76,12 @@ public class SessionMonitor extends SessionTracker
     {
         Link link = componentResources.createEventLink(eventName);
         String baseURI = link.toAbsoluteURI(isSecure);
+
+        int baseIndex = baseURI.lastIndexOf(request.getContextPath()) + request.getContextPath().length() + 1;
+        final String contextBasePath = baseURI.substring(0, baseIndex);
+        final String securityModulePath = contextBasePath + SecurityModule.SECURITY_PATH_PREFIX;
+        final String sessionExpiredEvent = securityModulePath + "/login:sessionExpired";
+
         int index = baseURI.indexOf(":" + eventName);
         String defaultURIparameters = baseURI.substring(index + eventName.length() + 1);
         defaultURIparameters += "".equals(defaultURIparameters) ? "?" : "&";
@@ -102,6 +97,7 @@ public class SessionMonitor extends SessionTracker
         spec.put("endOnClose", true);
         spec.put("idleCheckSeconds", idleCheck);
         spec.put("endedHandler", _endedHandler);
+        spec.put("sessionExpiredEvent", sessionExpiredEvent);
         jsSupport.addInitializerCall("sessionMonitor", spec);
     }
     
@@ -109,9 +105,6 @@ public class SessionMonitor extends SessionTracker
     @Parameter("15") private int idleCheck;
     @Parameter(defaultPrefix = BindingConstants.LITERAL, value = "end") @NotNull private String endedHandler;
     @Parameter("false") private boolean keepAlive;
-    @Parameter("false") private boolean sessionExpired;
-    private @SessionAttribute String loginSessionExpiredMessage;
-    private @Inject @Symbol(Symbols.SESSION_EXPIRED_MESSAGE) String loginExpiredMessage;
     
     @Inject private ComponentResources componentResources;
     @Environmental private JavaScriptSupport jsSupport;    

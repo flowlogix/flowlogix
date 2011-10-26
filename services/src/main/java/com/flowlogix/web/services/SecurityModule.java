@@ -159,6 +159,6 @@ public class SecurityModule
     }
     
     
-    private static final String SECURITY_PATH_PREFIX = "flowlogix/security";
+    public static final String SECURITY_PATH_PREFIX = "flowlogix/security";
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
 }

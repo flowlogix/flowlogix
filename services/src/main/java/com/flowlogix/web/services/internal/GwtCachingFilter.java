@@ -43,11 +43,11 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         this.rg = rg;
         configure(rawNeverExpires, rawNeverCache);
     }
-    
+
     
     private void configure(String rawNeverExpires, String rawNeverCache)
     {
-        if(rawNeverExpires != null)
+        if(rawNeverExpires != null && (!rawNeverExpires.isEmpty()))
         {
             for(String ext : extSplitPattern.split(rawNeverExpires))
             {
@@ -55,7 +55,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
             }
         }
 
-        if(rawNeverCache != null)
+        if(rawNeverCache != null && (!rawNeverCache.isEmpty()))
         {
             for(String ext : extSplitPattern.split(rawNeverCache))
             {
@@ -69,30 +69,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
     public boolean service(HttpServletRequest request, HttpServletResponse response, HttpServletRequestHandler chainHandler) throws IOException
     {
         String path = request.getServletPath();
-
-        boolean neverExpire = false;
-        for (String ext : neverExpireExtensions)
-        {
-            if (path.endsWith(ext))
-            {
-                neverExpire = true;
-                break;
-            }
-        }
-
-        if (neverExpire == false)
-        {
-            for (String ext : neverCachedExtensions)
-            {
-                if (path.endsWith(ext))
-                {
-                    response.setHeader("Cache-Control", "no-cache"); //HTTP 1.1
-                    response.setHeader("Pragma", "no-cache");        //HTTP 1.0
-                    response.setDateHeader("Expires", 0);
-                    break;
-                }
-            }
-        }
+        boolean neverExpire = checkConfig(path, response);
         
         if (neverExpire == false)
         {
@@ -115,6 +92,34 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         {
             return chainHandler.service(request, response);
         }
+    }
+    
+    
+    private boolean checkConfig(String path, HttpServletResponse response)
+    {
+        boolean neverExpire = false;
+        for (String ext : neverExpireExtensions)
+        {
+            if (path.endsWith(ext))
+            {
+                neverExpire = true;
+                break;
+            }
+        }
+        if (neverExpire == false)
+        {
+            for (String ext : neverCachedExtensions)
+            {
+                if (path.endsWith(ext))
+                {
+                    response.setHeader("Cache-Control", "no-cache"); //HTTP 1.1
+                    response.setHeader("Pragma", "no-cache");        //HTTP 1.0
+                    response.setDateHeader("Expires", 0);
+                    break;
+                }
+            }
+        }
+        return neverExpire;
     }
     
     

@@ -18,7 +18,7 @@
         <war-deps.scope>provided</war-deps.scope>
         <rhino.version>1.6R7</rhino.version>
         <yuicompressor.version>2.4.6</yuicompressor.version>
-        <tap.version>5.3-beta-28</tap.version>
+        <tap.version>5.3-beta-29</tap.version>
         <gwt.version>2.4.0</gwt.version>
     </properties>
 

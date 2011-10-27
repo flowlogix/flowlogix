@@ -6,6 +6,9 @@ package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.AjaxAnnotationWorker;
 import com.flowlogix.web.services.internal.AssetMinimizerImpl;
+import java.io.IOException;
+import org.apache.tapestry5.ComponentResources;
+import org.apache.tapestry5.Link;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
@@ -16,7 +19,10 @@ import org.apache.tapestry5.ioc.annotations.SubModule;
 import org.apache.tapestry5.ioc.services.FactoryDefaults;
 import org.apache.tapestry5.ioc.services.SymbolProvider;
 import org.apache.tapestry5.services.ComponentClassResolver;
+import org.apache.tapestry5.services.ComponentSource;
 import org.apache.tapestry5.services.LibraryMapping;
+import org.apache.tapestry5.services.RequestExceptionHandler;
+import org.apache.tapestry5.services.Response;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
 
 /**
@@ -52,6 +58,35 @@ public class ServicesModule
     public static void bind(ServiceBinder binder)
     {
         binder.bind(AssetMinimizer.class, AssetMinimizerImpl.class);
+    }
+    
+    
+    /**
+     * silently redirect the user to the intended page when browsing through
+     * tapestry forms through browser history
+     */
+    
+    public RequestExceptionHandler decorateRequestExceptionHandler(
+            final ComponentSource componentSource,
+            final Response response,
+            final RequestExceptionHandler oldHandler)
+    {
+        return new RequestExceptionHandler()
+        {
+            @Override
+            public void handleRequestException(Throwable exception) throws IOException
+            {
+                if (!exception.getMessage().contains("Forms require that the request method be POST and that the t:formdata query parameter have values"))
+                {
+                    oldHandler.handleRequestException(exception);
+                    return;
+                }
+                ComponentResources cr = componentSource.getActivePage().getComponentResources();
+                Link link = cr.createEventLink("");
+                String uri = link.toRedirectURI().replaceAll(":", "");
+                response.sendRedirect(uri);
+            }
+        };
     }
 
 

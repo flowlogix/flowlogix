@@ -76,7 +76,12 @@ public class ServicesModule
             @Override
             public void handleRequestException(Throwable exception) throws IOException
             {
-                if (!exception.getMessage().contains("Forms require that the request method be POST and that the t:formdata query parameter have values"))
+                String msg = exception.getMessage();
+                if(msg == null)
+                {
+                    msg = "";
+                }
+                if (!msg.contains("Forms require that the request method be POST and that the t:formdata query parameter have values"))
                 {
                     oldHandler.handleRequestException(exception);
                     return;

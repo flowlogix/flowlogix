@@ -8,9 +8,9 @@ import com.flowlogix.web.base.LoginBase;
 import com.flowlogix.web.services.SecurityModule.Symbols;
 import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.annotations.Persist;
+import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
-import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.ExceptionReporter;
 
 /**
@@ -48,20 +48,19 @@ public class Login extends LoginBase implements ExceptionReporter
     }
     
     
-    public boolean checkExpiredMessage()
+    private boolean checkExpiredMessage()
     {
+        if(showSessionExpiredMessage)
+        {
+            loginSessionExpiredMessage = loginExpiredMessage;
+            showSessionExpiredMessage = false;
+        }
         return loginSessionExpiredMessage != null && (!loginSessionExpiredMessage.isEmpty());
     }
     
     
-    JSONObject onSessionExpired() 
-    {
-        loginSessionExpiredMessage = loginExpiredMessage;
-        return new JSONObject();
-    }
-    
-
     private @Persist(PersistenceConstants.FLASH) String loginSessionExpiredMessage;
     private Throwable exception;
     private @Inject @Symbol(Symbols.SESSION_EXPIRED_MESSAGE) String loginExpiredMessage;
+    private @SessionAttribute boolean showSessionExpiredMessage;
 }

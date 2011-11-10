@@ -77,10 +77,9 @@ public class SessionMonitor extends SessionTracker
         Link link = componentResources.createEventLink(eventName);
         String baseURI = link.toAbsoluteURI(isSecure);
 
-        int baseIndex = baseURI.lastIndexOf(request.getContextPath()) + request.getContextPath().length() + 1;
+        int baseIndex = baseURI.indexOf(request.getContextPath()) + request.getContextPath().length() + 1;
         final String contextBasePath = baseURI.substring(0, baseIndex);
-        final String securityModulePath = contextBasePath + SecurityModule.SECURITY_PATH_PREFIX;
-        final String sessionExpiredEvent = securityModulePath + "/login:sessionExpired";
+        final String sessionExpiredEvent = contextBasePath + loginPagePath + ":sessionExpired";
 
         int index = baseURI.indexOf(":" + eventName);
         String defaultURIparameters = baseURI.substring(index + eventName.length() + 1);
@@ -110,6 +109,7 @@ public class SessionMonitor extends SessionTracker
     @Environmental private JavaScriptSupport jsSupport;    
     @Inject private Request request;
     
+    private @Inject @Symbol(SecurityModule.Symbols.LOGIN_URL) String loginPagePath;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     private String _endedHandler;
 

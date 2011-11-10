@@ -50,6 +50,10 @@ public class Login extends LoginBase implements ExceptionReporter
     
     private boolean checkExpiredMessage()
     {
+        if(showSessionExpiredMessage == null)
+        {
+            showSessionExpiredMessage = false;
+        }
         if(showSessionExpiredMessage)
         {
             loginSessionExpiredMessage = loginExpiredMessage;
@@ -62,5 +66,5 @@ public class Login extends LoginBase implements ExceptionReporter
     private @Persist(PersistenceConstants.FLASH) String loginSessionExpiredMessage;
     private Throwable exception;
     private @Inject @Symbol(Symbols.SESSION_EXPIRED_MESSAGE) String loginExpiredMessage;
-    private @SessionAttribute boolean showSessionExpiredMessage;
+    private @SessionAttribute Boolean showSessionExpiredMessage;
 }

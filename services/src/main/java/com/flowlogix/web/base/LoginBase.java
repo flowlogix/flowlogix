@@ -22,7 +22,7 @@ public class LoginBase
     /**
      * when a user is redirected to the Logon page through a AJAX
      * request after their session has expired,
-     * return an json response that redirects them to the logon page
+     * return a JSON response that redirects them to the logon page
      * @return
      * @throws IOException
      */

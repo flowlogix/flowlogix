@@ -8,6 +8,7 @@ import com.flowlogix.session.SessionTrackerHolder;
 import java.io.IOException;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.BeginRender;
+import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.PageRenderLinkSource;
@@ -29,11 +30,16 @@ public class LoginBase
     @BeginRender
     private Object checkForAjax() throws IOException
     {
+        if(rg.getRequest().isXHR())
+        {
+            showSessionExpiredMessage = true;
+        }
         SessionTrackerHolder.redirectToSelf(rg, linkSource, isSecure);
         return null;
     }
    
     private @Inject RequestGlobals rg;
     private @Inject PageRenderLinkSource linkSource;
-    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
+    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
+    private @SessionAttribute Boolean showSessionExpiredMessage;
 }

@@ -12,6 +12,7 @@ import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.ExceptionReporter;
+import org.apache.tapestry5.services.Request;
 
 /**
  *
@@ -50,6 +51,10 @@ public class Login extends LoginBase implements ExceptionReporter
     
     private boolean checkExpiredMessage()
     {
+        if(request.isXHR())
+        {
+            return false;
+        }
         if(showSessionExpiredMessage == null)
         {
             showSessionExpiredMessage = false;
@@ -67,4 +72,5 @@ public class Login extends LoginBase implements ExceptionReporter
     private Throwable exception;
     private @Inject @Symbol(Symbols.SESSION_EXPIRED_MESSAGE) String loginExpiredMessage;
     private @SessionAttribute Boolean showSessionExpiredMessage;
+    private @Inject Request request;
 }

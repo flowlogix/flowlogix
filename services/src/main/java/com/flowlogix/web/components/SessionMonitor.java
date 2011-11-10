@@ -5,7 +5,6 @@
 package com.flowlogix.web.components;
 
 import com.flowlogix.web.mixins.SessionTracker;
-import com.flowlogix.web.services.SecurityModule;
 import javax.validation.constraints.NotNull;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
@@ -76,18 +75,12 @@ public class SessionMonitor extends SessionTracker
     {
         Link link = componentResources.createEventLink(eventName);
         String baseURI = link.toAbsoluteURI(isSecure);
-
-        int baseIndex = baseURI.indexOf(request.getContextPath()) + request.getContextPath().length() + 1;
-        final String contextBasePath = baseURI.substring(0, baseIndex);
-        final String sessionExpiredEvent = contextBasePath + loginPagePath + ":sessionExpired";
-
         int index = baseURI.indexOf(":" + eventName);
         String defaultURIparameters = baseURI.substring(index + eventName.length() + 1);
         defaultURIparameters += "".equals(defaultURIparameters) ? "?" : "&";
         defaultURIparameters += KEEPALIVE_NAME + "=";
         baseURI = baseURI.substring(0, index + 1);
 
-        
         JSONObject spec = new JSONObject();
         spec.put("contextPath", request.getContextPath());
         spec.put("baseURI", baseURI);
@@ -96,7 +89,6 @@ public class SessionMonitor extends SessionTracker
         spec.put("endOnClose", true);
         spec.put("idleCheckSeconds", idleCheck);
         spec.put("endedHandler", _endedHandler);
-        spec.put("sessionExpiredEvent", sessionExpiredEvent);
         jsSupport.addInitializerCall("sessionMonitor", spec);
     }
     
@@ -109,7 +101,6 @@ public class SessionMonitor extends SessionTracker
     @Environmental private JavaScriptSupport jsSupport;    
     @Inject private Request request;
     
-    private @Inject @Symbol(SecurityModule.Symbols.LOGIN_URL) String loginPagePath;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     private String _endedHandler;
 

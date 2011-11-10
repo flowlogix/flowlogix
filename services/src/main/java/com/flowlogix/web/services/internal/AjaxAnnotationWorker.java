@@ -9,7 +9,6 @@ import com.flowlogix.web.services.annotations.AJAX;
 import java.io.IOException;
 import lombok.SneakyThrows;
 import org.apache.tapestry5.SymbolConstants;
-import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.model.MutableComponentModel;
@@ -60,7 +59,6 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
                             invocation.proceed();
                         } else
                         {
-                            showSessionExpiredMessage = true;
                             SessionTrackerHolder.redirectToSelf(rg, linkSource, isSecure);
                             if(!isVoid)
                             {
@@ -118,5 +116,4 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
     private @Inject RequestGlobals rg;
     private @Inject PageRenderLinkSource linkSource;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
-    private @SessionAttribute boolean showSessionExpiredMessage;
 }

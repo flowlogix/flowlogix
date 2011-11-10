@@ -14,7 +14,6 @@ import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.InjectContainer;
 import org.apache.tapestry5.annotations.OnEvent;
 import org.apache.tapestry5.annotations.Parameter;
-import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.corelib.components.Zone;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
@@ -47,7 +46,6 @@ public class UpdateEvent extends SessionTracker
         if(isValidSession() == false)
         {
             rv.put("reloadPage", true);
-            showSessionExpiredMessage = true;
         }
         return rv;
     }
@@ -70,7 +68,5 @@ public class UpdateEvent extends SessionTracker
     private @Environmental JavaScriptSupport js;
     private @Inject ComponentResources cr;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
-    private @SessionAttribute boolean showSessionExpiredMessage;
     public static final String CHECK_SESSION_EVENT = "checkSessionEvent";
-    
 }

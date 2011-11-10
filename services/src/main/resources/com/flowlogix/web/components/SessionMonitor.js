@@ -17,6 +17,7 @@ SessionMonitor.prototype = {
         this.endedHandler = spec.endedHandler;
         this.idleCheckId = null;
         this.reloadPageOnly = false;
+        this.sessionExpiredEvent = spec.sessionExpiredEvent
 		
         if (spec.idleCheckSeconds != null && spec.idleCheckSeconds > 0) this.checkIdleNext(spec.idleCheckSeconds);
     },
@@ -33,9 +34,22 @@ SessionMonitor.prototype = {
 
     end: function(self) {
         if (self.endOnClose == false) return;
-        window.location.reload();
+        if(self.reloadPageOnly == false) {
+            new Ajax.Request(self.sessionExpiredEvent, {
+                method: 'post',
+                onSuccess: self.reloadWindow.bind(self),
+                onFailure: self.reloadWindow.bind(self)
+            });
+        }
+        else {
+            self.reloadWindow();
+        }
     },
     
+    reloadWindow : function() {
+        window.location.reload();
+    },
+
     endHandler : function() {
         if (this.endedHandler != null) {
             this.callHandler(this.endedHandler);

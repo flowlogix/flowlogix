@@ -118,5 +118,5 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
     private @Inject RequestGlobals rg;
     private @Inject PageRenderLinkSource linkSource;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
-    private @SessionAttribute boolean showSessionExpiredMessage;
+    private @SessionAttribute Boolean showSessionExpiredMessage;
 }

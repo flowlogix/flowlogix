@@ -70,7 +70,6 @@ public class UpdateEvent extends SessionTracker
     private @Environmental JavaScriptSupport js;
     private @Inject ComponentResources cr;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
-    private @SessionAttribute boolean showSessionExpiredMessage;
+    private @SessionAttribute Boolean showSessionExpiredMessage;
     public static final String CHECK_SESSION_EVENT = "checkSessionEvent";
-    
 }

@@ -1,23 +1,43 @@
 // when manual input is erroneous, do not pop up validatio errors here
-Tapestry.DateField.prototype.sendServerRequest = function(url, input, resultHandler, errorHandler) {
-    var successHandler = function(response) {
-        var json = response.responseJSON;
+Tapestry.DateField.prototype.triggerClicked = function() {
+    if (this.field.disabled)
+        return;
 
-        var result = json.result;
+    if (this.popup == null) {
+        this.createPopup();
 
-        if (result == null)
-        {
-            result = new Date();
-            this.datePicker.setDate(null, false);
+    } else {
+        if (this.popup.visible()) {
+            this.hidePopup();
+            return;
         }
-        resultHandler.call(this, result);
-    }.bind(this);
+    }
 
-    Tapestry.ajaxRequest(url, {
-        method : 'get',
-        parameters : {
-            input : input
-        },
-        onSuccess : successHandler
-    });
+    var value = $F(this.field).escapeHTML();
+
+    if (value == "") {
+        this.datePicker._selectedDate = null;
+        this.datePicker.setDate(null);
+        this.positionPopup();
+        this.revealPopup();
+        return;
+    }
+
+    var resultHandler = function(result) {
+        var date = new Date();
+        date.setTime(result);
+        this.datePicker.setDate(date);
+        this.positionPopup();
+        this.revealPopup();
+    };
+
+    var errorHandler = function(message) {
+        this.datePicker._selectedDate = null;
+        this.datePicker.setDate(null);
+        this.positionPopup();
+        this.revealPopup();
+    };
+
+    this.sendServerRequest(this.parseURL, value, resultHandler,
+        errorHandler);
 }

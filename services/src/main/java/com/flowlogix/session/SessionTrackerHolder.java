@@ -4,7 +4,6 @@
  */
 package com.flowlogix.session;
 
-import com.flowlogix.web.mixins.SessionTracker;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -51,7 +50,7 @@ public class SessionTrackerHolder
     }
     
     
-    public void setPageSession(String pageName, HttpSession session, SessionTracker tracker)
+    public void setPageSession(String pageName, HttpSession session, SessionTrackerBase tracker)
     {
         Map<Integer, Value> map = trackers.get(pageName);
         if(map == null)

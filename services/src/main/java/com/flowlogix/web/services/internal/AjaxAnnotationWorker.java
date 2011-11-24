@@ -5,6 +5,7 @@
 package com.flowlogix.web.services.internal;
 
 import com.flowlogix.session.SessionTrackerHolder;
+import com.flowlogix.web.mixins.SessionTracker;
 import com.flowlogix.web.services.annotations.AJAX;
 import java.io.IOException;
 import lombok.SneakyThrows;
@@ -39,10 +40,16 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
     @Override
     public void transform(PlasticClass plasticClass, TransformationSupport support, MutableComponentModel model)
     {
+        boolean hasTrackerMixin = model.getMixinClassNames().contains(SessionTracker.class.getName());
         for(PlasticMethod method : plasticClass.getMethodsWithAnnotation(AJAX.class))
         {
             final AJAX annotation = method.getAnnotation(AJAX.class);
             final boolean isVoid = method.isVoid();
+            if(annotation.requireSession() && (!hasTrackerMixin))
+            {
+                model.addMixinClassName(SessionTracker.class.getName());
+                hasTrackerMixin = true;
+            }
             method.addAdvice(new MethodAdvice()
             {
                 @Override

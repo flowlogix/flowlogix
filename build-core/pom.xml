@@ -18,7 +18,7 @@
         <war-deps.scope>provided</war-deps.scope>
         <rhino.version>1.6R7</rhino.version>
         <yuicompressor.version>2.4.6</yuicompressor.version>
-        <tap.version>5.3-rc-3</tap.version>
+        <tap.version>5.3</tap.version>
         <gwt.version>2.4.0</gwt.version>
     </properties>
 
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.9</version>
+            <version>4.10</version>
             <scope>test</scope>
             <optional>true</optional>
         </dependency>
@@ -227,7 +227,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>1.6.2</version>
+            <version>1.6.4</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
@@ -253,7 +253,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.6.2</version>
+            <version>1.6.4</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
@@ -486,7 +486,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.10</version>
                 <configuration>
                     <includes>
                         <include>**/test/**</include>                     
@@ -497,10 +497,6 @@
     </build>
     
     <repositories>
-        <repository>
-            <id>tapestry-repo</id>
-            <url>https://repository.apache.org/content/groups/staging</url>
-        </repository>
         <repository>
             <id>projectlombok.org</id>
             <url>http://projectlombok.org/mavenrepo</url>

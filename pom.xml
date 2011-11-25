@@ -5,6 +5,7 @@
     <version>0.8.5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
+    <description>Flow Logix Utility Library Root POM</description>
   
     <modules>
         <module>build-core</module>

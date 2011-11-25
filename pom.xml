@@ -39,7 +39,7 @@
     
     <profiles>
         <profile>
-            <id>release-flowlogix</id>
+            <id>release-flowlogix-prod</id>
             <activation>
                 <property>
                     <name>performRelease</name>
@@ -51,10 +51,6 @@
                     <id>flowlogix-repo.googlecode.com</id>
                     <url>svn:https://flowlogix-repo.googlecode.com/svn/releases/</url>
                 </repository>
-                <snapshotRepository>
-                    <id>flowlogix-repo.googlecode.com</id>
-                    <url>svn:https://flowlogix-repo.googlecode.com/svn/snapshots/</url>
-                </snapshotRepository>
             </distributionManagement>
             <build>
                 <plugins>
@@ -74,6 +70,15 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>release-flowlogix</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>flowlogix-repo.googlecode.com</id>
+                    <url>svn:https://flowlogix-repo.googlecode.com/svn/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
     </profiles>
 </project>

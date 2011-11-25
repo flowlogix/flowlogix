@@ -17,7 +17,7 @@
             <extension>
                 <groupId>com.google.code.maven-svn-wagon</groupId>
                 <artifactId>maven-svn-wagon</artifactId>
-                <version>1.5</version>
+                <version>1.4</version>
             </extension>
         </extensions>
         <plugins>

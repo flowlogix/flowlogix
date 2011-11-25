@@ -29,6 +29,12 @@
     <profiles>
         <profile>
             <id>release-flowlogix</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <distributionManagement>
                 <repository>
                     <id>flowlogix-repo.googlecode.com</id>
@@ -48,7 +54,22 @@
                         <configuration>
                             <goals>source:jar javadoc:jar deploy</goals>
                             <tagNameFormat>VERS_@{project.version}-TODAY</tagNameFormat>
+                            <mavenExecutorId>forked-path</mavenExecutorId>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

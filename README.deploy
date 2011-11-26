@@ -5,4 +5,4 @@ mvn release:prepare -DdryRun=true
 mvn release:perform -DdryRun=true
 
 # To deploy a snapshot
-mvn -Prelease-flowlogix clean source:jar javadoc:jar deploy
+mvn clean source:jar javadoc:jar deploy

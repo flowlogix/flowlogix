@@ -12,6 +12,12 @@
         <module>services</module>
     </modules>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <build>
         <extensions>
             <extension>
@@ -46,12 +52,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <distributionManagement>
-                <repository>
-                    <id>flowlogix-repo.googlecode.com</id>
-                    <url>svn:https://flowlogix-repo.googlecode.com/svn/releases/</url>
-                </repository>
-            </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
@@ -70,15 +70,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>release-flowlogix</id>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>flowlogix-repo.googlecode.com</id>
-                    <url>svn:https://flowlogix-repo.googlecode.com/svn/snapshots/</url>
-                </snapshotRepository>
-            </distributionManagement>
         </profile>
     </profiles>
 </project>

@@ -13,7 +13,9 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
- * Overrides Calendar to have "October 2011" and such on the popup label
+ * Overrides Calendar to have "October 2011" and such on the popup label,<br/>
+ * Fixes the JIRA issue <a href="https://issues.apache.org/jira/browse/TAP5-805">TAP5-805</a><br/>
+ * Fixes the JIRA issue <a href="https://issues.apache.org/jira/browse/TAP5-1697">TAP5-1697</a>
  * 
  * @author lprimak
  */

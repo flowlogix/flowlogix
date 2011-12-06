@@ -198,6 +198,20 @@
             <scope>${war-deps.scope}</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.tapestry</groupId>
+            <artifactId>tapestry-jmx</artifactId>
+            <version>${tap.version}</version>
+            <type>jar</type>
+            <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tapestry</groupId>
+            <artifactId>tapestry-upload</artifactId>
+            <version>${tap.version}</version>
+            <type>jar</type>
+            <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
             <groupId>org.tynamo</groupId>
             <artifactId>tapestry-security</artifactId>
             <version>0.4.0</version>
@@ -290,6 +304,20 @@
                                     <groupId>commons-codec</groupId>
                                     <artifactId>commons-codec</artifactId>
                                     <version>1.5</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-fileupload</groupId>
+                                    <artifactId>commons-fileupload</artifactId>
+                                    <version>1.2.2</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-io</groupId>
+                                    <artifactId>commons-io</artifactId>
+                                    <version>2.1</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -402,6 +430,18 @@
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                     <version>${yuicompressor.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.tapestry</groupId>
+                                    <artifactId>tapestry-jmx</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.tapestry</groupId>
+                                    <artifactId>tapestry-upload</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.tynamo</groupId>

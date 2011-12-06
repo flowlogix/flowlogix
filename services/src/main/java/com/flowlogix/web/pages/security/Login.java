@@ -5,72 +5,23 @@
 package com.flowlogix.web.pages.security;
 
 import com.flowlogix.web.base.LoginBase;
-import com.flowlogix.web.services.SecurityModule.Symbols;
-import org.apache.tapestry5.PersistenceConstants;
-import org.apache.tapestry5.annotations.Persist;
-import org.apache.tapestry5.annotations.SessionAttribute;
-import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.ioc.annotations.Symbol;
-import org.apache.tapestry5.services.ExceptionReporter;
-import org.apache.tapestry5.services.Request;
 
 /**
  *
  * @author lprimak
  */
-public class Login extends LoginBase implements ExceptionReporter
+public class Login extends LoginBase
 {
     @Override
-    public void reportException(Throwable exception)
+    protected String getLoginMessage()
     {
-        this.exception = exception;
-    }
-
-    
-    public Throwable getException()
-    {
-        return exception;
-    }
-
-    
-    public String getMessage()
-    {
-        if (exception != null && !checkExpiredMessage())
+        if(getException() == null)
         {
-            return exception.getMessage() + " Try login.";
-        } else
-        {
-            if(checkExpiredMessage())
-            {
-                return loginSessionExpiredMessage;
-            }
             return "";
         }
+        else
+        {
+            return getException().getMessage() + " Please Log In";
+        }
     }
-    
-    
-    private boolean checkExpiredMessage()
-    {
-        if(request.isXHR())
-        {
-            return false;
-        }
-        if(showSessionExpiredMessage == null)
-        {
-            showSessionExpiredMessage = false;
-        }
-        if(showSessionExpiredMessage)
-        {
-            loginSessionExpiredMessage = loginExpiredMessage;
-            showSessionExpiredMessage = false;
-        }
-        return loginSessionExpiredMessage != null && (!loginSessionExpiredMessage.isEmpty());
-    }
-    
-    
-    private @Persist(PersistenceConstants.FLASH) String loginSessionExpiredMessage;
-    private Throwable exception;
-    private @Inject @Symbol(Symbols.SESSION_EXPIRED_MESSAGE) String loginExpiredMessage;
-    private @SessionAttribute Boolean showSessionExpiredMessage;
-    private @Inject Request request;
 }

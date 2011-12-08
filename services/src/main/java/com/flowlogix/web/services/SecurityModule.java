@@ -31,6 +31,8 @@ import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.TapestryRealmSecurityManager;
 
@@ -98,14 +100,21 @@ public class SecurityModule
 
     
     @Match("WebSecurityManager")
-    public static WebSecurityManager decorateWebSecurityManager(WebSecurityManager _manager, 
+    public WebSecurityManager decorateWebSecurityManager(WebSecurityManager _manager, 
         @Symbol(Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)
     {
         if (_manager instanceof TapestryRealmSecurityManager)
         {
             TapestryRealmSecurityManager manager = (TapestryRealmSecurityManager)_manager;
             CookieRememberMeManager mgr = (CookieRememberMeManager)manager.getRememberMeManager();
-            mgr.getCookie().setMaxAge(daysToRemember * 24 * 60 * 60);
+            if(productionMode)
+            {
+                mgr.getCookie().setMaxAge(daysToRemember * 24 * 60 * 60);
+            }
+            else
+            {
+                mgr.getCookie().setMaxAge(-1);
+            }
             
             mgr.setSerializer(new Serialize<PrincipalCollection>());
         }
@@ -161,4 +170,7 @@ public class SecurityModule
     
     public static final String SECURITY_PATH_PREFIX = "flowlogix/security";
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
+    private @Inject @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode;
+    
+    private static final Logger logger = LoggerFactory.getLogger(SecurityModule.class);
 }

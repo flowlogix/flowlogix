@@ -4,7 +4,7 @@
     <name>Build Core</name>
     <description>Parent POM for Tapestry Builds</description>
     <groupId>com.flowlogix</groupId>
-    <artifactId>build-core</artifactId>
+    <artifactId>tapestry-build-core</artifactId>
     <packaging>pom</packaging>
     <version>0.8.9-SNAPSHOT</version>
     

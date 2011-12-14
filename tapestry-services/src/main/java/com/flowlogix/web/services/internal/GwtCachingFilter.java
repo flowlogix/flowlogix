@@ -36,11 +36,13 @@ public class GwtCachingFilter implements HttpServletRequestFilter
     public GwtCachingFilter(ResourceStreamer streamer, @Service("ContextAssetFactory") AssetFactory contextAssetFactory,
             TapestrySessionFactory sessionFactory, RequestGlobals rg,
             @Symbol(Symbols.NEVER_EXPIRE) String rawNeverExpires,
-            @Symbol(Symbols.NEVER_CACHE) String rawNeverCache)
+            @Symbol(Symbols.NEVER_CACHE) String rawNeverCache,
+            @Symbol(SymbolConstants.ASSET_PATH_PREFIX) String assetPathPrefix)
     {
         this.carh = new ContextAssetRequestHandler(streamer, contextAssetFactory.getRootResource());
         this.sessionFactory = sessionFactory;
         this.rg = rg;
+        this.pathProcessor = new PathProcessor(assetPathPrefix);
         configure(rawNeverExpires, rawNeverCache);
     }
 
@@ -86,7 +88,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
 
         try
         {
-            return carh.handleAssetRequest(rq, rsp, PathProcessor.removeAssetPathPart(path));
+            return carh.handleAssetRequest(rq, rsp, pathProcessor.removeAssetPathPart(path));
         }
         catch(Exception e)
         {
@@ -133,6 +135,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
     private final ContextAssetRequestHandler carh;
     private final TapestrySessionFactory sessionFactory;
     private @Inject @Symbol(SymbolConstants.CHARSET) String applicationCharset;
+    private final PathProcessor pathProcessor;
     private final RequestGlobals rg;
     private final List<String> neverExpireExtensions = new LinkedList<String>();
     private final List<String> neverCachedExtensions = new LinkedList<String>();

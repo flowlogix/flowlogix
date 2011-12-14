@@ -71,13 +71,14 @@ public class SecurityModule
     
     @Contribute(RequestHandler.class)
     public void disableAssetDirListing(OrderedConfiguration<RequestFilter> configuration,
-                    @Symbol(SymbolConstants.APPLICATION_VERSION) final String applicationVersion)
+                    @Symbol(SymbolConstants.APPLICATION_VERSION) final String applicationVersion,
+                    @Symbol(SymbolConstants.ASSET_PATH_PREFIX) final String assetPathPrefix)
     {
         configuration.add("DisableDirListing", new RequestFilter() {
             @Override
             public boolean service(Request request, Response response, RequestHandler handler) throws IOException
             {
-                final String assetFolder = RequestConstants.ASSET_PATH_PREFIX + applicationVersion + "/" + 
+                final String assetFolder = assetPathPrefix+ applicationVersion + "/" + 
                         RequestConstants.CONTEXT_FOLDER;
                 if(request.getPath().startsWith(assetFolder) && request.getPath().endsWith("/"))
                 {

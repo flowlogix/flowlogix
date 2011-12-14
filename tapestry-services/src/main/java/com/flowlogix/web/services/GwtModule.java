@@ -40,14 +40,19 @@ public class GwtModule
     
     public static class PathProcessor
     {
-        public static String removeAssetPathPart(String path)
+        public PathProcessor(String assetPathPrefix)
+        {
+            filter = String.format("%s.*\\/%s", assetPathPrefix, RequestConstants.CONTEXT_FOLDER);
+        }
+        
+        
+        public String removeAssetPathPart(String path)
         {
             return path.replaceFirst(filter, "");
         }
         
         
-        private static final String filter = String.format("%s.*\\/%s", 
-                RequestConstants.ASSET_PATH_PREFIX, RequestConstants.CONTEXT_FOLDER);
+        private final String filter;
     }
     
     

@@ -10,7 +10,7 @@ import org.apache.tapestry5.services.FormSupport;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
- * <a href="http://code.google.com/p/flowlogix/wiki/DisableAfterSubmit" 
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLDisableAfterSubmit" 
  *    target="_blank">See Documentation</a>
  * @author lprimak
  */

@@ -99,7 +99,10 @@ public class SecurityModule
         return new SecurityInterceptorFilter(filter);
     }
 
-    
+
+    /**
+     * @see <a href="https://issues.apache.org/jira/browse/SHIRO-334" target="_blank">SHIRO-334</a>
+     */
     @Match("WebSecurityManager")
     public WebSecurityManager decorateWebSecurityManager(WebSecurityManager _manager, 
         @Symbol(Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)

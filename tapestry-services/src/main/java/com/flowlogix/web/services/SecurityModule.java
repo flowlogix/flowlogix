@@ -120,12 +120,16 @@ public class SecurityModule
                 mgr.getCookie().setMaxAge(-1);
             }
             
+            // +++ Remove this once Shiro 1.2 is released and integrated
             mgr.setSerializer(new Serialize<PrincipalCollection>());
         }
         return null;
     }
     
     
+    /**
+     * @deprecated since Shiro 1.2
+     */
     private static class Serialize<T> extends DefaultSerializer<T> 
     {
         @Override

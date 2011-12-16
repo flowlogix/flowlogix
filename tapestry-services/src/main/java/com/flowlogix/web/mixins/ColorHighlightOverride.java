@@ -14,7 +14,9 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
- *
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLColorHighlight"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 public class ColorHighlightOverride
@@ -26,7 +28,7 @@ public class ColorHighlightOverride
     }
     
     
-    private@Environmental JavaScriptSupport js;
+    private @Environmental JavaScriptSupport js;
     private @BindParameter String highlightColor;
     private @Inject @Path("EffectOverrides.js") Asset scriptAsset;
     private @Inject AssetMinimizer minimizer;

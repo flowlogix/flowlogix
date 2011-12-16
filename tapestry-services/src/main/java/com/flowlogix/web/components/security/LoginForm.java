@@ -16,12 +16,9 @@ import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 
 /**
+ * Default Login form component
  *
  * @author lprimak
- */
-/**
- * Login form component
- *
  */
 public class LoginForm extends LoginFormBase
 {
@@ -63,9 +60,9 @@ public class LoginForm extends LoginFormBase
     }
 
 
-    @Property private String login;
-    @Property private String password;
-    @Property private boolean tynamoRememberMe;
-    @Persist(PersistenceConstants.FLASH)
-    private @Setter String loginMessage;
+    private @Property String login;
+    private @Property String password;
+    private @Property boolean tynamoRememberMe;
+    private @Persist(PersistenceConstants.FLASH)
+    @Setter String loginMessage;
 }

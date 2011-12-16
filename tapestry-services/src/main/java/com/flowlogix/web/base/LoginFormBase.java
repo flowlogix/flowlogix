@@ -40,7 +40,9 @@ import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.SecurityService;
 
 /**
- *
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLLoginBase"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 @Import(library = "DetectJS.js")

@@ -23,8 +23,11 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 
 /**
  * Dynamic image, that is compatible and viewable for Web designers
- * with tools such as DreamWeaver.
- * Behaves just like an ordinary img tag.
+ * with tools such as DreamWeaver,
+ * Behaves just like an ordinary img tag<br>
+ * 
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLDynImg"
+ *    target="_blank">See Documentation</a>
  * 
  * @author lprimak
  */

@@ -16,7 +16,7 @@ import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.RequestGlobals;
 
 /**
- * Internal support class for {@see com.flowlogix.web.services.annotations.AJAX} annotation
+ * Internal support class for {@link com.flowlogix.web.services.annotations.AJAX} annotation
  * 
  * @author lprimak
  */

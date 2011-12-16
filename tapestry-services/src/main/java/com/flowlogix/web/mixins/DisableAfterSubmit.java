@@ -12,6 +12,7 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 /**
  * <a href="http://code.google.com/p/flowlogix/wiki/TLDisableAfterSubmit" 
  *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 @Import(library="DisableAfterSubmit.js")

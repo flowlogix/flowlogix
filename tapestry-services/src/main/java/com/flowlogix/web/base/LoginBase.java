@@ -4,7 +4,7 @@
  */
 package com.flowlogix.web.base;
 
-import com.flowlogix.session.SessionTrackerHolder;
+import com.flowlogix.session.internal.SessionTrackerHolder;
 import com.flowlogix.web.services.SecurityModule.Symbols;
 import java.io.IOException;
 import lombok.Getter;

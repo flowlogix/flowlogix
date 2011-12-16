@@ -26,7 +26,8 @@ import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
 import org.apache.tapestry5.services.transform.TransformationSupport;
 
 /**
- *
+ * Provides internal support for {@link com.flowlogix.web.services.annotations.AJAX} annotation
+ * 
  * @author lprimak
  */
 public class AjaxAnnotationWorker implements ComponentClassTransformWorker2

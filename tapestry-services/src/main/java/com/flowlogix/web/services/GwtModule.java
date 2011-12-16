@@ -15,6 +15,9 @@ import org.apache.tapestry5.ioc.services.SymbolProvider;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
 
 /**
+ * Provides forever caching of GWT assets,
+ * fixes paths for GWT-RPC<br>
+ * See {@link com.flowlogix.web.base.GwtSupport}
  *
  * @author lprimak
  */

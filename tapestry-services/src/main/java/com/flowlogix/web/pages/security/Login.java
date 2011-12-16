@@ -7,7 +7,8 @@ package com.flowlogix.web.pages.security;
 import com.flowlogix.web.base.LoginBase;
 
 /**
- *
+ * Default Login page
+ * 
  * @author lprimak
  */
 public class Login extends LoginBase

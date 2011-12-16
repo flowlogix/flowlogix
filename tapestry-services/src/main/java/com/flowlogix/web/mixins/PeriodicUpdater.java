@@ -17,7 +17,9 @@ import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
- *
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLPeriodicUpdater"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 @Import(library="PeriodicUpdater.js")

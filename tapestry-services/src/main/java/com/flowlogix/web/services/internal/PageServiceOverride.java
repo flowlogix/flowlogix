@@ -12,7 +12,8 @@ import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.impl.PageServiceImpl;
 
 /**
- *
+ * Override Tynamo Login, Success and Unauthorized pages
+ * 
  * @author lprimak
  */
 public class PageServiceOverride implements PageService

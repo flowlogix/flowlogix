@@ -10,6 +10,9 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 /**
  * Provides Timed Zone Updates
  * 
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLPeriodicUpdater"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 @Import(library="DeferUpdate.js")

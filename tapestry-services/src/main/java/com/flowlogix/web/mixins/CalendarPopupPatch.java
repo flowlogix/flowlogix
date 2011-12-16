@@ -17,6 +17,9 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * Fixes the JIRA issue <a href="https://issues.apache.org/jira/browse/TAP5-805">TAP5-805</a><br/>
  * Fixes the JIRA issue <a href="https://issues.apache.org/jira/browse/TAP5-1697">TAP5-1697</a>
  * 
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLCalendarPopupPatch"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 public class CalendarPopupPatch

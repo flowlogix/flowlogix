@@ -24,7 +24,9 @@ import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
- *
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLSessionMonitor"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 @Import(library = "SessionMonitor.js")

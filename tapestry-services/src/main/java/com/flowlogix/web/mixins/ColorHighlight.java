@@ -12,6 +12,12 @@ import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
+/**
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLColorHighlight"
+ *    target="_blank">See Documentation</a>
+ * 
+ * @author lprimak
+ */
 public class ColorHighlight
 {
     @SetupRender

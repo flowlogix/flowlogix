@@ -19,8 +19,10 @@ import org.apache.tapestry5.services.ExceptionReporter;
 import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.RequestGlobals;
 
-/**
- *
+/** 
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLLoginBase"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 public abstract class LoginBase implements ExceptionReporter

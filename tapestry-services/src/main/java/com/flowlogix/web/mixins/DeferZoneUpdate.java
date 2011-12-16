@@ -22,6 +22,6 @@ public class DeferZoneUpdate
     }
     
     
-    @InjectContainer private ClientElement container;
+    private @InjectContainer ClientElement container;
     private @Environmental JavaScriptSupport js;
 }

@@ -22,7 +22,8 @@ import org.apache.tapestry5.services.ComponentRequestHandler;
 import org.apache.tapestry5.services.PageRenderRequestParameters;
 
 /**
- *
+ * Propagates EJB security context into Shiro and Tapestry realm
+ * 
  * @author lprimak
  */
 public class SecurityInterceptorFilter implements ComponentRequestFilter

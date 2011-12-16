@@ -13,6 +13,7 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.RequestGlobals;
 
 /**
+ * Internal mixin to support {@link com.flowlogix.web.services.annotations.AJAX} annotation
  *
  * @author lprimak
  */

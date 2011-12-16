@@ -11,7 +11,9 @@ import org.apache.tapestry5.annotations.OnEvent;
 import org.apache.tapestry5.util.TextStreamResponse;
 
 /**
- *
+ * Support page to instantiate JavaScript variables needed for SmartGWT before other JS inclusions<br>
+ * See {@link com.flowlogix.web.base.GwtSupport}
+ * 
  * @author lprimak
  */
 public class GwtSupportVariable

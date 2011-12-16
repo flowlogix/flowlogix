@@ -21,7 +21,7 @@ import org.apache.tapestry5.services.assets.StreamableResourceProcessing;
 import org.apache.tapestry5.services.assets.StreamableResourceSource;
 
 /**
- *
+ * 
  * @author lprimak
  */
 public class AssetMinimizerImpl implements AssetMinimizer

@@ -26,7 +26,8 @@ import org.apache.tapestry5.services.Response;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
 
 /**
- *
+ * Put it all together, integrate with Tapestry
+ * 
  * @author lprimak
  */
 @SubModule({ EjbModule.class, GwtModule.class, SecurityModule.class })
@@ -65,7 +66,6 @@ public class ServicesModule
      * silently redirect the user to the intended page when browsing through
      * tapestry forms through browser history
      */
-    
     public RequestExceptionHandler decorateRequestExceptionHandler(
             final ComponentSource componentSource,
             final Response response,

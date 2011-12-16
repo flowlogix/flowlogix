@@ -23,6 +23,8 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
  * Trigger event after a Zone update
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLUpdateEvent"
+ *    target="_blank">See Documentation</a>
  * 
  * @author lprimak
  */

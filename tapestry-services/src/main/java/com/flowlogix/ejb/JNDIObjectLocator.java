@@ -53,10 +53,24 @@ public class JNDIObjectLocator
         jndiObjectCache.clear();
     }
     
-
-    public Object getJNDIObject(String jndiName) throws NamingException
+    
+    public<T> T getJNDIObject(String jndiName, boolean isStateful) throws NamingException
     {
-        Object jndiObject = jndiObjectCache.get(jndiName);
+        if(isStateful)
+        {
+            // no caching for stateful session beans
+            return (T)getInitialContext().lookup(jndiName);
+        }
+        else
+        {
+            return getJNDIObject(jndiName);
+        }
+    }
+    
+
+    public<T> T getJNDIObject(String jndiName) throws NamingException
+    {
+        T jndiObject = (T)jndiObjectCache.get(jndiName);
 
         if (jndiObject == null && !jndiObjectCache.containsKey(jndiName))
         {
@@ -74,7 +88,7 @@ public class JNDIObjectLocator
     }
 
     
-    private synchronized Object lookup(String name) throws NamingException
+    private synchronized<T> T lookup(String name) throws NamingException
     {
 
         // Recheck the cache because the name we're looking for may have been added while we were waiting for sync.
@@ -83,7 +97,7 @@ public class JNDIObjectLocator
         {
             try
             {
-                return getInitialContext().lookup(name);
+                return (T)getInitialContext().lookup(name);
             } catch (NameNotFoundException e)
             {
                 clear();
@@ -91,7 +105,7 @@ public class JNDIObjectLocator
             }
         } else
         {
-            return jndiObjectCache.get(name);
+            return (T)jndiObjectCache.get(name);
         }
     }
 

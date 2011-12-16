@@ -18,7 +18,9 @@ import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.subject.WebSubject;
 
 /**
- * allows access to shiro security subject within unrelated servlets
+ * allows access to shiro security subject within unrelated servlets<br>
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLWebSecurityFilter"
+ *    target="_blank">See Documentation</a>
  * 
  * @author lprimak
  */

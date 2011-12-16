@@ -15,7 +15,9 @@ import javax.interceptor.InvocationContext;
 import org.apache.shiro.subject.Subject;
 
 /**
- *
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLShiroSecurityInterceptor"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 @Interceptor

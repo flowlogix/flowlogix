@@ -15,8 +15,11 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 /**
- * JNDIObjectLocator is used to centralize all JNDI lookups. It minimises the overhead of JNDI lookups by caching the
+ * JNDIObjectLocator is used to centralize all JNDI lookups. It minimizes the overhead of JNDI lookups by caching the
  * objects it looks up.
+ * 
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLJNDIObjectLocator"
+ *    target="_blank">See Documentation</a>
  * 
  * @author Geoff Callendar
  * Enhancements by Lenny Primak

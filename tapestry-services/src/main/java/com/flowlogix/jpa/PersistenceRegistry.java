@@ -11,6 +11,8 @@ import org.apache.tapestry5.jpa.PersistenceUnitConfigurer;
 import org.apache.tapestry5.jpa.TapestryPersistenceUnitInfo;
 
 /**
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLPersistenceRegistry"
+ *    target="_blank">See Documentation</a>
  *
  * @author lprimak
  */

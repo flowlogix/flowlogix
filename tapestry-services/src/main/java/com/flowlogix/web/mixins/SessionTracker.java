@@ -4,8 +4,8 @@
  */
 package com.flowlogix.web.mixins;
 
-import com.flowlogix.session.SessionTrackerBase;
-import com.flowlogix.session.SessionTrackerHolder;
+import com.flowlogix.session.internal.SessionTrackerBase;
+import com.flowlogix.session.internal.SessionTrackerHolder;
 import javax.servlet.http.HttpSession;
 import org.apache.tapestry5.annotations.CleanupRender;
 import org.apache.tapestry5.annotations.Persist;

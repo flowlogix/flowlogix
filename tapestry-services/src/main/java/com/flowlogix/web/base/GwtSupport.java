@@ -21,7 +21,9 @@ import org.apache.tapestry5.services.assets.AssetPathConstructor;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
- *
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLGwtSupport"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 @Import(library="gwtSupport.js")

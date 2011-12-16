@@ -4,7 +4,7 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.session.SessionTrackerHolder;
+import com.flowlogix.session.internal.SessionTrackerHolder;
 import com.flowlogix.web.mixins.SessionTracker;
 import com.flowlogix.web.services.annotations.AJAX;
 import java.io.IOException;

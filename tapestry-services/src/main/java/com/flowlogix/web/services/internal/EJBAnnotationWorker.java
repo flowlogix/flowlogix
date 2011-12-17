@@ -205,12 +205,14 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         @SneakyThrows(NamingException.class)
         public Object get(Object instance, InstanceContext context)
         {
-            Session session = rg.getRequest().getSession(true);
-            Object rv = session.getAttribute(field.getName());
+            final Session session = rg.getRequest().getSession(true);
+            final String key = "".equals(stateful.sessionKey())? field.getName() : stateful.sessionKey();
+        
+            Object rv = session.getAttribute(key);
             if(rv == null)
             {
                 rv = locator.getJNDIObject(lookupname, stateful != null);
-                session.setAttribute(field.getName(), rv);
+                session.setAttribute(key, rv);
             }
             return rv;
         }

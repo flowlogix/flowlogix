@@ -38,4 +38,8 @@ public @interface Stateful
      * In the future, we may want to put stateful beans as session attributes as opposed to App State Manager objects
      */
     boolean isSessionAttribute() default false;
+    /**
+     * Optionally override the session attribute key, only works if isSessionAttribute is true
+     */
+    String sessionKey() default "";
 }

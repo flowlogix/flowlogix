@@ -45,9 +45,10 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             final EJB annotation = field.getAnnotation(EJB.class);
             final Stateful stateful = field.getAnnotation(Stateful.class);
             final String fieldType = field.getTypeName();
+            final String fieldName = field.getName();
             final String lookupname = getLookupName(annotation, fieldType);
 
-            Object injectionValue = lookupBean(field, fieldType, lookupname, stateful);
+            Object injectionValue = lookupBean(field, fieldType, fieldName, lookupname, stateful);
 
             if (injectionValue != null)
             {
@@ -115,18 +116,18 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     }
     
     
-    private Object lookupBean(final PlasticField field, final String typeName, 
+    private Object lookupBean(final PlasticField field, final String typeName, final String fieldName,
             final String lookupname, final Stateful stateful) throws NamingException
     {
         if(stateful != null)
         {
             if(stateful.isSessionAttribute())
             {
-                field.setConduit(new SessionAttributeFieldConduit(lookupname, stateful, field, typeName));              
+                field.setConduit(new SessionAttributeFieldConduit(lookupname, stateful, fieldName, typeName));              
             }
             else
             {
-                field.setConduit(new AppStateFieldConduit(lookupname, stateful, field, typeName));
+                field.setConduit(new AppStateFieldConduit(lookupname, stateful, fieldName, typeName));
             }
             return true;
         }
@@ -150,11 +151,11 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     
     private class AppStateFieldConduit implements FieldConduit<Object>
     {
-        public AppStateFieldConduit(String lookupname, Stateful stateful, PlasticField field, String typeName)
+        public AppStateFieldConduit(String lookupname, Stateful stateful, String fieldName, String typeName)
         {
             this.lookupname = lookupname;
             this.stateful = stateful;
-            this.field = field;
+            this.fieldName = fieldName;
             this.typeName = typeName;
             this.type = classCache.forName(typeName);
         }
@@ -181,13 +182,13 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         @SneakyThrows(IllegalAccessException.class)
         public void set(Object instance, InstanceContext context, Object newValue)
         {
-            throw new IllegalAccessException(String.format("Field %s is Read Only", field.getName()));
+            throw new IllegalAccessException(String.format("Field %s is Read Only", fieldName));
         }
         
         
         protected final String lookupname;
         protected final Stateful stateful;
-        protected final PlasticField field;
+        protected final String fieldName;
         protected final String typeName;
         protected final Class<?> type;
     }
@@ -195,9 +196,9 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     
     private class SessionAttributeFieldConduit extends AppStateFieldConduit
     {
-        public SessionAttributeFieldConduit(String lookupname, Stateful stateful, PlasticField field, String typeName)
+        public SessionAttributeFieldConduit(String lookupname, Stateful stateful, String fieldName, String typeName)
         {
-            super(lookupname, stateful, field, typeName);
+            super(lookupname, stateful, fieldName, typeName);
         }
 
         
@@ -206,7 +207,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         public Object get(Object instance, InstanceContext context)
         {
             final Session session = rg.getRequest().getSession(true);
-            final String key = "".equals(stateful.sessionKey())? field.getName() : stateful.sessionKey();
+            final String key = "".equals(stateful.sessionKey())? fieldName : stateful.sessionKey();
         
             Object rv = session.getAttribute(key);
             if(rv == null)

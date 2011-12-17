@@ -198,7 +198,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     {
         public SessionAttributeFieldConduit(String lookupname, Stateful stateful, String fieldName, String typeName)
         {
-            super(lookupname, stateful, fieldName, typeName);
+            super(lookupname, stateful, "".equals(stateful.sessionKey())? fieldName : stateful.sessionKey(), typeName);
         }
 
         
@@ -207,13 +207,12 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         public Object get(Object instance, InstanceContext context)
         {
             final Session session = rg.getRequest().getSession(true);
-            final String key = "".equals(stateful.sessionKey())? fieldName : stateful.sessionKey();
         
-            Object rv = session.getAttribute(key);
+            Object rv = session.getAttribute(fieldName);
             if(rv == null)
             {
                 rv = locator.getJNDIObject(lookupname, stateful != null);
-                session.setAttribute(key, rv);
+                session.setAttribute(fieldName, rv);
             }
             return rv;
         }

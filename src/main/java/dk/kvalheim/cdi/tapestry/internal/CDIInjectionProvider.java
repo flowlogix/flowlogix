@@ -34,18 +34,18 @@ public class CDIInjectionProvider implements InjectionProvider2 {
 	@Override
 	public boolean provideInjection(PlasticField field, ObjectLocator locator,
 			MutableComponentModel componentModel) {
+		Class type = cache.forName(field.getTypeName());
 		/**
 		 * Problem: in many cases a tapestry service will qualify as a cdi bean.
 		 * In order to prevent cdi for managing a service that should be provided by tapestry we check if locator has the service.
 		 */
 		try {
-			if(locator.getService(field.getClass())!=null)
+			if(locator.getService(type)!=null)
 				return false;
 		} catch (RuntimeException e) {
 			// TODO: handle exception
 		}
 			
-		Class type = cache.forName(field.getTypeName());
         final Object injectionValue = cdiFactory.get(type);
         
         if(injectionValue!=null) {

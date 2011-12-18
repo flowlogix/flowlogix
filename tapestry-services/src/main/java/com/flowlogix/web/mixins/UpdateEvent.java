@@ -57,7 +57,15 @@ public class UpdateEvent extends SessionTracker
 
     private void createEvent(String event)
     {
-        Link link = cr.createEventLink(event);
+        Link link = null;
+        if(context == null)
+        {
+            link = cr.createEventLink(event);
+        }
+        else
+        {
+            link = cr.createEventLink(event, context);
+        }
         String uri = link.toAbsoluteURI(isSecure);
 
         JSONObject spec = new JSONObject();
@@ -68,6 +76,11 @@ public class UpdateEvent extends SessionTracker
 
     
     private @Parameter(allowNull = false, defaultPrefix = BindingConstants.LITERAL) String updateEvent;
+    /**
+     * The context for the triggered event.
+     */
+    private @Parameter String context;
+
     private @InjectContainer Zone zone;
     private @Environmental JavaScriptSupport js;
     private @Inject ComponentResources cr;

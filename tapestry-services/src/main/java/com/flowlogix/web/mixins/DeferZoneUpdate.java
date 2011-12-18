@@ -5,6 +5,7 @@ import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.InjectContainer;
+import org.apache.tapestry5.annotations.Mixin;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -27,4 +28,5 @@ public class DeferZoneUpdate
     
     private @InjectContainer ClientElement container;
     private @Environmental JavaScriptSupport js;
+    private @Mixin PeriodicUpdater periodicUpdater;
 }

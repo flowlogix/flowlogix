@@ -1,1 +1,6 @@
-Adds CDI support for Tapestry 5 
+Adds CDI support for Tapestry 5.
+
+-@Inject, Preferred-
+Contributes to InjectionProvider so that we can use @Inject (from tap or javax.inject).
+
+Alternatively the @CDI annotation can be used which oses own annotation  worker and objectfactory.

@@ -12,11 +12,11 @@
 			<version>${tapestry-release-version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.weld.se</groupId>
-			<artifactId>weld-se</artifactId>
-			<version>1.1.2.Final</version>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
 			<scope>provided</scope>
-			</dependency>
+		</dependency>
 	</dependencies>
 	<build>		
 		<plugins>
@@ -83,6 +83,6 @@
 	</pluginRepositories>
 
 	<properties>
-		<tapestry-release-version>5.2.6</tapestry-release-version>
+		<tapestry-release-version>5.3</tapestry-release-version>
 	</properties>
 </project>

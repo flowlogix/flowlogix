@@ -6,36 +6,51 @@
  */
 package dk.kvalheim.cdi.tapestry.internal;
 
+import org.apache.tapestry5.internal.services.ComponentClassCache;
 import org.apache.tapestry5.model.MutableComponentModel;
-import org.apache.tapestry5.services.ClassTransformation;
-import org.apache.tapestry5.services.ComponentClassTransformWorker;
-import org.apache.tapestry5.services.TransformField;
+import org.apache.tapestry5.plastic.PlasticClass;
+import org.apache.tapestry5.plastic.PlasticField;
+import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
+import org.apache.tapestry5.services.transform.TransformationSupport;
 
 import dk.kvalheim.cdi.CDIFactory;
 import dk.kvalheim.cdi.tapestry.annotation.CDI;
 
 /**
+ * Worker for the CDI annotation
+ * @author Magnus Kvalheim
  * 
- * @author Magnus
  */
-public class CDIAnnotationWorker implements ComponentClassTransformWorker {
+public class CDIAnnotationWorker implements ComponentClassTransformWorker2 {
 
 	private CDIFactory cdiFactory;
-	public CDIAnnotationWorker(CDIFactory cdiFactory) {
+	private final ComponentClassCache cache;
+
+	public CDIAnnotationWorker(CDIFactory cdiFactory, ComponentClassCache cache) {
 		this.cdiFactory = cdiFactory;
+		this.cache = cache;
 	}
-	public void transform(ClassTransformation transformation,
-			MutableComponentModel model) {
-		for(final TransformField field : transformation.matchFieldsWithAnnotation(CDI.class)) {
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.tapestry5.services.transform.ComponentClassTransformWorker2
+	 * #transform(org.apache.tapestry5.plastic.PlasticClass,
+	 * org.apache.tapestry5.services.transform.TransformationSupport,
+	 * org.apache.tapestry5.model.MutableComponentModel)
+	 */
+	@Override
+	public void transform(PlasticClass plasticClass,
+			TransformationSupport support, MutableComponentModel model) {
+		for (PlasticField field : plasticClass.getFieldsWithAnnotation(CDI.class)) {
 			final CDI annotation = field.getAnnotation(CDI.class);
-			String fieldType = field.getType();
-            Class type = transformation.toClass(fieldType);
-            final Object injectionValue = cdiFactory.get(type);
-            
-            if(injectionValue!=null) {
-            	field.inject(injectionValue);
-            	field.claim(annotation);
-            }
-		}		
+			Class type = cache.forName(field.getTypeName());
+			final Object injectionValue = cdiFactory.get(type);
+			if (injectionValue != null) {
+				field.inject(injectionValue);
+				field.claim(annotation);
+			}
+		}
 	}
 }

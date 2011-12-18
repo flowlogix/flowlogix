@@ -10,13 +10,14 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.apache.tapestry5.internal.services.ComponentClassCache;
 import org.apache.tapestry5.ioc.ObjectProvider;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Contribute;
 import org.apache.tapestry5.ioc.annotations.Local;
-import org.apache.tapestry5.services.ComponentClassTransformWorker;
-import org.apache.tapestry5.services.InjectionProvider;
+import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
+import org.apache.tapestry5.services.transform.InjectionProvider2;
 import org.slf4j.Logger;
 
 import dk.kvalheim.cdi.CDIFactory;
@@ -44,20 +45,16 @@ public class CDIModule {
 	public static CDIFactory buildCDIFactory(Logger log, @Local BeanManager beanManager) {		
 		return new CDIFactory(log, beanManager);
 	}	
-//	public static void contributeMasterObjectProvider(
-//			@Local ObjectProvider cdiProvider,
-//			OrderedConfiguration<ObjectProvider> configuration) {	
-////		configuration.add("cdiProvider", cdiProvider, "after:Service,after:AnnotationBasedContributions,after:Alias,after:Autobuild");		
-//		configuration.add("cdiProvider", cdiProvider, "after:*");	
-//	} 
 	public static void contributeInjectionProvider(
-			OrderedConfiguration<InjectionProvider> configuration,
-			@Local CDIFactory cdiFactory) {
-		configuration.add("CDI", new CDIInjectionProvider(cdiFactory), "after:*,before:Service");
+			OrderedConfiguration<InjectionProvider2> configuration,
+			@Local CDIFactory cdiFactory,
+			ComponentClassCache cache) {
+		configuration.add("CDI", new CDIInjectionProvider(cdiFactory, cache), "after:*,before:Service");
 	}
 	
-	@Contribute(ComponentClassTransformWorker.class)
-    public static void provideClassTransformWorkers(OrderedConfiguration<ComponentClassTransformWorker> configuration) {
+	@Contribute(ComponentClassTransformWorker2.class)
+    public static void provideClassTransformWorkers(
+    		OrderedConfiguration<ComponentClassTransformWorker2> configuration) {
         configuration.addInstance("CDI", CDIAnnotationWorker.class, "before:Property");
     }
 }

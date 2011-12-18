@@ -6,11 +6,11 @@
  */
 package dk.kvalheim.cdi.tapestry.internal;
 
+import org.apache.tapestry5.internal.services.ComponentClassCache;
 import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.model.MutableComponentModel;
-import org.apache.tapestry5.services.ClassTransformation;
-import org.apache.tapestry5.services.InjectionProvider;
-import org.apache.tapestry5.services.TransformField;
+import org.apache.tapestry5.plastic.PlasticField;
+import org.apache.tapestry5.services.transform.InjectionProvider2;
 
 import dk.kvalheim.cdi.CDIFactory;
 
@@ -18,35 +18,35 @@ import dk.kvalheim.cdi.CDIFactory;
  * 
  * @author Magnus
  */
-public class CDIInjectionProvider implements InjectionProvider {
+public class CDIInjectionProvider implements InjectionProvider2 {
 
 	private CDIFactory cdiFactory;
-	public CDIInjectionProvider(CDIFactory cdiFactory) {
-		this.cdiFactory = cdiFactory;
-	}
+	private final ComponentClassCache cache;
 	
+	public CDIInjectionProvider(CDIFactory cdiFactory, ComponentClassCache cache) {
+		this.cdiFactory = cdiFactory;
+		this.cache = cache;
+	}
+
 	/* (non-Javadoc)
-	 * @see org.apache.tapestry5.services.InjectionProvider#provideInjection(java.lang.String, java.lang.Class, org.apache.tapestry5.ioc.ObjectLocator, org.apache.tapestry5.services.ClassTransformation, org.apache.tapestry5.model.MutableComponentModel)
+	 * @see org.apache.tapestry5.services.transform.InjectionProvider2#provideInjection(org.apache.tapestry5.plastic.PlasticField, org.apache.tapestry5.ioc.ObjectLocator, org.apache.tapestry5.model.MutableComponentModel)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public boolean provideInjection(String fieldName, Class fieldType,
-			ObjectLocator locator, ClassTransformation transformation,
+	public boolean provideInjection(PlasticField field, ObjectLocator locator,
 			MutableComponentModel componentModel) {
-		
 		/**
 		 * Problem: in many cases a tapestry service will qualify as a cdi bean.
 		 * In order to prevent cdi for managing a service that should be provided by tapestry we check if locator has the service.
 		 */
 		try {
-			if(locator.getService(fieldType)!=null)
+			if(locator.getService(field.getClass())!=null)
 				return false;
 		} catch (RuntimeException e) {
 			// TODO: handle exception
 		}
-		
-		TransformField field = transformation.getField(fieldName);		
-        final Object injectionValue = cdiFactory.get(fieldType);
+			
+		Class type = cache.forName(field.getTypeName());
+        final Object injectionValue = cdiFactory.get(type);
         
         if(injectionValue!=null) {
         	field.inject(injectionValue);

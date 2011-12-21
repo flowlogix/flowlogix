@@ -131,11 +131,11 @@ public class LoginFormBase
     }
     
 
-    @Inject private Response response;
-    @Inject private Request request;
-    @Inject private RequestGlobals requestGlobals;
-    @Inject private SecurityService securityService;
-    @Inject private PageService pageService;
+    private @Inject Response response;
+    private @Inject Request request;
+    private @Inject RequestGlobals requestGlobals;
+    private @Inject SecurityService securityService;
+    private @Inject PageService pageService;
     private @Inject PageRenderLinkSource linkSource;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
     private @Inject @Symbol(SecurityModule.Symbols.INVALID_AUTH_DELAY) int authDelayInterval;

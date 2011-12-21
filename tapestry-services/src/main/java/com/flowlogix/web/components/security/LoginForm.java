@@ -22,37 +22,36 @@ import org.apache.tapestry5.annotations.Property;
  */
 public class LoginForm extends LoginFormBase
 {
-    public Object onActionFromTynamoLoginForm()
+    public Object onActionFromFlowlogixLoginForm()
     {
         try
         {
-            Object rv = login(login, password, tynamoRememberMe, null);
-            return rv;
+            return login(login, password, flowlogixRememberMe, null);
         }
         catch (UnknownAccountException e)
         {
-            loginMessage = "Account not exists";
+            loginErrorMessage = "Account not exists";
             return null;
         } catch (IncorrectCredentialsException e)
         {
-            loginMessage = "Wrong password";
+            loginErrorMessage = "Wrong password";
             return null;
         } catch (LockedAccountException e)
         {
-            loginMessage = "Account locked";
+            loginErrorMessage = "Account locked";
             return null;
         } catch (AuthenticationException e)
         {
-            loginMessage = "Authentication Error";
+            loginErrorMessage = "Authentication Error";
             return null;
         }
     }
 
-    public String getLoginMessage()
+    public String getLoginErrorMessage()
     {
-        if (StringUtils.hasText(loginMessage))
+        if (StringUtils.hasText(loginErrorMessage))
         {
-            return loginMessage;
+            return loginErrorMessage;
         } else
         {
             return " ";
@@ -62,7 +61,6 @@ public class LoginForm extends LoginFormBase
 
     private @Property String login;
     private @Property String password;
-    private @Property boolean tynamoRememberMe;
-    private @Persist(PersistenceConstants.FLASH)
-    @Setter String loginMessage;
+    private @Property boolean flowlogixRememberMe;
+    private @Persist(PersistenceConstants.FLASH) @Setter String loginErrorMessage;
 }

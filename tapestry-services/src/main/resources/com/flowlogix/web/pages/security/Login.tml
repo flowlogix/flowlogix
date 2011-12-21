@@ -4,18 +4,18 @@
     <head>
         <title>Please Log In</title>
         <style type="text/css">
-            #tynamoLoginFormContainer {
+            #flowlogixLoginFormContainer {
                 background: url(${asset:classpath:org/tynamo/security/img/login-bg.png}) no-repeat;
                 width:778px;
                 height:600px;
                 margin:0 auto;
             }
 
-            #tynamoLoginForm {
+            #flowlogixLoginForm {
                 padding: 90px 110px;
             }
 
-            #tynamoLoginMessage {
+            #flowlogixLoginMessage {
                 color:red;
                 margin-bottom: 10px;	
             }
@@ -28,26 +28,26 @@
                 font-size: 220%; width: 400px;
             }
 
-            #tynamoLoginContainer {
+            #flowlogixLoginContainer {
                 margin-bottom: 50px;
             }
 
-            #tynamoPasswordContainer {
+            #flowlogixPasswordContainer {
                 margin-bottom: 50px;
             }
 
-            #tynamoRememberMeContainer {
+            #flowlogixRememberMeContainer {
                 margin-bottom: 40px;
             }
 
-            .tynamoMessage {
+            .flowlogixMessage {
                 margin:0 auto;
             }
         </style>	
     </head>
 
     <body style="text-align:center;font-family:'lucida grande','lucida sans unicode','bitstream vera sans', 'trebuchet ms',arial,sans-serif;">
-        <div class="tynamoMessage">
+        <div class="flowlogixMessage">
             ${message}
         </div>
 

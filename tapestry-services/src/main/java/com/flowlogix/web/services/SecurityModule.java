@@ -69,6 +69,9 @@ public class SecurityModule
     }
     
     
+    /**
+     * See <a href="https://issues.apache.org/jira/browse/TAP5-1779" target="_blank">TAP5-1779</a>
+     */
     @Contribute(RequestHandler.class)
     public void disableAssetDirListing(OrderedConfiguration<RequestFilter> configuration,
                     @Symbol(SymbolConstants.APPLICATION_VERSION) final String applicationVersion,

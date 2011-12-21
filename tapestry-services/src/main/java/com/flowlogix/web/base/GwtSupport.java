@@ -4,6 +4,7 @@
  */
 package com.flowlogix.web.base;
 
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -38,7 +39,7 @@ public abstract class GwtSupport
      */
     protected List<String> getJavaScriptInitialization()
     {
-        return null;
+        return Lists.newLinkedList();
     }
     
     
@@ -47,8 +48,7 @@ public abstract class GwtSupport
      */
     protected List<String> getGWTParameters()
     {
-        ArrayList<String> params = new ArrayList<String>();
-        return params;
+        return Lists.newLinkedList();
     }
     
     
@@ -66,15 +66,12 @@ public abstract class GwtSupport
         
         final String gwtModule = getModuleName();
         final String supportVariablePath = "flowlogix/js/GwtSupportVariable";
-        if (getJavaScriptInitialization() != null)
+        for (String var : getJavaScriptInitialization())
         {
-            for (String var : getJavaScriptInitialization())
-            {
-                jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s",
-                        requestGlobals.getRequest().getContextPath(), supportVariablePath, 
-                        urlEncoder.encode(var)));
-            }
-        }     
+            jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s",
+                    requestGlobals.getRequest().getContextPath(), supportVariablePath,
+                    urlEncoder.encode(var)));
+        }
         final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
         jsSupport.importJavaScriptLibrary(assetSource.getExpandedAsset(gwtModuleJSPath));
     }    

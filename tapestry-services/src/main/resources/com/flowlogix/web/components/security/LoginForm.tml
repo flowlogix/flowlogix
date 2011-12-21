@@ -1,8 +1,8 @@
 <div xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter" 
      id="flowlogixLoginFormContainer" >
 
-    <t:form t:id="tynamoLoginForm">
-        <div id="flowlogixLoginErrorMessage" >${loginErrorMessage}</div>
+    <t:form t:id="flowlogixLoginForm">
+        <div id="flowlogixErrorMessage" >${loginErrorMessage}</div>
         <div id="flowlogixLoginContainer">
             <div><t:label for="login">login:</t:label></div>
             <div><t:textfield t:id="login" validate="required"/></div>

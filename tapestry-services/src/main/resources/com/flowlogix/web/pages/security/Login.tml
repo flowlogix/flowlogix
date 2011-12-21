@@ -15,7 +15,7 @@
                 padding: 90px 110px;
             }
 
-            #flowlogixLoginMessage {
+            #flowlogixErrorMessage {
                 color:red;
                 margin-bottom: 10px;	
             }

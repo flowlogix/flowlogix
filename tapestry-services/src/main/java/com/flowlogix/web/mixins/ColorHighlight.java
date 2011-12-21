@@ -23,13 +23,13 @@ public class ColorHighlight
     @SetupRender
     void init()
     {
-        js.addScript(script, color);
+        js.addScript(script, highlightColor);
     }
     
     
     private @Environmental JavaScriptSupport js;
     private @Parameter(required=true, defaultPrefix=BindingConstants.LITERAL) 
-            @NotNull String color;
+            @NotNull String highlightColor;
     private @Inject @Path("ColorHighlight.js") Asset scriptAsset;
     private @Inject AssetMinimizer minimizer;
     private final String script = minimizer.minimize(scriptAsset);

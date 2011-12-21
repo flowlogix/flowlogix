@@ -24,6 +24,9 @@ import org.apache.tapestry5.services.Request;
 /**
  * Determines the User's browser and Operating system
  * 
+ * <a href="http://code.google.com/p/flowlogix/w/edit/TLUserEnvironment"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 public class UserEnvironment

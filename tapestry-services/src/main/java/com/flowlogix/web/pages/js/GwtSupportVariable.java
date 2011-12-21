@@ -20,7 +20,7 @@ public class GwtSupportVariable
 {
     public @OnEvent StreamResponse getVariable()
     {
-        return new TextStreamResponse("text/javascript", String.format("var isomorphicDir = \"%s\";", value));
+        return new TextStreamResponse("text/javascript", value);
     }
             
     

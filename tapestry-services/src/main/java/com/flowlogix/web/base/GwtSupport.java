@@ -29,8 +29,21 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 @Import(library="gwtSupport.js")
 public abstract class GwtSupport
 {    
+    protected abstract Class<?> getEntryPoint();
+    protected abstract String getModuleName();
+    
+    
     /**
-     * Override this method to add parameters to the GWT component
+     * Override to add JavaScript initialization code that module depends on
+     */
+    protected List<String> getJavaScriptInitialization()
+    {
+        return null;
+    }
+    
+    
+    /**
+     * Override to add parameters to the GWT component
      */
     protected List<String> getGWTParameters()
     {
@@ -39,8 +52,10 @@ public abstract class GwtSupport
     }
     
     
-    protected abstract Class<?> getEntryPoint();
-    protected abstract String getModuleName();
+    protected String getGwtModulePath()
+    {
+        return contextRoot.constructAssetPath(RequestConstants.CONTEXT_FOLDER, getModuleName());
+    }
     
     
     @SetupRender
@@ -48,19 +63,22 @@ public abstract class GwtSupport
     {        
         jsSupport.addScript("GWTComponentController.add('%s','%s')", getEntryPoint().getName(), 
                 addParameters(resources.getCompleteId(), getGWTParameters()));
-     
+        
         final String gwtModule = getModuleName();
         final String supportVariablePath = "flowlogix/js/GwtSupportVariable";
-        final String gwtModulePath = contextRoot.constructAssetPath(RequestConstants.CONTEXT_FOLDER, gwtModule);
-        
-        final String modulePathValue = urlEncoder.encode(String.format("%s/sc/", gwtModulePath));
-        jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s", 
-                requestGlobals.getRequest().getContextPath(), supportVariablePath, modulePathValue));
-
+        if (getJavaScriptInitialization() != null)
+        {
+            for (String var : getJavaScriptInitialization())
+            {
+                jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s",
+                        requestGlobals.getRequest().getContextPath(), supportVariablePath, 
+                        urlEncoder.encode(var)));
+            }
+        }     
         final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
         jsSupport.importJavaScriptLibrary(assetSource.getExpandedAsset(gwtModuleJSPath));
     }    
-
+   
     
     private String addParameters(String id, List<String> additinalParameters)
     {

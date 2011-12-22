@@ -53,7 +53,7 @@ public class CDIModule {
             OrderedConfiguration<InjectionProvider2> configuration,
             @Local CDIFactory cdiFactory,
             ComponentClassCache cache) {
-        configuration.add("CDI", new CDIInjectionProvider(cdiFactory, cache), "after:*,before:Service");
+        configuration.add("CDI", new CDIInjectionProvider(cdiFactory, cache), "after:InjectionProvider");
     }
 
     @Contribute(ComponentClassTransformWorker2.class)

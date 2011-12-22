@@ -16,7 +16,7 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * @author lprimak
  */
 @Import(library="DeferUpdate.js")
-public class DeferZoneUpdate
+public class DeferZoneUpdate extends PeriodicUpdater
 {
     @AfterRender
     void addStatusReset()

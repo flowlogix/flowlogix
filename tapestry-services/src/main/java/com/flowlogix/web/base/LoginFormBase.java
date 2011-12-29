@@ -5,10 +5,9 @@
 package com.flowlogix.web.base;
 
 import com.flowlogix.web.components.security.LoginForm;
+import com.flowlogix.web.mixins.ExternalPageLink;
 import com.flowlogix.web.services.SecurityModule;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import lombok.SneakyThrows;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
@@ -22,15 +21,12 @@ import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
+import org.apache.tapestry5.annotations.Mixin;
 import org.apache.tapestry5.annotations.OnEvent;
 import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
-import org.apache.tapestry5.ioc.util.UnknownValueException;
-import org.apache.tapestry5.services.BaseURLSource;
-import org.apache.tapestry5.services.PageRenderLinkSource;
-import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
@@ -48,7 +44,7 @@ import org.tynamo.security.services.SecurityService;
 @Import(library = "DetectJS.js")
 public class LoginFormBase
 {
-    @SneakyThrows({MalformedURLException.class, InterruptedException.class})
+    @SneakyThrows({InterruptedException.class})
     public Object login(String tynamoLogin, String tynamoPassword, boolean tynamoRememberMe, String host) throws ShiroException
     {
         Subject currentUser = securityService.getSubject();
@@ -75,20 +71,7 @@ public class LoginFormBase
         }
 
         SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(requestGlobals.getHTTPServletRequest());
-
-        Object successLink;
-        try
-        {
-            successLink = linkSource.createPageRenderLink(pageService.getSuccessPage());
-        }
-        catch(UnknownValueException e)
-        {
-            // try an external page
-            
-            successLink = new URL(String.format("%s%s/%s", 
-                    urlSource.getBaseURL(isSecure), request.getContextPath(),
-                    pageService.getSuccessPage()));
-        }
+        final String successLink = externalLink.createLink(pageService.getSuccessPage());
 
         if (savedRequest != null && savedRequest.getMethod().equalsIgnoreCase("GET"))
         {
@@ -132,18 +115,16 @@ public class LoginFormBase
     
 
     private @Inject Response response;
-    private @Inject Request request;
     private @Inject RequestGlobals requestGlobals;
     private @Inject SecurityService securityService;
     private @Inject PageService pageService;
-    private @Inject PageRenderLinkSource linkSource;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
     private @Inject @Symbol(SecurityModule.Symbols.INVALID_AUTH_DELAY) int authDelayInterval;
-    private @Inject BaseURLSource urlSource;
     
     private @Environmental JavaScriptSupport jsSupport;
     private @Inject ComponentResources componentResources;
     private @SessionAttribute Boolean javaScriptDisabled;
+    private @Mixin ExternalPageLink externalLink;
 
     public static final String ENABLE_JS_EVENT = "enableJSOnLogin";
     private static final Logger logger = LoggerFactory.getLogger(LoginForm.class);

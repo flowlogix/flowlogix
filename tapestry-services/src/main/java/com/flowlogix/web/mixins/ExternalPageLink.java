@@ -27,7 +27,9 @@ import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 
 /**
- *
+ * Creates links to pages that are external to tapestry,
+ * if a tapestry page was not found
+ * 
  * @author lprimak
  */
 public class ExternalPageLink

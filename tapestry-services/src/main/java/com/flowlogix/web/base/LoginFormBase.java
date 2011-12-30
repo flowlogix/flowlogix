@@ -5,7 +5,7 @@
 package com.flowlogix.web.base;
 
 import com.flowlogix.web.components.security.LoginForm;
-import com.flowlogix.web.mixins.ExternalPageLink;
+import com.flowlogix.web.services.ExternalPageLink;
 import com.flowlogix.web.services.SecurityModule;
 import java.io.IOException;
 import lombok.SneakyThrows;
@@ -21,7 +21,6 @@ import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
-import org.apache.tapestry5.annotations.Mixin;
 import org.apache.tapestry5.annotations.OnEvent;
 import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.annotations.SetupRender;
@@ -124,7 +123,7 @@ public class LoginFormBase
     private @Environmental JavaScriptSupport jsSupport;
     private @Inject ComponentResources componentResources;
     private @SessionAttribute Boolean javaScriptDisabled;
-    private @Mixin ExternalPageLink externalLink;
+    private @Inject ExternalPageLink externalLink;
 
     public static final String ENABLE_JS_EVENT = "enableJSOnLogin";
     private static final Logger logger = LoggerFactory.getLogger(LoginForm.class);

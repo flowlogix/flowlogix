@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.web.mixins;
+package com.flowlogix.web.services;
 
 import java.net.MalformedURLException;
 import java.net.URL;

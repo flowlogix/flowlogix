@@ -30,6 +30,9 @@ import org.apache.tapestry5.services.Request;
  * Creates links to pages that are external to tapestry,
  * if a tapestry page was not found
  * 
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLExternalPageLink"
+ *    target="_blank">See Documentation</a>
+ * 
  * @author lprimak
  */
 public class ExternalPageLink

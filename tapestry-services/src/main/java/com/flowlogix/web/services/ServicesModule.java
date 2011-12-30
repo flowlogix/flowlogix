@@ -59,6 +59,7 @@ public class ServicesModule
     public static void bind(ServiceBinder binder)
     {
         binder.bind(AssetMinimizer.class, AssetMinimizerImpl.class);
+        binder.bind(ExternalPageLink.class);
     }
     
     

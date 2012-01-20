@@ -14,8 +14,8 @@
         </div>
 
         <div id="flowlogixRememberMeContainer">
-            <div>
-                <t:checkbox t:id="flowlogixRememberMe" />
+            <div t:type="if" test="!rememberMeDisabled">
+                <t:checkbox t:id="flowlogixRememberMe" disabled="rememberMeDisabled" />
                 <t:label for="flowlogixRememberMe">Remember Me</t:label>
             </div>
         </div>

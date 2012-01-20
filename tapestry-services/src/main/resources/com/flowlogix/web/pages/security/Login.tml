@@ -51,7 +51,7 @@
             ${message}
         </div>
 
-        <t:flowlogix.security.loginform />
+        <t:flowlogix.security.loginform rememberMeDisabled="rememberMeDisabled"/>
 
     </body>
 </html>

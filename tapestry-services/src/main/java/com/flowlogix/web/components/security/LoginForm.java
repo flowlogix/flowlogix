@@ -5,6 +5,7 @@
 package com.flowlogix.web.components.security;
 
 import com.flowlogix.web.base.LoginFormBase;
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -12,6 +13,7 @@ import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.util.StringUtils;
 import org.apache.tapestry5.PersistenceConstants;
+import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 
@@ -47,6 +49,7 @@ public class LoginForm extends LoginFormBase
         }
     }
 
+    
     public String getLoginErrorMessage()
     {
         if (StringUtils.hasText(loginErrorMessage))
@@ -57,7 +60,9 @@ public class LoginForm extends LoginFormBase
             return " ";
         }
     }
-
+    
+    
+    private @Parameter("false") @Getter boolean rememberMeDisabled;
 
     private @Property String login;
     private @Property String password;

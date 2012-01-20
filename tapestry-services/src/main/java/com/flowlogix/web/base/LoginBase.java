@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.base;
 
 import com.flowlogix.session.internal.SessionTrackerHolder;
@@ -49,6 +45,15 @@ public abstract class LoginBase implements ExceptionReporter
     protected abstract String getLoginMessage();
     
     
+    /**
+     * Override if you want to disable remember me checkbox
+     */
+    public boolean isRememberMeDisabled()
+    {
+        return false;
+    }
+    
+    
     private boolean checkExpiredMessage()
     {
         if(rg.getRequest().isXHR())
@@ -93,6 +98,7 @@ public abstract class LoginBase implements ExceptionReporter
         return null;
     }
    
+    
     private @Inject RequestGlobals rg;
     private @Inject PageRenderLinkSource linkSource;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;

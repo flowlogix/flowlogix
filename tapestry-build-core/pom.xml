@@ -206,6 +206,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
+            <artifactId>tapestry-beanvalidator</artifactId>
+            <version>5.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tapestry</groupId>
             <artifactId>tapestry-upload</artifactId>
             <version>${tap.version}</version>
             <type>jar</type>
@@ -434,6 +439,12 @@
                                 <artifactItem>
                                     <groupId>org.apache.tapestry</groupId>
                                     <artifactId>tapestry-jmx</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.tapestry</groupId>
+                                    <artifactId>tapestry-beanvalidator</artifactId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>

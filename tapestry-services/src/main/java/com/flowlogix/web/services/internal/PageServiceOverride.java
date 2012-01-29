@@ -8,6 +8,7 @@ import com.flowlogix.web.services.SecurityModule.Symbols;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.LocalizationSetter;
@@ -22,26 +23,30 @@ import org.tynamo.security.services.impl.PageServiceImpl;
  */
 public class PageServiceOverride implements PageService
 {       
-    public PageServiceOverride(
-            @Inject @Symbol(Symbols.SUCCESS_URL) String successUrl,
-            @Inject @Symbol(Symbols.LOGIN_URL) String loginUrl,
-            @Inject @Symbol(Symbols.UNAUTHORIZED_URL) String unauthorizedUrl,
-            @Inject @Symbol(SecuritySymbols.UNAUTHORIZED_URL) String tynamoUnauthorizedUrl,
-            HttpServletRequest request, HttpServletResponse response,
-            LocalizationSetter localizationSetter)
+    public PageServiceOverride(ObjectLocator locator)
     {
-        if(unauthorizedUrl.isEmpty())
+        this.locator = locator;
+    }
+    
+    
+    private void init()
+    {
+        if(impl != null)
         {
-            unauthorizedUrl = tynamoUnauthorizedUrl;
+            return;
         }
-        impl = new PageServiceImpl(successUrl, loginUrl, unauthorizedUrl,
-                request, response, localizationSetter);
+        String unauth = unauthorizedUrl.isEmpty()? tynamoUnauthorizedUrl : unauthorizedUrl;
+        impl = new PageServiceImpl(successUrl, loginUrl, unauth,
+                locator.getService(HttpServletRequest.class), 
+                locator.getService(HttpServletResponse.class), 
+                locator.getService(LocalizationSetter.class));
     }
     
 
     @Override
     public String getLoginPage()
     {
+        init();
         return impl.getLoginPage();
     }
     
@@ -49,6 +54,7 @@ public class PageServiceOverride implements PageService
     @Override
     public String getSuccessPage()
     {
+        init();
         return impl.getSuccessPage();
     }
 
@@ -56,6 +62,7 @@ public class PageServiceOverride implements PageService
     @Override
     public String getUnauthorizedPage()
     {
+        init();
         return impl.getUnauthorizedPage();
     }
 
@@ -63,6 +70,7 @@ public class PageServiceOverride implements PageService
     @Override
     public String getLocalelessPathWithinApplication()
     {
+        init();
         return impl.getLocalelessPathWithinApplication();
     }
 
@@ -70,6 +78,7 @@ public class PageServiceOverride implements PageService
     @Override
     public String getLocaleFromPath(String path)
     {
+        init();
         return impl.getLocaleFromPath(path);
     }
     
@@ -77,6 +86,7 @@ public class PageServiceOverride implements PageService
     @Override
     public void saveRequest()
     {
+        init();
         impl.saveRequest();
     }
 
@@ -84,9 +94,15 @@ public class PageServiceOverride implements PageService
     @Override
     public void redirectToSavedRequest(String fallbackUrl) throws IOException
     {
-        redirectToSavedRequest(fallbackUrl);
+        init();
+        impl.redirectToSavedRequest(fallbackUrl);
     }
     
     
-    private final PageServiceImpl impl;
+    private PageServiceImpl impl;
+    private @Inject @Symbol(Symbols.SUCCESS_URL) String successUrl;
+    private @Inject @Symbol(Symbols.LOGIN_URL) String loginUrl;
+    private @Inject @Symbol(Symbols.UNAUTHORIZED_URL) String unauthorizedUrl;
+    private @Inject @Symbol(SecuritySymbols.UNAUTHORIZED_URL) String tynamoUnauthorizedUrl;
+    private final ObjectLocator locator;
 }

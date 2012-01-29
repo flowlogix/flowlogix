@@ -86,7 +86,7 @@ public class SecurityModule
 
     
     @Match("ComponentRequestFilter")
-    public static ComponentRequestFilter decorateComponentRequestFilter(ComponentRequestFilter filter)
+    public static ComponentRequestFilter decorateEJBSecurityInterceptor(ComponentRequestFilter filter)
     {
         return new SecurityInterceptorFilter(filter);
     }
@@ -96,7 +96,7 @@ public class SecurityModule
      * @see <a href="https://issues.apache.org/jira/browse/SHIRO-334" target="_blank">SHIRO-334</a>
      */
     @Match("WebSecurityManager")
-    public WebSecurityManager decorateWebSecurityManager(WebSecurityManager _manager, 
+    public WebSecurityManager decorateRememberMeDefaults(WebSecurityManager _manager, 
         @Symbol(Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)
     {
         if (_manager instanceof TapestryRealmSecurityManager)

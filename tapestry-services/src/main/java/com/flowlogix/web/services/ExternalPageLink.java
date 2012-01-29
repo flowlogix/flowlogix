@@ -37,13 +37,26 @@ import org.apache.tapestry5.services.Request;
  */
 public class ExternalPageLink
 {
-    @SneakyThrows(MalformedURLException.class)
     public String createLink(String pageName)
+    {
+        return createLink(pageName, false);
+    }
+    
+    
+    @SneakyThrows(MalformedURLException.class)
+    public String createLink(String pageName, boolean isAbsolute)
     {
         try
         {
             // try Tapestry page
-            return linkSource.createPageRenderLink(pageName).toURI();
+            if(isAbsolute)
+            {
+                return linkSource.createPageRenderLink(pageName).toAbsoluteURI(isSecure);
+            }
+            else
+            {
+                return linkSource.createPageRenderLink(pageName).toURI();
+            }
         }
         catch(UnknownValueException e)
         {

@@ -13,17 +13,10 @@ import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.util.SavedRequest;
-import org.apache.shiro.web.util.WebUtils;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Link;
 import org.apache.tapestry5.SymbolConstants;
-import org.apache.tapestry5.annotations.AfterRender;
-import org.apache.tapestry5.annotations.Environmental;
-import org.apache.tapestry5.annotations.Import;
-import org.apache.tapestry5.annotations.OnEvent;
-import org.apache.tapestry5.annotations.SessionAttribute;
-import org.apache.tapestry5.annotations.SetupRender;
+import org.apache.tapestry5.annotations.*;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -31,6 +24,7 @@ import org.apache.tapestry5.services.Response;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tynamo.security.SecuritySymbols;
 import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.SecurityService;
 
@@ -43,7 +37,7 @@ import org.tynamo.security.services.SecurityService;
 @Import(library = "DetectJS.js")
 public class LoginFormBase
 {
-    @SneakyThrows({InterruptedException.class})
+    @SneakyThrows({InterruptedException.class, IOException.class})
     public Object login(String tynamoLogin, String tynamoPassword, boolean tynamoRememberMe, String host) throws ShiroException
     {
         Subject currentUser = securityService.getSubject();
@@ -69,24 +63,15 @@ public class LoginFormBase
             throw ae;
         }
 
-        SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(requestGlobals.getHTTPServletRequest());
-        final String successLink = externalLink.createLink(pageService.getSuccessPage());
+        final String successLink = externalLink.createLink(pageService.getSuccessPage(), true);
 
-        if (savedRequest != null && savedRequest.getMethod().equalsIgnoreCase("GET"))
+        if (redirectToSavedUrl)
         {
-            try
-            {
-                response.sendRedirect(savedRequest.getRequestUrl());
-                return null;
-            } catch (IOException e)
-            {
-                logger.warn("Can't redirect to saved request.");
-                return successLink;
-            }
-        } else
-        {
-            return successLink;
+            pageService.redirectToSavedRequest(successLink);
+            return null;
         }
+        
+        return successLink;
     }
     
     
@@ -119,7 +104,7 @@ public class LoginFormBase
     private @Inject PageService pageService;
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
     private @Inject @Symbol(SecurityModule.Symbols.INVALID_AUTH_DELAY) int authDelayInterval;
-    
+    private @Inject @Symbol(SecuritySymbols.REDIRECT_TO_SAVED_URL) boolean redirectToSavedUrl;
     private @Environmental JavaScriptSupport jsSupport;
     private @Inject ComponentResources componentResources;
     private @SessionAttribute Boolean javaScriptDisabled;

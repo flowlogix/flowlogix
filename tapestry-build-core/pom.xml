@@ -450,6 +450,12 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.tapestry</groupId>
+                                    <artifactId>tapestry-jpa</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.tapestry</groupId>
                                     <artifactId>tapestry-json</artifactId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>

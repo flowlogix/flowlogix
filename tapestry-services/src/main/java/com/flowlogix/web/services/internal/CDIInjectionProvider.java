@@ -13,6 +13,8 @@ import org.apache.tapestry5.plastic.PlasticField;
 import org.apache.tapestry5.services.transform.InjectionProvider2;
 
 import com.flowlogix.cdi.CDIFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -44,7 +46,7 @@ public class CDIInjectionProvider implements InjectionProvider2 {
                 return false;
             }
         } catch (RuntimeException e) {
-            // TODO: handle exception
+            logger.error("Error Getting Tapestry Service", e);
         }
 
         final Object injectionValue = cdiFactory.get(type);
@@ -55,4 +57,7 @@ public class CDIInjectionProvider implements InjectionProvider2 {
         }
         return false;
     }
+    
+    
+    private static final Logger logger = LoggerFactory.getLogger(CDIInjectionProvider.class);
 }

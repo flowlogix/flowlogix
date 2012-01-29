@@ -21,6 +21,7 @@ import org.apache.tapestry5.ioc.internal.util.CollectionFactory;
 import org.slf4j.Logger;
 
 import com.flowlogix.cdi.CDIFactory;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -68,7 +69,7 @@ public class CDIObjectProvider implements ObjectProvider
             }
         } catch (RuntimeException e)
         {
-            // TODO: handle exception
+            logger.error("Error Getting Tapestry Service", e);
         }
 
         return cdiFactory.get(objectType);
@@ -90,4 +91,7 @@ public class CDIObjectProvider implements ObjectProvider
     {
         return bean != null && allowedScopes.contains(bean.getScope());
     }
+    
+    
+    private static final Logger logger = LoggerFactory.getLogger(CDIInjectionProvider.class);
 }

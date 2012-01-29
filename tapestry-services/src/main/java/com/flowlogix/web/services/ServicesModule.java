@@ -88,8 +88,8 @@ public class ServicesModule
                     return;
                 }
                 ComponentResources cr = componentSource.getActivePage().getComponentResources();
-                Link link = cr.createEventLink("");
-                String uri = link.toRedirectURI().replaceAll(":", "");
+                Link link = cr.createEventLink("dummy");
+                String uri = link.toRedirectURI().replaceAll(":dummy", "");
                 response.sendRedirect(uri);
             }
         };

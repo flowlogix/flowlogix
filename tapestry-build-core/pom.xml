@@ -236,6 +236,13 @@
         </dependency>
         <dependency>
             <groupId>org.tynamo</groupId>
+            <artifactId>tapestry-exceptionpage</artifactId>
+            <version>0.1.1</version>
+            <type>jar</type>
+            <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.tynamo</groupId>
             <artifactId>tapestry-security</artifactId>
             <version>0.4.1</version>
             <type>jar</type>
@@ -475,6 +482,12 @@
                                 <artifactItem>
                                     <groupId>org.apache.tapestry</groupId>
                                     <artifactId>tapestry-upload</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.tynamo</groupId>
+                                    <artifactId>tapestry-exceptionpage</artifactId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>

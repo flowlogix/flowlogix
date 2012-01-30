@@ -6,8 +6,10 @@ package com.flowlogix.web.services.internal;
 
 import com.flowlogix.web.services.SecurityModule.Symbols;
 import java.io.IOException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.shiro.web.util.WebUtils;
 import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
@@ -36,10 +38,10 @@ public class PageServiceOverride implements PageService
             return;
         }
         String unauth = unauthorizedUrl.isEmpty()? tynamoUnauthorizedUrl : unauthorizedUrl;
-        impl = new PageServiceImpl(successUrl, loginUrl, unauth,
-                locator.getService(HttpServletRequest.class), 
-                locator.getService(HttpServletResponse.class), 
-                locator.getService(LocalizationSetter.class));
+        request = locator.getService(HttpServletRequest.class);
+        response = locator.getService(HttpServletResponse.class);
+        impl = new PageServiceImpl(successUrl, loginUrl, unauth, request, response, 
+        locator.getService(LocalizationSetter.class));
     }
     
 
@@ -90,12 +92,25 @@ public class PageServiceOverride implements PageService
         impl.saveRequest();
     }
 
-    
+
+    /**
+     * +++ See http://jira.codehaus.org/browse/TYNAMO-120
+     * Once that issue is fixed, this method can be
+     * made the a simple proxy again
+     */
     @Override
     public void redirectToSavedRequest(String fallbackUrl) throws IOException
     {
         init();
-        impl.redirectToSavedRequest(fallbackUrl);
+        for (Cookie cookie : request.getCookies())
+        {
+            if (WebUtils.SAVED_REQUEST_KEY.equals(cookie.getName()))
+            {
+                impl.redirectToSavedRequest(fallbackUrl);
+                return;
+            }
+        }
+        WebUtils.issueRedirect(request, response, fallbackUrl);
     }
     
     
@@ -105,4 +120,6 @@ public class PageServiceOverride implements PageService
     private @Inject @Symbol(Symbols.UNAUTHORIZED_URL) String unauthorizedUrl;
     private @Inject @Symbol(SecuritySymbols.UNAUTHORIZED_URL) String tynamoUnauthorizedUrl;
     private final ObjectLocator locator;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
 }

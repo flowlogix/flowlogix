@@ -4,14 +4,18 @@
  */
 package com.flowlogix.web.services;
 
+import com.flowlogix.web.services.internal.ExceptionHandlerAssistantImpl;
 import com.flowlogix.web.services.internal.PageServiceOverride;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.IOException;
+import org.apache.shiro.ShiroException;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.tapestry5.MetaDataConstants;
 import org.apache.tapestry5.SymbolConstants;
+import org.apache.tapestry5.internal.services.PageResponseRenderer;
 import org.apache.tapestry5.internal.services.RequestConstants;
+import org.apache.tapestry5.internal.services.RequestPageCache;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Contribute;
@@ -22,7 +26,9 @@ import org.apache.tapestry5.ioc.services.ServiceOverride;
 import org.apache.tapestry5.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
 import org.tynamo.security.services.PageService;
+import org.tynamo.security.services.SecurityService;
 import org.tynamo.security.services.TapestryRealmSecurityManager;
 
 /**
@@ -113,6 +119,20 @@ public class SecurityModule
             }            
         }
         return null;
+    }
+    
+    
+    /**
+     * Taken from SecurityModule, has to be kept in sync
+     * in future versions, added the isXHR bit
+     * See http://jira.codehaus.org/browse/TYNAMO-121
+     */
+    public void contributeExceptionHandler(MappedConfiguration<Class<?>, ExceptionHandlerAssistant> configuration,
+            final SecurityService securityService, final RequestGlobals rg, final PageService pageService,
+            final RequestPageCache pageCache, final PageResponseRenderer renderer, final Cookies cookies)
+    {
+        ExceptionHandlerAssistant assistant = new ExceptionHandlerAssistantImpl(securityService, pageService, rg, pageCache, renderer, cookies);
+        configuration.override(ShiroException.class, assistant);
     }
         
     

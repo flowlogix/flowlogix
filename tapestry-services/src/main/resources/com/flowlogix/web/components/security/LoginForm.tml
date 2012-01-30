@@ -4,24 +4,24 @@
     <t:form t:id="flowlogixLoginForm">
         <div id="flowlogixErrorMessage" >${loginErrorMessage}</div>
         <div id="flowlogixLoginContainer">
-            <div><t:label for="login">login:</t:label></div>
+            <div><t:label for="login">${message:loginLabel}</t:label></div>
             <div><t:textfield t:id="login" validate="required"/></div>
         </div>
 
         <div id="flowlogixPasswordContainer">
-            <div><t:label for="password">password:</t:label></div>
+            <div><t:label for="password">${message:passwordLabel}</t:label></div>
             <div><t:passwordfield t:id="password" validate="required"/></div>
         </div>
 
         <div id="flowlogixRememberMeContainer">
             <div t:type="if" test="!rememberMeDisabled">
                 <t:checkbox t:id="flowlogixRememberMe" disabled="rememberMeDisabled" />
-                <t:label for="flowlogixRememberMe">Remember Me</t:label>
+                <t:label for="flowlogixRememberMe">${message:rememberMeLabel}</t:label>
             </div>
         </div>
 
         <div id="flowlogixEnterContainer">
-            <input type="submit" id="flowlogixEnter" value="Enter" />
+            <input type="submit" id="flowlogixEnter" value="${message:loginSubmit}" />
         </div>
     </t:form>
 </div>

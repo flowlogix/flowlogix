@@ -31,10 +31,12 @@
             #flowlogixLoginContainer {
                 margin-bottom: 50px;
             }
+            #flowlogixLoginContainer label:after { content: ": " }
 
             #flowlogixPasswordContainer {
                 margin-bottom: 50px;
             }
+            #flowlogixPasswordContainer label:after { content: ": " }
 
             #flowlogixRememberMeContainer {
                 margin-bottom: 40px;

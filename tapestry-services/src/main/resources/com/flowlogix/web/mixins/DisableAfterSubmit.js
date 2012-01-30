@@ -32,7 +32,7 @@ DisableAfterSubmit.prototype = {
         }
         else {
             if(isZone) {
-                doEnable();
+                this.doEnable();
             }
             else {
                 $(this.elementId).enable();                       

@@ -15,17 +15,21 @@ DisableAfterSubmit.prototype = {
 
     doDisable: function() {
         $(this.elementId).disable();
+        var isZone = $(this.formId).getStorage().zoneId != null;
 
-        if($(this.formId).getStorage().zoneId != null) {
+        if(isZone) {
             this.zoneElement = Tapestry.findZoneManager(this.formId).element;
             Event.observe(this.zoneElement, Tapestry.ZONE_UPDATED_EVENT, 
-                this.handler);    
+                this.handler); 
+        }
 
-            $(this.formId).setSubmittingElement($(this.elementId));
-            $(this.formId).onsubmit();
+        $(this.formId).setSubmittingElement($(this.elementId));
+        var validationSuccess = $(this.formId).onsubmit();
+        if(validationSuccess) {
+            if(isZone == false) $(this.formId).submit();
         }
         else {
-            $(this.formId).submit();
+            $(this.elementId).enable();           
         }
     },
 		

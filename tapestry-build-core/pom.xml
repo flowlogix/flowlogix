@@ -16,13 +16,28 @@
     </parent>
 
     <properties>
-        <war-deps.scope>provided</war-deps.scope>
+        <war-deps.scope>compile</war-deps.scope>
         <rhino.version>1.6R7</rhino.version>
         <yuicompressor.version>2.4.6</yuicompressor.version>
         <tap.version>5.3.2</tap.version>
         <gwt.version>2.4.0</gwt.version>
         <guava.version>11.0.1</guava.version>
     </properties>
+        
+    <profiles>
+        <profile>
+            <id>skinny-war</id>
+            <properties>
+                <war-deps.scope>provided</war-deps.scope>
+            </properties>
+        </profile>
+        <profile>
+            <id>self-contained</id>
+            <properties>
+                <war-deps.scope>compile</war-deps.scope>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -556,20 +571,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <id>buildid</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>hgchangeset</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
@@ -602,13 +603,4 @@
             <url>http://download.java.net/maven/glassfish</url>
         </repository>
     </repositories>
-        
-    <profiles>
-        <profile>
-            <id>self-contained</id>
-            <properties>
-                <war-deps.scope>compile</war-deps.scope>
-            </properties>
-        </profile>
-    </profiles>
 </project>

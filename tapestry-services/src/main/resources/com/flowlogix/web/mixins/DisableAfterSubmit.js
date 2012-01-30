@@ -26,10 +26,17 @@ DisableAfterSubmit.prototype = {
         $(this.formId).setSubmittingElement($(this.elementId));
         var validationSuccess = $(this.formId).onsubmit();
         if(validationSuccess) {
-            if(isZone == false) $(this.formId).submit();
+            if(isZone == false) {
+                $(this.formId).submit();
+            }
         }
         else {
-            $(this.elementId).enable();           
+            if(isZone) {
+                doEnable();
+            }
+            else {
+                $(this.elementId).enable();                       
+            }
         }
     },
 		

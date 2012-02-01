@@ -22,6 +22,7 @@
         <tap.version>5.3.2</tap.version>
         <gwt.version>2.4.0</gwt.version>
         <guava.version>11.0.1</guava.version>
+        <groovy.version>1.8.5</groovy.version>
         <lombok.version>0.9.3</lombok.version>
     </properties>
         
@@ -130,7 +131,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>1.8.5</version>
+            <version>${groovy.version}</version>
             <scope>${war-deps.scope}</scope>
         </dependency>
         <dependency>
@@ -578,7 +579,15 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
+                    <compilerId>groovy-eclipse-compiler</compilerId>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-compiler</artifactId>
+                        <version>2.6.0-01</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

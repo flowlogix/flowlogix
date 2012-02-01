@@ -23,6 +23,7 @@
         <gwt.version>2.4.0</gwt.version>
         <guava.version>11.0.1</guava.version>
         <groovy.version>1.8.5</groovy.version>
+        <gmaven.version>1.8</gmaven.version>
         <lombok.version>0.9.3</lombok.version>
     </properties>
         
@@ -133,6 +134,12 @@
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
             <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.gmaven.runtime</groupId>
+            <artifactId>gmaven-runtime-${gmaven.version}</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
@@ -579,15 +586,7 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
-                    <compilerId>groovy-eclipse-compiler</compilerId>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
-                        <artifactId>groovy-eclipse-compiler</artifactId>
-                        <version>2.6.0-01</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -598,6 +597,31 @@
                         <include>**/test/**</include>                     
                     </includes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <sources>
+                        <fileset>
+                            <directory>${pom.basedir}/src/main/groovy</directory>
+                            <includes>
+                                <include>**/*.groovy</include>
+                            </includes>
+                        </fileset>
+                    </sources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generateStubs</goal>
+                            <goal>compile</goal>
+                            <goal>generateTestStubs</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>    

@@ -562,7 +562,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.6</version>
+                <version>1.7</version>
                 <executions>
                     <execution>
                         <id>default-cli</id>
@@ -609,24 +609,40 @@
                     <groupId>org.codehaus.gmaven</groupId>
                     <artifactId>gmaven-plugin</artifactId>
                     <version>1.4</version>
-                    <configuration>
-                        <sources>
-                            <fileset>
-                                <directory>${pom.basedir}/src/main/groovy</directory>
-                                <includes>
-                                    <include>**/*.groovy</include>
-                                </includes>
-                            </fileset>
-                        </sources>
-                    </configuration>
                     <executions>
                         <execution>
+                            <id>compile</id>
                             <goals>
                                 <goal>generateStubs</goal>
                                 <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <fileset>
+                                        <directory>${pom.basedir}/src/main/groovy</directory>
+                                        <includes>
+                                            <include>**/*.groovy</include>
+                                        </includes>
+                                    </fileset>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>test-compile</id>
+                            <goals>
                                 <goal>generateTestStubs</goal>
                                 <goal>testCompile</goal>
                             </goals>
+                            <configuration>
+                                <sources>
+                                    <fileset>
+                                        <directory>${pom.basedir}/src/test/groovy</directory>
+                                        <includes>
+                                            <include>**/*.groovy</include>
+                                        </includes>
+                                    </fileset>
+                                </sources>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>

@@ -94,7 +94,7 @@ public class PageServiceOverride implements PageService
 
 
     /**
-     * +++ See http://jira.codehaus.org/browse/TYNAMO-120
+     * TODO See http://jira.codehaus.org/browse/TYNAMO-120
      * Once that issue is fixed, this method can be
      * made the a simple proxy again
      */

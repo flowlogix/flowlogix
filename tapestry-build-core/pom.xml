@@ -606,6 +606,20 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.0</version>
+                    <executions>
+                        <execution>
+                            <id>buildid</id>
+                            <phase>generate-resources</phase>
+                            <goals>
+                                <goal>hgchangeset</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.gmaven</groupId>
                     <artifactId>gmaven-plugin</artifactId>
                     <version>1.4</version>

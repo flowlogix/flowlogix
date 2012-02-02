@@ -23,7 +23,7 @@
         <gwt.version>2.4.0</gwt.version>
         <guava.version>11.0.1</guava.version>
         <groovy.version>1.8.5</groovy.version>
-        <gmaven.version>1.8</gmaven.version>
+        <gmaven.runtime>1.8</gmaven.runtime>
         <lombok.version>0.9.3</lombok.version>
     </properties>
         
@@ -137,7 +137,7 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.gmaven.runtime</groupId>
-            <artifactId>gmaven-runtime-${gmaven.version}</artifactId>
+            <artifactId>gmaven-runtime-${gmaven.runtime}</artifactId>
             <version>1.4</version>
             <scope>test</scope>
         </dependency>
@@ -602,31 +602,35 @@
                     </includes>
                 </configuration>
             </plugin>
-<!--            <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <version>1.4</version>
-                <configuration>
-                    <sources>
-                        <fileset>
-                            <directory>${pom.basedir}/src/main/groovy</directory>
-                            <includes>
-                                <include>**/*.groovy</include>
-                            </includes>
-                        </fileset>
-                    </sources>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generateStubs</goal>
-                            <goal>compile</goal>
-                            <goal>generateTestStubs</goal>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.gmaven</groupId>
+                    <artifactId>gmaven-plugin</artifactId>
+                    <version>1.4</version>
+                    <configuration>
+                        <sources>
+                            <fileset>
+                                <directory>${pom.basedir}/src/main/groovy</directory>
+                                <includes>
+                                    <include>**/*.groovy</include>
+                                </includes>
+                            </fileset>
+                        </sources>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generateStubs</goal>
+                                <goal>compile</goal>
+                                <goal>generateTestStubs</goal>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>    
 </project>

@@ -17,10 +17,9 @@ package com.flowlogix.web.services.internal;
 
 import com.flowlogix.ejb.JNDIObjectLocator;
 import com.flowlogix.web.services.annotations.Stateful;
-import java.util.regex.Pattern;
+import java.io.Serializable;
 import javax.ejb.EJB;
 import javax.naming.NamingException;
-
 import lombok.SneakyThrows;
 import org.apache.tapestry5.internal.services.ComponentClassCache;
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -64,32 +63,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             }
         }
     }
-    
-    
-    public static String guessByType(String type) 
-    {
-        String lookupname = type.substring(type.lastIndexOf(".") + 1);
-        // support naming convention that strips Local/Remote from the
-        // end of an interface class to try to determine the actual bean name,
-        // to avoid @EJB(beanName="myBeanName"), and just use plain old @EJB
-        String uc = lookupname.toUpperCase();
-        if (uc.endsWith(LOCAL) || uc.endsWith(REMOTE)) {
-            lookupname = StripLocalPattern.matcher(lookupname).replaceFirst("");
-        }
-        return lookupname;
-    }
-    
-    
-    public static String prependPortableName(String lookupname)
-    {
-        //convert to jndi name
-        if (!lookupname.startsWith("java:")) 
-        {
-            lookupname = "java:module/" + lookupname;
-        }
-        return lookupname;
-    }
-    
+
     
     private String getLookupName(EJB annotation, String fieldType)
     {
@@ -116,10 +90,10 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         //use type
         if (lookupname == null)
         {
-            lookupname = guessByType(fieldType);
+            lookupname = JNDIObjectLocator.guessByType(fieldType);
         }
 
-        lookupname = prependPortableName(lookupname);
+        lookupname = JNDIObjectLocator.prependPortableName(lookupname);
         return lookupname;
     }
     
@@ -129,14 +103,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     {
         if(stateful != null)
         {
-            if(stateful.isSessionAttribute())
-            {
-                field.setConduit(new SessionAttributeFieldConduit(lookupname, stateful, fieldName, typeName));              
-            }
-            else
-            {
-                field.setConduit(new AppStateFieldConduit(lookupname, stateful, fieldName, typeName));
-            }
+            field.setConduit(new EJBFieldConduit(lookupname, stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));              
             return true;
         }
         else
@@ -157,32 +124,34 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     }
     
     
-    private class AppStateFieldConduit implements FieldConduit<Object>
+    private class EJBFieldConduit implements FieldConduit<Object>
     {
-        public AppStateFieldConduit(String lookupname, Stateful stateful, String fieldName, String typeName)
+        public EJBFieldConduit(String lookupname, Stateful stateful, String attributeName, String fieldName)
         {
             this.lookupname = lookupname;
             this.stateful = stateful;
+            this.attributeName = "ejb:" + attributeName;
             this.fieldName = fieldName;
-            this.typeName = typeName;
-            this.type = classCache.forName(typeName);
         }
 
         
         @Override
-        @SneakyThrows(NamingException.class)
         public Object get(Object instance, InstanceContext context)
         {
-            if(asm.exists(type))
+            final Session session = rg.getRequest().getSession(true);
+        
+            Wrapper rv = (Wrapper)session.getAttribute(attributeName);
+            if(rv == null)
             {
-                return asm.get(type);
+                rv = new Wrapper().lookupBean();
+                session.setAttribute(attributeName, rv);
             }
-            else
+            else if(rv.value == null)
             {
-                Object bean = locator.getJNDIObject(lookupname, stateful != null);
-                asm.set((Class<Object>) type, bean);
-                return bean;
+                rv.lookupBean();
             }
+        
+            return rv.value;
         }
 
         
@@ -196,43 +165,28 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         
         protected final String lookupname;
         protected final Stateful stateful;
+        protected final String attributeName;
         protected final String fieldName;
-        protected final String typeName;
-        protected final Class<?> type;
-    }
-    
-    
-    private class SessionAttributeFieldConduit extends AppStateFieldConduit
-    {
-        public SessionAttributeFieldConduit(String lookupname, Stateful stateful, String fieldName, String typeName)
-        {
-            super(lookupname, stateful, "".equals(stateful.sessionKey())? fieldName : stateful.sessionKey(), typeName);
-        }
-
         
-        @Override
-        @SneakyThrows(NamingException.class)
-        public Object get(Object instance, InstanceContext context)
-        {
-            final Session session = rg.getRequest().getSession(true);
         
-            Object rv = session.getAttribute(fieldName);
-            if(rv == null)
+        private class Wrapper implements Serializable
+        {
+            public Wrapper() { }
+            
+            
+            @SneakyThrows(NamingException.class)
+            public Wrapper lookupBean()
             {
-                rv = locator.getJNDIObject(lookupname, stateful != null);
-                session.setAttribute(fieldName, rv);
+                value = locator.getJNDIObject(lookupname, stateful != null);
+                return this;
             }
-            return rv;
+            public transient Object value;
         }
     }
     
-
+    
     private final JNDIObjectLocator locator = new JNDIObjectLocator();
     private @Inject ApplicationStateManager asm;
     private @Inject ComponentClassCache classCache;
     private @Inject RequestGlobals rg;
-    
-    private static final String REMOTE = "REMOTE";
-    private static final String LOCAL = "LOCAL";
-    public static final Pattern StripLocalPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
 }

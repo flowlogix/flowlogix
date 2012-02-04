@@ -4,10 +4,10 @@
  */
 package com.flowlogix.ejb;
 
-import com.flowlogix.web.services.internal.EJBAnnotationWorker;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
@@ -36,8 +36,8 @@ public class JNDIObjectLocator
     @SneakyThrows(NamingException.class)
     public<T> T getObject(Class<T> beanClass)
     {
-        String name = EJBAnnotationWorker.guessByType(beanClass.getName());
-        return getObject(EJBAnnotationWorker.prependPortableName(name));
+        String name = guessByType(beanClass.getName());
+        return getObject(prependPortableName(name));
     }
     
     
@@ -86,6 +86,31 @@ public class JNDIObjectLocator
         }
         return jndiObject;
     }
+    
+    
+    public static String prependPortableName(String lookupname)
+    {
+        //convert to jndi name
+        if (!lookupname.startsWith("java:")) 
+        {
+            lookupname = "java:module/" + lookupname;
+        }
+        return lookupname;
+    }
+    
+    
+    public static String guessByType(String type) 
+    {
+        String lookupname = type.substring(type.lastIndexOf(".") + 1);
+        // support naming convention that strips Local/Remote from the
+        // end of an interface class to try to determine the actual bean name,
+        // to avoid @EJB(beanName="myBeanName"), and just use plain old @EJB
+        String uc = lookupname.toUpperCase();
+        if (uc.endsWith(LOCAL) || uc.endsWith(REMOTE)) {
+            lookupname = StripInterfaceSuffixPattern.matcher(lookupname).replaceFirst("");
+        }
+        return lookupname + "!" + type;
+    }
 
     
     private synchronized<T> T lookup(String name) throws NamingException
@@ -112,4 +137,8 @@ public class JNDIObjectLocator
     
     @Getter private final InitialContext initialContext;
     private final Map<String, Object> jndiObjectCache = Collections.synchronizedMap(new HashMap<String, Object>());
+        
+    private static final String REMOTE = "REMOTE";
+    private static final String LOCAL = "LOCAL";
+    public static final Pattern StripInterfaceSuffixPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
 }

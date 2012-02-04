@@ -8,6 +8,7 @@ import com.flowlogix.web.components.security.LoginForm;
 import com.flowlogix.web.services.ExternalPageLink;
 import com.flowlogix.web.services.SecurityModule;
 import java.io.IOException;
+import java.net.URL;
 import lombok.SneakyThrows;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
@@ -71,7 +72,7 @@ public class LoginFormBase
             return null;
         }
         
-        return successLink;
+        return new URL(successLink);
     }
     
     

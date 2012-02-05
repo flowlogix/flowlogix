@@ -17,7 +17,6 @@ package com.flowlogix.web.services.internal;
 
 import com.flowlogix.ejb.JNDIObjectLocator;
 import com.flowlogix.web.services.annotations.Stateful;
-import java.io.Serializable;
 import javax.ejb.EJB;
 import javax.naming.NamingException;
 import lombok.SneakyThrows;
@@ -130,27 +129,22 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             this.stateful = stateful;
             this.attributeName = "ejb:" + attributeName;
             this.fieldName = fieldName;
-            this.locator = EJBAnnotationWorker.this.locator;
         }
 
         
         @Override
+        @SneakyThrows({NamingException.class})
         public Object get(Object instance, InstanceContext context)
         {
             final Session session = rg.getRequest().getSession(true);
         
-            Wrapper rv = (Wrapper)session.getAttribute(attributeName);
+            Object rv = session.getAttribute(attributeName);
             if(rv == null)
             {
-                rv = new Wrapper(this);
+                rv = locator.getJNDIObject(lookupname, stateful != null); 
                 session.setAttribute(attributeName, rv);
             }
-            else if(rv.value == null)
-            {
-                rv.lookupBean(this);
-            }
-        
-            return rv.value;
+            return rv;
         }
 
         
@@ -166,34 +160,9 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         protected final Stateful stateful;
         protected final String attributeName;
         protected final String fieldName;
-        protected final JNDIObjectLocator locator;
     }
     
     
     private final JNDIObjectLocator locator = new JNDIObjectLocator();
     private @Inject RequestGlobals rg;
-    
-    
-    private static class Wrapper implements Serializable
-    {
-        public Wrapper()
-        {
-        }
-        
-        
-        public Wrapper(EJBFieldConduit client)
-        {
-            lookupBean(client);
-        }
-
-        
-        @SneakyThrows(NamingException.class)
-        public final void lookupBean(EJBFieldConduit client)
-        {
-            value = client.locator.getJNDIObject(client.lookupname, client.stateful != null); 
-        }
-
-        
-        public transient Object value;
-    }
 }

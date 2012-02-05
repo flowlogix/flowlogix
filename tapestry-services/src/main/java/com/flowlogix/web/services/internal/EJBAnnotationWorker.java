@@ -21,14 +21,12 @@ import java.io.Serializable;
 import javax.ejb.EJB;
 import javax.naming.NamingException;
 import lombok.SneakyThrows;
-import org.apache.tapestry5.internal.services.ComponentClassCache;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.model.MutableComponentModel;
 import org.apache.tapestry5.plastic.FieldConduit;
 import org.apache.tapestry5.plastic.InstanceContext;
 import org.apache.tapestry5.plastic.PlasticClass;
 import org.apache.tapestry5.plastic.PlasticField;
-import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Session;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
@@ -132,6 +130,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             this.stateful = stateful;
             this.attributeName = "ejb:" + attributeName;
             this.fieldName = fieldName;
+            this.locator = EJBAnnotationWorker.this.locator;
         }
 
         
@@ -143,12 +142,12 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             Wrapper rv = (Wrapper)session.getAttribute(attributeName);
             if(rv == null)
             {
-                rv = new Wrapper().lookupBean();
+                rv = new Wrapper(this);
                 session.setAttribute(attributeName, rv);
             }
             else if(rv.value == null)
             {
-                rv.lookupBean();
+                rv.lookupBean(this);
             }
         
             return rv.value;
@@ -167,26 +166,34 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         protected final Stateful stateful;
         protected final String attributeName;
         protected final String fieldName;
-        
-        
-        private class Wrapper implements Serializable
-        {
-            public Wrapper() { }
-            
-            
-            @SneakyThrows(NamingException.class)
-            public Wrapper lookupBean()
-            {
-                value = locator.getJNDIObject(lookupname, stateful != null);
-                return this;
-            }
-            public transient Object value;
-        }
+        protected final JNDIObjectLocator locator;
     }
     
     
     private final JNDIObjectLocator locator = new JNDIObjectLocator();
-    private @Inject ApplicationStateManager asm;
-    private @Inject ComponentClassCache classCache;
     private @Inject RequestGlobals rg;
+    
+    
+    private static class Wrapper implements Serializable
+    {
+        public Wrapper()
+        {
+        }
+        
+        
+        public Wrapper(EJBFieldConduit client)
+        {
+            lookupBean(client);
+        }
+
+        
+        @SneakyThrows(NamingException.class)
+        public final void lookupBean(EJBFieldConduit client)
+        {
+            value = client.locator.getJNDIObject(client.lookupname, client.stateful != null); 
+        }
+
+        
+        public transient Object value;
+    }
 }

@@ -15,7 +15,8 @@ DisableAfterSubmit.prototype = {
 
     doDisable: function() {
         $(this.elementId).disable();
-        var isZone = $(this.formId).getStorage().zoneId != null;
+        var tapStorage = $(this.formId).getStorage();
+        var isZone = tapStorage.zoneId != null;
 
         if(isZone) {
             this.zoneElement = Tapestry.findZoneManager(this.formId).element;
@@ -24,18 +25,18 @@ DisableAfterSubmit.prototype = {
         }
 
         $(this.formId).setSubmittingElement($(this.elementId));
-        var validationSuccess = $(this.formId).onsubmit();
-        if(validationSuccess) {
-            if(isZone == false) {
-                $(this.formId).submit();
-            }
-        }
-        else {
+        $(this.formId).onsubmit();
+        if(tapStorage.validationError) {
             if(isZone) {
                 this.doEnable();
             }
             else {
                 $(this.elementId).enable();                       
+            }
+        }
+        else {
+            if(isZone == false) {
+                $(this.formId).submit();
             }
         }
     },

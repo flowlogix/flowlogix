@@ -6,10 +6,8 @@ package com.flowlogix.web.services.internal;
 
 import com.flowlogix.web.services.SecurityModule.Symbols;
 import java.io.IOException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.shiro.web.util.WebUtils;
 import org.apache.tapestry5.ioc.ObjectLocator;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
@@ -93,24 +91,11 @@ public class PageServiceOverride implements PageService
     }
 
 
-    /**
-     * TODO See http://jira.codehaus.org/browse/TYNAMO-120
-     * Once that issue is fixed, this method can be
-     * made the a simple proxy again
-     */
     @Override
     public void redirectToSavedRequest(String fallbackUrl) throws IOException
     {
         init();
-        for (Cookie cookie : request.getCookies())
-        {
-            if (WebUtils.SAVED_REQUEST_KEY.equals(cookie.getName()))
-            {
-                impl.redirectToSavedRequest(fallbackUrl);
-                return;
-            }
-        }
-        WebUtils.issueRedirect(request, response, fallbackUrl);
+        impl.redirectToSavedRequest(fallbackUrl);
     }
     
     

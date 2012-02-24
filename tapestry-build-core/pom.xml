@@ -213,7 +213,7 @@
             <artifactId>tapestry-jpa</artifactId>
             <version>${tap.version}</version>
             <type>jar</type>
-            <scope>${war-deps.scope}</scope>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.persistence</groupId>
@@ -331,7 +331,7 @@
             <scope>${war-deps.scope}</scope>
         </dependency>
     </dependencies>
-
+    
     <build>
         <plugins>
             <plugin>
@@ -473,12 +473,6 @@
                                     <groupId>org.apache.tapestry</groupId>
                                     <artifactId>tapestry5-annotations</artifactId>
                                     <version>${tap.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.tapestry</groupId>
-                                    <artifactId>tapestry-jpa</artifactId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>

@@ -33,6 +33,9 @@ import org.tynamo.security.services.SecurityService;
 /**
  * See http://jira.codehaus.org/browse/TYNAMO-121
  * This is a workaround for this bug
+ *
+ * Taken from SecurityModule, has to be kept in sync
+ * in future versions, added the isXHR bit
  * 
  * @author lprimak
  */

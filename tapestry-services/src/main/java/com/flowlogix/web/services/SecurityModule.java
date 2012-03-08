@@ -98,9 +98,6 @@ public class SecurityModule
     }
 
 
-    /**
-     * @see <a href="https://issues.apache.org/jira/browse/SHIRO-334" target="_blank">SHIRO-334</a>
-     */
     @Match("WebSecurityManager")
     public WebSecurityManager decorateRememberMeDefaults(WebSecurityManager _manager, 
         @Symbol(Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)
@@ -123,8 +120,6 @@ public class SecurityModule
     
     
     /**
-     * Taken from SecurityModule, has to be kept in sync
-     * in future versions, added the isXHR bit
      * See http://jira.codehaus.org/browse/TYNAMO-121
      */
     public void contributeExceptionHandler(MappedConfiguration<Class<?>, ExceptionHandlerAssistant> configuration,

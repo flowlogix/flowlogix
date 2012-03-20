@@ -120,7 +120,7 @@ public class SecurityModule
     
     
     /**
-     * See http://jira.codehaus.org/browse/TYNAMO-121
+     * Detects expired session and sets an attribute to indicate that fact
      */
     public void contributeExceptionHandler(MappedConfiguration<Class<?>, ExceptionHandlerAssistant> configuration,
             final SecurityService securityService, final RequestGlobals rg, final PageService pageService,

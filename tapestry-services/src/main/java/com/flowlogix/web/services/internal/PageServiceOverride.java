@@ -4,7 +4,6 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.web.services.SecurityModule.Symbols;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.tapestry5.ioc.annotations.Symbol;
@@ -19,15 +18,12 @@ import org.tynamo.security.services.impl.PageServiceImpl;
  */
 public class PageServiceOverride extends PageServiceImpl
 {
-    public PageServiceOverride(@Symbol(Symbols.SUCCESS_URL) String successUrl,
-            @Symbol(Symbols.LOGIN_URL) String loginUrl,
-            @Symbol(Symbols.UNAUTHORIZED_URL) String unauthorizedUrl,
-            @Symbol(SecuritySymbols.UNAUTHORIZED_URL) String tynamoUnauthorizedUrl,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            LocalizationSetter lc)
+    public PageServiceOverride(@Symbol(SecuritySymbols.SUCCESS_URL) String successUrl,
+            @Symbol(SecuritySymbols.LOGIN_URL) String loginUrl,
+            @Symbol(SecuritySymbols.UNAUTHORIZED_URL) String unauthorizedUrl,
+            HttpServletRequest request, HttpServletResponse response, LocalizationSetter lc)
     {
-        super(successUrl, loginUrl, unauthorizedUrl.isEmpty() ? tynamoUnauthorizedUrl : unauthorizedUrl,
+        super(successUrl, loginUrl, unauthorizedUrl,
                 request, response, lc);
     }
 }

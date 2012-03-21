@@ -6,6 +6,8 @@ package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.IOException;
+import org.apache.shiro.mgt.RememberMeManager;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.tapestry5.MetaDataConstants;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.internal.services.RequestConstants;
@@ -76,21 +78,22 @@ public class SecurityModule
     }
 
 
-//    @Match("RememberMeManager")
-//    public RememberMeManager decorateRememberMeDefaults(@Autobuild CookieRememberMeManager mgr, 
-//        @Symbol(Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)
-//    {
-//            if(productionMode)
-//            {
-//                mgr.getCookie().setMaxAge(daysToRemember * 24 * 60 * 60);
-//            }
-//            else
-//            {
-//                mgr.getCookie().setMaxAge(-1);
-//            }            
-//        
-//        return mgr;
-//    }
+    @Match("RememberMeManager")
+    public RememberMeManager decorateRememberMeDefaults(RememberMeManager _mgr, 
+        @Symbol(Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)
+    {
+        CookieRememberMeManager mgr = (CookieRememberMeManager)_mgr;
+        if (productionMode)
+        {
+            mgr.getCookie().setMaxAge(daysToRemember * 24 * 60 * 60);
+        } 
+        else
+        {
+            mgr.getCookie().setMaxAge(-1);
+        }
+        
+        return mgr;
+    }
     
     
     /**

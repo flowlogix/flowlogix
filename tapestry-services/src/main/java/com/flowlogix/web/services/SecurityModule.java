@@ -31,9 +31,6 @@ public class SecurityModule
 {
     public static void contributeFactoryDefaults(MappedConfiguration<String, String> configuration)
     {
-        configuration.add(Symbols.LOGIN_URL, "/" + SECURITY_PATH_PREFIX + "/login");
-        configuration.add(Symbols.SUCCESS_URL, "/index");
-        configuration.add(Symbols.UNAUTHORIZED_URL, "");
         configuration.add(Symbols.REMEMBER_ME_DURATION, Integer.toString(2 * 7)); // 2 weeks
         configuration.add(Symbols.INVALID_AUTH_DELAY, Integer.toString(3));
         configuration.add(Symbols.SESSION_EXPIRED_MESSAGE, "Your Session Has Expired");
@@ -49,6 +46,7 @@ public class SecurityModule
     @Contribute(ServiceOverride.class)
     public static void overrideLoginScreen(MappedConfiguration<Class<?>, Object> configuration, @Local PageService override)
     {
+        // no need to override for now
         configuration.add(PageService.class, override);
     }
     
@@ -124,9 +122,6 @@ public class SecurityModule
     
     public static class Symbols
     {
-        public static final String LOGIN_URL = "flowlogix.security.loginurl";
-        public static final String SUCCESS_URL = "flowlogix.security.successurl";
-        public static final String UNAUTHORIZED_URL = "flowlogix.security.unauthorizedurl";        
         public static final String REMEMBER_ME_DURATION = "flowlogix.security.remembermeduration";        
         public static final String INVALID_AUTH_DELAY = "flowlogix.security.invalid-auth-delay";
         public static final String SESSION_EXPIRED_MESSAGE = "flowlogix.security.session-expired-message";

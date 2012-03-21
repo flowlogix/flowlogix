@@ -99,7 +99,7 @@ public class SecurityModule
             mgr.getCookie().setMaxAge(-1);
         }
         
-        return mgr;
+        return null;
     }
     
     

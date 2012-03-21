@@ -18,52 +18,81 @@ package com.flowlogix.web.services.internal;
 import com.flowlogix.session.internal.SessionTrackerHolder;
 import java.io.IOException;
 import java.util.List;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.shiro.util.StringUtils;
+import org.apache.shiro.web.util.WebUtils;
 import org.apache.tapestry5.internal.services.PageResponseRenderer;
 import org.apache.tapestry5.internal.services.RequestPageCache;
+import org.apache.tapestry5.internal.structure.Page;
 import org.apache.tapestry5.services.Cookies;
-import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
-import org.apache.tapestry5.services.Response;
-import org.tynamo.security.internal.SecurityExceptionHandlerAssistant;
+import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
 import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.SecurityService;
 
 /**
- * Detects expired session and sets an attribute
+ * See http://jira.codehaus.org/browse/TYNAMO-121
+ * See http://jira.codehaus.org/browse/TYNAMO-121
+ * This is a workaround for these bugs
  * 
  * @author lprimak
  */
-public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssistant
+public class ExceptionHandlerAssistantImpl implements ExceptionHandlerAssistant 
 {
-    public ExceptionHandlerAssistantImpl(SecurityService securityService, PageService pageService, 
-            RequestPageCache pageCache, PageResponseRenderer renderer, Cookies cookies,
-            HttpServletRequest httpRequest, Response response)
+    public ExceptionHandlerAssistantImpl(SecurityService securityService, PageService pageService, RequestGlobals rg, 
+            RequestPageCache pageCache, PageResponseRenderer renderer, Cookies cookies)
     {
-        super(securityService, pageService, pageCache, httpRequest, response, 
-                renderer, cookies);
-        this.httpRequest = httpRequest;
+        this.securityService = securityService;
+        this.pageService = pageService;
+        this.rg = rg;
+        this.pageCache = pageCache;
+        this.renderer = renderer;
+        this.cookies = cookies;
     }
 
     
     @Override
-    public Object handleRequestException(Throwable exception, List<Object> exceptionContext) throws IOException
+    public String handleRequestException(Throwable exception, List<Object> exceptionContext) throws IOException
     {
-        Object rv = super.handleRequestException(exception, exceptionContext);
-        if(rv != null)
+        if (securityService.isAuthenticated())
         {
-            // do not invoke on Ajax bad sessions
-            if (request.isXHR() && SessionTrackerHolder.get().isValidSession(rg.getActivePageName(), httpRequest.getSession(false)) == false)
+            String unauthorizedPage = pageService.getUnauthorizedPage();
+            rg.getResponse().setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            if (!StringUtils.hasText(unauthorizedPage))
             {
-                request.getSession(true).setAttribute("showSessionExpiredMessage", Boolean.TRUE);
+                return null;
             }
+            Page page = pageCache.get(unauthorizedPage);
+            renderer.renderPageResponse(page);
+            return null;
         }
-        return rv;
-    }    
+        
+        /**
+         * Begin Flow Logix Addition
+         */
+        // do not invoke on Ajax bad sessions
+        if (rg.getRequest().isXHR() && SessionTrackerHolder.get().isValidSession(rg.getActivePageName(), rg.getHTTPServletRequest().getSession(false)) == false)
+        {
+            rg.getRequest().getSession(true).setAttribute("showSessionExpiredMessage", Boolean.TRUE);
+        }
+        /**
+         * End Flow Logix Addition
+         */
+        
+        String contextPath = rg.getHTTPServletRequest().getContextPath();
+        if ("".equals(contextPath))
+        {
+            contextPath = "/";
+        }
+        cookies.writeCookieValue(WebUtils.SAVED_REQUEST_KEY, WebUtils.getPathWithinApplication(rg.getHTTPServletRequest()), contextPath);
+        return pageService.getLoginPage();
+    }
     
     
-    private @Inject Request request;
-    private @Inject RequestGlobals rg;
-    private final HttpServletRequest httpRequest;
+    private final SecurityService securityService;
+    private final PageService pageService;
+    private final RequestGlobals rg;
+    private final RequestPageCache pageCache;
+    private final PageResponseRenderer renderer;
+    private final Cookies cookies;
 }

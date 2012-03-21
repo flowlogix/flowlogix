@@ -21,6 +21,7 @@ import org.apache.tapestry5.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
+import org.tynamo.security.SecuritySymbols;
 import org.tynamo.security.services.TapestryRealmSecurityManager;
 
 /**
@@ -56,6 +57,7 @@ public class SecurityModule
     public void contributeMetaDataLocator(MappedConfiguration<String, String> configuration)
     {
         configuration.add(String.format("%s:%s", SECURITY_PATH_PREFIX, MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
+        configuration.add(String.format("%s:%s", "security", MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
     }
     
     

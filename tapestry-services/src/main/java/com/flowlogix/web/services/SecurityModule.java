@@ -8,7 +8,6 @@ import com.flowlogix.web.services.internal.ExceptionHandlerAssistantImpl;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.IOException;
 import org.apache.shiro.ShiroException;
-import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.tapestry5.MetaDataConstants;
@@ -33,6 +32,13 @@ import org.tynamo.security.services.TapestryRealmSecurityManager;
  */
 public class SecurityModule 
 {
+    public SecurityModule(@Symbol(SymbolConstants.ASSET_PATH_PREFIX) String assetPathPrefix)
+    {
+        this.assetPathPrefix = assetPathPrefix;
+        pathProcessor = new GwtModule.PathProcessor(assetPathPrefix);
+    }
+    
+    
     public static void contributeFactoryDefaults(MappedConfiguration<String, String> configuration)
     {
         configuration.add(Symbols.REMEMBER_ME_DURATION, Integer.toString(2 * 7)); // 2 weeks
@@ -59,22 +65,24 @@ public class SecurityModule
     @Contribute(RequestHandler.class)
     public void disableAssetDirListing(OrderedConfiguration<RequestFilter> configuration,
                     @Symbol(SymbolConstants.APPLICATION_VERSION) final String applicationVersion,
-                    @Symbol(SymbolConstants.ASSET_PATH_PREFIX) final String assetPathPrefix)
+                    final Context ctxt)
     {
         configuration.add("DisableDirListing", new RequestFilter() {
             @Override
             public boolean service(Request request, Response response, RequestHandler handler) throws IOException
             {
-                final String assetFolder = assetPathPrefix+ applicationVersion + "/" + 
-                        RequestConstants.CONTEXT_FOLDER;
-                if(request.getPath().startsWith(assetFolder) && request.getPath().endsWith("/"))
+                final String assetFolder = assetPathPrefix + applicationVersion + "/"
+                        + RequestConstants.CONTEXT_FOLDER;
+                if (request.getPath().startsWith(assetFolder))
                 {
-                    return false;
+                    if(request.getPath().endsWith("/") || 
+                            ctxt.getRealFile(pathProcessor.removeAssetPathPart(
+                            request.getPath())).isDirectory())
+                    {
+                        return false;
+                    }
                 }
-                else
-                {
-                    return handler.service(request, response);
-                }
+                return handler.service(request, response);
             }
         }, "before:AssetDispatcher");
     }      
@@ -129,6 +137,9 @@ public class SecurityModule
     public static final String SECURITY_PATH_PREFIX = "flowlogix/security";
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     private @Inject @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode;
+   
+    private final GwtModule.PathProcessor pathProcessor;
+    private final String assetPathPrefix;
     
     private static final Logger logger = LoggerFactory.getLogger(SecurityModule.class);
 }

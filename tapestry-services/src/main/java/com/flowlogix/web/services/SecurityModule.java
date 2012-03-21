@@ -4,7 +4,6 @@
  */
 package com.flowlogix.web.services;
 
-import com.flowlogix.web.services.internal.PageServiceOverride;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.IOException;
 import org.apache.tapestry5.MetaDataConstants;
@@ -12,13 +11,13 @@ import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
-import org.apache.tapestry5.ioc.ServiceBinder;
-import org.apache.tapestry5.ioc.annotations.*;
-import org.apache.tapestry5.ioc.services.ServiceOverride;
+import org.apache.tapestry5.ioc.annotations.Contribute;
+import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Match;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tynamo.security.services.PageService;
 
 /**
  * patch Tynamo security to load classes from the
@@ -36,21 +35,7 @@ public class SecurityModule
         configuration.add(Symbols.SESSION_EXPIRED_MESSAGE, "Your Session Has Expired");
     }
     
-    
-    public static void bind(ServiceBinder binder)
-    {
-        binder.bind(PageService.class, PageServiceOverride.class).withId("FLPageServiceOverride");
-    }
-
-
-    @Contribute(ServiceOverride.class)
-    public static void overrideLoginScreen(MappedConfiguration<Class<?>, Object> configuration, @Local PageService override)
-    {
-        // no need to override for now
-        configuration.add(PageService.class, override);
-    }
-    
-       
+           
     public void contributeMetaDataLocator(MappedConfiguration<String, String> configuration)
     {
         configuration.add(String.format("%s:%s", SECURITY_PATH_PREFIX, MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));

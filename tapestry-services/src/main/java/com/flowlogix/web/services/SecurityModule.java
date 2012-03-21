@@ -4,30 +4,21 @@
  */
 package com.flowlogix.web.services;
 
-import com.flowlogix.web.services.internal.ExceptionHandlerAssistantImpl;
 import com.flowlogix.web.services.internal.PageServiceOverride;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.IOException;
-import org.apache.shiro.ShiroException;
-import org.apache.shiro.mgt.RememberMeManager;
-import org.apache.shiro.web.mgt.CookieRememberMeManager;
-import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.tapestry5.MetaDataConstants;
 import org.apache.tapestry5.SymbolConstants;
-import org.apache.tapestry5.internal.services.PageResponseRenderer;
 import org.apache.tapestry5.internal.services.RequestConstants;
-import org.apache.tapestry5.internal.services.RequestPageCache;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
+import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.*;
 import org.apache.tapestry5.ioc.services.ServiceOverride;
 import org.apache.tapestry5.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
 import org.tynamo.security.services.PageService;
-import org.tynamo.security.services.SecurityService;
-import org.tynamo.security.services.TapestryRealmSecurityManager;
 
 /**
  * patch Tynamo security to load classes from the
@@ -47,12 +38,18 @@ public class SecurityModule
         configuration.add(Symbols.INVALID_AUTH_DELAY, Integer.toString(3));
         configuration.add(Symbols.SESSION_EXPIRED_MESSAGE, "Your Session Has Expired");
     }
+    
+    
+    public static void bind(ServiceBinder binder)
+    {
+        binder.bind(PageService.class, PageServiceOverride.class).withId("FLPageServiceOverride");
+    }
 
 
     @Contribute(ServiceOverride.class)
-    public static void overrideLoginScreen(MappedConfiguration<Class<?>, Object> configuration)
+    public static void overrideLoginScreen(MappedConfiguration<Class<?>, Object> configuration, @Local PageService override)
     {
-        configuration.addInstance(PageService.class, PageServiceOverride.class);
+        configuration.add(PageService.class, override);
     }
     
        

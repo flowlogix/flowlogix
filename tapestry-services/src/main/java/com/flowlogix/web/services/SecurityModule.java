@@ -55,6 +55,7 @@ public class SecurityModule
     public void contributeMetaDataLocator(MappedConfiguration<String, String> configuration)
     {
         configuration.add(String.format("%s:%s", SECURITY_PATH_PREFIX, MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
+        configuration.add(String.format("%s:%s", "security", MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
     }
     
     

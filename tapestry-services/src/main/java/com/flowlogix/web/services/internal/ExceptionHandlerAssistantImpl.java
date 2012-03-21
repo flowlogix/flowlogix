@@ -18,10 +18,14 @@ package com.flowlogix.web.services.internal;
 import com.flowlogix.session.internal.SessionTrackerHolder;
 import java.io.IOException;
 import java.util.List;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.tapestry5.internal.services.PageResponseRenderer;
 import org.apache.tapestry5.internal.services.RequestPageCache;
 import org.apache.tapestry5.services.Cookies;
+import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
+import org.apache.tapestry5.services.Response;
 import org.tynamo.security.internal.SecurityExceptionHandlerAssistant;
 import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.SecurityService;
@@ -33,12 +37,13 @@ import org.tynamo.security.services.SecurityService;
  */
 public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssistant
 {
-    public ExceptionHandlerAssistantImpl(SecurityService securityService, PageService pageService, RequestGlobals rg, 
-            RequestPageCache pageCache, PageResponseRenderer renderer, Cookies cookies)
+    public ExceptionHandlerAssistantImpl(SecurityService securityService, PageService pageService, 
+            RequestPageCache pageCache, PageResponseRenderer renderer, Cookies cookies,
+            HttpServletRequest httpRequest, Response response)
     {
-        super(securityService, pageService, pageCache, rg.getHTTPServletRequest(), rg.getResponse(), 
+        super(securityService, pageService, pageCache, httpRequest, response, 
                 renderer, cookies);
-        this.rg = rg;
+        this.httpRequest = httpRequest;
     }
 
     
@@ -49,14 +54,16 @@ public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssis
         if(rv != null)
         {
             // do not invoke on Ajax bad sessions
-            if (rg.getRequest().isXHR() && SessionTrackerHolder.get().isValidSession(rg.getActivePageName(), rg.getHTTPServletRequest().getSession(false)) == false)
+            if (request.isXHR() && SessionTrackerHolder.get().isValidSession(rg.getActivePageName(), httpRequest.getSession(false)) == false)
             {
-                rg.getRequest().getSession(true).setAttribute("showSessionExpiredMessage", Boolean.TRUE);
+                request.getSession(true).setAttribute("showSessionExpiredMessage", Boolean.TRUE);
             }
         }
         return rv;
-    }
+    }    
     
     
-    private final RequestGlobals rg;
+    private @Inject Request request;
+    private @Inject RequestGlobals rg;
+    private final HttpServletRequest httpRequest;
 }

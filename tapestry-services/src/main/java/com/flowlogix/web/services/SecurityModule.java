@@ -4,8 +4,10 @@
  */
 package com.flowlogix.web.services;
 
+import com.flowlogix.web.services.internal.ExceptionHandlerAssistantImpl;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.IOException;
+import org.apache.shiro.ShiroException;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.tapestry5.MetaDataConstants;
@@ -13,13 +15,12 @@ import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
-import org.apache.tapestry5.ioc.annotations.Contribute;
-import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.ioc.annotations.Match;
-import org.apache.tapestry5.ioc.annotations.Symbol;
+import org.apache.tapestry5.ioc.ServiceBinder;
+import org.apache.tapestry5.ioc.annotations.*;
 import org.apache.tapestry5.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
 
 /**
  * patch Tynamo security to load classes from the
@@ -37,7 +38,13 @@ public class SecurityModule
         configuration.add(Symbols.SESSION_EXPIRED_MESSAGE, "Your Session Has Expired");
     }
     
-           
+    
+    public static void bind(ServiceBinder binder)
+    {
+        binder.bind(ExceptionHandlerAssistant.class, ExceptionHandlerAssistantImpl.class).withId("FLSecurityExceptionHandler");
+    }
+
+
     public void contributeMetaDataLocator(MappedConfiguration<String, String> configuration)
     {
         configuration.add(String.format("%s:%s", SECURITY_PATH_PREFIX, MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
@@ -99,13 +106,11 @@ public class SecurityModule
     /**
      * Detects expired session and sets an attribute to indicate that fact
      */
-//    public void contributeExceptionHandler(MappedConfiguration<Class<?>, ExceptionHandlerAssistant> configuration,
-//            final SecurityService securityService, final RequestGlobals rg, final PageService pageService,
-//            final RequestPageCache pageCache, final PageResponseRenderer renderer, final Cookies cookies)
-//    {
-//        ExceptionHandlerAssistant assistant = new ExceptionHandlerAssistantImpl(securityService, pageService, rg, pageCache, renderer, cookies);
-//        configuration.override(ShiroException.class, assistant);
-//    }
+    public void contributeExceptionHandler(MappedConfiguration<Class<?>, ExceptionHandlerAssistant> configuration,
+        @Local ExceptionHandlerAssistant assistant)
+    {
+        configuration.override(ShiroException.class, assistant);
+    }
         
     
     public static class Symbols

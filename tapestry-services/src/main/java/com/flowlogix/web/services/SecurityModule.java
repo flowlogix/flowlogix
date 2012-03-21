@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
+import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.tapestry5.MetaDataConstants;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.internal.services.RequestConstants;
@@ -21,6 +22,7 @@ import org.apache.tapestry5.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
+import org.tynamo.security.services.TapestryRealmSecurityManager;
 
 /**
  * patch Tynamo security to load classes from the
@@ -85,21 +87,24 @@ public class SecurityModule
     }
 
 
-    @Match("RememberMeManager")
-    public RememberMeManager decorateRememberMeDefaults(RememberMeManager _mgr, 
+    @Match("WebSecurityManager")
+    public WebSecurityManager decorateRememberMeDefaults(WebSecurityManager _manager, 
         @Symbol(Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)
     {
-        CookieRememberMeManager mgr = (CookieRememberMeManager)_mgr;
-        if (productionMode)
+        if (_manager instanceof TapestryRealmSecurityManager)
         {
-            mgr.getCookie().setMaxAge(daysToRemember * 24 * 60 * 60);
-        } 
-        else
-        {
-            mgr.getCookie().setMaxAge(-1);
+            TapestryRealmSecurityManager manager = (TapestryRealmSecurityManager)_manager;
+            CookieRememberMeManager mgr = (CookieRememberMeManager)manager.getRememberMeManager();
+            if(productionMode)
+            {
+                mgr.getCookie().setMaxAge(daysToRemember * 24 * 60 * 60);
+            }
+            else
+            {
+                mgr.getCookie().setMaxAge(-1);
+            }            
         }
-        
-        return mgr;
+        return null;
     }
     
     

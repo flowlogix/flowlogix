@@ -32,7 +32,7 @@ import org.tynamo.security.services.SecurityService;
 
 /**
  * See http://jira.codehaus.org/browse/TYNAMO-121
- * See http://jira.codehaus.org/browse/TYNAMO-121
+ * See http://jira.codehaus.org/browse/TYNAMO-133
  * This is a workaround for these bugs
  * 
  * @author lprimak

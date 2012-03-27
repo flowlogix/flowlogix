@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.tapestry5.internal.services.PageResponseRenderer;
 import org.apache.tapestry5.internal.services.RequestPageCache;
-import org.apache.tapestry5.services.Cookies;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
@@ -38,11 +37,11 @@ import org.tynamo.security.services.SecurityService;
 public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssistant
 {
     public ExceptionHandlerAssistantImpl(SecurityService securityService, PageService pageService, 
-            RequestPageCache pageCache, PageResponseRenderer renderer, Cookies cookies,
+            RequestPageCache pageCache, PageResponseRenderer renderer,
             HttpServletRequest httpRequest, Response response)
     {
         super(securityService, pageService, pageCache, httpRequest, response, 
-                renderer, cookies);
+                renderer);
         this.httpRequest = httpRequest;
     }
 

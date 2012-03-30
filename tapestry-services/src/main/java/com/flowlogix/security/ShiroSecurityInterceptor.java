@@ -32,7 +32,7 @@ public class ShiroSecurityInterceptor implements Serializable
             Principal principal = javax.security.auth.Subject.getSubject(AccessController.getContext()).
                     getPrincipals().iterator().next();
             subject = ((SecurityInterceptorFilter.SubjectWrapper) principal).getSubject();
-        } finally
+        } catch(Throwable e)
         {
             // intentionally left blank
         }

@@ -63,8 +63,7 @@ public class SessionTrackerHolder
     }
     
     
-    public static void redirectToSelf(RequestGlobals rg, PageRenderLinkSource linkSource,
-            boolean isSecure) throws IOException
+    public static void redirectToSelf(RequestGlobals rg, PageRenderLinkSource linkSource) throws IOException
     {
         if(rg.getRequest().isXHR() == false)
         {
@@ -74,7 +73,7 @@ public class SessionTrackerHolder
         // redirect to the same page
         Link link = linkSource.createPageRenderLink(rg.getRequest().getPath().replaceFirst("\\..*", "").substring(1));
         writer.write("{\n\t\"redirectURL\" : \""
-                + link.toAbsoluteURI(isSecure) + "\"\n}");
+                + link.toAbsoluteURI(rg.getRequest().isSecure()) + "\"\n}");
         writer.close();
     }
     

@@ -16,7 +16,6 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Link;
-import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.*;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
@@ -87,7 +86,7 @@ public class LoginFormBase
     public void detectJavaScript()
     {
         Link link = componentResources.createEventLink(ENABLE_JS_EVENT);
-        String eventURI = link.toAbsoluteURI(isSecure);
+        String eventURI = link.toAbsoluteURI(requestGlobals.getRequest().isSecure());
         jsSupport.addInitializerCall("detectJS", eventURI);
     }
     
@@ -103,7 +102,6 @@ public class LoginFormBase
     private @Inject RequestGlobals requestGlobals;
     private @Inject SecurityService securityService;
     private @Inject PageService pageService;
-    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
     private @Inject @Symbol(SecurityModule.Symbols.INVALID_AUTH_DELAY) int authDelayInterval;
     private @Inject @Symbol(SecuritySymbols.REDIRECT_TO_SAVED_URL) boolean redirectToSavedUrl;
     private @Environmental JavaScriptSupport jsSupport;

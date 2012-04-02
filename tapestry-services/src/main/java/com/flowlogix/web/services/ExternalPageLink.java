@@ -18,9 +18,7 @@ package com.flowlogix.web.services;
 import java.net.MalformedURLException;
 import java.net.URL;
 import lombok.SneakyThrows;
-import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.ioc.util.UnknownValueException;
 import org.apache.tapestry5.services.BaseURLSource;
 import org.apache.tapestry5.services.PageRenderLinkSource;
@@ -45,13 +43,13 @@ public class ExternalPageLink
     
     @SneakyThrows(MalformedURLException.class)
     public String createLink(String pageName, boolean isAbsolute)
-    {
+    {        
         try
         {
             // try Tapestry page
             if(isAbsolute)
             {
-                return linkSource.createPageRenderLink(pageName).toAbsoluteURI(isSecure);
+                return linkSource.createPageRenderLink(pageName).toAbsoluteURI(request.isSecure());
             }
             else
             {
@@ -62,7 +60,7 @@ public class ExternalPageLink
         {
             // try external page
             return new URL(String.format("%s%s/%s",
-                    urlSource.getBaseURL(isSecure), request.getContextPath(),
+                    urlSource.getBaseURL(request.isSecure()), request.getContextPath(),
                     pageName)).toExternalForm();
         }
     }
@@ -70,6 +68,5 @@ public class ExternalPageLink
     
     private @Inject Request request;
     private @Inject PageRenderLinkSource linkSource;
-    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;  
     private @Inject BaseURLSource urlSource;
 }

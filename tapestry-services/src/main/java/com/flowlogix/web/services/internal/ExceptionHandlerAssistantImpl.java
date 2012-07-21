@@ -26,6 +26,7 @@ import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
 import org.tynamo.security.internal.SecurityExceptionHandlerAssistant;
+import org.tynamo.security.internal.services.LoginContextService;
 import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.SecurityService;
 
@@ -36,11 +37,11 @@ import org.tynamo.security.services.SecurityService;
  */
 public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssistant
 {
-    public ExceptionHandlerAssistantImpl(SecurityService securityService, PageService pageService, 
+    public ExceptionHandlerAssistantImpl(SecurityService securityService, LoginContextService contextService, 
             RequestPageCache pageCache, PageResponseRenderer renderer,
             HttpServletRequest httpRequest, Response response)
     {
-        super(securityService, pageService, pageCache, httpRequest, response, 
+        super(securityService, contextService, pageCache, httpRequest, response, 
                 renderer);
         this.httpRequest = httpRequest;
     }

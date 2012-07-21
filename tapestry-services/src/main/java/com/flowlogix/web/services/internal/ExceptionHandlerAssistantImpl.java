@@ -27,7 +27,6 @@ import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
 import org.tynamo.security.internal.SecurityExceptionHandlerAssistant;
 import org.tynamo.security.internal.services.LoginContextService;
-import org.tynamo.security.services.PageService;
 import org.tynamo.security.services.SecurityService;
 
 /**

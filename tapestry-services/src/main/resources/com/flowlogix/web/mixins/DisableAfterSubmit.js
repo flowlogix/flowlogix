@@ -13,7 +13,7 @@ DisableAfterSubmit.prototype = {
             this.doDisable.bindAsEventListener(this));			
     },
 
-    doDisable: function() {
+    doDisable: function(domevent) {
         $(this.elementId).disable();
         var tapStorage = $(this.formId).getStorage();
         var isZone = tapStorage.zoneId != null;
@@ -25,7 +25,7 @@ DisableAfterSubmit.prototype = {
         }
 
         $(this.formId).setSubmittingElement($(this.elementId));
-        $(this.formId).onsubmit();
+        $(this.formId).onsubmit(domevent);
         if(tapStorage.validationError) {
             if(isZone) {
                 this.doEnable();

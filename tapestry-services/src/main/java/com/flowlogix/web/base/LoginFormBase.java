@@ -25,7 +25,7 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tynamo.security.SecuritySymbols;
-import org.tynamo.security.services.PageService;
+import org.tynamo.security.internal.services.LoginContextService;
 import org.tynamo.security.services.SecurityService;
 
 /**
@@ -63,11 +63,11 @@ public class LoginFormBase
             throw ae;
         }
 
-        final String successLink = externalLink.createLink(pageService.getSuccessPage(), true);
+        final String successLink = externalLink.createLink(contextService.getSuccessPage(), true);
 
         if (redirectToSavedUrl)
         {
-            pageService.redirectToSavedRequest(successLink);
+            contextService.redirectToSavedRequest(successLink);
             return null;
         }
         
@@ -101,7 +101,7 @@ public class LoginFormBase
     private @Inject Response response;
     private @Inject RequestGlobals requestGlobals;
     private @Inject SecurityService securityService;
-    private @Inject PageService pageService;
+    private @Inject LoginContextService contextService;
     private @Inject @Symbol(SecurityModule.Symbols.INVALID_AUTH_DELAY) int authDelayInterval;
     private @Inject @Symbol(SecuritySymbols.REDIRECT_TO_SAVED_URL) boolean redirectToSavedUrl;
     private @Environmental JavaScriptSupport jsSupport;

@@ -8,7 +8,6 @@
     <description>Flow Logix Utility Library Root POM</description>
   
     <modules>
-        <module>tapestry-build-core</module>
         <module>tapestry-services</module>
     </modules>
 

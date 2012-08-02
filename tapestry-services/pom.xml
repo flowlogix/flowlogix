@@ -3,7 +3,7 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>tapestry-services</artifactId>
-    <version>0.9-SNAPSHOT</version>
+    <version>0.9-obsolete</version>
     <packaging>jar</packaging>
 
     <name>Flow Logix Tapestry Services</name>
@@ -36,7 +36,7 @@
         <groupId>com.flowlogix</groupId>
         <artifactId>tapestry-build-core</artifactId>
         <relativePath>../tapestry-build-core/pom.xml</relativePath>
-        <version>0.9-SNAPSHOT</version>
+        <version>0.8.9</version>
     </parent>
     
     <build>

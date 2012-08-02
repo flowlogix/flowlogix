@@ -3,7 +3,7 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>tapestry-services</artifactId>
-    <version>0.9-obsolete</version>
+    <version>0.10-obsolete-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Flow Logix Tapestry Services</name>

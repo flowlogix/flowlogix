@@ -4,44 +4,39 @@
  */
 package com.flowlogix.web.mixins;
 
-import com.flowlogix.session.internal.SessionTrackerBase;
-import com.flowlogix.session.internal.SessionTrackerHolder;
-import javax.servlet.http.HttpSession;
+import com.flowlogix.session.internal.SessionTrackerUtil;
 import org.apache.tapestry5.annotations.CleanupRender;
-import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.RequestGlobals;
+import org.apache.tapestry5.services.Session;
 
 /**
  * Internal mixin to support {@link com.flowlogix.web.services.annotations.AJAX} annotation
  *
  * @author lprimak
  */
-public class SessionTracker implements SessionTrackerBase
+public class SessionTracker
 {
-    @Override
-    public boolean isValidSession() 
+    public boolean isValidSession()
     {
-        return Boolean.TRUE.equals(hasSession);
-    }    
+        return SessionTrackerUtil.isValidSession(rg.getActivePageName(), rg.getRequest().getSession(false));
+    }
     
-        
+    
     @CleanupRender
     private void setSession()
     {
         if (rg.getRequest().isXHR() == false)
         {
-            HttpSession session = rg.getHTTPServletRequest().getSession(false);
-            hasSession = session != null;
+            Session session = rg.getRequest().getSession(false);
+            boolean hasSession = session != null;
             if(hasSession == true)
             {
-                holder.setPageSession(rg.getActivePageName(), session, this);
+                SessionTrackerUtil.setPageSession(rg.getActivePageName(), session);
             }
         }
     }
 
     
     private @Inject RequestGlobals rg;  
-    private @Persist Boolean hasSession;
-    private SessionTrackerHolder holder = SessionTrackerHolder.get();
 }

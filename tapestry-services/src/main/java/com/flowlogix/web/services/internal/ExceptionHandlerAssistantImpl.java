@@ -15,7 +15,7 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.session.internal.SessionTrackerHolder;
+import com.flowlogix.session.internal.SessionTrackerUtil;
 import java.io.IOException;
 import java.util.List;
 import javax.inject.Inject;
@@ -42,7 +42,6 @@ public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssis
     {
         super(securityService, contextService, pageCache, httpRequest, response, 
                 renderer);
-        this.httpRequest = httpRequest;
     }
 
     
@@ -53,7 +52,7 @@ public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssis
         if(rv != null)
         {
             // do not invoke on Ajax bad sessions
-            if (request.isXHR() && SessionTrackerHolder.get().isValidSession(rg.getActivePageName(), httpRequest.getSession(false)) == false)
+            if (request.isXHR() && SessionTrackerUtil.isValidSession(rg.getActivePageName(), request.getSession(false)) == false)
             {
                 request.getSession(true).setAttribute("showSessionExpiredMessage", Boolean.TRUE);
             }
@@ -64,5 +63,4 @@ public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssis
     
     private @Inject Request request;
     private @Inject RequestGlobals rg;
-    private final HttpServletRequest httpRequest;
 }

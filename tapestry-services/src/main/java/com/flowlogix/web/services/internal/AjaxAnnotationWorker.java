@@ -4,7 +4,7 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.session.internal.SessionTrackerHolder;
+import com.flowlogix.session.internal.SessionTrackerUtil;
 import com.flowlogix.web.mixins.SessionTracker;
 import com.flowlogix.web.services.annotations.AJAX;
 import java.io.IOException;
@@ -61,13 +61,13 @@ public class AjaxAnnotationWorker implements ComponentClassTransformWorker2
                     } else
                     {
                         // do not invoke on bad sessions
-                        if (SessionTrackerHolder.get().isValidSession(rg.getActivePageName(), rg.getHTTPServletRequest().getSession(false)))
+                        if (SessionTrackerUtil.isValidSession(rg.getActivePageName(), rg.getRequest().getSession(false)))
                         {
                             invocation.proceed();
                         } else
                         {
                             showSessionExpiredMessage = true;
-                            SessionTrackerHolder.redirectToSelf(rg, linkSource);
+                            SessionTrackerUtil.redirectToSelf(rg, linkSource);
                             if(!isVoid)
                             {
                                 invocation.setReturnValue(null);

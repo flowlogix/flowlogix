@@ -3,7 +3,7 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix-tapestry</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
 
     <name>Flow Logix Tapestry Services</name>
@@ -19,7 +19,7 @@
     <scm>
         <url>http://code.google.com/p/flowlogix/source/browse/</url>
         <connection>scm:hg:http://code.google.com/p/flowlogix/</connection>
-      <tag>HEAD</tag>
+      <tag>VERS_1.1.1-20121007</tag>
   </scm>
     <developers>
         <developer>
@@ -37,7 +37,7 @@
         <groupId>com.flowlogix</groupId>
         <artifactId>tapestry-build-core</artifactId>
         <relativePath>../tapestry-build-core/pom.xml</relativePath>
-        <version>1.1.1-SNAPSHOT</version>
+        <version>1.1.1</version>
     </parent>
     
     <build>

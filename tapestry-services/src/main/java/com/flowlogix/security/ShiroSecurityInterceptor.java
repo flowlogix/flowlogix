@@ -4,7 +4,6 @@
  */
 package com.flowlogix.security;
 
-import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.Serializable;
 import java.security.AccessController;
 import java.security.Principal;
@@ -12,6 +11,8 @@ import java.util.concurrent.Callable;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.apache.shiro.subject.Subject;
 
 /**
@@ -31,7 +32,7 @@ public class ShiroSecurityInterceptor implements Serializable
         {
             Principal principal = javax.security.auth.Subject.getSubject(AccessController.getContext()).
                     getPrincipals().iterator().next();
-            subject = ((SecurityInterceptorFilter.SubjectWrapper) principal).getSubject();
+            subject = ((SubjectWrapper) principal).getSubject();
         } catch(Throwable e)
         {
             // intentionally left blank
@@ -51,6 +52,26 @@ public class ShiroSecurityInterceptor implements Serializable
         {
             return ctx.proceed();
         }
+    }
+    
+    
+    public @EqualsAndHashCode static class SubjectWrapper implements Principal, Serializable
+    {
+        public SubjectWrapper(org.apache.shiro.subject.Subject subject)
+        {
+            this.subject = subject;
+        }
+
+        
+        @Override
+        public String getName()
+        {
+            return subject.getPrincipal().toString();
+        }
+        
+        
+        private @Getter org.apache.shiro.subject.Subject subject;
+        private static final long serialVersionUID = 1L;
     }
 
     

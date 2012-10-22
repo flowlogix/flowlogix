@@ -7,6 +7,7 @@ package com.flowlogix.web.services;
 import com.flowlogix.web.services.internal.ExceptionHandlerAssistantImpl;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.IOException;
+import java.util.regex.Pattern;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
@@ -43,6 +44,7 @@ public class SecurityModule
         configuration.add(Symbols.REMEMBER_ME_DURATION, Integer.toString(2 * 7)); // 2 weeks
         configuration.add(Symbols.INVALID_AUTH_DELAY, Integer.toString(3));
         configuration.add(Symbols.SESSION_EXPIRED_MESSAGE, "Your Session Has Expired");
+        configuration.add(Symbols.DISABLE_PORTNUM_REMOVAL, Boolean.FALSE.toString());
     }
     
     
@@ -121,13 +123,39 @@ public class SecurityModule
     {
         configuration.override(ShiroException.class, assistant);
     }
-        
+    
+    /**
+     * Fix for https://issues.apache.org/jira/browse/TAP5-1973
+     * Remove appending the port number for URLs
+     */
+    @Match("BaseURLSource")
+    public BaseURLSource decorateFixSecureLinks(final BaseURLSource source,
+        @Symbol(Symbols.DISABLE_PORTNUM_REMOVAL) final Boolean disablePortnumRemoval)
+    {
+        return new BaseURLSource() {
+            @Override
+            public String getBaseURL(boolean secure)
+            {
+                String rv = source.getBaseURL(secure);
+                if(disablePortnumRemoval)
+                {
+                    return rv;
+                }
+                else
+                {
+                    return removePortNumber.matcher(rv).replaceFirst("");
+                }
+            }
+        };
+    }
+
     
     public static class Symbols
     {
         public static final String REMEMBER_ME_DURATION = "flowlogix.security.remembermeduration";        
         public static final String INVALID_AUTH_DELAY = "flowlogix.security.invalid-auth-delay";
         public static final String SESSION_EXPIRED_MESSAGE = "flowlogix.security.session-expired-message";
+        public static final String DISABLE_PORTNUM_REMOVAL = "flowlogix.security.disable-portnum-removal";
     }
     
     
@@ -137,6 +165,7 @@ public class SecurityModule
    
     private final GwtModule.PathProcessor pathProcessor;
     private final String assetPathPrefix;
+    private final Pattern removePortNumber = Pattern.compile(":[0-9]{1,5}+$");
     
     private static final Logger logger = LoggerFactory.getLogger(SecurityModule.class);
 }

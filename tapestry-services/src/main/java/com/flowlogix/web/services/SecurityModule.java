@@ -129,7 +129,7 @@ public class SecurityModule
      * Remove appending the port number for URLs
      */
     @Match("BaseURLSource")
-    public BaseURLSource decorateFixSecureLinks(final BaseURLSource source,
+    public BaseURLSource decorateDisablePortNumAppend(final BaseURLSource source,
         @Symbol(Symbols.DISABLE_PORTNUM_REMOVAL) final Boolean disablePortnumRemoval)
     {
         return new BaseURLSource() {
@@ -165,7 +165,7 @@ public class SecurityModule
    
     private final GwtModule.PathProcessor pathProcessor;
     private final String assetPathPrefix;
-    private final Pattern removePortNumber = Pattern.compile(":[0-9]{1,5}+$");
+    private final Pattern removePortNumber = Pattern.compile(":(80|443)$");
     
     private static final Logger logger = LoggerFactory.getLogger(SecurityModule.class);
 }

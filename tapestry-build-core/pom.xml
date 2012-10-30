@@ -18,11 +18,11 @@
     <properties>
         <war-deps.scope>compile</war-deps.scope>
         <tap.version>5.3.6</tap.version>
-        <gwt.version>2.4.0</gwt.version>
+        <gwt.version>2.5.0</gwt.version>
         <guava.version>13.0.1</guava.version>
         <groovy.version>2.0.5</groovy.version>
         <gmaven.runtime>2.0</gmaven.runtime>
-        <lombok.version>0.11.4</lombok.version>
+        <lombok.version>0.11.6</lombok.version>
     </properties>
         
     <profiles>

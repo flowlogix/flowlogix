@@ -22,6 +22,7 @@ import lombok.SneakyThrows;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.util.ClassUtils;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.subject.WebSubject;
@@ -52,7 +53,7 @@ public class WebSecurityFilter implements Filter
             String securitiyManagerClassStr = fc.getInitParameter("securityManager");
             if(securitiyManagerClassStr != null)
             {
-                securityManagerClass = (Class<? extends org.apache.shiro.mgt.SecurityManager>) Class.forName(securitiyManagerClassStr);
+                securityManagerClass = (Class<? extends org.apache.shiro.mgt.SecurityManager>) ClassUtils.forName(securitiyManagerClassStr);
             }
         }
     }
@@ -141,7 +142,7 @@ public class WebSecurityFilter implements Filter
             {
                 if(!realm.isEmpty())
                 {
-                    realmClasses.add((Class<Realm>)Class.forName(realm));
+                    realmClasses.add((Class<Realm>)ClassUtils.forName(realm));
                 }
             }
         }

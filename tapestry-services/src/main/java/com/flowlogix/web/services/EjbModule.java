@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Integrate EJB3 Beans into the Web site
- * 
+ *
  * @author lprimak
  */
 public class EjbModule
@@ -37,15 +37,15 @@ public class EjbModule
     {
         configuration.addInstance("EJB", EJBAnnotationWorker.class, "before:Property");
     }
-    
-    
+
+
     /**
      * ping all session beans in all requests so they don't time out before the session
-     * @param config 
+     * @param config
      */
     public void contributeHttpServletRequestHandler(OrderedConfiguration<HttpServletRequestFilter> config)
     {
-        config.add("PingSessionBeansFilter", new HttpServletRequestFilter() 
+        config.add("PingSessionBeansFilter", new HttpServletRequestFilter()
         {
             @Override
             public boolean service(HttpServletRequest request, HttpServletResponse response, HttpServletRequestHandler handler) throws IOException
@@ -55,38 +55,35 @@ public class EjbModule
                 {
                     @SuppressWarnings("unchecked")
                     final List<String> _allAttrs = Collections.list(session.getAttributeNames());
-                    final Collection<String> allAttrs = Collections2.filter(_allAttrs, Predicates.contains(ejbPattern));                    
-                    try
+                    final Collection<String> allAttrs = Collections2.filter(_allAttrs, Predicates.contains(ejbPattern));
+                    final JNDIObjectLocator locator = allAttrs.isEmpty() ? null : new JNDIObjectLocator();
+                    for (String attrName : allAttrs)
                     {
-                        final JNDIObjectLocator locator = allAttrs.isEmpty()? null : new JNDIObjectLocator();
-                        for(String attrName : allAttrs)
+                        Class<?> ejbClass = ClassUtils.forName(attrName.replaceFirst("ejb:", ""));
+                        try
                         {
-                            Class<?> ejbClass = ClassUtils.forName(attrName.replaceFirst("ejb:", ""));
                             Object _pingable = locator.getObject(ejbClass);
-                            if(_pingable instanceof Pingable)
+                            if (_pingable instanceof Pingable)
                             {
-                                Pingable pingable = (Pingable)_pingable;
+                                Pingable pingable = (Pingable) _pingable;
                                 pingable.ping();
                             }
                         }
-                    } 
-                    catch (EJBException e)
-                    {
-                        log.warn("Failed to Ping Stateful EJBs", e);
-                        for(String attrName : allAttrs)                            
+                        catch (EJBException e)
                         {
+                            log.debug("Failed to Ping Stateful EJBs", e);
                             session.removeAttribute(attrName);
                         }
                     }
                 }
                 return handler.service(request, response);
             }
-            
-            
+
+
             private final Pattern ejbPattern = Pattern.compile("^ejb:.*");
         }, "after:IgnoredPathsFilter");
     }
-    
-    
+
+
     private static final Logger log = LoggerFactory.getLogger(EjbModule.class);
 }

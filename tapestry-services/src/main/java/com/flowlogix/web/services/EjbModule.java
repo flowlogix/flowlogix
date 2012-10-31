@@ -1,6 +1,5 @@
 package com.flowlogix.web.services;
 
-import com.flowlogix.ejb.JNDIObjectLocator;
 import com.flowlogix.ejb.Pingable;
 import com.flowlogix.web.services.internal.EJBAnnotationWorker;
 import com.google.common.base.Predicates;
@@ -14,7 +13,6 @@ import javax.ejb.EJBException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.apache.shiro.util.ClassUtils;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Contribute;
 import org.apache.tapestry5.ioc.annotations.Primary;
@@ -56,13 +54,11 @@ public class EjbModule
                     @SuppressWarnings("unchecked")
                     final List<String> _allAttrs = Collections.list(session.getAttributeNames());
                     final Collection<String> allAttrs = Collections2.filter(_allAttrs, Predicates.contains(ejbPattern));
-                    final JNDIObjectLocator locator = allAttrs.isEmpty() ? null : new JNDIObjectLocator();
                     for (String attrName : allAttrs)
                     {
-                        Class<?> ejbClass = ClassUtils.forName(attrName.replaceFirst("ejb:", ""));
                         try
                         {
-                            Object _pingable = locator.getObject(ejbClass);
+                            Object _pingable = session.getAttribute(attrName);
                             if (_pingable instanceof Pingable)
                             {
                                 Pingable pingable = (Pingable) _pingable;

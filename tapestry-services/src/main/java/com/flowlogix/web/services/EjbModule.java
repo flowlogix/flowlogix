@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+import javax.ejb.EJBException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -68,7 +69,7 @@ public class EjbModule
                                 pingable.ping();
                             }
                         }
-                        catch (Exception e)
+                        catch (EJBException e)
                         {
                             log.debug("Failed to Ping Stateful EJBs", e);
                             session.removeAttribute(attrName);

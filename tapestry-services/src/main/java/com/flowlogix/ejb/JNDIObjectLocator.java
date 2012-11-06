@@ -12,6 +12,7 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 /**
@@ -30,6 +31,20 @@ public class JNDIObjectLocator
     public JNDIObjectLocator()
     {
         initialContext = new InitialContext();
+        portableNamePrefix = PORTABLE_NAME_PREFIX;
+    }
+    
+    
+    public JNDIObjectLocator(InitialContext ic)
+    {
+        this(ic, PORTABLE_NAME_PREFIX);
+    }
+
+    
+    public JNDIObjectLocator(InitialContext ic, String portableNamePrefix)
+    {
+        this.initialContext = ic;
+        this.portableNamePrefix = portableNamePrefix;
     }
     
     
@@ -88,12 +103,12 @@ public class JNDIObjectLocator
     }
     
     
-    public static String prependPortableName(String lookupname)
+    public String prependPortableName(String lookupname)
     {
         //convert to jndi name
         if (!lookupname.startsWith("java:")) 
         {
-            lookupname = "java:module/" + lookupname;
+            lookupname = portableNamePrefix + "/" + lookupname;
         }
         return lookupname;
     }
@@ -136,9 +151,11 @@ public class JNDIObjectLocator
 
     
     @Getter private final InitialContext initialContext;
+    private @Getter @Setter String portableNamePrefix;
     private final Map<String, Object> jndiObjectCache = Collections.synchronizedMap(new HashMap<String, Object>());
         
     private static final String REMOTE = "REMOTE";
     private static final String LOCAL = "LOCAL";
+    private static final String PORTABLE_NAME_PREFIX = "java:module";
     public static final Pattern StripInterfaceSuffixPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
 }

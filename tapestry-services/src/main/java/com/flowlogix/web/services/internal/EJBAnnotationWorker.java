@@ -15,9 +15,13 @@
  */
 package com.flowlogix.web.services.internal;
 
+import com.flowlogix.ejb.JNDIConfigurer;
 import com.flowlogix.ejb.JNDIObjectLocator;
 import com.flowlogix.web.services.annotations.Stateful;
+import java.util.Hashtable;
+import java.util.Map;
 import javax.ejb.EJB;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import lombok.SneakyThrows;
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -50,10 +54,12 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             final Stateful stateful = field.getAnnotation(Stateful.class);
             final String fieldType = field.getTypeName();
             final String fieldName = field.getName();
-            final String lookupname = getLookupName(annotation, fieldType);
-
-            Object injectionValue = lookupBean(field, fieldType, fieldName, lookupname, stateful);
-
+            final String mappedName = annotation.mappedName();
+            
+            final JNDIObjectLocator locator = isBlankOrNull(mappedName)? new JNDIObjectLocator() : getConfiguredLocator(mappedName);
+            final String lookupname = getLookupName(annotation, fieldType, locator);
+            
+            Object injectionValue = lookupBean(field, fieldType, fieldName, lookupname, mappedName, stateful, locator);
             if (injectionValue != null)
             {
                 field.claim(annotation);
@@ -62,7 +68,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     }
 
     
-    private String getLookupName(EJB annotation, String fieldType)
+    private String getLookupName(EJB annotation, String fieldType, final JNDIObjectLocator locator)
     {
         String lookupname = null;
         //try lookup
@@ -90,17 +96,19 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             lookupname = JNDIObjectLocator.guessByType(fieldType);
         }
 
-        lookupname = JNDIObjectLocator.prependPortableName(lookupname);
+        lookupname = locator.prependPortableName(lookupname);
         return lookupname;
     }
     
     
     private Object lookupBean(final PlasticField field, final String typeName, final String fieldName,
-            final String lookupname, final Stateful stateful) throws NamingException
+            final String lookupname, final String mappedName, final Stateful stateful,
+            final JNDIObjectLocator locator) throws NamingException
     {
         if(stateful != null)
         {
-            field.setConduit(new EJBFieldConduit(lookupname, stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));              
+            field.setConduit(new EJBFieldConduit(locator, lookupname, 
+                    stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));              
             return true;
         }
         else
@@ -119,16 +127,54 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     {
         return s == null || s.trim().equals("");
     }
+
+    
+    @SneakyThrows(NamingException.class)
+    private JNDIObjectLocator getConfiguredLocator(String mappedName)
+    {
+        JNDIConfigurer configBean = JNDIConfigurer.getInstance();
+        JNDIConfigurer.Config config = configBean.getConfiguration().get(mappedName);
+        
+        Hashtable<String, String> env = new Hashtable<>();
+        if(!isBlankOrNull(config.getHostname()))
+        {
+            env.put("org.omg.CORBA.ORBInitialHost", config.getHostname());           
+        }
+        if(config.getPort() != null)
+        {
+            env.put("org.omg.CORBA.ORBInitialPort", config.getPort().toString());           
+        }
+        for(Map.Entry<String, String> entry : config.getAdditionalProperties().entrySet())
+        {
+            env.put(entry.getKey(), entry.getValue());
+        }
+        JNDIObjectLocator locator;
+        if(env.isEmpty())
+        {
+            locator = new JNDIObjectLocator();
+        }
+        else
+        {
+            locator = new JNDIObjectLocator(new InitialContext(env));
+        }
+        if(!isBlankOrNull(config.getPrefix()))
+        {
+            locator.setPortableNamePrefix(config.getPrefix());
+        }
+        return locator;
+    }
     
     
     private class EJBFieldConduit implements FieldConduit<Object>
     {
-        public EJBFieldConduit(String lookupname, Stateful stateful, String attributeName, String fieldName)
+        public EJBFieldConduit(final JNDIObjectLocator locator, String lookupname, Stateful stateful,
+                String attributeName, String fieldName)
         {
             this.lookupname = lookupname;
             this.stateful = stateful;
             this.attributeName = "ejb:" + attributeName;
             this.fieldName = fieldName;
+            this.locator = locator;
         }
 
         
@@ -160,9 +206,9 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         protected final Stateful stateful;
         protected final String attributeName;
         protected final String fieldName;
+        protected final JNDIObjectLocator locator;
     }
     
     
-    private final JNDIObjectLocator locator = new JNDIObjectLocator();
     private @Inject RequestGlobals rg;
 }

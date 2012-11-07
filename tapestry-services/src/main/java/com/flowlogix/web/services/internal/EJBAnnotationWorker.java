@@ -113,6 +113,12 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
                     stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));              
             return true;
         }
+        else if(typeName.toUpperCase().endsWith("REMOTE"))
+        {
+            field.setConduit(new EJBFieldConduit(locator, lookupname, 
+                    null, "", fieldName));              
+            return true;            
+        }
         else
         {
             Object rv = locator.getJNDIObject(lookupname, false);
@@ -190,6 +196,11 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         @SneakyThrows({NamingException.class})
         public Object get(Object instance, InstanceContext context)
         {
+            if(stateful == null)
+            {
+                return locator.getJNDIObject(lookupname, true);
+            }
+            
             final Session session = rg.getRequest().getSession(true);
         
             Object rv = session.getAttribute(attributeName);

@@ -24,6 +24,7 @@ import javax.ejb.EJB;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.model.MutableComponentModel;
 import org.apache.tapestry5.plastic.FieldConduit;
@@ -41,6 +42,7 @@ import org.apache.tapestry5.services.transform.TransformationSupport;
  * @author Magnus
  * Enhancements by Lenny Primak
  */
+@Slf4j
 public class EJBAnnotationWorker implements ComponentClassTransformWorker2
 {
     @Override
@@ -134,6 +136,12 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     {
         JNDIConfigurer configBean = JNDIConfigurer.getInstance();
         JNDIConfigurer.Config config = configBean.getConfiguration().get(mappedName);
+        
+        if(config == null)
+        {
+            log.error("Tapestry @EJB Location Failed: mappedName %s is not configured", mappedName);
+            return new JNDIObjectLocator();
+        }
         
         Hashtable<String, String> env = new Hashtable<>();
         if(!isBlankOrNull(config.getHostname()))

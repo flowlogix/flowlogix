@@ -36,15 +36,19 @@ public class SessionTrackerUtil
     
     public static void redirectToSelf(RequestGlobals rg, PageRenderLinkSource linkSource) throws IOException
     {
-        if(rg.getRequest().isXHR() == false)
+        final Link link = linkSource.createPageRenderLink(rg.getRequest().getPath().replaceFirst("\\..*", "").substring(1));
+        final String url = link.toAbsoluteURI(rg.getRequest().isSecure());
+        if(rg.getRequest().isXHR())
         {
-            return;
+            try (PrintWriter writer = rg.getResponse().getPrintWriter("application/json"))
+            {
+                writer.write("{\n\t\"redirectURL\" : \""
+                        + url + "\"\n}");
+            }
         }
-        try (PrintWriter writer = rg.getResponse().getPrintWriter("application/json"))
+        else
         {
-            Link link = linkSource.createPageRenderLink(rg.getRequest().getPath().replaceFirst("\\..*", "").substring(1));
-            writer.write("{\n\t\"redirectURL\" : \""
-                    + link.toAbsoluteURI(rg.getRequest().isSecure()) + "\"\n}");
+            rg.getResponse().sendRedirect(url);
         }
     }
     

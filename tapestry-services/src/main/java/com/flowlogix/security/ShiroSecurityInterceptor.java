@@ -13,6 +13,12 @@ import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.codec.Base64;
+import org.apache.shiro.io.DefaultSerializer;
+import org.apache.shiro.io.Serializer;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
 /**
@@ -22,6 +28,7 @@ import org.apache.shiro.subject.Subject;
  * @author lprimak
  */
 @Interceptor
+@Slf4j
 public class ShiroSecurityInterceptor implements Serializable
 {
     @AroundInvoke
@@ -32,9 +39,10 @@ public class ShiroSecurityInterceptor implements Serializable
         {
             Principal principal = javax.security.auth.Subject.getSubject(AccessController.getContext()).
                     getPrincipals().iterator().next();
-            subject = ((SubjectWrapper) principal).getSubject();
+            subject = new Subject.Builder().principals(SubjectWrapper.buildPrincipals(principal.getName())).buildSubject();
         } catch(Throwable e)
         {
+            log.debug("Translating Shiro/EJB Security", e);
             // intentionally left blank
         }
         if (subject != null)
@@ -59,18 +67,34 @@ public class ShiroSecurityInterceptor implements Serializable
     {
         public SubjectWrapper(org.apache.shiro.subject.Subject subject)
         {
-            this.subject = subject;
+            Object primary = subject.getPrincipal();
+            if(primary != null)
+            {
+                name = Base64.encodeToString(ser.serialize(subject.getPrincipals()));    
+            }
+            else
+            {
+                name = null;
+            }
+        }
+        
+        
+        private static PrincipalCollection buildPrincipals(String name)
+        {
+            if(name == null)
+            {
+                return new SimplePrincipalCollection();
+            }
+            else
+            {
+                return ser.deserialize(Base64.decode(name));
+            }
         }
 
+
         
-        @Override
-        public String getName()
-        {
-            return subject.getPrincipal().toString();
-        }
-        
-        
-        private @Getter org.apache.shiro.subject.Subject subject;
+        private final @Getter String name;
+        private static final Serializer<PrincipalCollection> ser = new DefaultSerializer<>();
         private static final long serialVersionUID = 1L;
     }
 

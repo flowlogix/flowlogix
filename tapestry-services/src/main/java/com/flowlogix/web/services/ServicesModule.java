@@ -4,11 +4,10 @@
  */
 package com.flowlogix.web.services;
 
+import com.flowlogix.session.internal.SessionTrackerUtil;
 import com.flowlogix.web.services.internal.AjaxAnnotationWorker;
 import com.flowlogix.web.services.internal.AssetMinimizerImpl;
 import java.io.IOException;
-import org.apache.tapestry5.ComponentResources;
-import org.apache.tapestry5.Link;
 import org.apache.tapestry5.beanvalidator.BeanValidatorConfigurer;
 import org.apache.tapestry5.beanvalidator.BeanValidatorSource;
 import org.apache.tapestry5.ioc.Configuration;
@@ -16,6 +15,7 @@ import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Contribute;
+import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.SubModule;
@@ -87,10 +87,7 @@ public class ServicesModule
                     oldHandler.handleRequestException(exception);
                     return;
                 }
-                ComponentResources cr = componentSource.getActivePage().getComponentResources();
-                Link link = cr.createEventLink("dummy");
-                String uri = link.toRedirectURI().replaceAll(":dummy", "");
-                response.sendRedirect(uri);
+                SessionTrackerUtil.redirectToSelf(rg, linkSource);
             }
         };
     }
@@ -114,4 +111,8 @@ public class ServicesModule
     {
         public static final String MINIMIZE_ASSETS = "flowlogix.minimize-assets";
     }
+    
+    
+    private @Inject RequestGlobals rg;
+    private @Inject PageRenderLinkSource linkSource;
 }

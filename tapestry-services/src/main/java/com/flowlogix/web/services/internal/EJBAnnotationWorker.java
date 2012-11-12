@@ -18,13 +18,10 @@ package com.flowlogix.web.services.internal;
 import com.flowlogix.ejb.JNDIConfigurer;
 import com.flowlogix.ejb.JNDIObjectLocator;
 import com.flowlogix.web.services.annotations.Stateful;
-import java.util.Hashtable;
-import java.util.Map;
 import javax.ejb.EJB;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.util.StringUtils;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.model.MutableComponentModel;
 import org.apache.tapestry5.plastic.FieldConduit;
@@ -42,7 +39,6 @@ import org.apache.tapestry5.services.transform.TransformationSupport;
  * @author Magnus
  * Enhancements by Lenny Primak
  */
-@Slf4j
 public class EJBAnnotationWorker implements ComponentClassTransformWorker2
 {
     @Override
@@ -58,7 +54,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             final String fieldName = field.getName();
             final String mappedName = annotation.mappedName();
             
-            final JNDIObjectLocator locator = isBlankOrNull(mappedName)? new JNDIObjectLocator() : getConfiguredLocator(mappedName);
+            final JNDIObjectLocator locator = JNDIConfigurer.getInstance().buildLocator(mappedName);
             final String lookupname = getLookupName(annotation, fieldType, locator);
             
             Object injectionValue = lookupBean(field, fieldType, fieldName, lookupname, mappedName, stateful, locator);
@@ -74,18 +70,18 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     {
         String lookupname = null;
         //try lookup
-        if (!isBlankOrNull(annotation.lookup()))
+        if (StringUtils.hasText(annotation.lookup()))
         {
             lookupname = annotation.lookup();
         } //try name
         else
         {
-            if (!isBlankOrNull(annotation.name()))
+            if (StringUtils.hasText(annotation.name()))
             {
                 lookupname = annotation.name();
             } else
             {
-                if (!isBlankOrNull(annotation.beanName()))
+                if (StringUtils.hasText(annotation.beanName()))
                 {
                     lookupname = annotation.beanName();
                 }
@@ -113,7 +109,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
                     stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));              
             return true;
         }
-        else if(typeName.toUpperCase().endsWith("REMOTE"))
+        else if(typeName.toUpperCase().endsWith("REMOTE") || locator.isNoCaching())
         {
             field.setConduit(new EJBFieldConduit(locator, lookupname, 
                     null, "", fieldName));              
@@ -131,54 +127,6 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
     }
     
 
-    private boolean isBlankOrNull(String s)
-    {
-        return s == null || s.trim().equals("");
-    }
-
-    
-    @SneakyThrows(NamingException.class)
-    private JNDIObjectLocator getConfiguredLocator(String mappedName)
-    {
-        JNDIConfigurer configBean = JNDIConfigurer.getInstance();
-        JNDIConfigurer.Config config = configBean.getConfiguration().get(mappedName);
-        
-        if(config == null)
-        {
-            log.error("Tapestry @EJB Location Failed: mappedName %s is not configured", mappedName);
-            return new JNDIObjectLocator();
-        }
-        
-        Hashtable<String, String> env = new Hashtable<>();
-        if(!isBlankOrNull(config.getHostname()))
-        {
-            env.put("org.omg.CORBA.ORBInitialHost", config.getHostname());           
-        }
-        if(config.getPort() != null)
-        {
-            env.put("org.omg.CORBA.ORBInitialPort", config.getPort().toString());           
-        }
-        for(Map.Entry<String, String> entry : config.getAdditionalProperties().entrySet())
-        {
-            env.put(entry.getKey(), entry.getValue());
-        }
-        JNDIObjectLocator locator;
-        if(env.isEmpty())
-        {
-            locator = new JNDIObjectLocator();
-        }
-        else
-        {
-            locator = new JNDIObjectLocator(new InitialContext(env));
-        }
-        if(!isBlankOrNull(config.getPrefix()))
-        {
-            locator.setPortableNamePrefix(config.getPrefix());
-        }
-        return locator;
-    }
-    
-    
     private class EJBFieldConduit implements FieldConduit<Object>
     {
         public EJBFieldConduit(final JNDIObjectLocator locator, String lookupname, Stateful stateful,

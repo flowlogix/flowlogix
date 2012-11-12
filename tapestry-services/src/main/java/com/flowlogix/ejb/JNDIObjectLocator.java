@@ -71,7 +71,7 @@ public class JNDIObjectLocator
     
     public<T> T getJNDIObject(String jndiName, boolean isStateful) throws NamingException
     {
-        if(isStateful)
+        if(isStateful || noCaching)
         {
             // no caching for stateful session beans
             return (T)getInitialContext().lookup(jndiName);
@@ -85,6 +85,11 @@ public class JNDIObjectLocator
 
     public<T> T getJNDIObject(String jndiName) throws NamingException
     {
+        if(noCaching)
+        {
+            return (T)getInitialContext().lookup(jndiName);
+        }
+        
         T jndiObject = (T)jndiObjectCache.get(jndiName);
 
         if (jndiObject == null && !jndiObjectCache.containsKey(jndiName))
@@ -130,7 +135,6 @@ public class JNDIObjectLocator
     
     private synchronized<T> T lookup(String name) throws NamingException
     {
-
         // Recheck the cache because the name we're looking for may have been added while we were waiting for sync.
 
         if (!jndiObjectCache.containsKey(name))
@@ -150,8 +154,9 @@ public class JNDIObjectLocator
     }
 
     
-    @Getter private final InitialContext initialContext;
+    private @Getter final InitialContext initialContext;
     private @Getter @Setter String portableNamePrefix;
+    private @Getter @Setter boolean noCaching = false;
     private final Map<String, Object> jndiObjectCache = Collections.synchronizedMap(new HashMap<String, Object>());
         
     private static final String REMOTE = "REMOTE";

@@ -69,25 +69,17 @@ public class JNDIObjectLocator
     }
     
     
-    public<T> T getJNDIObject(String jndiName, boolean isStateful) throws NamingException
-    {
-        if(isStateful || noCaching)
-        {
-            // no caching for stateful session beans
-            return (T)getInitialContext().lookup(jndiName);
-        }
-        else
-        {
-            return getJNDIObject(jndiName);
-        }
-    }
-    
-
     public<T> T getJNDIObject(String jndiName) throws NamingException
     {
-        if(noCaching)
+        return getJNDIObject(jndiName, false);
+    }
+    
+    
+    public<T> T getJNDIObject(String jndiName, boolean noCaching) throws NamingException
+    {
+        if(noCaching || this.noCaching)
         {
-            return (T)getInitialContext().lookup(jndiName);
+            return lookup(jndiName, true);
         }
         
         T jndiObject = (T)jndiObjectCache.get(jndiName);
@@ -96,7 +88,7 @@ public class JNDIObjectLocator
         {
             try
             {
-                jndiObject = lookup(jndiName);
+                jndiObject = lookup(jndiName, false);
                 jndiObjectCache.put(jndiName, jndiObject);
             } catch (NamingException e)
             {
@@ -133,8 +125,12 @@ public class JNDIObjectLocator
     }
 
     
-    private synchronized<T> T lookup(String name) throws NamingException
+    private synchronized<T> T lookup(String name, boolean noCaching) throws NamingException
     {
+        if(this.noCaching || noCaching)
+        {
+            return (T)getInitialContext().lookup(name);
+        }
         // Recheck the cache because the name we're looking for may have been added while we were waiting for sync.
 
         if (!jndiObjectCache.containsKey(name))
@@ -159,8 +155,8 @@ public class JNDIObjectLocator
     private @Getter @Setter boolean noCaching = false;
     private final Map<String, Object> jndiObjectCache = Collections.synchronizedMap(new HashMap<String, Object>());
         
-    private static final String REMOTE = "REMOTE";
-    private static final String LOCAL = "LOCAL";
+    public static final String REMOTE = "REMOTE";
+    public static final String LOCAL = "LOCAL";
     private static final String PORTABLE_NAME_PREFIX = "java:module";
     public static final Pattern StripInterfaceSuffixPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
 }

@@ -109,7 +109,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
                     stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));              
             return true;
         }
-        else if(typeName.toUpperCase().endsWith("REMOTE") || locator.isNoCaching())
+        else if(typeName.toUpperCase().endsWith(JNDIObjectLocator.REMOTE) || locator.isNoCaching())
         {
             field.setConduit(new EJBFieldConduit(locator, lookupname, 
                     null, "", fieldName));              

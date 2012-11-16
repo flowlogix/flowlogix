@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.util.StringUtils;
 
@@ -53,7 +54,12 @@ public class JNDIConfigurer
             log.error("Building EJB Locator Failed: mappedName %s is not configured", mappedName);
             return new JNDIObjectLocator();
         }
-        
+        return buildLocator(config);
+    }
+    
+    
+    public static JNDIObjectLocator buildLocator(@NonNull Config config)  throws NamingException
+    {
         Hashtable<String, String> env = new Hashtable<>();
         if(StringUtils.hasText(config.getHostname()))
         {
@@ -81,13 +87,13 @@ public class JNDIConfigurer
             locator.setPortableNamePrefix(config.getPrefix());
         }
         locator.setNoCaching(!config.isCache());
-        return locator;
+        return locator;        
     }
     
     
     public JNDIObjectLocator buildLocator() throws NamingException
     {
-        return buildLocator(null);
+        return buildLocator(StringUtils.EMPTY_STRING);
     }
 
     

@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * <a href="http://code.google.com/p/flowlogix/wiki/TLUtilStreams"
+ * <a href="http://code.google.com/p/flowlogix/wiki/TLUtil"
  *    target="_blank">See Documentation</a>
  * 
  * @author lprimak

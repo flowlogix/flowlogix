@@ -11,12 +11,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
 /**
  * 
  * @author Magnus
  */
-@Target({FIELD})
+@Target(
+{ FIELD})
 @Retention(RUNTIME)
 public @interface CDI {
+
 }

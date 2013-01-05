@@ -20,7 +20,7 @@
         <tap.version>5.3.6</tap.version>
         <gwt.version>2.5.0</gwt.version>
         <guava.version>13.0.1</guava.version>
-        <groovy.version>2.0.5</groovy.version>
+        <groovy.version>2.0.6</groovy.version>
         <gmaven.runtime>2.0</gmaven.runtime>
         <lombok.version>0.11.6</lombok.version>
     </properties>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
             <scope>test</scope>
             <optional>true</optional>
         </dependency>
@@ -136,7 +136,7 @@
         <dependency>
             <groupId>org.codehaus.gmaven.runtime</groupId>
             <artifactId>gmaven-runtime-${gmaven.runtime}</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -254,7 +254,7 @@
         <dependency>
             <groupId>org.tynamo</groupId>
             <artifactId>tapestry-security</artifactId>
-            <version>0.4.6</version>
+            <version>0.5.0</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
@@ -275,7 +275,7 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.16.1-GA</version>
+            <version>3.17.1-GA</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
@@ -296,7 +296,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr-runtime</artifactId>
-            <version>3.4</version>
+            <version>3.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.antlr</groupId>
@@ -513,7 +513,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.0</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
@@ -535,7 +535,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.1</version>
+                    <version>1.2</version>
                     <executions>
                         <execution>
                             <id>buildid</id>
@@ -549,7 +549,7 @@
                 <plugin>
                     <groupId>org.codehaus.gmaven</groupId>
                     <artifactId>gmaven-plugin</artifactId>
-                    <version>1.4</version>
+                    <version>1.5</version>
                     <executions>
                         <execution>
                             <id>compile</id>

@@ -42,7 +42,6 @@ public class CDIInjectionProvider implements InjectionProvider2 {
 //			if(locator.getService(type)!=null)
 //				return false;
 //		} catch (RuntimeException e) {
-//			// TODO: handle exception
 //		}
 			
         final Object injectionValue = cdiFactory.get(type);

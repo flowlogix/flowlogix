@@ -55,7 +55,6 @@ public class CDIObjectProvider implements ObjectProvider {
 //			if(locator.getService(objectType)!=null)
 //				return null;
 //		} catch (RuntimeException e) {
-//			// TODO: handle exception
 //		}
 		
 		return cdiFactory.get(objectType);

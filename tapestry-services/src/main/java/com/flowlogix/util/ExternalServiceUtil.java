@@ -25,7 +25,7 @@ import org.apache.tapestry5.ioc.Registry;
  */
 public class ExternalServiceUtil
 {
-    static<TT> TT getTapestryService(ServletContext servletContext, Class<TT> serviceInterface)
+    public static<TT> TT getTapestryService(ServletContext servletContext, Class<TT> serviceInterface)
     {
         Registry registry = (Registry) 
             servletContext.getAttribute(TapestryFilter.REGISTRY_CONTEXT_NAME);

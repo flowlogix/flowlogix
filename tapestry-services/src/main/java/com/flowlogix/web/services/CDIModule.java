@@ -6,11 +6,13 @@
  */
 package com.flowlogix.web.services;
 
+import com.flowlogix.cdi.CDIFactory;
+import com.flowlogix.web.services.internal.CDIAnnotationWorker;
+import com.flowlogix.web.services.internal.CDIInjectionProvider;
 import com.flowlogix.web.services.internal.CDIObjectProvider;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-
 import org.apache.tapestry5.internal.services.ComponentClassCache;
 import org.apache.tapestry5.ioc.ObjectProvider;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
@@ -21,44 +23,48 @@ import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
 import org.apache.tapestry5.services.transform.InjectionProvider2;
 import org.slf4j.Logger;
 
-import com.flowlogix.cdi.CDIFactory;
-import com.flowlogix.web.services.internal.CDIAnnotationWorker;
-import com.flowlogix.web.services.internal.CDIInjectionProvider;
-
 /**
  * 
  * @author Magnus
  */
 public class CDIModule {
-
-    public static void bind(ServiceBinder binder) {
-        binder.bind(ObjectProvider.class, CDIObjectProvider.class).withId("CDIObjectProvider");
-    }
-
-    public static BeanManager buildBeanManager(Logger log) {
-        try {
-            BeanManager beanManager = (BeanManager) new InitialContext().lookup("java:comp/BeanManager");
-            return beanManager;
-        } catch (NamingException e) {
-            log.error("Could not lookup jndi resource: java:comp/BeanManager", e);
-        }
-        return null;
-    }
-
-    public static CDIFactory buildCDIFactory(Logger log, @Local BeanManager beanManager) {
-        return new CDIFactory(log, beanManager);
-    }
-
-    public static void contributeInjectionProvider(
-            OrderedConfiguration<InjectionProvider2> configuration,
-            @Local CDIFactory cdiFactory,
-            ComponentClassCache cache) {
-        configuration.add("CDI", new CDIInjectionProvider(cdiFactory, cache), "after:InjectionProvider");
-    }
-
-    @Contribute(ComponentClassTransformWorker2.class)
+	
+	public static void bind(ServiceBinder binder) {
+    	binder.bind(ObjectProvider.class, CDIObjectProvider.class).withId("CDIObjectProvider");        
+    }	
+	public static BeanManager buildBeanManager(Logger log) {	
+		log.info("buildBeanManager");
+		try {
+			BeanManager beanManager = (BeanManager) new InitialContext().lookup("java:comp/BeanManager");
+			return beanManager;			
+		} catch (NamingException e) {
+			log.error("Could not lookup jndi resource: java:comp/BeanManager", e); 
+		}
+		return null;
+	}	
+	public static CDIFactory buildCDIFactory(Logger log, @Local BeanManager beanManager) {		
+		return new CDIFactory(log, beanManager);
+	}	
+	
+	@Contribute(InjectionProvider2.class)
+	public static void provideInjectionProvider(
+			OrderedConfiguration<InjectionProvider2> configuration,
+			@Local CDIFactory cdiFactory,
+			ComponentClassCache cache) {
+//		configuration.add("CDI", new CDIInjectionProvider(cdiFactory, cache), "after:*,before:Service");
+		configuration.add("CDI", new CDIInjectionProvider(cdiFactory, cache), "after:InjectionProvider");
+	}
+	
+	public static void contributeMasterObjectProvider(
+			@Local ObjectProvider cdiProvider,
+			OrderedConfiguration<ObjectProvider> configuration) {	
+//		configuration.add("cdiProvider", cdiProvider, "after:Service,after:AnnotationBasedContributions,after:Alias,after:Autobuild");		
+		configuration.add("cdiProvider", cdiProvider, "after:*");	
+	} 
+	
+	@Contribute(ComponentClassTransformWorker2.class)
     public static void provideClassTransformWorkers(
-            OrderedConfiguration<ComponentClassTransformWorker2> configuration) {
+    		OrderedConfiguration<ComponentClassTransformWorker2> configuration) {
         configuration.addInstance("CDI", CDIAnnotationWorker.class, "before:Property");
     }
 }

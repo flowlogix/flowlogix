@@ -4,14 +4,12 @@
  * Copyright 2009 by Movellas ApS
  * All rights reserved. 
  */
-package dk.kvalheim.cdi;
+package com.flowlogix.cdi;
 
 import java.util.Set;
-
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-
 import org.slf4j.Logger;
 
 /**

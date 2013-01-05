@@ -1,0 +1,6 @@
+/* Based on a solution by Howard Lewis Ship at http://tapestryjava.blogspot.co.uk/2011/12/adding-ajax-throbbers-to-zone-updates.html .*/
+
+DIV.zone-ajax-overlay {
+    background-color: silver;
+    filter: alpha(opacity = 35);
+}

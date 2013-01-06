@@ -10,6 +10,9 @@ import com.flowlogix.cdi.CDIFactory;
 import com.flowlogix.web.services.internal.CDIAnnotationWorker;
 import com.flowlogix.web.services.internal.CDIInjectionProvider;
 import com.flowlogix.web.services.internal.CDIObjectProvider;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -33,14 +36,21 @@ public class CDIModule {
     	binder.bind(ObjectProvider.class, CDIObjectProvider.class).withId("CDIObjectProvider");        
     }	
 	public static BeanManager buildBeanManager(Logger log) {	
-		log.info("buildBeanManager");
+		log.debug("buildBeanManager");
 		try {
 			BeanManager beanManager = (BeanManager) new InitialContext().lookup("java:comp/BeanManager");
 			return beanManager;			
 		} catch (NamingException e) {
-			log.error("Could not lookup jndi resource: java:comp/BeanManager", e); 
+			log.info("CDI Not Available"); 
 		}
-		return null;
+		return (BeanManager)Proxy.newProxyInstance(BeanManager.class.getClassLoader(), 
+                        new Class<?>[] { BeanManager.class }, new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+                    {
+                        throw new UnsupportedOperationException("CDI Not Supported");
+                    }
+            });
 	}	
 	public static CDIFactory buildCDIFactory(Logger log, @Local BeanManager beanManager) {		
 		return new CDIFactory(log, beanManager);

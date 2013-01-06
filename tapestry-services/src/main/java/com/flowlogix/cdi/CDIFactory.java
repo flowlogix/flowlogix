@@ -26,12 +26,20 @@ public class CDIFactory {
 	}
 	
 	public <T> T get(Class<T> clazz) {
-		Set<Bean<?>> beans =  beanManager.getBeans(clazz);
+            Set<Bean<?>> beans;
+            try
+            {
+                beans =  beanManager.getBeans(clazz);
+            }
+            catch(UnsupportedOperationException e)
+            {
+                return null;
+            }
 		if(beans!=null && beans.size()>0) {
 			Bean<T> bean = (Bean<T>) beans.iterator().next();		
 			CreationalContext<T> ctx = beanManager.createCreationalContext(bean);			
 			T o = clazz.cast(beanManager.getReference(bean, clazz, ctx)); 
-			log.info("Found and returning: "+clazz.getCanonicalName());
+			log.debug("Found and returning: "+clazz.getCanonicalName());
 			return o;	
 		}
 		return null;

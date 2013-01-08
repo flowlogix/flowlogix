@@ -9,7 +9,6 @@ import java.security.AccessController;
 import java.security.Principal;
 import java.util.concurrent.Callable;
 import javax.interceptor.AroundInvoke;
-import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,7 +26,6 @@ import org.apache.shiro.subject.Subject;
  * 
  * @author lprimak
  */
-@Interceptor
 @Slf4j
 public class ShiroSecurityInterceptor implements Serializable
 {
@@ -92,7 +90,6 @@ public class ShiroSecurityInterceptor implements Serializable
         }
 
 
-        
         private final @Getter String name;
         private static final Serializer<PrincipalCollection> ser = new DefaultSerializer<>();
         private static final long serialVersionUID = 1L;

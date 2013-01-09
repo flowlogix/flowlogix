@@ -1,12 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.security;
 
 import java.io.Serializable;
 import java.security.AccessController;
 import java.security.Principal;
+import java.util.List;
 import java.util.concurrent.Callable;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
@@ -19,6 +16,8 @@ import org.apache.shiro.io.Serializer;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.tynamo.shiro.extension.authz.aop.AopHelper;
+import org.tynamo.shiro.extension.authz.aop.SecurityInterceptor;
 
 /**
  * <a href="http://code.google.com/p/flowlogix/wiki/TLShiroSecurityInterceptor"
@@ -50,17 +49,28 @@ public class ShiroSecurityInterceptor implements Serializable
                 @Override
                 public Object call() throws Exception
                 {
+                    checkPermissions(ctx);
                     return ctx.proceed();
                 }
             });
-
         } else
         {
             return ctx.proceed();
+        }            
+    }
+    
+        
+    private void checkPermissions(final InvocationContext ctx) throws Exception
+    {
+        List<SecurityInterceptor> siList = AopHelper.createSecurityInterceptors(ctx.getMethod(), 
+                ctx.getMethod().getDeclaringClass());
+        for(SecurityInterceptor si : siList)
+        {
+            si.intercept();
         }
     }
     
-    
+
     public @EqualsAndHashCode static class SubjectWrapper implements Principal, Serializable
     {
         public SubjectWrapper(org.apache.shiro.subject.Subject subject)

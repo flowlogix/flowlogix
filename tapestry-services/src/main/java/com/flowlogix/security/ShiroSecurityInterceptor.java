@@ -55,6 +55,7 @@ public class ShiroSecurityInterceptor implements Serializable
             });
         } else
         {
+            checkPermissions(ctx);
             return ctx.proceed();
         }            
     }

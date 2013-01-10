@@ -34,13 +34,18 @@ public class ShiroSecurityInterceptor implements Serializable
         Subject subject = null;
         try
         {
-            Principal principal = javax.security.auth.Subject.getSubject(AccessController.getContext()).
-                    getPrincipals().iterator().next();
-            subject = new Subject.Builder().principals(SubjectWrapper.buildPrincipals(principal.getName())).buildSubject();
+            for(Principal principal : 
+                    javax.security.auth.Subject.getSubject(AccessController.getContext()).getPrincipals())
+            {
+                if(principal.getClass().getName().equals(SubjectWrapper.class.getName()))
+                {
+                    subject = new Subject.Builder().principals(SubjectWrapper.buildPrincipals(principal.getName())).buildSubject();
+                    break;
+                }
+            }
         } catch(Throwable e)
         {
-            log.debug("Translating Shiro/EJB Security", e);
-            // intentionally left blank
+            log.debug("Failed Translating Shiro/EJB Security", e);
         }
         if (subject != null)
         {

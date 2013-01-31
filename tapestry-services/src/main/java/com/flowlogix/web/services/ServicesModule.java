@@ -34,7 +34,7 @@ public class ServicesModule
 {    
     @Contribute(SymbolProvider.class)
     @FactoryDefaults
-    public void setFactoryDefaults(MappedConfiguration<String, String> configuration)
+    public static void setFactoryDefaults(MappedConfiguration<String, String> configuration)
     {
         configuration.add(Symbols.MINIMIZE_ASSETS, "true");
     }

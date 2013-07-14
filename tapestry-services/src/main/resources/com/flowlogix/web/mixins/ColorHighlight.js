@@ -5,7 +5,8 @@
 Tapestry.ElementEffect.colorhighlight = function(element) 
 {
     return new Effect.Highlight(element, { 
-        startcolor : '%s'
+        startcolor : '%s',
+        restorecolor: $(element).savedBackgroundColor
     }
     );
 };

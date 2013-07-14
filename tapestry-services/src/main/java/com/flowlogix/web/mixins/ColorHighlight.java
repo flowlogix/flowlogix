@@ -27,7 +27,7 @@ public class ColorHighlight
     @SetupRender
     void init()
     {
-        js.addScript(script, highlightColor);
+        js.addScript(script, highlightColor, highlightColor);
     }
     
     

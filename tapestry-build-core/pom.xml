@@ -145,12 +145,6 @@
             <version>${tap.version}</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-codec</artifactId>
-                    <groupId>commons-codec</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
@@ -249,16 +243,6 @@
             <version>${tap.version}</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-fileupload</artifactId>
-                    <groupId>commons-fileupload</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-io</artifactId>
-                    <groupId>commons-io</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.tynamo</groupId>

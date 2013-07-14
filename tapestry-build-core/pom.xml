@@ -63,6 +63,11 @@
                     <groupId>javax.alidation</groupId>
                     <artifactId>validation-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>json</artifactId>
+                    <groupId>org.json</groupId>
+                </exclusion>
+
             </exclusions>
         </dependency>
         <dependency>

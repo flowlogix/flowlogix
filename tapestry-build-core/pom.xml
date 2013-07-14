@@ -481,12 +481,6 @@
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.json</groupId>
-                                    <artifactId>json</artifactId>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}/deps</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>

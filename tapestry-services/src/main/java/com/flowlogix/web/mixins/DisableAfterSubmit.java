@@ -1,11 +1,15 @@
 package com.flowlogix.web.mixins;
 
+import com.flowlogix.web.services.internal.DisableAfterSubmitWorker;
 import org.apache.tapestry5.ClientElement;
+import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.InjectContainer;
+import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.json.JSONObject;
+import org.apache.tapestry5.services.Environment;
 import org.apache.tapestry5.services.FormSupport;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
@@ -19,16 +23,39 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 public class DisableAfterSubmit
 {
     @AfterRender
-    void addDisabler()
+    private void addDisabler()
+    {
+        if(DisableAfterSubmitWorker.isSubmitButton(cr))
+        {
+            enableSubmitProcessing(clientElement, fs, js);
+        }
+    }
+    
+    
+    private void setupRender()
+    {
+        environment.push(DisableAfterSubmit.class, this);
+    }
+    
+    
+    private void cleanupRender()
+    {
+        environment.pop(DisableAfterSubmit.class);
+    }
+    
+    
+    static public void enableSubmitProcessing(ClientElement clientElement, FormSupport fs, JavaScriptSupport js)
     {
         JSONObject spec = new JSONObject();
-        spec.put("elementId", submitButton.getClientId());
+        spec.put("elementId", clientElement.getClientId());
         spec.put("formId", fs.getClientId());
         js.addInitializerCall("disableAfterSubmit", spec);
     }
     
     
-    @Environmental private JavaScriptSupport js;
-    @InjectContainer private ClientElement submitButton;
-    @Environmental private FormSupport fs;
+    private @Inject ComponentResources cr;
+    private @Environmental JavaScriptSupport js;
+    private @InjectContainer ClientElement clientElement;
+    private @Environmental(false) FormSupport fs;
+    private @Inject Environment environment;
 }

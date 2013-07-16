@@ -24,13 +24,16 @@ public class ColorHighlightOverride
     @SetupRender
     void init()
     {
-        js.addScript(script, highlightColor);
+        js.addScript(effectOverrideScript, highlightColor);
+        js.addScript(colorHighlightScript, highlightColor, highlightColor);
     }
     
     
     private @Environmental JavaScriptSupport js;
     private @BindParameter String highlightColor;
-    private @Inject @Path("EffectOverrides.js") Asset scriptAsset;
+    private @Inject @Path("EffectOverrides.js") Asset effectOverrideScriptAsset;
     private @Inject AssetMinimizer minimizer;
-    private final String script = minimizer.minimize(scriptAsset);
+    private final String effectOverrideScript = minimizer.minimize(effectOverrideScriptAsset);
+    private @Inject @Path("ColorHighlight.js") Asset colorHighlightScriptAsset;
+    private final String colorHighlightScript = minimizer.minimize(colorHighlightScriptAsset);
 }

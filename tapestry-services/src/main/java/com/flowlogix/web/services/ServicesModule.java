@@ -5,12 +5,16 @@
 package com.flowlogix.web.services;
 
 import com.flowlogix.session.internal.SessionTrackerUtil;
+import com.flowlogix.web.mixins.AutoDisableAfterSubmit;
+import com.flowlogix.web.mixins.AutoZoneColorHighlight;
 import com.flowlogix.web.services.internal.AjaxAnnotationWorker;
 import com.flowlogix.web.services.internal.AssetMinimizerImpl;
-import com.flowlogix.web.services.internal.DisableAfterSubmitWorker;
+import com.flowlogix.web.services.internal.MixinAdderWorker;
 import java.io.IOException;
 import org.apache.tapestry5.beanvalidator.BeanValidatorConfigurer;
 import org.apache.tapestry5.beanvalidator.BeanValidatorSource;
+import org.apache.tapestry5.corelib.components.Submit;
+import org.apache.tapestry5.corelib.components.Zone;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
@@ -53,7 +57,10 @@ public class ServicesModule
     public static void provideClassTransformWorkers(OrderedConfiguration<ComponentClassTransformWorker2> configuration)
     {
         configuration.addInstance("AJAX", AjaxAnnotationWorker.class, "before:Property");
-        configuration.addInstance("DisableAfterSubmit", DisableAfterSubmitWorker.class, "after:AJAX");
+        configuration.add("DisableAfterSubmit", 
+                new MixinAdderWorker(Submit.class, AutoDisableAfterSubmit.class), "after:AJAX");
+        configuration.add("ZoneColorHighlight", 
+                new MixinAdderWorker(Zone.class, AutoZoneColorHighlight.class), "after:AJAX");
     }
 
     

@@ -7,6 +7,7 @@ package com.flowlogix.web.services;
 import com.flowlogix.session.internal.SessionTrackerUtil;
 import com.flowlogix.web.services.internal.AjaxAnnotationWorker;
 import com.flowlogix.web.services.internal.AssetMinimizerImpl;
+import com.flowlogix.web.services.internal.DisableAfterSubmitWorker;
 import java.io.IOException;
 import org.apache.tapestry5.beanvalidator.BeanValidatorConfigurer;
 import org.apache.tapestry5.beanvalidator.BeanValidatorSource;
@@ -52,6 +53,7 @@ public class ServicesModule
     public static void provideClassTransformWorkers(OrderedConfiguration<ComponentClassTransformWorker2> configuration)
     {
         configuration.addInstance("AJAX", AjaxAnnotationWorker.class, "before:Property");
+        configuration.addInstance("DisableAfterSubmit", DisableAfterSubmitWorker.class, "after:AJAX");
     }
 
     

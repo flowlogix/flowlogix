@@ -34,13 +34,19 @@ public class DisableAfterSubmit
     
     private void setupRender()
     {
-        environment.push(DisableAfterSubmit.class, this);
+        if(!DisableAfterSubmitWorker.isSubmitButton(cr))
+        {
+            environment.push(DisableAfterSubmit.class, this);
+        }
     }
     
     
     private void cleanupRender()
     {
-        environment.pop(DisableAfterSubmit.class);
+        if(!DisableAfterSubmitWorker.isSubmitButton(cr))
+        {        
+            environment.pop(DisableAfterSubmit.class);
+        }
     }
     
     

@@ -16,3 +16,7 @@ Tapestry.ElementEffect.colorhighlight = function(element, color)
         }
     );
 };
+
+// override default Tapestry highlight
+Tapestry.ElementEffect.taphighlight = Tapestry.ElementEffect.highlight;  // save the original function
+Tapestry.ElementEffect.highlight = Tapestry.ElementEffect.colorhighlight;

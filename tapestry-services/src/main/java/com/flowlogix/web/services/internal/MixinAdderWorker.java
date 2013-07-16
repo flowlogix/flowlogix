@@ -15,28 +15,27 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.web.mixins.AutoDisableAfterSubmit;
+import lombok.RequiredArgsConstructor;
 import org.apache.shiro.util.ClassUtils;
 import org.apache.tapestry5.ComponentResources;
-import org.apache.tapestry5.corelib.components.Submit;
 import org.apache.tapestry5.model.MutableComponentModel;
 import org.apache.tapestry5.plastic.PlasticClass;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
 import org.apache.tapestry5.services.transform.TransformationSupport;
 
 /**
- * Adds DisableAfterSubmit to every submit element
+ * Adds specified mixin class to every component of type X
  * @author lprimak
  */
-public class DisableAfterSubmitWorker implements ComponentClassTransformWorker2
+public @RequiredArgsConstructor class MixinAdderWorker implements ComponentClassTransformWorker2
 {
     @Override
     public void transform(PlasticClass plasticClass, TransformationSupport support, MutableComponentModel model)
     {
-        boolean hasMixin = model.getMixinClassNames().contains(AutoDisableAfterSubmit.class.getName());
-        if(hasMixin == false && isSubmitButton(plasticClass.getClassName()))
+        boolean hasMixin = model.getMixinClassNames().contains(mixinType.getName());
+        if(hasMixin == false && isCorrectType(componentType, plasticClass.getClassName()))
         {
-            model.addMixinClassName(AutoDisableAfterSubmit.class.getName());
+            model.addMixinClassName(mixinType.getName());
         }
     }
         
@@ -45,19 +44,23 @@ public class DisableAfterSubmitWorker implements ComponentClassTransformWorker2
      * Determines if the mixin's container is a submit element
      */
 
-    public static boolean isSubmitButton(ComponentResources cr)
+    public static boolean isCorrectType(Class<?> componentType, ComponentResources cr)
     {
-        return isSubmitButton(cr.getContainerResources().getComponentModel().
+        return isCorrectType(componentType, cr.getContainerResources().getComponentModel().
                 getComponentClassName());
     }
                 
     /**
      * Determines if the mixin's container is a submit element
      */
-    public static boolean isSubmitButton(String className)
+    public static boolean isCorrectType(Class<?> componentType, String className)
     {
         Class<?> myClass = ClassUtils.forName(className);
-        Class<?> submitClass = ClassUtils.forName(Submit.class.getName());
-        return submitClass.isAssignableFrom(myClass);
+        Class<?> componentClass = ClassUtils.forName(componentType.getName());
+        return componentClass.isAssignableFrom(myClass);
     }
+    
+    
+    private final Class<?> componentType;
+    private final Class<?> mixinType;
 }

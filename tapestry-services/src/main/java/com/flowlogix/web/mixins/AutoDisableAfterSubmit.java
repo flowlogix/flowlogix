@@ -28,7 +28,7 @@ import org.apache.tapestry5.services.FormSupport;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
- *
+ * Internal mixin for DisableAfterSubmit
  * @author lprimak
  */
 @Import(library="DisableAfterSubmit.js")

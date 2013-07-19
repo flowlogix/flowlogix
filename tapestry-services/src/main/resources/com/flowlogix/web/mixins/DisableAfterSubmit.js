@@ -5,17 +5,25 @@
 var DisableAfterSubmit = Class.create();
 DisableAfterSubmit.prototype = {
     initialize: function(elementId, formId) {
+        var element = $(elementId);
+
+        if(element.disablerAttached != undefined) {
+            return;
+        }
+        
         this.formId = formId;
         this.elementId = elementId;
         this.handler = this.doEnable.bindAsEventListener(this);
-
-        Event.observe($(elementId), 'click',
-            this.doDisable.bindAsEventListener(this));			
+        Event.observe(element, 'click',
+            this.doDisable.bindAsEventListener(this));	
+        element.disablerAttached = true;
     },
 
     doDisable: function(domevent) {
-        $(this.elementId).disable();
-        var tapStorage = $(this.formId).getStorage();
+        var element = $(this.elementId);
+        var form = $(this.formId);
+        element.disable();
+        var tapStorage = form.getStorage();
         var isZone = tapStorage.zoneId != null;
 
         if(isZone) {
@@ -24,19 +32,19 @@ DisableAfterSubmit.prototype = {
                 this.handler); 
         }
 
-        $(this.formId).setSubmittingElement($(this.elementId));
-        $(this.formId).onsubmit(domevent);
+        form.setSubmittingElement(element);
+        form.onsubmit(domevent);
         if(tapStorage.validationError) {
             if(isZone) {
                 this.doEnable();
             }
             else {
-                $(this.elementId).enable();                       
+                element.enable();                       
             }
         }
         else {
             if(isZone == false) {
-                $(this.formId).submit();
+                form.submit();
             }
         }
     },

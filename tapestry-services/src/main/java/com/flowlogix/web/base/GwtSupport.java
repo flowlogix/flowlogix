@@ -1,13 +1,14 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * TODO fix this
  */
 package com.flowlogix.web.base;
 
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
@@ -18,6 +19,9 @@ import org.apache.tapestry5.services.AssetSource;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.URLEncoder;
 import org.apache.tapestry5.services.assets.AssetPathConstructor;
+import org.apache.tapestry5.services.assets.StreamableResource;
+import org.apache.tapestry5.services.assets.StreamableResourceProcessing;
+import org.apache.tapestry5.services.assets.StreamableResourceSource;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -51,9 +55,15 @@ public abstract class GwtSupport
     }
     
     
+    @SneakyThrows(IOException.class)
     protected String getGwtModulePath()
     {
-        return contextRoot.constructAssetPath(RequestConstants.CONTEXT_FOLDER, getModuleName());
+        // TODO fix this
+        final String gwtModule = getModuleName();
+        final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
+        StreamableResource sr = srs.getStreamableResource(assetSource.getExpandedAsset(gwtModuleJSPath).getResource(), 
+                StreamableResourceProcessing.COMPRESSION_DISABLED, null);
+        return contextRoot.constructAssetPath(RequestConstants.CONTEXT_FOLDER, getModuleName(), sr);
     }
     
     
@@ -90,6 +100,7 @@ public abstract class GwtSupport
     
     private @Environmental JavaScriptSupport jsSupport;
     private @Inject AssetSource assetSource;
+    private @Inject StreamableResourceSource srs;
     private @Getter @Inject ComponentResources resources;
     private @Inject RequestGlobals requestGlobals;
     private @Inject AssetPathConstructor contextRoot;

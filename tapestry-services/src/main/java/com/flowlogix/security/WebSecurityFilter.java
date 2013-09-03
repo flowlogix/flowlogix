@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.security;
 
 import java.io.IOException;
@@ -21,7 +17,6 @@ import javax.servlet.annotation.WebFilter;
 import lombok.SneakyThrows;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.util.ClassUtils;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -53,7 +48,7 @@ public class WebSecurityFilter implements Filter
             String securitiyManagerClassStr = fc.getInitParameter("securityManager");
             if(securitiyManagerClassStr != null)
             {
-                securityManagerClass = (Class<? extends org.apache.shiro.mgt.SecurityManager>) ClassUtils.forName(securitiyManagerClassStr);
+                securityManagerClass = ClassUtils.forName(securitiyManagerClassStr);
             }
         }
     }
@@ -108,15 +103,14 @@ public class WebSecurityFilter implements Filter
                 SecurityUtils.getSecurityManager();
             } catch (UnavailableSecurityManagerException e)
             {
-                List<Realm> realmInstances = new LinkedList<>();
-                for (Class<Realm> realmClass : realmClasses)
+                List<Object> realmInstances = new LinkedList<>();
+                for (Class<?> realmClass : realmClasses)
                 {
                     realmInstances.add(realmClass.newInstance());
                 }
 
-                Constructor<org.apache.shiro.mgt.SecurityManager> constr = (Constructor<org.apache.shiro.mgt.SecurityManager>) 
-                        securityManagerClass.getConstructor(Collection.class);
-                ThreadContext.bind(constr.newInstance(realmInstances));
+                Constructor<?> constr = securityManagerClass.getConstructor(Collection.class);
+                ThreadContext.bind((org.apache.shiro.mgt.SecurityManager)constr.newInstance(realmInstances));
 
                 forcedShiroActivateion = true;
             }
@@ -142,7 +136,7 @@ public class WebSecurityFilter implements Filter
             {
                 if(!realm.isEmpty())
                 {
-                    realmClasses.add((Class<Realm>)ClassUtils.forName(realm));
+                    realmClasses.add(ClassUtils.forName(realm));
                 }
             }
         }
@@ -151,6 +145,6 @@ public class WebSecurityFilter implements Filter
 
     
     private boolean backupShiroInit = false;
-    private final List<Class<Realm>> realmClasses = new LinkedList<>();
-    private Class<? extends org.apache.shiro.mgt.SecurityManager> securityManagerClass = DefaultWebSecurityManager.class;
+    private final List<Class<?>> realmClasses = new LinkedList<>();
+    private Class<?> securityManagerClass = DefaultWebSecurityManager.class;
 }

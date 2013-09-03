@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.services;
 
 import com.flowlogix.session.internal.SessionTrackerUtil;
@@ -118,6 +114,7 @@ public class ServicesModule
 
     public static class Symbols
     {
+        // TODO still necessary?
         public static final String MINIMIZE_ASSETS = "flowlogix.minimize-assets";
     }
     

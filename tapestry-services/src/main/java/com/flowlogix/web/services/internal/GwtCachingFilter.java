@@ -28,6 +28,7 @@ import org.apache.tapestry5.services.Response;
 
 /**
  * Cache and gzip compress GWT assets outside of Tapestry control
+ * TODO check operation
  * 
  * @author lprimak
  */

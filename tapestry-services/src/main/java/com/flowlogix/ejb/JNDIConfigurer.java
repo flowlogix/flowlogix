@@ -17,8 +17,8 @@ package com.flowlogix.ejb;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
+import java.util.Properties;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import lombok.AllArgsConstructor;
@@ -60,7 +60,7 @@ public class JNDIConfigurer
     
     public static JNDIObjectLocator buildLocator(@NonNull Config config)  throws NamingException
     {
-        Hashtable<String, String> env = new Hashtable<>();
+        Properties env = new Properties();
         if(StringUtils.hasText(config.getHostname()))
         {
             env.put("org.omg.CORBA.ORBInitialHost", config.getHostname());           

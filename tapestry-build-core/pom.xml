@@ -232,6 +232,61 @@
             <scope>${war-deps.scope}</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.tapestry</groupId>
+            <artifactId>tapestry-webresources</artifactId>
+            <version>${tap.version}</version>
+            <type>jar</type>
+            <scope>${war-deps.scope}</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>json</artifactId>
+                    <groupId>org.json</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <artifactId>ST4</artifactId>
+            <groupId>org.antlr</groupId>
+            <type>jar</type>
+            <version>4.0.7</version>
+            <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
+            <artifactId>less4j</artifactId>
+            <groupId>com.github.sommeri</groupId>
+            <type>jar</type>
+            <version>1.1.2</version>
+            <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
+            <artifactId>protobuf-java</artifactId>
+            <groupId>com.google.protobuf</groupId>
+            <type>jar</type>
+            <version>2.5.0</version>
+            <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
+            <artifactId>closure-compiler</artifactId>
+            <groupId>com.google.javascript</groupId>
+            <type>jar</type>
+            <version>v20130722</version>
+            <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
+            <artifactId>args4j</artifactId>
+            <groupId>args4j</groupId>
+            <type>jar</type>
+            <version>2.0.25</version>
+            <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
+            <artifactId>antlr</artifactId>
+            <groupId>org.antlr</groupId>
+            <type>jar</type>
+            <version>3.5</version>
+            <scope>${war-deps.scope}</scope>
+        </dependency>
+        <dependency>
             <groupId>org.tynamo</groupId>
             <artifactId>tapestry-exceptionpage</artifactId>
             <version>0.1.2</version>
@@ -447,6 +502,48 @@
                                 <artifactItem>
                                     <groupId>org.apache.tapestry</groupId>
                                     <artifactId>tapestry-upload</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.tapestry</groupId>
+                                    <artifactId>tapestry-webresources</artifactId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <artifactId>ST4</artifactId>
+                                    <groupId>org.antlr</groupId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <artifactId>less4j</artifactId>
+                                    <groupId>com.github.sommeri</groupId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <artifactId>protobuf-java</artifactId>
+                                    <groupId>com.google.protobuf</groupId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <artifactId>closure-compiler</artifactId>
+                                    <groupId>com.google.javascript</groupId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <artifactId>args4j</artifactId>
+                                    <groupId>args4j</groupId>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                                <artifactItem>
+                                    <artifactId>antlr</artifactId>
+                                    <groupId>org.antlr</groupId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>

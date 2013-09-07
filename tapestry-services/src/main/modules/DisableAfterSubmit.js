@@ -34,7 +34,11 @@
       
       var findZone = function(elt) {
           var formElt = elt.findParent('form');
-          var zoneElt = (formElt !== null)? zone.findZone(formElt) : null; 
+          var zoneElt = null;
+          try {
+            zoneElt = (formElt !== null)? zone.findZone(formElt) : null; 
+          }
+          catch(err) { }
           return zoneElt;
       };
       

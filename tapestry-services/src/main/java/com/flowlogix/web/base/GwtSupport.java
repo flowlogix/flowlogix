@@ -1,37 +1,31 @@
-/*
- * TODO fix this
- */
 package com.flowlogix.web.base;
 
 import com.google.common.collect.Lists;
-import java.io.IOException;
+import java.io.File;
 import java.util.List;
-import java.util.logging.Logger;
 import lombok.Getter;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.tapestry5.Asset;
 import org.apache.tapestry5.ComponentResources;
+import org.apache.tapestry5.MarkupWriter;
+import org.apache.tapestry5.SymbolConstants;
+import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
-import org.apache.tapestry5.annotations.Import;
-import org.apache.tapestry5.annotations.SetupRender;
-import org.apache.tapestry5.internal.services.RequestConstants;
+import org.apache.tapestry5.dom.Element;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
+import org.apache.tapestry5.ioc.services.ThreadLocale;
 import org.apache.tapestry5.services.AssetSource;
-import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.URLEncoder;
-import org.apache.tapestry5.services.assets.AssetPathConstructor;
-import org.apache.tapestry5.services.assets.StreamableResource;
-import org.apache.tapestry5.services.assets.StreamableResourceProcessing;
-import org.apache.tapestry5.services.assets.StreamableResourceSource;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
  * <a href="http://code.google.com/p/flowlogix/wiki/TLGwtSupport"
  *    target="_blank">See Documentation</a>
- * TODO needs to be reworked
  * 
  * @author lprimak
  */
-@Import(library="gwtSupport.js")
+@Slf4j
 public abstract class GwtSupport
 {    
     protected abstract Class<?> getEntryPoint();
@@ -56,34 +50,31 @@ public abstract class GwtSupport
     }
     
     
-    @SneakyThrows(IOException.class)
     protected String getGwtModulePath()
     {
-        // TODO fix this
         final String gwtModule = getModuleName();
         final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
-        StreamableResource sr = srs.getStreamableResource(assetSource.getExpandedAsset(gwtModuleJSPath).getResource(), 
-                StreamableResourceProcessing.COMPRESSION_DISABLED, null);
-        return contextRoot.constructAssetPath(RequestConstants.CONTEXT_FOLDER, getModuleName(), sr);
+        final Asset asset = assetSource.getContextAsset(gwtModuleJSPath, threadLocale.getLocale());
+        return new File(asset.toClientURL()).getParent();
     }
     
     
-    @SetupRender
-    public void addScript()
+    @AfterRender
+    public void addScript(MarkupWriter writer)
     {        
-        jsSupport.addScript("GWTComponentController.add('%s','%s')", getEntryPoint().getName(), 
-                addParameters(resources.getCompleteId(), getGWTParameters()));
+        Element head = writer.getDocument().find("html/head");
         
-        final String gwtModule = getModuleName();
-        final String supportVariablePath = "flowlogix/js/GwtSupportVariable";
         for (String var : getJavaScriptInitialization())
         {
-            jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s",
-                    requestGlobals.getRequest().getContextPath(), supportVariablePath,
-                    urlEncoder.encode(var)));
+            head.element("script").raw(var);
         }
+
+        final String gwtModule = getModuleName();
+        jsSupport.require("flowlogix/GwtModuleInit").with(getEntryPoint().getName(), 
+                addParameters(resources.getCompleteId(), getGWTParameters()));
+        
         final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
-        jsSupport.importJavaScriptLibrary(assetSource.getExpandedAsset(gwtModuleJSPath));
+        head.element("script", "src", assetSource.getExpandedAsset(gwtModuleJSPath).toClientURL());
     }    
    
     
@@ -101,10 +92,8 @@ public abstract class GwtSupport
     
     private @Environmental JavaScriptSupport jsSupport;
     private @Inject AssetSource assetSource;
-    private @Inject StreamableResourceSource srs;
+    private @Inject ThreadLocale threadLocale;
     private @Getter @Inject ComponentResources resources;
-    private @Inject RequestGlobals requestGlobals;
-    private @Inject AssetPathConstructor contextRoot;
+    private @Inject @Symbol(SymbolConstants.CONTEXT_PATH) String contextPath;
     private @Inject URLEncoder urlEncoder;
-    private static final Logger log = Logger.getLogger(GwtSupport.class.getName());
 }

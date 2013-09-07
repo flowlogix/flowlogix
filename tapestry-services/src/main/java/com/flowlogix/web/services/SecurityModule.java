@@ -88,7 +88,6 @@ public class SecurityModule
     
     /**
      * Fix for https://issues.apache.org/jira/browse/TAP5-1973
-     * TODO check this
      * Remove appending the port number for URLs
      */
     @Match("BaseURLSource")

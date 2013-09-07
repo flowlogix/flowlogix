@@ -1,7 +1,6 @@
 package com.flowlogix.web.mixins;
 
 import com.flowlogix.web.base.UserEnvironment;
-import com.flowlogix.web.services.AssetMinimizer;
 import org.apache.tapestry5.Asset;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Path;
@@ -24,8 +23,6 @@ public class CalendarPopupPatch extends UserEnvironment
     public void setupRender()
     {
         super.setupRender();
-        
-        js.addScript(calPopupScript);
     }
     
     
@@ -35,12 +32,11 @@ public class CalendarPopupPatch extends UserEnvironment
         {
             js.importStylesheet(datefieldWinPatch);
         }
+        js.importJavaScriptLibrary(calPopupScriptAsset);
     }
     
     
     private @Environmental JavaScriptSupport js;
     private @Inject @Path("js/CalendarPopupPatch.js") Asset calPopupScriptAsset;
     private @Inject @Path("css/DateFieldWindowsPatch.css") Asset datefieldWinPatch;
-    private @Inject AssetMinimizer minimizer;
-    private final String calPopupScript = minimizer.minimize(calPopupScriptAsset);
 }

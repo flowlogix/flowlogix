@@ -7,10 +7,13 @@
         var createOverlay = function(elt, isZone) {
             var zoneElt = elt;
             if (isZone != true) {
-                zoneElt = zone.findZone(elt);
-                if (zoneElt == null) {
-                    return;
+                try {
+                    zoneElt = zone.findZone(elt);
                 }
+                catch(err) { }
+            }
+            if (zoneElt == null) {
+                return;
             }
             
             zoneElt.prepend("<div class='zone-loading-overlay'/>");

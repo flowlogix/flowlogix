@@ -111,7 +111,6 @@ public class ServicesModule
 
     public static class Symbols
     {
-        // TODO still necessary?
         public static final String MINIMIZE_ASSETS = "flowlogix.minimize-assets";
     }
     

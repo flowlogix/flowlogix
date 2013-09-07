@@ -16,29 +16,25 @@
 package com.flowlogix.web.mixins;
 
 import org.apache.tapestry5.BindingConstants;
-import org.apache.tapestry5.ClientElement;
+import org.apache.tapestry5.MarkupWriter;
 import org.apache.tapestry5.annotations.AfterRender;
-import org.apache.tapestry5.annotations.Environmental;
-import org.apache.tapestry5.annotations.Import;
-import org.apache.tapestry5.annotations.InjectContainer;
 import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.dom.Element;
+import org.apache.tapestry5.dom.Node;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Environment;
-import org.apache.tapestry5.services.FormSupport;
-import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
  * Internal mixin for DisableAfterSubmit
  * @author lprimak
  */
-@Import(library="DisableAfterSubmit.js")
 public class AutoDisableAfterSubmit
 {
     private @Parameter(name = "disableAfterSubmitEnabled", defaultPrefix = BindingConstants.LITERAL) Boolean enabled;
 
     
     @AfterRender
-    private void addDisabler()
+    private void addDisabler(MarkupWriter writer)
     {
         if (environment.peek(DisableAfterSubmit.class) == null)
         {
@@ -52,15 +48,19 @@ public class AutoDisableAfterSubmit
             enabled = true;
         }
         
-        if (enabled)
+        if (enabled == false)
         {
-            DisableAfterSubmit.enableSubmitProcessing(clientElement, fs, js);
+            for (Node child : writer.getElement().getChildren())
+            {
+                if (child instanceof Element)
+                {
+                    Element elt = (Element)child;
+                    elt.attributes("data-disable-after-submit-excluded", "true");
+                }
+            }
         }
     }
     
     
-    private @InjectContainer ClientElement clientElement;
-    private @Environmental(false) FormSupport fs;
     private @Inject Environment environment;
-    private @Environmental JavaScriptSupport js;
 }

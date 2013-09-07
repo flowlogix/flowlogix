@@ -17,7 +17,7 @@
 
     <properties>
         <war-deps.scope>compile</war-deps.scope>
-        <tap.version>5.4-alpha-15</tap.version>
+        <tap.version>5.4-alpha-17</tap.version>
         <gwt.version>2.5.1</gwt.version>
         <guava.version>14.0.1</guava.version>
         <groovy.version>2.1.6</groovy.version>

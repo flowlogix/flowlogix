@@ -41,6 +41,22 @@
     </parent>
     
     <build>
+        <resources>
+            <resource>
+                <targetPath>META-INF/assets/flowlogix</targetPath>
+                <directory>src/main/assets</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <targetPath>META-INF/modules/flowlogix</targetPath>
+                <directory>src/main/modules</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/tml</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

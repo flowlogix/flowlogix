@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.mixins;
 
 import com.flowlogix.web.base.UserEnvironment;
@@ -30,7 +26,6 @@ public class CalendarPopupPatch extends UserEnvironment
         super.setupRender();
         
         js.addScript(calPopupScript);
-        js.addScript(dateFieldParserScript);
     }
     
     
@@ -44,10 +39,8 @@ public class CalendarPopupPatch extends UserEnvironment
     
     
     private @Environmental JavaScriptSupport js;
-    private @Inject @Path("CalendarPopupPatch.js") Asset calPopupScriptAsset;
-    private @Inject @Path("DateFieldParserPatch.js") Asset dateFieldParserscriptAsset;
-    private @Inject @Path("DateFieldWindowsPatch.css") Asset datefieldWinPatch;
+    private @Inject @Path("js/CalendarPopupPatch.js") Asset calPopupScriptAsset;
+    private @Inject @Path("css/DateFieldWindowsPatch.css") Asset datefieldWinPatch;
     private @Inject AssetMinimizer minimizer;
     private final String calPopupScript = minimizer.minimize(calPopupScriptAsset);
-    private final String dateFieldParserScript = minimizer.minimize(dateFieldParserscriptAsset);
 }

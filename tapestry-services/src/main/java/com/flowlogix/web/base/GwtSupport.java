@@ -27,6 +27,7 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 /**
  * <a href="http://code.google.com/p/flowlogix/wiki/TLGwtSupport"
  *    target="_blank">See Documentation</a>
+ * TODO needs to be reworked
  * 
  * @author lprimak
  */

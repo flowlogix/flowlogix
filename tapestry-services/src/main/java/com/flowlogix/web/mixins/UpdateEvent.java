@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.mixins;
 
 import org.apache.tapestry5.BindingConstants;
@@ -21,10 +17,9 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * 
  * @author lprimak
  */
-@Import(library = "UpdateEvent.js")
 public class UpdateEvent extends SessionTracker
 {
-    @AfterRender
+        @AfterRender
     private void addUpdater()
     {
         if(updateEvent != null)
@@ -50,7 +45,7 @@ public class UpdateEvent extends SessionTracker
 
     private void createEvent(String event)
     {
-        Link link = null;
+        Link link;
         if(context == null)
         {
             link = cr.createEventLink(event);
@@ -64,7 +59,8 @@ public class UpdateEvent extends SessionTracker
         JSONObject spec = new JSONObject();
         spec.put("elementId", zone.getClientId());
         spec.put("uri", uri);
-        js.addInitializerCall("updateEvent", spec);
+        
+        js.require("flowlogix/UpdateEvent").invoke("updateEvent").with(zone.getClientId(), uri);
     }
 
     

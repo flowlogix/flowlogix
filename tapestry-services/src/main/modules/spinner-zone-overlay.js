@@ -26,10 +26,17 @@
             });
 
         };
+        
+        var removeOverlay = function(elt) {
+            elt.$.find("div.zone-loading-overlay").remove();
+        };
 
         return function() {
             dom.onDocument(events.zone.willUpdate, function() {
                 createOverlay(this, true);
+            });
+            dom.onDocument(events.zone.didUpdate, function() {
+                removeOverlay(this);
             });
             dom.onDocument(events.form.prepareForSubmit, function() {
                 createOverlay(this, false);

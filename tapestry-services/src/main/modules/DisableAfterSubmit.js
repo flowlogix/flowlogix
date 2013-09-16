@@ -50,11 +50,11 @@
                   enableButtons(zoneElt);
                   zoneElt.meta(metaButtonIdStr, this);
               }
-              _.defer(function(self) {
-                  if(zoneElt.meta(metaButtonIdStr) !== null) {
-                     self.attribute('disabled', 'disabled');                   
-                  }
-              }, this);
+                _.defer(function(self) {
+                    if (zoneElt.meta(metaButtonIdStr) !== null) {
+                        self.attribute('disabled', 'disabled');
+                    }
+                }, this);
           });
           
           dom.onDocument(events.zone.didUpdate, function() {

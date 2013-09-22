@@ -43,13 +43,7 @@
     <build>
         <resources>
             <resource>
-                <targetPath>META-INF/assets/flowlogix</targetPath>
-                <directory>src/main/assets</directory>
-                <filtering>false</filtering>
-            </resource>
-            <resource>
-                <targetPath>META-INF/modules/flowlogix</targetPath>
-                <directory>src/main/modules</directory>
+                <directory>src/main/resources</directory>
                 <filtering>false</filtering>
             </resource>
             <resource>

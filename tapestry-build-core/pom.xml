@@ -279,7 +279,7 @@
             <artifactId>closure-compiler</artifactId>
             <groupId>com.google.javascript</groupId>
             <type>jar</type>
-            <version>v20130722</version>
+            <version>v20130823</version>
             <scope>${war-deps.scope}</scope>
             <exclusions>
                 <exclusion>

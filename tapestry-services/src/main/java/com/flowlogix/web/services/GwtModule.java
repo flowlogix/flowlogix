@@ -23,7 +23,7 @@ import org.apache.tapestry5.services.HttpServletRequestFilter;
  */
 @Slf4j
 public class GwtModule 
-{    
+{  
     public void contributeHttpServletRequestHandler(OrderedConfiguration<HttpServletRequestFilter> config)
     {
         // add GWT html caching and gzip compression
@@ -43,10 +43,10 @@ public class GwtModule
 
     
     public static class PathProcessor
-    {
+    { 
         public PathProcessor(String assetPathPrefix)
         {
-            filter = String.format("%s.*\\/%s", assetPathPrefix, RequestConstants.CONTEXT_FOLDER);
+            filter = String.format("%s.*\\/%s\\/\\w+\\/", assetPathPrefix, RequestConstants.CONTEXT_FOLDER);
         }
         
         

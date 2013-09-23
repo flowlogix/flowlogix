@@ -75,7 +75,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
             return chainHandler.service(request, response);
         }
         
-        log.debug("GwtCachingFilter: Processing %s", path);
+        log.debug("GwtCachingFilter: Processing {}", path);
 
         Request rq = new RequestImpl(request, applicationCharset, sessionFactory);
         Response rsp = new ResponseImpl(request, response);

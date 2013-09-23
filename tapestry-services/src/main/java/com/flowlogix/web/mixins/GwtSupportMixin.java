@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2013 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.flowlogix.web.mixins;
 
-/* 
- * initialize GWT GS module
+import lombok.Getter;
+import org.apache.tapestry5.Asset;
+import org.apache.tapestry5.annotations.Path;
+import org.apache.tapestry5.ioc.annotations.Inject;
+
+/**
+ *
+ * @author lprimak
  */
-
-(function() {
-  define(["flowlogix/GwtSupport"], function() {
-      return function(name, parameters) {
-          GWTComponentController.add(name, parameters);
-      };
-  });
-}).call(this);
+public class GwtSupportMixin
+{
+    private @Getter @Inject @Path("js/GwtSupport.js") Asset gwtSupportAsset;
+}

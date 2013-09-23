@@ -73,7 +73,8 @@ public abstract class GwtSupport
     @SetupRender
     public void init()
     {
-        GwtSupportLoaded.getGwtModuleNames().add(getModuleName());
+        // add to redirect list so relative asset paths work
+        GwtSupportLoaded.getModuleNames().add(getModuleName());
     }
     
     
@@ -82,10 +83,12 @@ public abstract class GwtSupport
     {        
         Element head = writer.getDocument().find("html/head");
         
-        GwtSupportLoaded isSupportScriptLoaded = environment.peek(GwtSupportLoaded.class);
-        if(isSupportScriptLoaded == null)
+        GwtSupportLoaded supportScriptLoaded = environment.peek(GwtSupportLoaded.class);
+        if(supportScriptLoaded == null)
         {
-            environment.push(GwtSupportLoaded.class, new GwtSupportLoaded());
+            // only one copy of module initializations per page
+            supportScriptLoaded = new GwtSupportLoaded();
+            environment.push(GwtSupportLoaded.class, supportScriptLoaded);
             List<String> initList = getJavaScriptInitialization();
             Element scriptElement = initList.isEmpty() ? null : head.element("script");
             for (String var : getJavaScriptInitialization())
@@ -98,7 +101,13 @@ public abstract class GwtSupport
         head.element("script").raw(String.format("GWTComponentController.add('%s', '%s');", 
                 getEntryPoint().getName(), addParameters(resources.getCompleteId(), getGWTParameters())));
 
-        head.element("script", "src", getGwtModuleAsset().toClientURL());
+        if(supportScriptLoaded.getModulesLoaded().contains(getModuleName()) == false)
+        {
+            // only one copy of module script per page
+            supportScriptLoaded.getModulesLoaded().add(getModuleName());
+            head.element("script", "src", getGwtModuleAsset().toClientURL());
+        }
+        
         for(String var : getPostInitScripts())
         {
             head.element("script", "src", var);

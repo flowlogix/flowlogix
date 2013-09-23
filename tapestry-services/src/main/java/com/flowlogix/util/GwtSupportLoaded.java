@@ -26,5 +26,6 @@ import lombok.Getter;
  */
 public class GwtSupportLoaded
 {
-    static @Getter final Set<String> gwtModuleNames = Collections.synchronizedSet(new HashSet<String>());
+    private @Getter Set<String> modulesLoaded = new HashSet<>();
+    private static @Getter final Set<String> moduleNames = Collections.synchronizedSet(new HashSet<String>());
 }

@@ -70,7 +70,7 @@ public class GwtModule
             public boolean service(final Request request, Response response, RequestHandler handler) throws IOException
             {
                 final String path = request.getPath();
-                boolean handled = Sets.filter(GwtSupportLoaded.getGwtModuleNames(), new Predicate<String>() 
+                boolean handled = Sets.filter(GwtSupportLoaded.getModuleNames(), new Predicate<String>() 
                 {
                     @Override
                     public boolean apply(String input)

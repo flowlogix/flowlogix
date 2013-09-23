@@ -12,6 +12,7 @@ import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.MarkupWriter;
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Mixin;
+import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.dom.Element;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.services.ThreadLocale;
@@ -66,6 +67,13 @@ public abstract class GwtSupport
         final String gwtModule = getModuleName();
         final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
         return assetSource.getContextAsset(gwtModuleJSPath, threadLocale.getLocale());        
+    }
+    
+    
+    @SetupRender
+    public void init()
+    {
+        GwtSupportLoaded.getGwtModuleNames().add(getModuleName());
     }
     
     

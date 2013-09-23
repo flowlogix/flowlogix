@@ -15,10 +15,16 @@
  */
 package com.flowlogix.util;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import lombok.Getter;
+
 /**
  *
  * @author lprimak
  */
 public class GwtSupportLoaded
 {
+    static @Getter final Set<String> gwtModuleNames = Collections.synchronizedSet(new HashSet<String>());
 }

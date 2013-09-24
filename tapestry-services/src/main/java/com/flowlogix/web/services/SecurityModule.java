@@ -23,13 +23,6 @@ import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
  */
 public class SecurityModule 
 {
-    public SecurityModule(@Symbol(SymbolConstants.ASSET_PATH_PREFIX) String assetPathPrefix)
-    {
-        this.assetPathPrefix = assetPathPrefix;
-        pathProcessor = new GwtModule.PathProcessor(assetPathPrefix);
-    }
-    
-    
     public static void contributeFactoryDefaults(MappedConfiguration<String, String> configuration)
     {
         configuration.add(Symbols.REMEMBER_ME_DURATION, Integer.toString(2 * 7)); // 2 weeks
@@ -125,7 +118,5 @@ public class SecurityModule
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     private @Inject @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode;
    
-    private final GwtModule.PathProcessor pathProcessor;
-    private final String assetPathPrefix;
     private final Pattern removePortNumber = Pattern.compile(":(80|443)$");
 }

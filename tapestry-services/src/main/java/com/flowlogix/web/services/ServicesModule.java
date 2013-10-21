@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.apache.tapestry5.beanvalidator.BeanValidatorConfigurer;
 import org.apache.tapestry5.beanvalidator.BeanValidatorSource;
 import org.apache.tapestry5.corelib.components.BeanEditForm;
+import org.apache.tapestry5.corelib.components.BeanEditor;
 import org.apache.tapestry5.corelib.components.Submit;
 import org.apache.tapestry5.corelib.components.Zone;
 import org.apache.tapestry5.ioc.Configuration;
@@ -59,8 +60,10 @@ public class ServicesModule
         configuration.addInstance("AJAX", AjaxAnnotationWorker.class, "before:Property");
         configuration.add("DisableAfterSubmit", 
                 new MixinAdderWorker(Submit.class, AutoDisableAfterSubmit.class), "after:AJAX");
-        configuration.add("FormHorizontalSupport",
+        configuration.add("FormHorizontalBEFSupport",
                 new MixinAdderWorker(BeanEditForm.class, FormHorizontal.class), "after:AJAX");
+        configuration.add("FormHorizontalBESupport",
+                new MixinAdderWorker(BeanEditor.class, FormHorizontal.class), "after:AJAX");
     }
 
     

@@ -56,10 +56,6 @@ public class UpdateEvent extends SessionTracker
         }
         String uri = link.toAbsoluteURI(request.isSecure());
 
-        JSONObject spec = new JSONObject();
-        spec.put("elementId", zone.getClientId());
-        spec.put("uri", uri);
-        
         js.require("flowlogix/UpdateEvent").invoke("updateEvent").with(zone.getClientId(), uri);
     }
 

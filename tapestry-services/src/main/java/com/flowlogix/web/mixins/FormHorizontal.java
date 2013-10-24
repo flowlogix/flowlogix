@@ -88,45 +88,59 @@ public class FormHorizontal
                 }
             }));
             
+            if("true".equals(element.getAttribute(FORM_HORIZONTAL_PROCESSED)))
+            {
+                return;
+            }
+            
             if(element.getName().equals("label"))
             {
                 String classAttr = element.getAttribute("class");
                 if(classAttr != null && classAttr.contains("control-label"))
                 {
                     element.attribute("class", labelClass);
+                    labelElement = element;
                     labelProcessed = true;
                 }
             }            
-            else if(labelProcessed)
+            else if(labelProcessed && !"hidden".equals(element.getAttribute("type")))
             {
                 labelProcessed = false;
-                element.wrap("div", "class", inputClass);
+                if(element.getContainer().getName().equals("form"))
+                {
+                    Element formGroup = element.wrap("div", "class", "form-group", FORM_HORIZONTAL_PROCESSED, "true");
+                    labelElement.moveToTop(formGroup);
+                }
+                element.wrap("div", "class", inputClass, FORM_HORIZONTAL_PROCESSED, "true");
             }
             else if(element.getName().equals("form"))
             {
-                element.attribute("class", "form-horizontal t-beaneditor");
+                element.attributes("class", "form-horizontal t-beaneditor", FORM_HORIZONTAL_PROCESSED, "true");
             }
             else if(element.getName().equals("div"))
             {
                 String classAttr = element.getAttribute("class");
                 if("checkbox".equals(classAttr) || "btn-toolbar".equals(classAttr))
                 {
-                    element.attribute("class", inputClass + " col-md-offset-" + computedOffset);
-                    element.wrap("div", "class", "form-group");
+                    element.attributes("class", inputClass + " col-md-offset-" + computedOffset, FORM_HORIZONTAL_PROCESSED, "true");
+                    element.wrap("div", "class", "form-group", FORM_HORIZONTAL_PROCESSED, "true");
                     if("checkbox".equals(classAttr))
                     {
-                        element.wrap("div", "class", "checkbox");
+                        element.wrap("div", "class", "checkbox", FORM_HORIZONTAL_PROCESSED, "true");
                     }
                 }
             }
         }
         
+        private Element labelElement;
         private boolean labelProcessed = false;
     }
     
     
     private int computedOffset = 2;
     private static Pattern offsetPattern = Pattern.compile(".*-([0-9]*)");
+    public static final String FORM_HORIZONTAL_PROCESSED="data-form-horizontal-processed";
+    
     public static class Symbols
     {
         public static final String FORM_HORIZONTAL_DISABLED = "flowlogix.form-horizontal-disabled";

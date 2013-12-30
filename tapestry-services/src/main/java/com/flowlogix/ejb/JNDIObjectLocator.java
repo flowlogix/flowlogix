@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.ejb;
 
 import java.util.Collections;
@@ -82,6 +78,7 @@ public class JNDIObjectLocator
             return lookup(jndiName, true);
         }
         
+        @SuppressWarnings("unchecked")
         T jndiObject = (T)jndiObjectCache.get(jndiName);
 
         if (jndiObject == null && !jndiObjectCache.containsKey(jndiName))
@@ -125,6 +122,7 @@ public class JNDIObjectLocator
     }
 
     
+    @SuppressWarnings("unchecked")
     private synchronized<T> T lookup(String name, boolean noCaching) throws NamingException
     {
         if(this.noCaching || noCaching)

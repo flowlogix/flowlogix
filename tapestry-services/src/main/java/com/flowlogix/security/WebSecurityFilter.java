@@ -17,6 +17,7 @@ import javax.servlet.annotation.WebFilter;
 import lombok.SneakyThrows;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.util.ClassUtils;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -33,7 +34,8 @@ import org.apache.shiro.web.subject.WebSubject;
 public class WebSecurityFilter implements Filter
 {
     @Override
-    @SneakyThrows(ClassNotFoundException.class)
+    @SneakyThrows({ClassNotFoundException.class, InstantiationException.class, IllegalAccessException.class,
+                    NoSuchMethodException.class, InvocationTargetException.class})
     public void init(FilterConfig fc) throws ServletException
     {
         String backupShiroInitStr = fc.getInitParameter("backupShiroInit");
@@ -44,12 +46,23 @@ public class WebSecurityFilter implements Filter
         
         if(backupShiroInit)
         {
-            parseRealms(fc.getInitParameter("realms"));
+            final List<Class<?>> realmClasses = parseRealms(fc.getInitParameter("realms"));  
+            final List<Realm> realmInstances = new LinkedList<>();
+
+            Class<?> securityManagerClass = DefaultWebSecurityManager.class;
             String securitiyManagerClassStr = fc.getInitParameter("securityManager");
             if(securitiyManagerClassStr != null)
             {
                 securityManagerClass = ClassUtils.forName(securitiyManagerClassStr);
             }
+            
+            for (Class<?> realmClass : realmClasses)
+            {
+                realmInstances.add((Realm)realmClass.newInstance());
+            }
+
+            Constructor<?> constr = securityManagerClass.getConstructor(Collection.class);
+            securityManager = (org.apache.shiro.mgt.SecurityManager) constr.newInstance(realmInstances);
         }
     }
 
@@ -91,8 +104,6 @@ public class WebSecurityFilter implements Filter
     }   
     
     
-    @SneakyThrows({ InstantiationException.class, IllegalAccessException.class, 
-        NoSuchMethodException.class, InvocationTargetException.class })
     private boolean backupShiroInit()
     {
         boolean forcedShiroActivateion = false;
@@ -103,15 +114,7 @@ public class WebSecurityFilter implements Filter
                 SecurityUtils.getSecurityManager();
             } catch (UnavailableSecurityManagerException e)
             {
-                List<Object> realmInstances = new LinkedList<>();
-                for (Class<?> realmClass : realmClasses)
-                {
-                    realmInstances.add(realmClass.newInstance());
-                }
-
-                Constructor<?> constr = securityManagerClass.getConstructor(Collection.class);
-                ThreadContext.bind((org.apache.shiro.mgt.SecurityManager)constr.newInstance(realmInstances));
-
+                ThreadContext.bind(securityManager);
                 forcedShiroActivateion = true;
             }
         }
@@ -128,8 +131,9 @@ public class WebSecurityFilter implements Filter
     }
     
     
-    private void parseRealms(String realmsConfigStr) throws ClassNotFoundException
+    private List<Class<?>> parseRealms(String realmsConfigStr) throws ClassNotFoundException
     {
+        List<Class<?>> realmClasses = new LinkedList<>();
         if(realmsConfigStr != null)
         {
             for(String realm : realmsConfigStr.split("[, ]"))
@@ -140,11 +144,11 @@ public class WebSecurityFilter implements Filter
                 }
             }
         }
+        return realmClasses;
     }
 
 
     
     private boolean backupShiroInit = false;
-    private final List<Class<?>> realmClasses = new LinkedList<>();
-    private Class<?> securityManagerClass = DefaultWebSecurityManager.class;
+    private org.apache.shiro.mgt.SecurityManager securityManager;
 }

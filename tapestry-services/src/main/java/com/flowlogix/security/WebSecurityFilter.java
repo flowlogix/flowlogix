@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.security;
 
 import java.io.IOException;
@@ -38,7 +34,8 @@ import org.apache.shiro.web.subject.WebSubject;
 public class WebSecurityFilter implements Filter
 {
     @Override
-    @SneakyThrows(ClassNotFoundException.class)
+    @SneakyThrows({ClassNotFoundException.class, InstantiationException.class, IllegalAccessException.class,
+                    NoSuchMethodException.class, InvocationTargetException.class})
     public void init(FilterConfig fc) throws ServletException
     {
         String backupShiroInitStr = fc.getInitParameter("backupShiroInit");
@@ -49,12 +46,23 @@ public class WebSecurityFilter implements Filter
         
         if(backupShiroInit)
         {
-            parseRealms(fc.getInitParameter("realms"));
+            final List<Class<?>> realmClasses = parseRealms(fc.getInitParameter("realms"));  
+            final List<Realm> realmInstances = new LinkedList<>();
+
+            Class<?> securityManagerClass = DefaultWebSecurityManager.class;
             String securitiyManagerClassStr = fc.getInitParameter("securityManager");
             if(securitiyManagerClassStr != null)
             {
-                securityManagerClass = (Class<? extends org.apache.shiro.mgt.SecurityManager>) ClassUtils.forName(securitiyManagerClassStr);
+                securityManagerClass = ClassUtils.forName(securitiyManagerClassStr);
             }
+            
+            for (Class<?> realmClass : realmClasses)
+            {
+                realmInstances.add((Realm)realmClass.newInstance());
+            }
+
+            Constructor<?> constr = securityManagerClass.getConstructor(Collection.class);
+            securityManager = (org.apache.shiro.mgt.SecurityManager) constr.newInstance(realmInstances);
         }
     }
 
@@ -96,8 +104,6 @@ public class WebSecurityFilter implements Filter
     }   
     
     
-    @SneakyThrows({ InstantiationException.class, IllegalAccessException.class, 
-        NoSuchMethodException.class, InvocationTargetException.class })
     private boolean backupShiroInit()
     {
         boolean forcedShiroActivateion = false;
@@ -108,16 +114,7 @@ public class WebSecurityFilter implements Filter
                 SecurityUtils.getSecurityManager();
             } catch (UnavailableSecurityManagerException e)
             {
-                List<Realm> realmInstances = new LinkedList<>();
-                for (Class<Realm> realmClass : realmClasses)
-                {
-                    realmInstances.add(realmClass.newInstance());
-                }
-
-                Constructor<org.apache.shiro.mgt.SecurityManager> constr = (Constructor<org.apache.shiro.mgt.SecurityManager>) 
-                        securityManagerClass.getConstructor(Collection.class);
-                ThreadContext.bind(constr.newInstance(realmInstances));
-
+                ThreadContext.bind(securityManager);
                 forcedShiroActivateion = true;
             }
         }
@@ -134,23 +131,24 @@ public class WebSecurityFilter implements Filter
     }
     
     
-    private void parseRealms(String realmsConfigStr) throws ClassNotFoundException
+    private List<Class<?>> parseRealms(String realmsConfigStr) throws ClassNotFoundException
     {
+        List<Class<?>> realmClasses = new LinkedList<>();
         if(realmsConfigStr != null)
         {
             for(String realm : realmsConfigStr.split("[, ]"))
             {
                 if(!realm.isEmpty())
                 {
-                    realmClasses.add((Class<Realm>)ClassUtils.forName(realm));
+                    realmClasses.add(ClassUtils.forName(realm));
                 }
             }
         }
+        return realmClasses;
     }
 
 
     
     private boolean backupShiroInit = false;
-    private final List<Class<Realm>> realmClasses = new LinkedList<>();
-    private Class<? extends org.apache.shiro.mgt.SecurityManager> securityManagerClass = DefaultWebSecurityManager.class;
+    private org.apache.shiro.mgt.SecurityManager securityManager;
 }

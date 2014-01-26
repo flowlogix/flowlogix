@@ -1,26 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.ExceptionHandlerAssistantImpl;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
-import java.io.IOException;
 import java.util.regex.Pattern;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.tapestry5.MetaDataConstants;
 import org.apache.tapestry5.SymbolConstants;
-import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.ioc.MappedConfiguration;
-import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.*;
 import org.apache.tapestry5.services.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
 
 /**
@@ -32,13 +23,6 @@ import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
  */
 public class SecurityModule 
 {
-    public SecurityModule(@Symbol(SymbolConstants.ASSET_PATH_PREFIX) String assetPathPrefix)
-    {
-        this.assetPathPrefix = assetPathPrefix;
-        pathProcessor = new GwtModule.PathProcessor(assetPathPrefix);
-    }
-    
-    
     public static void contributeFactoryDefaults(MappedConfiguration<String, String> configuration)
     {
         configuration.add(Symbols.REMEMBER_ME_DURATION, Integer.toString(2 * 7)); // 2 weeks
@@ -60,35 +44,6 @@ public class SecurityModule
         configuration.add(String.format("%s:%s", "security", MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
     }
     
-    
-    /**
-     * See <a href="https://issues.apache.org/jira/browse/TAP5-1779" target="_blank">TAP5-1779</a>
-     */
-    @Contribute(RequestHandler.class)
-    public void disableAssetDirListing(OrderedConfiguration<RequestFilter> configuration,
-                    @Symbol(SymbolConstants.APPLICATION_VERSION) final String applicationVersion,
-                    final Context ctxt)
-    {
-        configuration.add("DisableDirListing", new RequestFilter() {
-            @Override
-            public boolean service(Request request, Response response, RequestHandler handler) throws IOException
-            {
-                final String assetFolder = assetPathPrefix + applicationVersion + "/"
-                        + RequestConstants.CONTEXT_FOLDER;
-                if (request.getPath().startsWith(assetFolder))
-                {
-                    if(request.getPath().endsWith("/") || 
-                            ctxt.getRealFile(pathProcessor.removeAssetPathPart(
-                            request.getPath())).isDirectory())
-                    {
-                        return false;
-                    }
-                }
-                return handler.service(request, response);
-            }
-        }, "before:AssetDispatcher");
-    }      
-
     
     @Match("ComponentRequestFilter")
     public static ComponentRequestFilter decorateEJBSecurityInterceptor(ComponentRequestFilter filter)
@@ -163,9 +118,5 @@ public class SecurityModule
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     private @Inject @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode;
    
-    private final GwtModule.PathProcessor pathProcessor;
-    private final String assetPathPrefix;
     private final Pattern removePortNumber = Pattern.compile(":(80|443)$");
-    
-    private static final Logger logger = LoggerFactory.getLogger(SecurityModule.class);
 }

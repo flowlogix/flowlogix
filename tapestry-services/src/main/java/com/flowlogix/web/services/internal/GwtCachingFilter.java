@@ -2,6 +2,7 @@ package com.flowlogix.web.services.internal;
 
 import com.flowlogix.web.services.GwtModule.PathProcessor;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.Service;
 import org.apache.tapestry5.internal.InternalConstants;
@@ -31,6 +33,7 @@ import org.apache.tapestry5.services.Response;
  * 
  * @author lprimak
  */
+@Slf4j
 public class GwtCachingFilter implements HttpServletRequestFilter
 {
     public GwtCachingFilter(ResourceStreamer streamer, @Service("ContextAssetFactory") AssetFactory contextAssetFactory,
@@ -51,18 +54,12 @@ public class GwtCachingFilter implements HttpServletRequestFilter
     {
         if(rawNeverExpires != null && (!rawNeverExpires.isEmpty()))
         {
-            for(String ext : extSplitPattern.split(rawNeverExpires))
-            {
-                neverExpireExtensions.add(ext);
-            }
+            neverExpireExtensions.addAll(Arrays.asList(extSplitPattern.split(rawNeverExpires)));
         }
 
         if(rawNeverCache != null && (!rawNeverCache.isEmpty()))
         {
-            for(String ext : extSplitPattern.split(rawNeverCache))
-            {
-                neverCachedExtensions.add(ext);
-            }
+            neverCachedExtensions.addAll(Arrays.asList(extSplitPattern.split(rawNeverCache)));
         }        
     }
 
@@ -78,7 +75,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
             return chainHandler.service(request, response);
         }
         
-        log.finer("GwtCachingFilter: Processing " + path);
+        log.debug("GwtCachingFilter: Processing {}", path);
 
         Request rq = new RequestImpl(request, applicationCharset, sessionFactory);
         Response rsp = new ResponseImpl(request, response);
@@ -137,9 +134,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
     private @Inject @Symbol(SymbolConstants.CHARSET) String applicationCharset;
     private final PathProcessor pathProcessor;
     private final RequestGlobals rg;
-    private final List<String> neverExpireExtensions = new LinkedList<String>();
-    private final List<String> neverCachedExtensions = new LinkedList<String>();
+    private final List<String> neverExpireExtensions = new LinkedList<>();
+    private final List<String> neverCachedExtensions = new LinkedList<>();
     private static final Pattern extSplitPattern = Pattern.compile("[;, \t\n\f\r]+");
-    
-    private static final Logger log = Logger.getLogger(GwtCachingFilter.class.getName());
 }

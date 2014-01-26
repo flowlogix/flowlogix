@@ -13,15 +13,16 @@ import org.apache.tapestry5.services.javascript.StylesheetOptions;
  * 
  * @author lprimak
  */
-@Import(library = "spinner-zone-overlay.js", stylesheet = "spinner-zone-overlay.css")
+@Import(stylesheet = "css/spinner-zone-overlay.css")
 public class ZoneLoadingSpinner
 {
     public void afterRender()
     {
+        jsSupport.require("flowlogix/spinner-zone-overlay");
         jsSupport.importStylesheet(new StylesheetLink(ieCSS, new StylesheetOptions().withCondition("IE")));
     }
     
-    
+
     private @Inject JavaScriptSupport jsSupport;
-    private @Inject @Path("spinner-zone-overlay-ie.css") Asset ieCSS;
+    private @Inject @Path("css/spinner-zone-overlay-ie.css") Asset ieCSS;
 }

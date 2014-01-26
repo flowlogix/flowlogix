@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-// Extend the Tapestry.Initializer with a static method that instantiates us
-Tapestry.Initializer.initHighlightRestoreColor = function(_element) {
-    var element = $(_element);
-    element.savedBackgroundColor = element.getStyle('background-color');
-};
+(function() {
+    define(["t5/core/dom", "t5/core/events", "jquery", "//code.jquery.com/ui/1.10.3/jquery-ui.js"], 
+        function(dom, events, $, jqUi) {
+        return function(highlightColor, interval) {
+            dom.onDocument(events.zone.didUpdate, function() {
+                this.$.effect("highlight", { color: highlightColor }, interval);
+            });
+        };
+    });
+}).call(this);

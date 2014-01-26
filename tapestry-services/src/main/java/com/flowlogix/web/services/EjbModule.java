@@ -13,20 +13,20 @@ import javax.ejb.EJBException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Contribute;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
 import org.apache.tapestry5.services.HttpServletRequestHandler;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Integrate EJB3 Beans into the Web site
  *
  * @author lprimak
  */
+@Slf4j
 public class EjbModule
 {
     @Contribute(ComponentClassTransformWorker2.class)
@@ -79,7 +79,4 @@ public class EjbModule
             private final Pattern ejbPattern = Pattern.compile("^ejb:.*");
         }, "after:IgnoredPathsFilter");
     }
-
-
-    private static final Logger log = LoggerFactory.getLogger(EjbModule.class);
 }

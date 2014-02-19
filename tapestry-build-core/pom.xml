@@ -19,7 +19,7 @@
         <war-deps.scope>compile</war-deps.scope>
         <tap.version>5.4-beta-2</tap.version>
         <gwt.version>2.6.0</gwt.version>
-        <guava.version>16.0</guava.version>
+        <guava.version>16.0.1</guava.version>
         <groovy.version>2.2.1</groovy.version>
         <gmaven.runtime>2.0</gmaven.runtime>
         <lombok.version>1.12.4</lombok.version>
@@ -118,7 +118,7 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <type>jar</type>
-            <scope>${war-deps.scope}</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -333,14 +333,14 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
+            <version>1.7.6</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.5</version>
+            <version>1.7.6</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
@@ -395,7 +395,7 @@
                                 <artifactItem>
                                     <groupId>commons-fileupload</groupId>
                                     <artifactId>commons-fileupload</artifactId>
-                                    <version>1.3</version>
+                                    <version>1.3.1</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -415,12 +415,6 @@
                                 <artifactItem>
                                     <groupId>com.google.gwt</groupId>
                                     <artifactId>gwt-user</artifactId>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.projectlombok</groupId>
-                                    <artifactId>lombok</artifactId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>

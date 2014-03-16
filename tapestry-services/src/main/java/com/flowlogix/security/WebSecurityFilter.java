@@ -21,6 +21,7 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.util.ClassUtils;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.subject.WebSubject;
 
 /**
@@ -72,7 +73,8 @@ public class WebSecurityFilter implements Filter
     {
         boolean forcedShiroInit = backupShiroInit();
         
-        if (ThreadContext.getSecurityManager() != null && (SecurityUtils.getSubject() instanceof WebSubject) == false)
+        if (ThreadContext.getSecurityManager() != null && ThreadContext.getSecurityManager() instanceof WebSecurityManager
+                && (SecurityUtils.getSubject() instanceof WebSubject) == false)
         {
             WebSubject subject = new WebSubject.Builder(SecurityUtils.getSecurityManager(), sr, sr1).buildWebSubject();
             subject.execute(new Callable<Void>() {

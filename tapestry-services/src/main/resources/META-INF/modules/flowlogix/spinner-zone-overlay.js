@@ -32,7 +32,7 @@
         };
 
         return function() {
-            dom.onDocument(events.zone.willUpdate, function() {
+            dom.onDocument(events.zone.refresh, function() {
                 createOverlay(this, true);
             });
             dom.onDocument(events.zone.didUpdate, function() {

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import javax.ejb.Remote;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
@@ -47,15 +48,22 @@ public class JNDIObjectLocator
     @SneakyThrows(NamingException.class)
     public<T> T getObject(Class<T> beanClass)
     {
+        boolean remote = beanClass.isAnnotationPresent(Remote.class);
         String name = guessByType(beanClass.getName());
-        return getObject(prependPortableName(name));
+        return getObject(prependPortableName(name), remote && !cacheRemote);
     }
     
     
-    @SuppressWarnings("unchecked")
     public<T> T getObject(String jndiName) throws NamingException
     {
-        return (T)getJNDIObject(jndiName);
+        return getObject(jndiName, false);
+    }
+
+    
+    @SuppressWarnings("unchecked")
+    public<T> T getObject(String jndiName, boolean noCaching) throws NamingException
+    {
+        return (T)getJNDIObject(jndiName, noCaching);
     }
 
     
@@ -151,6 +159,7 @@ public class JNDIObjectLocator
     private @Getter final InitialContext initialContext;
     private @Getter @Setter String portableNamePrefix;
     private @Getter @Setter boolean noCaching = false;
+    private @Getter @Setter boolean cacheRemote = false;
     private final Map<String, Object> jndiObjectCache = Collections.synchronizedMap(new HashMap<String, Object>());
         
     public static final String REMOTE = "REMOTE";

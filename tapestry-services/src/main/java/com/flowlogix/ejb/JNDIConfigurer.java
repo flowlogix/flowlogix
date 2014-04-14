@@ -87,6 +87,7 @@ public class JNDIConfigurer
             locator.setPortableNamePrefix(config.getPrefix());
         }
         locator.setNoCaching(!config.isCache());
+        locator.setCacheRemote(config.isCacheRemote());
         return locator;        
     }
     
@@ -104,7 +105,7 @@ public class JNDIConfigurer
     {
         public Config(String hostname, Integer port, String prefix)
         {
-            this(hostname, port, prefix, false);
+            this(hostname, port, prefix, false, false);
         }
         
         
@@ -112,6 +113,7 @@ public class JNDIConfigurer
         Integer port;
         String prefix;
         boolean cache;
+        boolean cacheRemote;
         final Map<String, String> additionalProperties = new HashMap<>();
     }
 }

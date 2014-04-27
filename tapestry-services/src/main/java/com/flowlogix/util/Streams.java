@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.util;
 
 import java.io.BufferedReader;
@@ -21,7 +17,7 @@ public class Streams
     {
         BufferedReader br = new BufferedReader(new InputStreamReader(strm));
         StringBuilder sb = new StringBuilder();
-        String line = null;
+        String line;
 
         while ((line = br.readLine()) != null) {
             sb.append(line).append("\n");

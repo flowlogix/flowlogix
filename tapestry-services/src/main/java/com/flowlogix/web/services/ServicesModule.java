@@ -1,18 +1,16 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.services;
 
 import com.flowlogix.session.internal.SessionTrackerUtil;
 import com.flowlogix.web.mixins.AutoDisableAfterSubmit;
-import com.flowlogix.web.mixins.AutoZoneColorHighlight;
+import com.flowlogix.web.mixins.FormHorizontal;
 import com.flowlogix.web.services.internal.AjaxAnnotationWorker;
 import com.flowlogix.web.services.internal.AssetMinimizerImpl;
 import com.flowlogix.web.services.internal.MixinAdderWorker;
 import java.io.IOException;
 import org.apache.tapestry5.beanvalidator.BeanValidatorConfigurer;
 import org.apache.tapestry5.beanvalidator.BeanValidatorSource;
+import org.apache.tapestry5.corelib.components.BeanEditForm;
+import org.apache.tapestry5.corelib.components.BeanEditor;
 import org.apache.tapestry5.corelib.components.Submit;
 import org.apache.tapestry5.corelib.components.Zone;
 import org.apache.tapestry5.ioc.Configuration;
@@ -42,6 +40,9 @@ public class ServicesModule
     public static void setFactoryDefaults(MappedConfiguration<String, String> configuration)
     {
         configuration.add(Symbols.MINIMIZE_ASSETS, "true");
+        configuration.add(FormHorizontal.Symbols.LABEL_CLASS_DEFAULT, "col-md-2");
+        configuration.add(FormHorizontal.Symbols.INPUT_CLASS_DEFAULT, "col-md-10");
+        configuration.add(FormHorizontal.Symbols.FORM_HORIZONTAL_DISABLED, "false");
     }
 
 
@@ -59,8 +60,10 @@ public class ServicesModule
         configuration.addInstance("AJAX", AjaxAnnotationWorker.class, "before:Property");
         configuration.add("DisableAfterSubmit", 
                 new MixinAdderWorker(Submit.class, AutoDisableAfterSubmit.class), "after:AJAX");
-        configuration.add("ZoneColorHighlight", 
-                new MixinAdderWorker(Zone.class, AutoZoneColorHighlight.class), "after:AJAX");
+        configuration.add("FormHorizontalBEFSupport",
+                new MixinAdderWorker(BeanEditForm.class, FormHorizontal.class), "after:AJAX");
+        configuration.add("FormHorizontalBESupport",
+                new MixinAdderWorker(BeanEditor.class, FormHorizontal.class), "after:AJAX");
     }
 
     

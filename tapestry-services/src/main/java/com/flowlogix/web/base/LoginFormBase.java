@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.base;
 
 import com.flowlogix.web.components.security.LoginForm;
@@ -10,6 +6,7 @@ import com.flowlogix.web.services.SecurityModule;
 import java.io.IOException;
 import java.net.URL;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -22,8 +19,6 @@ import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tynamo.security.SecuritySymbols;
 import org.tynamo.security.internal.services.LoginContextService;
 import org.tynamo.security.services.SecurityService;
@@ -34,7 +29,7 @@ import org.tynamo.security.services.SecurityService;
  * 
  * @author lprimak
  */
-@Import(library = "DetectJS.js")
+@Slf4j
 public class LoginFormBase
 {
     @SneakyThrows({InterruptedException.class, IOException.class})
@@ -87,7 +82,7 @@ public class LoginFormBase
     {
         Link link = componentResources.createEventLink(ENABLE_JS_EVENT);
         String eventURI = link.toAbsoluteURI(requestGlobals.getRequest().isSecure());
-        jsSupport.addInitializerCall("detectJS", eventURI);
+        jsSupport.require("flowlogix/DetectJS").with(eventURI);
     }
     
     
@@ -110,5 +105,4 @@ public class LoginFormBase
     private @Inject ExternalPageLink externalLink;
 
     public static final String ENABLE_JS_EVENT = "enableJSOnLogin";
-    private static final Logger logger = LoggerFactory.getLogger(LoginForm.class);
 }

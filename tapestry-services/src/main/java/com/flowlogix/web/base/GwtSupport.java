@@ -1,24 +1,23 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.base;
 
+import com.flowlogix.util.GwtSupportLoaded;
+import com.flowlogix.web.mixins.GwtSupportMixin;
 import com.google.common.collect.Lists;
+import java.io.File;
 import java.util.List;
-import java.util.logging.Logger;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.tapestry5.Asset;
 import org.apache.tapestry5.ComponentResources;
-import org.apache.tapestry5.annotations.Environmental;
-import org.apache.tapestry5.annotations.Import;
+import org.apache.tapestry5.MarkupWriter;
+import org.apache.tapestry5.annotations.AfterRender;
+import org.apache.tapestry5.annotations.Mixin;
 import org.apache.tapestry5.annotations.SetupRender;
-import org.apache.tapestry5.internal.services.RequestConstants;
+import org.apache.tapestry5.dom.Element;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.services.ThreadLocale;
 import org.apache.tapestry5.services.AssetSource;
-import org.apache.tapestry5.services.RequestGlobals;
-import org.apache.tapestry5.services.URLEncoder;
-import org.apache.tapestry5.services.assets.AssetPathConstructor;
-import org.apache.tapestry5.services.javascript.JavaScriptSupport;
+import org.apache.tapestry5.services.Environment;
 
 /**
  * <a href="http://code.google.com/p/flowlogix/wiki/TLGwtSupport"
@@ -26,17 +25,23 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * 
  * @author lprimak
  */
-@Import(library="gwtSupport.js")
+@Slf4j
 public abstract class GwtSupport
 {    
     protected abstract Class<?> getEntryPoint();
     protected abstract String getModuleName();
     
-    
+        
     /**
      * Override to add JavaScript initialization code that module depends on
      */
     protected List<String> getJavaScriptInitialization()
+    {
+        return Lists.newLinkedList();
+    }
+    
+    
+    protected List<String> getPostInitScripts()
     {
         return Lists.newLinkedList();
     }
@@ -53,26 +58,60 @@ public abstract class GwtSupport
     
     protected String getGwtModulePath()
     {
-        return contextRoot.constructAssetPath(RequestConstants.CONTEXT_FOLDER, getModuleName());
+        return new File(getGwtModuleAsset().toClientURL()).getParent();
+    }
+    
+    
+    protected Asset getGwtModuleAsset()
+    {
+        final String gwtModule = getModuleName();
+        final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
+        return assetSource.getContextAsset(gwtModuleJSPath, threadLocale.getLocale());        
     }
     
     
     @SetupRender
-    public void addScript()
+    public void init()
+    {
+        // add to redirect list so relative asset paths work
+        GwtSupportLoaded.getModuleNames().add(getModuleName());
+    }
+    
+    
+    @AfterRender
+    public void addScript(MarkupWriter writer)
     {        
-        jsSupport.addScript("GWTComponentController.add('%s','%s')", getEntryPoint().getName(), 
-                addParameters(resources.getCompleteId(), getGWTParameters()));
+        Element head = writer.getDocument().find("html/head");
         
-        final String gwtModule = getModuleName();
-        final String supportVariablePath = "flowlogix/js/GwtSupportVariable";
-        for (String var : getJavaScriptInitialization())
+        GwtSupportLoaded supportScriptLoaded = environment.peek(GwtSupportLoaded.class);
+        if(supportScriptLoaded == null)
         {
-            jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s",
-                    requestGlobals.getRequest().getContextPath(), supportVariablePath,
-                    urlEncoder.encode(var)));
+            // only one copy of module initializations per page
+            supportScriptLoaded = new GwtSupportLoaded();
+            environment.push(GwtSupportLoaded.class, supportScriptLoaded);
+            List<String> initList = getJavaScriptInitialization();
+            Element scriptElement = initList.isEmpty() ? null : head.element("script");
+            for (String var : getJavaScriptInitialization())
+            {
+                scriptElement.raw(var);
+            }
+        
+            head.element("script", "src", mixin.getGwtSupportAsset().toClientURL());
         }
-        final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
-        jsSupport.importJavaScriptLibrary(assetSource.getExpandedAsset(gwtModuleJSPath));
+        head.element("script").raw(String.format("GWTComponentController.add('%s', '%s');", 
+                getEntryPoint().getName(), addParameters(resources.getCompleteId(), getGWTParameters())));
+
+        if(supportScriptLoaded.getModulesLoaded().contains(getModuleName()) == false)
+        {
+            // only one copy of module script per page
+            supportScriptLoaded.getModulesLoaded().add(getModuleName());
+            head.element("script", "src", getGwtModuleAsset().toClientURL());
+        }
+        
+        for(String var : getPostInitScripts())
+        {
+            head.element("script", "src", var);
+        }
     }    
    
     
@@ -88,11 +127,9 @@ public abstract class GwtSupport
     }
     
     
-    private @Environmental JavaScriptSupport jsSupport;
     private @Inject AssetSource assetSource;
+    private @Inject ThreadLocale threadLocale;
     private @Getter @Inject ComponentResources resources;
-    private @Inject RequestGlobals requestGlobals;
-    private @Inject AssetPathConstructor contextRoot;
-    private @Inject URLEncoder urlEncoder;
-    private static final Logger log = Logger.getLogger(GwtSupport.class.getName());
+    private @Mixin GwtSupportMixin mixin;
+    private @Inject Environment environment;
 }

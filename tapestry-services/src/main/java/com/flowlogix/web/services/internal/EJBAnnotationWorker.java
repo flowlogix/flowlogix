@@ -20,6 +20,7 @@ import com.flowlogix.ejb.JNDIObjectLocator;
 import com.flowlogix.web.services.annotations.Stateful;
 import javax.ejb.EJB;
 import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import lombok.SneakyThrows;
 import org.apache.shiro.util.StringUtils;
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -29,7 +30,6 @@ import org.apache.tapestry5.plastic.InstanceContext;
 import org.apache.tapestry5.plastic.PlasticClass;
 import org.apache.tapestry5.plastic.PlasticField;
 import org.apache.tapestry5.services.RequestGlobals;
-import org.apache.tapestry5.services.Session;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
 import org.apache.tapestry5.services.transform.TransformationSupport;
 
@@ -149,13 +149,17 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
                 return locator.getJNDIObject(lookupname, true);
             }
             
-            final Session session = rg.getRequest().getSession(true);
-        
-            Object rv = session.getAttribute(attributeName);
-            if(rv == null)
+            final HttpSession session = rg.getHTTPServletRequest().getSession(true);
+            
+            Object rv;
+            synchronized(session.getId().intern())
             {
-                rv = locator.getJNDIObject(lookupname, stateful != null); 
-                session.setAttribute(attributeName, rv);
+                rv = session.getAttribute(attributeName);
+                if (rv == null)
+                {
+                    rv = locator.getJNDIObject(lookupname, stateful != null);
+                    session.setAttribute(attributeName, rv);
+                }
             }
             return rv;
         }

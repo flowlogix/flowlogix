@@ -3,9 +3,8 @@ package com.flowlogix.web.services;
 import com.flowlogix.ejb.Pingable;
 import com.flowlogix.web.services.internal.EJBAnnotationWorker;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -51,24 +50,26 @@ public class EjbModule
                 HttpSession session = request.getSession(false);
                 if(session != null)
                 {
-                    @SuppressWarnings("unchecked")
-                    final List<String> _allAttrs = Collections.list(session.getAttributeNames());
-                    final Collection<String> allAttrs = Collections2.filter(_allAttrs, Predicates.contains(ejbPattern));
-                    for (String attrName : allAttrs)
+                    synchronized(session.getId().intern())
                     {
-                        try
+                        List<String> attrNames = FluentIterable.from(Collections.list(session.getAttributeNames()))
+                                .filter(Predicates.contains(ejbPattern)).toList();
+                        for (String attrName : attrNames)
                         {
-                            Object _pingable = session.getAttribute(attrName);
-                            if (_pingable instanceof Pingable)
+                            try
                             {
-                                Pingable pingable = (Pingable) _pingable;
-                                pingable.ping();
+                                Object _pingable = session.getAttribute(attrName);
+                                if (_pingable instanceof Pingable)
+                                {
+                                    Pingable pingable = (Pingable) _pingable;
+                                    pingable.ping();
+                                }
+                            } 
+                            catch (EJBException e)
+                            {
+                                log.debug("Failed to Ping Stateful EJBs", e);
+                                session.removeAttribute(attrName);
                             }
-                        }
-                        catch (EJBException e)
-                        {
-                            log.debug("Failed to Ping Stateful EJBs", e);
-                            session.removeAttribute(attrName);
                         }
                     }
                 }

@@ -17,6 +17,7 @@ package com.flowlogix.web.services.internal;
 
 import com.flowlogix.ejb.JNDIConfigurer;
 import com.flowlogix.ejb.JNDIObjectLocator;
+import com.flowlogix.ejb.StatefulUtil;
 import com.flowlogix.web.services.annotations.Stateful;
 import javax.ejb.EJB;
 import javax.naming.NamingException;
@@ -134,7 +135,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         {
             this.lookupname = lookupname;
             this.stateful = stateful;
-            this.attributeName = "ejb:" + attributeName;
+            this.attributeName = StatefulUtil.ejbPrefix + attributeName;
             this.fieldName = fieldName;
             this.locator = locator;
         }

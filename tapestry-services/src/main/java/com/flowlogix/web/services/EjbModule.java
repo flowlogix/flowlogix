@@ -13,8 +13,6 @@ import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
 import org.apache.tapestry5.services.HttpServletRequestHandler;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Integrate EJB3 Beans into the Web site
@@ -51,7 +49,4 @@ public class EjbModule
             }
         }, "after:IgnoredPathsFilter");
     }
-
-
-    private static final Logger log = LoggerFactory.getLogger(EjbModule.class);
 }

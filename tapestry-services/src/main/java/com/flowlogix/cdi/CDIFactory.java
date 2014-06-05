@@ -18,8 +18,8 @@ import org.slf4j.Logger;
  */
 public class CDIFactory {
 
-	private BeanManager beanManager;
-	private Logger log;
+	private final BeanManager beanManager;
+	private final Logger log;
 	public CDIFactory(Logger log, BeanManager bm) {
 		this.beanManager = bm;
 		this.log = log;
@@ -36,11 +36,16 @@ public class CDIFactory {
                 return null;
             }
 		if(beans!=null && beans.size()>0) {
+                        @SuppressWarnings("unchecked")
 			Bean<T> bean = (Bean<T>) beans.iterator().next();		
-			CreationalContext<T> ctx = beanManager.createCreationalContext(bean);			
-			T o = clazz.cast(beanManager.getReference(bean, clazz, ctx)); 
-			log.debug("Found and returning: "+clazz.getCanonicalName());
-			return o;	
+			CreationalContext<T> ctx = beanManager.createCreationalContext(bean);	
+                        try
+                        {
+                            T o = clazz.cast(beanManager.getReference(bean, clazz, ctx)); 
+                            log.debug("Found and returning: "+clazz.getCanonicalName());
+                            return o;
+                        }
+                        catch(Exception e) {}
 		}
 		return null;
 	}

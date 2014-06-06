@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2013 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.flowlogix.util;
 
-// Extend the Tapestry.Initializer with a static method that instantiates us
-Tapestry.Initializer.initHighlightRestoreColor = function(_element) {
-    var element = $(_element);
-    element.savedBackgroundColor = element.getStyle('background-color');
-};
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import lombok.Getter;
+
+/**
+ *
+ * @author lprimak
+ */
+public class GwtSupportLoaded
+{
+    private @Getter Set<String> modulesLoaded = new HashSet<>();
+    private static @Getter final Set<String> moduleNames = Collections.synchronizedSet(new HashSet<String>());
+}

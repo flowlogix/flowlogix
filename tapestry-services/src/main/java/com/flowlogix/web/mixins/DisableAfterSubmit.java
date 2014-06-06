@@ -1,17 +1,11 @@
 package com.flowlogix.web.mixins;
 
 import com.flowlogix.web.services.internal.MixinAdderWorker;
-import org.apache.tapestry5.ClientElement;
 import org.apache.tapestry5.ComponentResources;
-import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
-import org.apache.tapestry5.annotations.Import;
-import org.apache.tapestry5.annotations.InjectContainer;
 import org.apache.tapestry5.corelib.components.Submit;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.Environment;
-import org.apache.tapestry5.services.FormSupport;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -20,25 +14,15 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * 
  * @author lprimak
  */
-@Import(library="DisableAfterSubmit.js")
 public class DisableAfterSubmit
 {
-    @AfterRender
-    private void addDisabler()
-    {
-        if(MixinAdderWorker.isCorrectType(Submit.class, cr))
-        {
-            enableSubmitProcessing(clientElement, fs, js);
-        }
-    }
-    
-    
     private void setupRender()
     {
         if(!MixinAdderWorker.isCorrectType(Submit.class, cr))
         {
             environment.push(DisableAfterSubmit.class, this);
         }
+        js.require("flowlogix/DisableAfterSubmit");
     }
     
     
@@ -49,20 +33,9 @@ public class DisableAfterSubmit
             environment.pop(DisableAfterSubmit.class);
         }
     }
+
     
-    
-    static public void enableSubmitProcessing(ClientElement clientElement, FormSupport fs, JavaScriptSupport js)
-    {
-        JSONObject spec = new JSONObject();
-        spec.put("elementId", clientElement.getClientId());
-        spec.put("formId", fs.getClientId());
-        js.addInitializerCall("disableAfterSubmit", spec);
-    }
-    
-    
-    private @Inject ComponentResources cr;
     private @Environmental JavaScriptSupport js;
-    private @InjectContainer ClientElement clientElement;
-    private @Environmental(false) FormSupport fs;
+    private @Inject ComponentResources cr;
     private @Inject Environment environment;
 }

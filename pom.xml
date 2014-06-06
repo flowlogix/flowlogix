@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>1.2.15-SNAPSHOT</version>
+    <version>1.2.15</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Utility Library Root POM</description>
@@ -41,7 +41,7 @@
      
     <scm>
         <developerConnection>scm:hg:https://code.google.com/p/flowlogix/</developerConnection>
-      <tag>HEAD</tag>
+      <tag>VERS_1.2.15-20140605</tag>
   </scm>
     
     <profiles>

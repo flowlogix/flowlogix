@@ -18,6 +18,7 @@ import lombok.SneakyThrows;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.ExecutionException;
 import org.apache.shiro.util.ClassUtils;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -69,6 +70,7 @@ public class WebSecurityFilter implements Filter
 
     
     @Override
+    @SneakyThrows(Throwable.class)
     public void doFilter(final ServletRequest sr, final ServletResponse sr1, final FilterChain fc) throws IOException, ServletException
     {
         boolean forcedShiroInit = backupShiroInit();
@@ -77,18 +79,34 @@ public class WebSecurityFilter implements Filter
                 && (SecurityUtils.getSubject() instanceof WebSubject) == false)
         {
             WebSubject subject = new WebSubject.Builder(SecurityUtils.getSecurityManager(), sr, sr1).buildWebSubject();
-            subject.execute(new Callable<Void>() {
-
-                @Override
-                public Void call() throws Exception 
+            try {
+                subject.execute(new Callable<Void>()
                 {
-                    if(fc != null)
+                    @Override
+                    public Void call() throws Exception
                     {
-                        fc.doFilter(sr, sr1);
+                        if (fc != null)
+                        {
+                            fc.doFilter(sr, sr1);
+                        }
+                        return null;
                     }
-                    return null;
+                });
+            }            
+            catch(ExecutionException e)
+            {
+                // unwrap Shiro's ExecutionException, interferes
+                // with global exceptino handling mechanisms
+                Throwable cause = e.getCause();
+                if(cause != null)
+                {
+                    throw cause;
                 }
-            });
+                else
+                {
+                    throw e;
+                }
+            }
         }
         else
         {

@@ -18,11 +18,11 @@
     <properties>
         <war-deps.scope>compile</war-deps.scope>
         <tap.version>5.3.7</tap.version>
-        <gwt.version>2.6.0</gwt.version>
-        <guava.version>16.0.1</guava.version>
-        <groovy.version>2.2.1</groovy.version>
+        <gwt.version>2.6.1</gwt.version>
+        <guava.version>17.0</guava.version>
+        <groovy.version>2.3.4</groovy.version>
         <gmaven.runtime>2.0</gmaven.runtime>
-        <lombok.version>1.12.6</lombok.version>
+        <lombok.version>1.14.4</lombok.version>
     </properties>
         
     <profiles>
@@ -262,28 +262,28 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.18.1-GA</version>
+            <version>3.18.2-GA</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.6</version>
+            <version>1.7.7</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.6</version>
+            <version>1.7.7</version>
             <type>jar</type>
             <scope>${war-deps.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr-runtime</artifactId>
-            <version>3.5.1</version>
+            <version>3.5.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.antlr</groupId>
@@ -317,7 +317,7 @@
                                 <artifactItem>
                                     <groupId>commons-beanutils</groupId>
                                     <artifactId>commons-beanutils</artifactId>
-                                    <version>1.9.1</version>
+                                    <version>1.9.2</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -497,7 +497,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.16</version>
+                <version>2.17</version>
                 <configuration>
                     <includes>
                         <include>**/test/**</include>                     
@@ -510,7 +510,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.2</version>
+                    <version>1.3</version>
                     <executions>
                         <execution>
                             <id>buildid</id>

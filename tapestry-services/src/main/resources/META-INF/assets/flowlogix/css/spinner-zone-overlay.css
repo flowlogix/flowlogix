@@ -30,7 +30,7 @@ DIV.zone-loading-overlay {
     -moz-animation-duration: 250ms;
     -moz-animation-delay: 50ms;
     -moz-animation-fill-mode: forwards;
-    background-image: url(spinner-zone-loading.gif);
+    background-image: url(../images/spinner-zone-loading.gif);
     background-repeat: no-repeat;
     background-position: center center;
     z-index: 9999;

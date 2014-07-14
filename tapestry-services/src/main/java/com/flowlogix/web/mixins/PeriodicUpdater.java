@@ -6,14 +6,11 @@ package com.flowlogix.web.mixins;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Link;
-import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Environmental;
-import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.InjectContainer;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.corelib.components.Zone;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 
 /**
@@ -22,10 +19,9 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * 
  * @author lprimak
  */
-@Import(library="PeriodicUpdater.js")
 public class PeriodicUpdater
 {
-    /**
+        /**
      * The name of the event to call to update the zone.
      */
     @Parameter(required = true, defaultPrefix = BindingConstants.LITERAL)
@@ -37,6 +33,10 @@ public class PeriodicUpdater
     @Parameter
     private String context;
  
+    /**
+     * runs a refresh only once if true
+     */
+    @Parameter(defaultPrefix = BindingConstants.LITERAL, value = "false") boolean deferOnce;
     /**
      * How long, in seconds, to wait between the end of one request and the beginning of the next.
      */
@@ -51,11 +51,10 @@ public class PeriodicUpdater
  
     @Environmental
     private JavaScriptSupport jsSupport;
- 
-
-    @AfterRender
-    void afterRender() {
- 
+    
+     
+    void afterRender() 
+    {
         final String id = zone.getClientId();
  
         Link link;
@@ -68,12 +67,7 @@ public class PeriodicUpdater
             link = resources.createEventLink(event, context);
         }
  
-        final JSONObject spec = new JSONObject();
- 
-        spec.put("period", period);
-        spec.put("elementId", id);
-        spec.put("uri", link.toAbsoluteURI());
-
-        jsSupport.addInitializerCall("periodicUpdater", spec);
+        jsSupport.require("flowlogix/PeriodicUpdater").invoke("init").
+                with(id, period, link.toAbsoluteURI(), deferOnce);
     }
 }

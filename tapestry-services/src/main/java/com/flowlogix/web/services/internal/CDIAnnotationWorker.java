@@ -44,7 +44,7 @@ public class CDIAnnotationWorker implements ComponentClassTransformWorker2 {
 			TransformationSupport support, MutableComponentModel model) {
 		for (PlasticField field : plasticClass.getFieldsWithAnnotation(CDI.class)) {
 			final CDI annotation = field.getAnnotation(CDI.class);
-			Class type = cache.forName(field.getTypeName());
+			Class<?> type = cache.forName(field.getTypeName());
 			final Object injectionValue = cdiFactory.get(type);
 			if (injectionValue != null) {
 				field.inject(injectionValue);

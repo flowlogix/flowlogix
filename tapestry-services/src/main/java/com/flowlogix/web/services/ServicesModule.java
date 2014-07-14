@@ -12,16 +12,15 @@ import org.apache.tapestry5.beanvalidator.BeanValidatorSource;
 import org.apache.tapestry5.corelib.components.BeanEditForm;
 import org.apache.tapestry5.corelib.components.BeanEditor;
 import org.apache.tapestry5.corelib.components.Submit;
-import org.apache.tapestry5.corelib.components.Zone;
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Contribute;
+import org.apache.tapestry5.ioc.annotations.ImportModule;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.ioc.annotations.Primary;
-import org.apache.tapestry5.ioc.annotations.SubModule;
 import org.apache.tapestry5.ioc.services.FactoryDefaults;
 import org.apache.tapestry5.ioc.services.SymbolProvider;
 import org.apache.tapestry5.services.*;
@@ -32,7 +31,7 @@ import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
  * 
  * @author lprimak
  */
-@SubModule({ EjbModule.class, GwtModule.class, SecurityModule.class, CDIModule.class })
+@ImportModule({ EjbModule.class, GwtModule.class, SecurityModule.class, CDIModule.class })
 public class ServicesModule 
 {    
     @Contribute(SymbolProvider.class)

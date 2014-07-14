@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.base;
 
 import com.flowlogix.web.components.security.LoginForm;
@@ -16,7 +12,12 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Link;
-import org.apache.tapestry5.annotations.*;
+import org.apache.tapestry5.annotations.AfterRender;
+import org.apache.tapestry5.annotations.Environmental;
+import org.apache.tapestry5.annotations.Import;
+import org.apache.tapestry5.annotations.OnEvent;
+import org.apache.tapestry5.annotations.SessionAttribute;
+import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -37,8 +38,24 @@ import org.tynamo.security.services.SecurityService;
 @Import(library = "DetectJS.js")
 public class LoginFormBase
 {
-    @SneakyThrows({InterruptedException.class, IOException.class})
+    @SneakyThrows(IOException.class)
     public Object login(String tynamoLogin, String tynamoPassword, boolean tynamoRememberMe, String host) throws ShiroException
+    {
+        loginWithoutRedirect(tynamoLogin, tynamoPassword, true, host);
+        final String successLink = externalLink.createLink(contextService.getSuccessPage(), true);
+
+        if (redirectToSavedUrl)
+        {
+            contextService.redirectToSavedRequest(successLink);
+            return null;
+        }
+        
+        return new URL(successLink);
+    }
+    
+    
+    @SneakyThrows(InterruptedException.class)
+    public void loginWithoutRedirect(String tynamoLogin, String tynamoPassword, boolean tynamoRememberMe, String host) throws ShiroException
     {
         Subject currentUser = securityService.getSubject();
 
@@ -62,16 +79,6 @@ public class LoginFormBase
             }
             throw ae;
         }
-
-        final String successLink = externalLink.createLink(contextService.getSuccessPage(), true);
-
-        if (redirectToSavedUrl)
-        {
-            contextService.redirectToSavedRequest(successLink);
-            return null;
-        }
-        
-        return new URL(successLink);
     }
     
     

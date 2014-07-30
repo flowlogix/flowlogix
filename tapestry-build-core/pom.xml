@@ -16,6 +16,7 @@
     </parent>
 
     <properties>
+        <java.code.version>1.7</java.code.version>
         <war-deps.scope>compile</war-deps.scope>
         <tap.version>5.3.7</tap.version>
         <gwt.version>2.6.1</gwt.version>
@@ -490,8 +491,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${java.code.version}</source>
+                    <target>${java.code.version}</target>
                 </configuration>
             </plugin>
             <plugin>

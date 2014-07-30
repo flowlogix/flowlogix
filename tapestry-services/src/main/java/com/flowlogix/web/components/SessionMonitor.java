@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.flowlogix.web.components;
 
 import com.flowlogix.web.mixins.SessionTracker;
@@ -11,8 +7,10 @@ import org.apache.shiro.session.Session;
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Link;
+import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.annotations.*;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.json.JSONObject;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.javascript.JavaScriptSupport;
@@ -23,7 +21,6 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * 
  * @author lprimak
  */
-@Import(library = "SessionMonitor.js")
 public class SessionMonitor extends SessionTracker
 {
     JSONObject onCheckidle() 
@@ -63,12 +60,7 @@ public class SessionMonitor extends SessionTracker
         {
             _endedHandler = endedHandler;
         }
-    }
-
-    
-    @AfterRender
-    public void afterRender() 
-    {
+        
         Link link = componentResources.createEventLink(eventName);
         String baseURI = link.toAbsoluteURI(request.isSecure());
         int index = baseURI.indexOf(":" + eventName);
@@ -78,24 +70,26 @@ public class SessionMonitor extends SessionTracker
         baseURI = baseURI.substring(0, index + 1);
 
         JSONObject spec = new JSONObject();
-        spec.put("contextPath", request.getContextPath());
+        spec.put("contextPath", contextPath);
         spec.put("baseURI", baseURI);
         spec.put("defaultURIparameters", defaultURIparameters);
         spec.put("keepAlive", keepAlive);
         spec.put("endOnClose", true);
         spec.put("idleCheckSeconds", idleCheck);
         spec.put("endedHandler", _endedHandler);
-        jsSupport.addInitializerCall("sessionMonitor", spec);
+        
+        jsSupport.require("flowlogix/SessionMonitor").with(spec);
     }
+
+        
+    private @Parameter("15") int idleCheck;
+    private @Parameter(defaultPrefix = BindingConstants.LITERAL, value = "end") @NotNull String endedHandler;
+    private @Parameter("false") boolean keepAlive;
     
-    
-    @Parameter("15") private int idleCheck;
-    @Parameter(defaultPrefix = BindingConstants.LITERAL, value = "end") @NotNull private String endedHandler;
-    @Parameter("false") private boolean keepAlive;
-    
-    @Inject private ComponentResources componentResources;
-    @Environmental private JavaScriptSupport jsSupport;    
-    @Inject private Request request;
+    private @Inject ComponentResources componentResources;
+    private @Environmental JavaScriptSupport jsSupport;    
+    private @Inject Request request;
+    private @Inject @Symbol(SymbolConstants.CONTEXT_PATH) String contextPath;
     
     private String _endedHandler;
 

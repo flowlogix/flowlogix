@@ -368,12 +368,6 @@
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.codehaus.groovy</groupId>
-                                    <artifactId>groovy-all</artifactId>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>org.apache.shiro</groupId>
                                     <artifactId>shiro-core</artifactId>
                                     <type>jar</type>

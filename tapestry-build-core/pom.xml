@@ -21,8 +21,7 @@
         <tap.version>5.4-beta-6</tap.version>
         <gwt.version>2.6.1</gwt.version>
         <guava.version>17.0</guava.version>
-        <groovy.version>2.3.4</groovy.version>
-        <gmaven.runtime>2.0</gmaven.runtime>
+        <groovy.version>2.3.6</groovy.version>
         <lombok.version>1.14.4</lombok.version>
     </properties>
         
@@ -137,13 +136,8 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
+            <classifier>indy</classifier>
             <scope>${war-deps.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.gmaven.runtime</groupId>
-            <artifactId>gmaven-runtime-${gmaven.runtime}</artifactId>
-            <version>1.5</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
@@ -432,12 +426,6 @@
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.codehaus.groovy</groupId>
-                                    <artifactId>groovy-all</artifactId>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>org.apache.shiro</groupId>
                                     <artifactId>shiro-core</artifactId>
                                     <type>jar</type>
@@ -623,42 +611,24 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.gmaven</groupId>
-                    <artifactId>gmaven-plugin</artifactId>
-                    <version>1.5</version>
+                    <groupId>org.codehaus.gmavenplus</groupId>
+                    <artifactId>gmavenplus-plugin</artifactId>
+                    <version>1.2</version>
                     <executions>
                         <execution>
                             <id>compile</id>
                             <goals>
+                                <goal>addSources</goal>
+                                <goal>addTestSources</goal>
                                 <goal>generateStubs</goal>
                                 <goal>compile</goal>
-                            </goals>
-                            <configuration>
-                                <sources>
-                                    <fileset>
-                                        <directory>${pom.basedir}/src/main/groovy</directory>
-                                        <includes>
-                                            <include>**/*.groovy</include>
-                                        </includes>
-                                    </fileset>
-                                </sources>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>test-compile</id>
-                            <goals>
-                                <goal>generateTestStubs</goal>
+                                <goal>testGenerateStubs</goal>
                                 <goal>testCompile</goal>
+                                <goal>removeStubs</goal>
+                                <goal>removeTestStubs</goal>                            
                             </goals>
                             <configuration>
-                                <sources>
-                                    <fileset>
-                                        <directory>${pom.basedir}/src/test/groovy</directory>
-                                        <includes>
-                                            <include>**/*.groovy</include>
-                                        </includes>
-                                    </fileset>
-                                </sources>
+                                 <invokeDynamic>true</invokeDynamic>
                             </configuration>
                         </execution>
                     </executions>

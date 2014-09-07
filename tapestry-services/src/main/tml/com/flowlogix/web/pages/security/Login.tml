@@ -4,6 +4,14 @@
     <head>
         <title>Please Log In</title>
         <style type="text/css">
+            .form-control {
+                height: auto;
+                display: inline;
+            }
+            label {
+                font-weight: inherit;
+            }
+            
             #flowlogixLoginFormContainer {
                 background: url(${asset:classpath:org/tynamo/security/img/login-bg.png}) no-repeat;
                 width:778px;

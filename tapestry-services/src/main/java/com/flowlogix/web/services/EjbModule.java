@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.web.session.HttpServletSession;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Contribute;
@@ -19,6 +20,7 @@ import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
  *
  * @author lprimak
  */
+@Slf4j
 public class EjbModule
 {
     @Contribute(ComponentClassTransformWorker2.class)

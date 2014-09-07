@@ -15,25 +15,16 @@
  */
 package com.flowlogix.web.mixins;
 
-import org.apache.tapestry5.ClientElement;
-import org.apache.tapestry5.annotations.Environmental;
-import org.apache.tapestry5.annotations.Import;
-import org.apache.tapestry5.annotations.InjectContainer;
-import org.apache.tapestry5.services.javascript.JavaScriptSupport;
+import lombok.Getter;
+import org.apache.tapestry5.Asset;
+import org.apache.tapestry5.annotations.Path;
+import org.apache.tapestry5.ioc.annotations.Inject;
 
 /**
- * Internal mixin for ColorHighlightOverride
+ *
  * @author lprimak
  */
-@Import(library="ColorHighlightInitializer.js")
-public class AutoZoneColorHighlight
-{    
-    private void afterRender()
-    {
-        js.addInitializerCall("initHighlightRestoreColor", container.getClientId());        
-    }  
-    
-    
-    private @Environmental JavaScriptSupport js;
-    private @InjectContainer ClientElement container;
+public class GwtSupportMixin
+{
+    private @Getter @Inject @Path("js/GwtSupport.js") Asset gwtSupportAsset;
 }

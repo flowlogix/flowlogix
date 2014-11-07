@@ -9,25 +9,6 @@
     <name>Flow Logix Tapestry Services</name>
     <description>Flow Logix Utility Library for Tapestry</description>
     <url>http://code.google.com/p/flowlogix</url>
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <scm>
-        <url>http://code.google.com/p/flowlogix/source/browse/</url>
-        <connection>scm:hg:http://code.google.com/p/flowlogix/</connection>
-      <tag>HEAD</tag>
-  </scm>
-    <developers>
-        <developer>
-            <id>lprimak</id>
-            <name>Lenny Primak</name>
-            <email>lenny@flowlogix.com</email>
-        </developer>
-    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

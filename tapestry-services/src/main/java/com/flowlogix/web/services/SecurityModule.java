@@ -4,6 +4,7 @@
  */
 package com.flowlogix.web.services;
 
+import com.flowlogix.web.services.internal.AssetPathProcessor;
 import com.flowlogix.web.services.internal.ExceptionHandlerAssistantImpl;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.IOException;
@@ -17,10 +18,18 @@ import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
-import org.apache.tapestry5.ioc.annotations.*;
-import org.apache.tapestry5.services.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.tapestry5.ioc.annotations.Contribute;
+import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.ioc.annotations.Local;
+import org.apache.tapestry5.ioc.annotations.Match;
+import org.apache.tapestry5.ioc.annotations.Symbol;
+import org.apache.tapestry5.services.BaseURLSource;
+import org.apache.tapestry5.services.ComponentRequestFilter;
+import org.apache.tapestry5.services.Context;
+import org.apache.tapestry5.services.Request;
+import org.apache.tapestry5.services.RequestFilter;
+import org.apache.tapestry5.services.RequestHandler;
+import org.apache.tapestry5.services.Response;
 import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
 
 /**
@@ -35,7 +44,7 @@ public class SecurityModule
     public SecurityModule(@Symbol(SymbolConstants.ASSET_PATH_PREFIX) String assetPathPrefix)
     {
         this.assetPathPrefix = assetPathPrefix;
-        pathProcessor = new GwtModule.PathProcessor(assetPathPrefix);
+        pathProcessor = new AssetPathProcessor(assetPathPrefix);
     }
     
     
@@ -163,9 +172,7 @@ public class SecurityModule
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     private @Inject @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode;
    
-    private final GwtModule.PathProcessor pathProcessor;
+    private final AssetPathProcessor pathProcessor;
     private final String assetPathPrefix;
     private final Pattern removePortNumber = Pattern.compile(":(80|443)$");
-    
-    private static final Logger logger = LoggerFactory.getLogger(SecurityModule.class);
 }

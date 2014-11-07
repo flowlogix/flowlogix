@@ -2,17 +2,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.flowlogix.web.services;
+package com.flowlogix.webgwt.services;
 
-import com.flowlogix.web.services.internal.GwtCachingFilter;
-import java.util.logging.Logger;
-import org.apache.tapestry5.internal.services.RequestConstants;
+import com.flowlogix.webgwt.services.internal.GwtCachingFilter;
+import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.annotations.Contribute;
 import org.apache.tapestry5.ioc.services.FactoryDefaults;
 import org.apache.tapestry5.ioc.services.SymbolProvider;
+import org.apache.tapestry5.services.ComponentClassResolver;
 import org.apache.tapestry5.services.HttpServletRequestFilter;
+import org.apache.tapestry5.services.LibraryMapping;
 
 /**
  * Provides forever caching of GWT assets,
@@ -23,6 +24,13 @@ import org.apache.tapestry5.services.HttpServletRequestFilter;
  */
 public class GwtModule 
 {    
+    @Contribute(ComponentClassResolver.class)
+    public static void addLibrary(Configuration<LibraryMapping> configuration)
+    {
+        configuration.add(new LibraryMapping("flowlogixgwt", "com.flowlogix.webgwt"));
+    }
+
+    
     public void contributeHttpServletRequestHandler(OrderedConfiguration<HttpServletRequestFilter> config)
     {
         // add GWT html caching and gzip compression
@@ -39,25 +47,4 @@ public class GwtModule
         config.add(GwtCachingFilter.Symbols.NEVER_CACHE, "");
         config.add(GwtCachingFilter.Symbols.NEVER_EXPIRE, ".cache.html");
     }
-
-    
-    public static class PathProcessor
-    {
-        public PathProcessor(String assetPathPrefix)
-        {
-            filter = String.format("%s.*\\/%s", assetPathPrefix, RequestConstants.CONTEXT_FOLDER);
-        }
-        
-        
-        public String removeAssetPathPart(String path)
-        {
-            return path.replaceFirst(filter, "");
-        }
-        
-        
-        private final String filter;
-    }
-    
-    
-    private static final Logger log = Logger.getLogger(GwtModule.class.getName());
 }

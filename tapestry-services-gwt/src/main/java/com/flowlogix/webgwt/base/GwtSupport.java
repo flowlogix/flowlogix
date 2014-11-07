@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.flowlogix.web.base;
+package com.flowlogix.webgwt.base;
 
 import com.google.common.collect.Lists;
 import java.util.List;
@@ -35,6 +35,7 @@ public abstract class GwtSupport
     
     /**
      * Override to add JavaScript initialization code that module depends on
+     * @return 
      */
     protected List<String> getJavaScriptInitialization()
     {
@@ -44,6 +45,7 @@ public abstract class GwtSupport
     
     /**
      * Override to add parameters to the GWT component
+     * @return 
      */
     protected List<String> getGWTParameters()
     {

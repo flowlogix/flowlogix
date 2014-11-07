@@ -1,6 +1,6 @@
-package com.flowlogix.web.services.internal;
+package com.flowlogix.webgwt.services.internal;
 
-import com.flowlogix.web.services.GwtModule.PathProcessor;
+import com.flowlogix.web.services.internal.AssetPathProcessor;
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
@@ -42,7 +42,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
         this.carh = new ContextAssetRequestHandler(streamer, contextAssetFactory.getRootResource());
         this.sessionFactory = sessionFactory;
         this.rg = rg;
-        this.pathProcessor = new PathProcessor(assetPathPrefix);
+        this.pathProcessor = new AssetPathProcessor(assetPathPrefix);
         configure(rawNeverExpires, rawNeverCache);
     }
 
@@ -135,7 +135,7 @@ public class GwtCachingFilter implements HttpServletRequestFilter
     private final ContextAssetRequestHandler carh;
     private final TapestrySessionFactory sessionFactory;
     private @Inject @Symbol(SymbolConstants.CHARSET) String applicationCharset;
-    private final PathProcessor pathProcessor;
+    private final AssetPathProcessor pathProcessor;
     private final RequestGlobals rg;
     private final List<String> neverExpireExtensions = new LinkedList<String>();
     private final List<String> neverCachedExtensions = new LinkedList<String>();

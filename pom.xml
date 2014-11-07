@@ -63,11 +63,6 @@
         </plugins>
     </build>
      
-    <scm>
-        <developerConnection>scm:hg:https://code.google.com/p/flowlogix/</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
-    
     <profiles>
         <profile>
             <id>release-flowlogix-prod</id>

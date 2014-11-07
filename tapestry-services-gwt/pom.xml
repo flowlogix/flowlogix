@@ -31,7 +31,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Tapestry-Module-Classes>${project.groupId}.web.services.GwtModule</Tapestry-Module-Classes>
+                            <Tapestry-Module-Classes>${project.groupId}.webgwt.services.GwtModule</Tapestry-Module-Classes>
                         </manifestEntries>
                     </archive>
                 </configuration>

@@ -15,7 +15,7 @@
  */
 package com.flowlogix.util;
 
-import com.flowlogix.web.services.GwtModule;
+import com.flowlogix.web.services.internal.AssetPathProcessor;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.gwt.user.server.rpc.SerializationPolicy;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +33,9 @@ public abstract class TapestryRemoteServiceServlet extends RemoteServiceServlet
     {
         final SymbolSource symbolSource = ExternalServiceUtil.getTapestryService(getServletContext(), SymbolSource.class);
         final String prefix = symbolSource.valueForSymbol(SymbolConstants.ASSET_PATH_PREFIX);
-        final GwtModule.PathProcessor pathProcessor = new GwtModule.PathProcessor(prefix);
+        final AssetPathProcessor pathProcessor = new AssetPathProcessor(prefix);
         return super.doGetSerializationPolicy(request, pathProcessor.removeAssetPathPart(moduleBaseURL), strongName);
     }
+
+    private static final long serialVersionUID = 1L;
 }

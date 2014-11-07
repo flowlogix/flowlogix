@@ -26,7 +26,13 @@ import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.SubModule;
 import org.apache.tapestry5.ioc.services.FactoryDefaults;
 import org.apache.tapestry5.ioc.services.SymbolProvider;
-import org.apache.tapestry5.services.*;
+import org.apache.tapestry5.services.ComponentClassResolver;
+import org.apache.tapestry5.services.ComponentSource;
+import org.apache.tapestry5.services.LibraryMapping;
+import org.apache.tapestry5.services.PageRenderLinkSource;
+import org.apache.tapestry5.services.RequestExceptionHandler;
+import org.apache.tapestry5.services.RequestGlobals;
+import org.apache.tapestry5.services.Response;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
 
 /**
@@ -34,7 +40,7 @@ import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
  * 
  * @author lprimak
  */
-@SubModule({ EjbModule.class, GwtModule.class, SecurityModule.class, CDIModule.class })
+@SubModule({ EjbModule.class, SecurityModule.class, CDIModule.class })
 public class ServicesModule 
 {    
     @Contribute(SymbolProvider.class)

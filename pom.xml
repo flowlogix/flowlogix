@@ -17,7 +17,8 @@
     <scm>
         <url>http://code.google.com/p/flowlogix/source/browse/</url>
         <connection>scm:hg:http://code.google.com/p/flowlogix/</connection>
-      <tag>HEAD</tag>
+        <developerConnection>scm:hg:https://code.google.com/p/flowlogix/</developerConnection>
+        <tag>HEAD</tag>
     </scm>
     <developers>
         <developer>

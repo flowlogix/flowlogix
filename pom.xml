@@ -14,11 +14,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <scm>
-        <url>http://code.google.com/p/flowlogix/source/browse/</url>
-        <connection>scm:hg:http://code.google.com/p/flowlogix/</connection>
-      <tag>HEAD</tag>
-    </scm>
     <developers>
         <developer>
             <id>lprimak</id>
@@ -62,7 +57,13 @@
             </plugin>
         </plugins>
     </build>
-     
+        
+    <scm>
+        <url>http://code.google.com/p/flowlogix/source/browse/</url>
+        <connection>scm:hg:http://code.google.com/p/flowlogix/</connection>
+        <tag>HEAD</tag>
+    </scm>
+ 
     <profiles>
         <profile>
             <id>release-flowlogix-prod</id>

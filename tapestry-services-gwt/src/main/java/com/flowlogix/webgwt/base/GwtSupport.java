@@ -66,7 +66,7 @@ public abstract class GwtSupport
                 addParameters(resources.getCompleteId(), getGWTParameters()));
         
         final String gwtModule = getModuleName();
-        final String supportVariablePath = "flowlogix/js/GwtSupportVariable";
+        final String supportVariablePath = "flowlogixgwt/js/GwtSupportVariable";
         for (String var : getJavaScriptInitialization())
         {
             jsSupport.importJavaScriptLibrary(String.format("%s/%s:action?value=%s",

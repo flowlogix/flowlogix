@@ -2,6 +2,7 @@ package com.flowlogix.ejb;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.regex.Pattern;
 import javax.ejb.Remote;
@@ -24,23 +25,27 @@ import lombok.SneakyThrows;
  */
 public class JNDIObjectLocator
 {
-    @SneakyThrows(NamingException.class)
     public JNDIObjectLocator()
     {
-        initialContext = new InitialContext();
-        portableNamePrefix = PORTABLE_NAME_PREFIX;
+        this(PORTABLE_NAME_PREFIX);
     }
     
     
-    public JNDIObjectLocator(InitialContext ic)
+    public JNDIObjectLocator(String portableNamePrefix)
     {
-        this(ic, PORTABLE_NAME_PREFIX);
+        this(null, portableNamePrefix);
     }
 
     
-    public JNDIObjectLocator(InitialContext ic, String portableNamePrefix)
+    public JNDIObjectLocator(Hashtable<String, String> env)
     {
-        this.initialContext = ic;
+        this(env, PORTABLE_NAME_PREFIX);
+    }
+
+    
+    public JNDIObjectLocator(Hashtable<String, String> env, String portableNamePrefix)
+    {
+        this.env = env;
         this.portableNamePrefix = portableNamePrefix;
     }
     
@@ -128,6 +133,19 @@ public class JNDIObjectLocator
         }
         return lookupname + "!" + type;
     }
+    
+    
+    private InitialContext getInitialContext() throws NamingException
+    {
+        if(env == null)
+        {
+            return new InitialContext();
+        }
+        else
+        {
+            return new InitialContext(env);
+        }
+    }
 
     
     @SuppressWarnings("unchecked")
@@ -156,7 +174,7 @@ public class JNDIObjectLocator
     }
 
     
-    private @Getter final InitialContext initialContext;
+    private final Hashtable<String, String> env;
     private @Getter @Setter String portableNamePrefix;
     private @Getter @Setter boolean noCaching = false;
     private @Getter @Setter boolean cacheRemote = false;

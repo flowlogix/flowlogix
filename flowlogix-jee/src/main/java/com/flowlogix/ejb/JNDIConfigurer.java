@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -80,7 +79,7 @@ public class JNDIConfigurer
         }
         else
         {
-            locator = new JNDIObjectLocator(new InitialContext(env));
+            locator = new JNDIObjectLocator(env);
         }
         if(StringUtils.hasText(config.getPrefix()))
         {

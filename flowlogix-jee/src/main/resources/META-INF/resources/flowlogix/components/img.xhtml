@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite">
+
+    <!-- INTERFACE -->
+    <cc:interface componentType="flowlogix:resource">
+        <cc:attribute name="src" required="true"/>
+        <cc:attribute name="flowlogix.sourceKey" default="src"/>
+        <cc:attribute name="flowlogix.outerTag" default="img"/>
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <cc:insertChildren/>
+    </cc:implementation>
+</html>

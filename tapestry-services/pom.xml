@@ -24,7 +24,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jee-services</artifactId>
+            <artifactId>flowlogix-jee</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

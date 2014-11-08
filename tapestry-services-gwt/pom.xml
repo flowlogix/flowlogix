@@ -4,7 +4,7 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix-tapestry-gwt</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
 
     <name>Flow Logix Tapestry GWT Integration</name>
@@ -19,7 +19,7 @@
         <groupId>com.flowlogix</groupId>
         <artifactId>tapestry-gwt-build-core</artifactId>
         <relativePath>../tapestry-gwt-build-core/pom.xml</relativePath>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.3</version>
     </parent>
     
     <build>

@@ -17,7 +17,7 @@
     
     <properties>
         <java.code.version>1.7</java.code.version>
-        <war-deps.scope>compile</war-deps.scope>
+        <skinny.war>false</skinny.war>
         <guava.version>18.0</guava.version>
         <groovy.version>2.3.7</groovy.version>
         <lombok.version>1.14.8</lombok.version>
@@ -27,13 +27,13 @@
         <profile>
             <id>skinny-war</id>
             <properties>
-                <war-deps.scope>provided</war-deps.scope>
+                <skinny.war>true</skinny.war>
             </properties>
         </profile>
         <profile>
             <id>self-contained</id>
             <properties>
-                <war-deps.scope>compile</war-deps.scope>
+                <skinny.war>false</skinny.war>
             </properties>
         </profile>
     </profiles>
@@ -51,6 +51,12 @@
             <artifactId>glassfish-embedded-all</artifactId>
             <version>4.1</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools-jar</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.omnifaces</groupId>
@@ -61,7 +67,7 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
-            <scope>${war-deps.scope}</scope>
+            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -83,113 +89,91 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
-            <scope>${war-deps.scope}</scope>
+            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>3.0.0</version>
-            <scope>${war-deps.scope}</scope>
+            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
             <classifier>indy</classifier>
-            <scope>${war-deps.scope}</scope>
+            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
             <version>1.2.3</version>
-            <type>jar</type>
-            <scope>${war-deps.scope}</scope>
+            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
             <version>1.2.3</version>
-            <type>jar</type>
-            <scope>${war-deps.scope}</scope>
+            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.7</version>
-            <type>jar</type>
-            <scope>${war-deps.scope}</scope>
+            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.7.7</version>
-            <type>jar</type>
-            <scope>${war-deps.scope}</scope>
+            <optional>${skinny.war}</optional>
+        </dependency>
+        
+        <!-- Optional, Non-Transitive dependencies -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
+            <optional>${skinny.war}</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.9</version>
+            <optional>${skinny.war}</optional>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.3.1</version>
+            <optional>${skinny.war}</optional>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+            <optional>${skinny.war}</optional>
         </dependency>
     </dependencies>
     
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-cli</id>
-                        <inherited>true</inherited>
-                        <configuration>
-                            <includeScope>compile</includeScope>
-                            <excludeArtifactIds>
-                                javaee-api,
-                                lombok
-                            </excludeArtifactIds>
-                            <stripVersion>false</stripVersion>
-                            <excludeTransitive>true</excludeTransitive>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>commons-beanutils</groupId>
-                                    <artifactId>commons-beanutils</artifactId>
-                                    <version>1.9.2</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>commons-codec</groupId>
-                                    <artifactId>commons-codec</artifactId>
-                                    <version>1.9</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>commons-fileupload</groupId>
-                                    <artifactId>commons-fileupload</artifactId>
-                                    <version>1.3.1</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>commons-io</groupId>
-                                    <artifactId>commons-io</artifactId>
-                                    <version>2.4</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/deps</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

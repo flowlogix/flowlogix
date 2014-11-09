@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>1.3.0.2-SNAPSHOT</version>
+    <version>1.3.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Utility Library Root POM</description>
@@ -30,8 +30,6 @@
   
     <modules>
         <module>build-core</module>
-        <module>tapestry-build-core</module>
-        <module>tapestry-gwt-build-core</module>
         <module>flowlogix-jee</module>
         <module>tapestry-services</module>
         <module>tapestry-services-gwt</module>

@@ -15,9 +15,32 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <facelet-taglib xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_2.xsd"
-    version="2.2">    
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_2.xsd"
+                version="2.2">    
     <namespace>http://flowlogix.com/ui</namespace>
-    <composite-library-name>flowlogix</composite-library-name>
+    <tag>
+        <tag-name>empty</tag-name>
+        <component>
+            <resource-id>
+                flowlogix/empty.xhtml
+            </resource-id>
+        </component>
+    </tag>
+    <tag>
+        <tag-name>img</tag-name>
+        <component>
+            <resource-id>
+                flowlogix/img.xhtml
+            </resource-id>
+        </component>
+    </tag>
+    <tag>
+        <tag-name>link</tag-name>
+        <component>
+            <resource-id>
+                flowlogix/link.xhtml
+            </resource-id>
+        </component>
+    </tag>
 </facelet-taglib>

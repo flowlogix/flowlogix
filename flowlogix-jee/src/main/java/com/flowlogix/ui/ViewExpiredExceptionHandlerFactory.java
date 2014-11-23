@@ -83,9 +83,7 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
                         Faces.redirect(Faces.getRequestURIWithQueryString());
                     }
                     it.remove();
-                    // TODO uncomment the next line when flash is fixed
-                    // Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
-                    Faces.setSessionAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
+                    Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
                 }
             }
             getWrapped().handle();

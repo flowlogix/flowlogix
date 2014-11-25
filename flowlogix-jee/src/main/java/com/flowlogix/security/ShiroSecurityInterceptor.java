@@ -41,7 +41,7 @@ import org.apache.shiro.subject.Subject;
  * @author lprimak
  */
 @Slf4j
-public class ShiroSecurityInterceptor 
+public class ShiroSecurityInterceptor implements Serializable
 {
     @AroundInvoke
     public Object propagateShiroSecurity(final InvocationContext ctx) throws Exception

@@ -17,6 +17,7 @@ package com.flowlogix.ui;
 
 import static com.flowlogix.ui.AttributeKeys.SESSION_EXPIRED_KEY;
 import java.io.IOException;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.Iterator;
 import javax.faces.FacesException;
 import javax.faces.application.ViewExpiredException;
@@ -84,6 +85,11 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
                     }
                     it.remove();
                     Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
+                }
+                else if(ex instanceof ClosedByInterruptException)
+                {
+                    // ignore browser exists
+                    it.remove();
                 }
             }
             getWrapped().handle();

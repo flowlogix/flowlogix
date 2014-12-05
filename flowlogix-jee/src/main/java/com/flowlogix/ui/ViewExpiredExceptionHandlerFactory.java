@@ -29,6 +29,7 @@ import javax.faces.event.ExceptionQueuedEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
 
@@ -59,6 +60,13 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
             {
                 ExceptionQueuedEvent evt = it.next();
                 Throwable ex = Exceptions.unwrap(evt.getContext().getException());
+
+                Throwable pureRootCause = ExceptionUtils.getRootCause(evt.getContext().getException());
+                if(pureRootCause == null)
+                {
+                    pureRootCause = ex;
+                }
+
                 if (ex instanceof ViewExpiredException)
                 {               
                     if (Faces.isAjaxRequest())
@@ -86,7 +94,7 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
                     it.remove();
                     Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
                 }
-                else if(ex instanceof ClosedByInterruptException)
+                else if(pureRootCause instanceof ClosedByInterruptException)
                 {
                     // ignore browser exists
                     it.remove();

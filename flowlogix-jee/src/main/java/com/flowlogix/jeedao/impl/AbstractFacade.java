@@ -92,6 +92,7 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
         CriteriaQuery<Long> cq = getEntityManager().getCriteriaBuilder().createQuery(Long.class);
         Root<T> rt = cq.from(getEntityClass());
         cq.select(getEntityManager().getCriteriaBuilder().count(rt));
+        addToCountCriteria(getEntityManager().getCriteriaBuilder(), rt, cq);
         TypedQuery<Long> q = getEntityManager().createQuery(cq);
         return q.getSingleResult().intValue();
     }  
@@ -173,6 +174,13 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
      * @param cq 
      */
     protected void addToCriteria(CriteriaBuilder cb, Root<T> root, CriteriaQuery<T> cq) { /* override */ };
+    /**
+     * Add additional criteria for count() operation
+     * @param cb
+     * @param root
+     * @param cq 
+     */
+    protected void addToCountCriteria(CriteriaBuilder cb, Root<T> root, CriteriaQuery<Long> cq) { /* override */ };
     /**
      * add hints to query
      * @param tq

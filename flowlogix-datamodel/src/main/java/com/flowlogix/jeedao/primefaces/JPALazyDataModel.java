@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -42,6 +43,7 @@ import org.primefaces.model.SortOrder;
  * @param <KK> Key Type
  * @param <TT> Data Type
  */
+@Dependent
 public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
 {
     /**

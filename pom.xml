@@ -31,6 +31,7 @@
     <modules>
         <module>build-core</module>
         <module>flowlogix-jee</module>
+        <module>flowlogix-datamodel</module>
         <module>tapestry-services</module>
         <module>tapestry-services-gwt</module>
     </modules>

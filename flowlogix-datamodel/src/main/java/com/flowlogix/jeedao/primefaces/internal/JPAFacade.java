@@ -120,15 +120,21 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
         filters.forEach((key, value) ->
         {
             Predicate cond = null;
-            Class<?> fieldType = root.get(key).getJavaType();
-            if(fieldType == String.class)
+            try
             {
-                cond = cb.like(root.get(key), String.format("%%%s%%", value));                
+                Class<?> fieldType = root.get(key).getJavaType();
+                if (fieldType == String.class)
+                {
+                    cond = cb.like(root.get(key), String.format("%%%s%%", value));
+                } else
+                {
+                    if (TypeConverter.checkType(value.toString(), fieldType))
+                    {
+                        cond = cb.equal(root.get(key), value);
+                    }
+                }
             }
-            else if(TypeConverter.checkType(value.toString(), fieldType))
-            {
-                cond = cb.equal(root.get(key), value);
-            }
+            catch(IllegalArgumentException e) { /* ignore possibly extra filter fields */}
             predicates.put(key, new FilterData(value.toString(), cond));
         });
         if(filterHook.isPresent())

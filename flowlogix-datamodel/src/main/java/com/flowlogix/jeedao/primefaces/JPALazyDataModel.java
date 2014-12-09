@@ -15,6 +15,7 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.internal.JPAFacadeLocal;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -31,6 +32,7 @@ import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
@@ -110,6 +112,17 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
         void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<TT> root);
     }
 
+    
+    /**
+     * Lambda interface for replaceFilter utility method
+     */
+    @FunctionalInterface
+    public interface FilterReplacer
+    {
+        Predicate get(Predicate oldPredicate, Object fieldValue);
+    }
+
+
     /**
      * Sorter Hook
      * @param <TT> Entity Type
@@ -182,6 +195,24 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     public void removeFilter()
     {
         filter = Optional.absent();
+    }
+    
+     
+    /**
+     * Utility method for replacing a predicate in the filter list
+     * 
+     * @param filters filter list
+     * @param element element to be replace
+     * @param fp lambda to get the new Filter predicate
+     */
+    public void replaceFilter(Map<String, FilterData> filters, String element, FilterReplacer fp)
+    {
+        FilterData elt = filters.get(element);
+        if (elt != null && StringUtils.isNotBlank(elt.getFieldValue()))
+        {
+            filters.replace(element, new FilterData(elt.getFieldValue(), 
+                    fp.get(elt.getPredicate(), elt.getFieldValue())));
+        }
     }
 
     

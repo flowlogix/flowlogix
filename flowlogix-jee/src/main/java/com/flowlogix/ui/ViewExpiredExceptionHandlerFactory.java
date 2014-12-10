@@ -92,7 +92,13 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
                         Faces.redirect(Faces.getRequestURIWithQueryString());
                     }
                     it.remove();
-                    Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
+                    try
+                    {
+                        Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
+                    } catch(NullPointerException e) 
+                    {
+                        // ignore NPE due to a bug in Mojarra
+                    }
                 }
                 else if(pureRootCause instanceof ClosedByInterruptException)
                 {

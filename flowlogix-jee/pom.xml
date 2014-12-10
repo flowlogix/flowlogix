@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix-jee</artifactId>
-    <version>2.0.3-SNAPSHOT</version>
+    <version>2.0.3</version>
     <packaging>jar</packaging>
 
     <name>Flow Logix JEE Services</name>
@@ -18,6 +18,6 @@
         <groupId>com.flowlogix</groupId>
         <artifactId>build-core</artifactId>
         <relativePath>../build-core/pom.xml</relativePath>
-        <version>2.0.3-SNAPSHOT</version>
+        <version>2.0.3</version>
     </parent>
 </project>

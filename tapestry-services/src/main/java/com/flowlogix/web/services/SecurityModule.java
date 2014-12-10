@@ -7,6 +7,7 @@ package com.flowlogix.web.services;
 import com.flowlogix.web.services.internal.AssetPathProcessor;
 import com.flowlogix.web.services.internal.ExceptionHandlerAssistantImpl;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
+import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import org.apache.shiro.ShiroException;
@@ -86,9 +87,8 @@ public class SecurityModule
                         + RequestConstants.CONTEXT_FOLDER;
                 if (request.getPath().startsWith(assetFolder))
                 {
-                    if(request.getPath().endsWith("/") || 
-                            ctxt.getRealFile(pathProcessor.removeAssetPathPart(
-                            request.getPath())).isDirectory())
+                    File realFile = ctxt.getRealFile(pathProcessor.removeAssetPathPart(request.getPath()));
+                    if(request.getPath().endsWith("/") || (realFile != null && realFile.isDirectory()))
                     {
                         return false;
                     }

@@ -19,7 +19,7 @@
         <java.code.version>1.7</java.code.version>
         <skinny.war>false</skinny.war>
         <guava.version>18.0</guava.version>
-        <groovy.version>2.3.7</groovy.version>
+        <groovy.version>2.3.8</groovy.version>
         <lombok.version>1.14.8</lombok.version>
     </properties>
     
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>org.omnifaces</groupId>
             <artifactId>omnifaces</artifactId>
-            <version>1.8.1</version>
+            <version>2.0</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -155,7 +155,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.9</version>
+            <version>1.10</version>
             <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
@@ -186,7 +186,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
+                <version>2.18</version>
                 <configuration>
                     <includes>
                         <include>**/test/**</include>                     

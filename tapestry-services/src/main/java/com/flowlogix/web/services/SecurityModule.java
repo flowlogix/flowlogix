@@ -1,27 +1,30 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2014 lprimak.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.AssetPathProcessor;
-import com.flowlogix.web.services.internal.ExceptionHandlerAssistantImpl;
 import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
-import org.apache.shiro.ShiroException;
-import org.apache.shiro.mgt.RememberMeManager;
-import org.apache.shiro.web.mgt.CookieRememberMeManager;
-import org.apache.tapestry5.MetaDataConstants;
 import org.apache.tapestry5.SymbolConstants;
 import org.apache.tapestry5.internal.services.RequestConstants;
 import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
-import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Contribute;
-import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.ioc.annotations.Local;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.BaseURLSource;
@@ -31,7 +34,6 @@ import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestFilter;
 import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
-import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
 
 /**
  * patch Tynamo security to load classes from the
@@ -51,28 +53,15 @@ public class SecurityModule
     
     public static void contributeFactoryDefaults(MappedConfiguration<String, String> configuration)
     {
-        configuration.add(Symbols.REMEMBER_ME_DURATION, Integer.toString(2 * 7)); // 2 weeks
-        configuration.add(Symbols.INVALID_AUTH_DELAY, Integer.toString(3));
-        configuration.add(Symbols.SESSION_EXPIRED_MESSAGE, "Your Session Has Expired");
         configuration.add(Symbols.DISABLE_PORTNUM_REMOVAL, Boolean.FALSE.toString());
-    }
-    
-    
-    public static void bind(ServiceBinder binder)
-    {
-        binder.bind(ExceptionHandlerAssistant.class, ExceptionHandlerAssistantImpl.class).withId("FLSecurityExceptionHandler");
-    }
-
-
-    public void contributeMetaDataLocator(MappedConfiguration<String, String> configuration)
-    {
-        configuration.add(String.format("%s:%s", SECURITY_PATH_PREFIX, MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
-        configuration.add(String.format("%s:%s", "security", MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
     }
     
     
     /**
      * See <a href="https://issues.apache.org/jira/browse/TAP5-1779" target="_blank">TAP5-1779</a>
+     * @param configuration
+     * @param applicationVersion
+     * @param ctxt
      */
     @Contribute(RequestHandler.class)
     public void disableAssetDirListing(OrderedConfiguration<RequestFilter> configuration,
@@ -106,36 +95,12 @@ public class SecurityModule
     }
 
 
-    @Match("RememberMeManager")
-    public RememberMeManager decorateRememberMeDefaults(RememberMeManager _mgr, 
-        @Symbol(Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)
-    {
-        CookieRememberMeManager mgr = (CookieRememberMeManager)_mgr;
-        if (productionMode)
-        {
-            mgr.getCookie().setMaxAge(daysToRemember * 24 * 60 * 60);
-        } 
-        else
-        {
-            mgr.getCookie().setMaxAge(-1);
-        }
-        
-        return null;
-    }
-    
-    
-    /**
-     * Detects expired session and sets an attribute to indicate that fact
-     */
-    public void contributeExceptionHandler(MappedConfiguration<Class<?>, ExceptionHandlerAssistant> configuration,
-        @Local ExceptionHandlerAssistant assistant)
-    {
-        configuration.override(ShiroException.class, assistant);
-    }
-    
     /**
      * Fix for https://issues.apache.org/jira/browse/TAP5-1973
      * Remove appending the port number for URLs
+     * @param source
+     * @param disablePortnumRemoval
+     * @return 
      */
     @Match("BaseURLSource")
     public BaseURLSource decorateDisablePortNumAppend(final BaseURLSource source,
@@ -169,8 +134,6 @@ public class SecurityModule
     
     
     public static final String SECURITY_PATH_PREFIX = "flowlogix/security";
-    private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
-    private @Inject @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode;
    
     private final AssetPathProcessor pathProcessor;
     private final String assetPathPrefix;

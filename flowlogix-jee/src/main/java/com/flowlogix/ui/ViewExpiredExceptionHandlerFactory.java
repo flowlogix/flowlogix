@@ -24,7 +24,6 @@ import javax.faces.application.ViewExpiredException;
 import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerFactory;
 import javax.faces.context.ExceptionHandlerWrapper;
-import javax.faces.context.PartialResponseWriter;
 import javax.faces.event.ExceptionQueuedEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +31,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Servlets;
 
 /**
  * establishes a session for ajax exceptions
@@ -69,28 +69,6 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
 
                 if (ex instanceof ViewExpiredException)
                 {               
-                    if (Faces.isAjaxRequest())
-                    {
-                        Faces.responseReset();
-                        
-                        Faces.getResponse().setHeader("Cache-Control", "no-cache");
-                        Faces.getResponse().setCharacterEncoding(Faces.getResponseCharacterEncoding());
-                        Faces.getResponse().setContentType("text/xml");
-
-                        PartialResponseWriter writer = Faces.getContext().getPartialViewContext().getPartialResponseWriter();
-                        writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-                        writer.startElement("partial-response", null);
-                        writer.startElement("redirect", null);
-                        writer.writeAttribute("url", Faces.getRequestURIWithQueryString(), null);
-                        writer.endElement("redirect");
-                        writer.endElement("partial-response");
-                        
-                        Faces.responseComplete();
-                    } 
-                    else
-                    {
-                        Faces.redirect(Faces.getRequestURIWithQueryString());
-                    }
                     it.remove();
                     try
                     {
@@ -99,6 +77,7 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
                     {
                         // ignore NPE due to a bug in Mojarra
                     }
+                    Servlets.facesRedirect(Faces.getRequest(), Faces.getResponse(), Faces.getRequestURIWithQueryString());
                 }
                 else if(pureRootCause instanceof ClosedByInterruptException)
                 {

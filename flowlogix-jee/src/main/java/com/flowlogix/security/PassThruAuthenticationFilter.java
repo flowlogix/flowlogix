@@ -26,7 +26,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HttpMethod;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 import org.omnifaces.util.Servlets;
 
@@ -38,6 +41,14 @@ import org.omnifaces.util.Servlets;
 @Slf4j
 public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter
 {
+    @Override
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue)
+    {
+        Subject subject = getSubject(request, response);
+        return subject.isAuthenticated() || (useRemembered && subject.isRemembered());
+    }
+
+    
     @Override
     protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException
     {
@@ -107,4 +118,7 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     {
         throw new UnsupportedOperationException("bad op");
     }
+    
+    
+    private @Getter @Setter boolean useRemembered = false;
 }

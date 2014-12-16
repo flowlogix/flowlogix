@@ -31,7 +31,6 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.Servlets;
 
 /**
  * establishes a session for ajax exceptions
@@ -77,7 +76,8 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
                     {
                         // ignore NPE due to a bug in Mojarra
                     }
-                    Servlets.facesRedirect(Faces.getRequest(), Faces.getResponse(), Faces.getRequestURIWithQueryString());
+                    Faces.redirect(Faces.getRequestURIWithQueryString());
+                    return;
                 }
                 else if(pureRootCause instanceof ClosedByInterruptException)
                 {

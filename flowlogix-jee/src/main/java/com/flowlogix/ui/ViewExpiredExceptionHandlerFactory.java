@@ -74,7 +74,7 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
                         Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
                     } catch(NullPointerException e) 
                     {
-                        // ignore NPE due to a bug in Mojarra
+                        // TODO remove when https://java.net/jira/browse/JAVASERVERFACES-3621 is fixed
                     }
                     Faces.redirect(Faces.getRequestURIWithQueryString());
                     return;

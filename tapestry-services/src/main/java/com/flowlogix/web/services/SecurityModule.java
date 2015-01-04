@@ -36,9 +36,8 @@ import org.apache.tapestry5.services.RequestHandler;
 import org.apache.tapestry5.services.Response;
 
 /**
- * patch Tynamo security to load classes from the
- * our package, otherwise the library doesn't have access to our
- * principal classes
+ * Add Shiro SecurityInterceptorFilter filter, 
+ * disable directory listing
  * 
  * @author lprimak
  */

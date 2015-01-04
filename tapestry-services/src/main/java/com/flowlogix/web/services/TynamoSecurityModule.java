@@ -31,7 +31,10 @@ import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
 
 /**
- *
+ * patch Tynamo security to load classes from the
+ * our package, otherwise the library doesn't have access to our
+ * principal classes
+ * 
  * @author lprimak
  */
 public class TynamoSecurityModule

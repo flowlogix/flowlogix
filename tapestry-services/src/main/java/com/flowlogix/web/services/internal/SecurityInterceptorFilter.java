@@ -4,16 +4,11 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.security.ShiroSecurityInterceptor;
+import static com.flowlogix.security.ShiroSecurityInterceptor.buildSubject;
 import java.io.IOException;
-import java.security.Principal;
 import java.security.PrivilegedAction;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import javax.security.auth.Subject;
 import lombok.SneakyThrows;
-import org.apache.shiro.SecurityUtils;
 import org.apache.tapestry5.services.ComponentEventRequestParameters;
 import org.apache.tapestry5.services.ComponentRequestFilter;
 import org.apache.tapestry5.services.ComponentRequestHandler;
@@ -63,15 +58,6 @@ public class SecurityInterceptorFilter implements ComponentRequestFilter
         });
     }
     
-    
-    private Subject buildSubject()
-    {
-        Set<Principal> prinSet = new HashSet<>();
-        prinSet.add(new ShiroSecurityInterceptor.SubjectWrapper(SecurityUtils.getSubject()));
-        return new Subject(true, prinSet, perms, perms);
-    }
-    
         
     private final ComponentRequestFilter filter;
-    private final Set<?> perms = Collections.unmodifiableSet(new HashSet<>());
 }

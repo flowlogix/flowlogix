@@ -20,13 +20,17 @@ import com.flowlogix.security.internal.aop.SecurityInterceptor;
 import java.io.Serializable;
 import java.security.AccessController;
 import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.io.DefaultSerializer;
 import org.apache.shiro.io.Serializer;
@@ -35,6 +39,8 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
 /**
+ * Translate EJB Security Principal to Shiro
+ * 
  * <a href="http://code.google.com/p/flowlogix/wiki/TLShiroSecurityInterceptor"
  *    target="_blank">See Documentation</a>
  * 
@@ -91,7 +97,15 @@ public class ShiroSecurityInterceptor implements Serializable
         }
     }
     
+        
+    public static javax.security.auth.Subject buildSubject()
+    {
+        Set<Principal> prinSet = new HashSet<>();
+        prinSet.add(new ShiroSecurityInterceptor.SubjectWrapper(SecurityUtils.getSubject()));
+        return new javax.security.auth.Subject(true, prinSet, perms, perms);
+    }
 
+    
     public @EqualsAndHashCode static class SubjectWrapper implements Principal, Serializable
     {
         public SubjectWrapper(org.apache.shiro.subject.Subject subject)
@@ -128,4 +142,5 @@ public class ShiroSecurityInterceptor implements Serializable
 
     
     private static final long serialVersionUID = 1L;
+    private static final Set<?> perms = Collections.unmodifiableSet(new HashSet<>());
 }

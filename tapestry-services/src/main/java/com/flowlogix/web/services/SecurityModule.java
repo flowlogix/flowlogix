@@ -16,7 +16,6 @@
 package com.flowlogix.web.services;
 
 import com.flowlogix.web.services.internal.AssetPathProcessor;
-import com.flowlogix.web.services.internal.SecurityInterceptorFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -28,7 +27,6 @@ import org.apache.tapestry5.ioc.annotations.Contribute;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.apache.tapestry5.services.BaseURLSource;
-import org.apache.tapestry5.services.ComponentRequestFilter;
 import org.apache.tapestry5.services.Context;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestFilter;
@@ -87,13 +85,6 @@ public class SecurityModule
     }      
 
     
-    @Match("ComponentRequestFilter")
-    public static ComponentRequestFilter decorateEJBSecurityInterceptor(ComponentRequestFilter filter)
-    {
-        return new SecurityInterceptorFilter(filter);
-    }
-
-
     /**
      * Fix for https://issues.apache.org/jira/browse/TAP5-1973
      * Remove appending the port number for URLs

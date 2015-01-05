@@ -17,6 +17,7 @@ package com.flowlogix.security;
 
 import com.flowlogix.security.internal.aop.AopHelper;
 import com.flowlogix.security.internal.aop.SecurityInterceptor;
+import com.google.common.collect.Iterables;
 import java.io.Serializable;
 import java.security.AccessController;
 import java.security.Principal;
@@ -55,15 +56,9 @@ public class ShiroSecurityInterceptor implements Serializable
         Subject subject = null;
         try
         {
-            for(Principal principal : 
-                    javax.security.auth.Subject.getSubject(AccessController.getContext()).getPrincipals())
-            {
-                if(principal.getClass().getName().equals(SubjectWrapper.class.getName()))
-                {
-                    subject = new Subject.Builder().principals(SubjectWrapper.buildPrincipals(principal.getName())).buildSubject();
-                    break;
-                }
-            }
+            SubjectWrapper sw = Iterables.getOnlyElement(javax.security.auth.Subject
+                    .getSubject(AccessController.getContext()).getPrincipals(SubjectWrapper.class));
+            subject = new Subject.Builder().principals(sw.buildPrincipals()).buildSubject();
         } catch(Throwable e)
         {
             log.debug("Failed Translating Shiro/EJB Security", e);
@@ -119,7 +114,7 @@ public class ShiroSecurityInterceptor implements Serializable
         }
         
         
-        private static PrincipalCollection buildPrincipals(String name)
+        private PrincipalCollection buildPrincipals()
         {
             return ser.deserialize(Base64.decode(name));
         }

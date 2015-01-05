@@ -110,28 +110,18 @@ public class ShiroSecurityInterceptor implements Serializable
     {
         public SubjectWrapper(org.apache.shiro.subject.Subject subject)
         {
-            Object primary = subject.getPrincipal();
-            if(primary != null)
+            PrincipalCollection principals = subject.getPrincipals();
+            if(principals == null)
             {
-                name = Base64.encodeToString(ser.serialize(subject.getPrincipals()));    
+                principals = new SimplePrincipalCollection();
             }
-            else
-            {
-                name = null;
-            }
+            name = Base64.encodeToString(ser.serialize(principals));    
         }
         
         
         private static PrincipalCollection buildPrincipals(String name)
         {
-            if(name == null)
-            {
-                return new SimplePrincipalCollection();
-            }
-            else
-            {
-                return ser.deserialize(Base64.decode(name));
-            }
+            return ser.deserialize(Base64.decode(name));
         }
 
 

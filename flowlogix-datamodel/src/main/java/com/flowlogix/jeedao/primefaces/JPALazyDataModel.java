@@ -15,14 +15,15 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
-import com.flowlogix.jeedao.primefaces.interfaces.Filter;
-import com.flowlogix.jeedao.primefaces.interfaces.KeyConverter;
 import com.flowlogix.jeedao.primefaces.interfaces.EntityManagerGetter;
-import com.flowlogix.jeedao.primefaces.support.FilterData;
-import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
+import com.flowlogix.jeedao.primefaces.interfaces.Filter;
 import com.flowlogix.jeedao.primefaces.interfaces.FilterReplacer;
+import com.flowlogix.jeedao.primefaces.interfaces.Initializer;
+import com.flowlogix.jeedao.primefaces.interfaces.KeyConverter;
+import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
+import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
 import com.flowlogix.jeedao.primefaces.internal.JPAFacadeLocal;
+import com.flowlogix.jeedao.primefaces.support.FilterData;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -31,6 +32,7 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.apache.commons.lang.StringUtils;
+import org.omnifaces.config.BeanManager;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
@@ -50,15 +52,45 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
      * Set up this particular instance of the data model
      * with entity manager, class and key converter
      * 
+     * @param <K1>
+     * @param <T1>
+     * @param emg
+     * @param entityClass
+     * @param converter
+     * @return newly-created data model
+     */
+    public static<K1, T1> JPALazyDataModel<K1, T1> createModel(EntityManagerGetter emg,
+            Class<T1> entityClass, KeyConverter<K1> converter)
+    {
+        return createModel(emg, entityClass, converter, null);
+    }
+    
+    
+    /**
+     * Set up this particular instance of the data model
+     * with entity manager, class and key converter
+     * 
+     * @param <K1> Key Type
+     * @param <T1> Value Type
      * @param emg
      * @param entityClass
      * @param converter 
+     * @param initializer 
+     * @return newly-created data model
      */
-    public void setup(EntityManagerGetter emg, Class<TT> entityClass, KeyConverter<KK> converter)
+    public static<K1, T1> JPALazyDataModel<K1, T1> createModel(EntityManagerGetter emg,
+            Class<T1> entityClass, KeyConverter<K1> converter, Initializer<K1, T1> initializer)
     {
-        this.emg = emg;
-        this.entityClass = entityClass;
-        this.converter = converter;
+        @SuppressWarnings("unchecked")
+        JPALazyDataModel<K1, T1> model = BeanManager.INSTANCE.getReference(JPALazyDataModel.class);
+        model.emg = emg;
+        model.entityClass = entityClass;
+        model.converter = converter;
+        if(initializer != null)
+        {
+            initializer.init(model);
+        }
+        return model;
     }
 
 

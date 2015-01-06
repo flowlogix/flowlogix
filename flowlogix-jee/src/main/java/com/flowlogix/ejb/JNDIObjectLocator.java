@@ -1,5 +1,8 @@
 package com.flowlogix.ejb;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -23,7 +26,7 @@ import lombok.SneakyThrows;
  * @author Geoff Callendar
  * Enhancements by Lenny Primak
  */
-public class JNDIObjectLocator
+public class JNDIObjectLocator implements Serializable
 {
     public JNDIObjectLocator()
     {
@@ -172,16 +175,24 @@ public class JNDIObjectLocator
             return (T)jndiObjectCache.get(name);
         }
     }
+    
+    
+    private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException
+    {
+        is.defaultReadObject();
+        jndiObjectCache = Collections.synchronizedMap(new HashMap<String, Object>());
+    }
 
     
     private final Hashtable<String, String> env;
     private @Getter @Setter String portableNamePrefix;
     private @Getter @Setter boolean noCaching = false;
     private @Getter @Setter boolean cacheRemote = false;
-    private final Map<String, Object> jndiObjectCache = Collections.synchronizedMap(new HashMap<String, Object>());
+    private transient Map<String, Object> jndiObjectCache = Collections.synchronizedMap(new HashMap<String, Object>());
         
     public static final String REMOTE = "REMOTE";
     public static final String LOCAL = "LOCAL";
     private static final String PORTABLE_NAME_PREFIX = "java:module";
     public static final Pattern StripInterfaceSuffixPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
+    private static final long serialVersionUID = 1L;
 }

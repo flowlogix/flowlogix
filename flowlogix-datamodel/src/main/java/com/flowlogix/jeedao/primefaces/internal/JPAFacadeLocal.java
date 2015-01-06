@@ -16,10 +16,10 @@
 package com.flowlogix.jeedao.primefaces.internal;
 
 import com.flowlogix.jeedao.FacadeAPI;
-import com.flowlogix.jeedao.primefaces.JPALazyDataModel.EntityManagerGetter;
-import com.flowlogix.jeedao.primefaces.JPALazyDataModel.Filter;
-import com.flowlogix.jeedao.primefaces.JPALazyDataModel.Optimizer;
-import com.flowlogix.jeedao.primefaces.JPALazyDataModel.Sorter;
+import com.flowlogix.jeedao.primefaces.interfaces.EntityManagerGetter;
+import com.flowlogix.jeedao.primefaces.interfaces.Filter;
+import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
+import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
 import com.google.common.base.Optional;
 import java.util.List;
 import java.util.Map;

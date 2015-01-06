@@ -15,23 +15,21 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.JPALazyDataModel.Filter.FilterData;
+import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
+import com.flowlogix.jeedao.primefaces.interfaces.Filter;
+import com.flowlogix.jeedao.primefaces.interfaces.KeyConverter;
+import com.flowlogix.jeedao.primefaces.interfaces.EntityManagerGetter;
+import com.flowlogix.jeedao.primefaces.support.FilterData;
+import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
+import com.flowlogix.jeedao.primefaces.interfaces.FilterReplacer;
 import com.flowlogix.jeedao.primefaces.internal.JPAFacadeLocal;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
@@ -48,120 +46,6 @@ import org.primefaces.model.SortOrder;
 @Dependent
 public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
 {
-    /**
-     * Provides Entity Manager
-     */
-    @FunctionalInterface
-    public interface EntityManagerGetter
-    {
-        /**
-         * @return Entity Manager
-         */
-        EntityManager get();
-    }
-    
-    /**
-     * Convert Key String to Key Type
-     * 
-     * @param <KK> Key Type
-     */
-    @FunctionalInterface
-    public interface KeyConverter<KK>
-    {
-        /**
-         * return the key in the appropriate type
-         * 
-         * @param keyStr
-         * @return key type
-         */
-        KK convert(String keyStr);
-    }
-    
-    /**
-     * Filter Hook
-     * 
-     * @param <TT> Entity Type
-     */
-    @FunctionalInterface
-    public interface Filter<TT>
-    {
-        /**
-         * filter data
-         * this is what you replace with your own filter
-         */
-        @RequiredArgsConstructor @Getter
-        public static class FilterData
-        {
-            /**
-             * filter field value
-             */
-            private final String fieldValue;
-            /**
-             * Existing or null predicate, can replace with custom
-             */
-            private final Predicate predicate;
-        }
-        
-        /**
-         * hook to supply custom filter
-         * 
-         * @param filters user input
-         * @param cb
-         * @param root 
-         */
-        void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<TT> root);
-    }
-
-    
-    /**
-     * Lambda interface for replaceFilter utility method
-     */
-    @FunctionalInterface
-    public interface FilterReplacer
-    {
-        Predicate get(Predicate oldPredicate, Object fieldValue);
-    }
-
-
-    /**
-     * Sorter Hook
-     * @param <TT> Entity Type
-     */
-    @FunctionalInterface
-    public interface Sorter<TT>
-    {
-        /**
-         * Hook for sort criteria application
-         * can remove elements from the iterator and do your own action
-         * any elements left will be done via the default mechanism
-         * 
-         * @param sortCriteria
-         * @param cb
-         * @param root
-         * @return iterator to sort data, or, more likely same sortCriteria parameter
-         */
-        Iterator<SortMeta> sort(Iterator<SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root);
-    }
-    
-    /**
-     * Hook to add hints to the JPA query
-     * 
-     * @param <TT> Entity Type
-     */
-    @FunctionalInterface
-    public interface Optimizer<TT>
-    {
-        /**
-         * Add hints to the JPA query
-         * Mostly used for batch fetch
-         * 
-         * @param query to add hints to
-         * @return the same query
-         */
-        TypedQuery<TT> addHints(TypedQuery<TT> query);
-    }
-    
-    
     /**
      * Set up this particular instance of the data model
      * with entity manager, class and key converter

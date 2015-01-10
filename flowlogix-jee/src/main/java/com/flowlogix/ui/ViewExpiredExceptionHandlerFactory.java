@@ -69,13 +69,7 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
                 if (ex instanceof ViewExpiredException)
                 {               
                     it.remove();
-                    try
-                    {
-                        Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
-                    } catch(NullPointerException e) 
-                    {
-                        // TODO remove when https://java.net/jira/browse/JAVASERVERFACES-3621 is fixed
-                    }
+                    Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
                     Faces.redirect(Faces.getRequestURIWithQueryString());
                     return;
                 }

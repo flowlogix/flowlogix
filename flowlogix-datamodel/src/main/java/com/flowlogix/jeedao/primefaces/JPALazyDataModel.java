@@ -186,6 +186,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     
     @Override
     @SuppressWarnings("unchecked")
+    @Transactional
     public KK getRowKey(TT entity)
     {
         return (KK)emg.get().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
@@ -213,6 +214,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
 
     
     @Override
+    @Transactional
     public List<TT> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, Object> filters)
     {
         facade.setup(emg, entityClass, optimizer, filter, sorter);

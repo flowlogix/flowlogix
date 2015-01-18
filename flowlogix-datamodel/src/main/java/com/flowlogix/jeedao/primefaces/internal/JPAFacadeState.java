@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.support;
+package com.flowlogix.jeedao.primefaces.internal;
 
-import javax.persistence.criteria.Predicate;
+import java.io.Serializable;
+import javax.transaction.TransactionScoped;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
- * filter data
- * this is what you replace with your own filter
+ * Transaction-scoped state for DataTable parameters
+ * 
+ * @author lprimak
  */
-@RequiredArgsConstructor
-@Getter
-public class FilterData {
-    /**
-     * filter field value
-     */
-    private final String fieldValue;
-    /**
-     * Existing or null predicate, can replace with custom
-     */
-    private final Predicate predicate;
+@TransactionScoped
+public class JPAFacadeState implements Serializable
+{    
+    private final @Getter JPAFacadeTypedState<?> typedState = new JPAFacadeTypedState<>();
+    private static final long serialVersionUID = 1L;
 }

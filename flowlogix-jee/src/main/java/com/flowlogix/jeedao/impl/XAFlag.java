@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.support;
+package com.flowlogix.jeedao.impl;
 
-import javax.persistence.criteria.Predicate;
+import java.io.Serializable;
+import javax.transaction.TransactionScoped;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
- * filter data
- * this is what you replace with your own filter
+ * transaction-scoped flat whether XA is turned on
+ * 
+ * @author lprimak
  */
-@RequiredArgsConstructor
-@Getter
-public class FilterData {
+@TransactionScoped
+public class XAFlag implements Serializable
+{
     /**
-     * filter field value
+     * @return true of XA is enabled for this transaction
      */
-    private final String fieldValue;
-    /**
-     * Existing or null predicate, can replace with custom
-     */
-    private final Predicate predicate;
+    private @Getter @Setter(AccessLevel.MODULE) boolean XA = false;
+    private static final long serialVersionUID = 1L;
 }

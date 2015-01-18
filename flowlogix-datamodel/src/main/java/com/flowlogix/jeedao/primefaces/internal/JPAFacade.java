@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -38,7 +39,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.model.SortMeta;
 
@@ -55,26 +55,33 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     public void setup(EntityManagerGetter emg, Class<TT> entityClass, Optional<Optimizer<TT>> optimizer,
             Optional<Filter<TT>> filter, Optional<Sorter<TT>> sorter)
     {
-        this.emg = emg;
-        this.entityClass = entityClass;
-        this.optimizer = optimizer;
-        this.filterHook = filter;
-        this.sorterHook = sorter;
+        getState().setEmg(emg);
+        getState().setEntityClass(entityClass);
+        getState().setOptimizer(optimizer);
+        getState().setFilterHook(filter);
+        getState().setSorterHook(sorter);
     }
 
     
     @Override
     protected EntityManager getEntityManager()
     {
-        return emg.get();
+        return getState().getEmg().get();
+    }
+
+    
+    @Override
+    public Class<TT> getEntityClass()
+    {
+        return getState().getEntityClass();
     }
     
     
     @Override
     public int count(Map<String, Object> filters)
     {
-        this.filters = filters;
-        this.sortMeta = Lists.newLinkedList();
+        getState().setFilters(filters);
+        getState().setSortMeta(Lists.newLinkedList());
         return super.count();
     }
 
@@ -82,8 +89,8 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     @Override
     public List<TT> findRows(int first, int pageSize, Map<String, Object> filters, List<SortMeta> sortMeta)
     {
-        this.filters = filters;
-        this.sortMeta = sortMeta;
+        getState().setFilters(filters);
+        getState().setSortMeta(sortMeta);
         return super.findRange(new int[] { first, first + pageSize });
     }
 
@@ -91,8 +98,8 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     @Override
     protected void addToCriteria(CriteriaBuilder cb, Root<TT> root, CriteriaQuery<TT> cq)
     {
-        cq.where(getFilters(filters, cb, root));
-        cq.orderBy(getSort(sortMeta, cb, root));
+        cq.where(getFilters(getState().getFilters(), cb, root));
+        cq.orderBy(getSort(getState().getSortMeta(), cb, root));
         root.alias(JPALazyDataModel.RESULT);
     }
     
@@ -100,16 +107,16 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     @Override
     protected void addToCountCriteria(CriteriaBuilder cb, Root<TT> root, CriteriaQuery<Long> cq)
     {
-        cq.where(getFilters(filters, cb, root));
+        cq.where(getFilters(getState().getFilters(), cb, root));
     }
 
     
     @Override
     protected void addHints(TypedQuery<TT> tq, boolean isRange)
     {
-        if(optimizer.isPresent())
+        if(getState().getOptimizer().isPresent())
         {
-            optimizer.get().addHints(tq);
+            getState().getOptimizer().get().addHints(tq);
         }
     }
     
@@ -137,9 +144,9 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
             catch(IllegalArgumentException e) { /* ignore possibly extra filter fields */}
             predicates.put(key, new FilterData(value.toString(), cond));
         });
-        if(filterHook.isPresent())
+        if(getState().getFilterHook().isPresent())
         {
-            filterHook.get().filter(predicates, cb, root);
+            getState().getFilterHook().get().filter(predicates, cb, root);
         }
         
         return cb.and(FluentIterable.from(predicates.values())
@@ -151,9 +158,9 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     private List<Order> getSort(List<SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root)
     {
         Iterator<SortMeta> it;
-        if(sorterHook.isPresent())
+        if(getState().getSorterHook().isPresent())
         {
-            it = sorterHook.get().sort(Lists.newLinkedList(sortCriteria).iterator(), cb, root);          
+            it = getState().getSorterHook().get().sort(Lists.newLinkedList(sortCriteria).iterator(), cb, root);          
         }
         else
         {
@@ -176,11 +183,12 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     }
     
     
-    private EntityManagerGetter emg;
-    private @Getter(onMethod = @__(@Override)) Class<TT> entityClass;
-    private Optional<Optimizer<TT>> optimizer;
-    private Optional<Filter<TT>> filterHook;
-    private Optional<Sorter<TT>> sorterHook;
-    private Map<String, Object> filters;
-    private List<SortMeta> sortMeta;
+    @SuppressWarnings("unchecked")
+    private JPAFacadeTypedState<TT> getState()
+    {
+        return (JPAFacadeTypedState<TT>) state.getTypedState();
+    }
+    
+    
+    private @Inject JPAFacadeState state;
 }

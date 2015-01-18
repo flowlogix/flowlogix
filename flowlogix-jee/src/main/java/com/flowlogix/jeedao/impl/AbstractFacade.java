@@ -18,15 +18,15 @@ package com.flowlogix.jeedao.impl;
 import com.flowlogix.jeedao.QueryCriteria;
 import com.flowlogix.jeedao.TypedNativeQuery;
 import java.util.List;
-import javax.annotation.Resource;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import javax.transaction.TransactionSynchronizationRegistry;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Delegate;
 
 
 /**
@@ -127,28 +127,6 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
 
     
     /**
-     * 
-     * @return true of XA is enabled for this transaction
-     */
-    public boolean isXA()
-    {
-        checkTSR();
-        return Boolean.TRUE.equals(tsr.getResource(AbstractFacade.XA_EM_KEY));
-    }
-    
-    
-    /**
-     * mark transaction for XA
-     * @param tf True/False
-     */
-    public void markForXA(boolean tf)
-    {
-        checkTSR();
-        tsr.putResource(AbstractFacade.XA_EM_KEY, tf && xaEnabled);        // mark transaction as XA
-    }
-    
-    
-    /**
      * Override the default entity class getter
      * @return Entity class
      */
@@ -189,15 +167,6 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
     protected void addHints(TypedQuery<T> tq, boolean isRange) {}
     
     
-    private void checkTSR()
-    {
-        if(tsr == null)
-        {
-            throw new IllegalStateException("TransactionSynchronizationRegistry not available - Container-managed object?");
-        }
-    }
-    
-    
     public void checkForRequiredXA()
     {
         if(xaEnabled && !isXA())
@@ -205,12 +174,21 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
             throw new IllegalStateException("XA Transaction Required but not enabled - forgot to call markForXA(true)?");
         }
     }
+
+    
+    /**
+     * mark transaction for XA
+     * @param tf True/False
+     */
+    public void markForXA(boolean tf)
+    {
+        xaFlag.setXA(tf && xaEnabled);
+    }
             
     
     private final Class<T> entityClass;   
-    private @Resource TransactionSynchronizationRegistry tsr;
+    private @Inject @Delegate XAFlag xaFlag;
 
     private static final boolean xaEnabled = Boolean.getBoolean(AbstractFacade.XA_ENABLED_PROP);
-    private static final String XA_EM_KEY = "com.flowlogix.XA_EM_USED";
     public static final String XA_ENABLED_PROP = "com.flowlogix.XA_ENABLED";
 }

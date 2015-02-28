@@ -45,7 +45,7 @@ public class SortData
      */
     private final List<Order> sortOrder = Lists.newLinkedList();
     /**
-     * which goes first - sort by the client (default) or field-based sort
+     * which sort gets priority - sort by the UI (default) or application-based sort
      */
-    private boolean appendSortOrder = false;
+    private boolean appendSortOrder = true;
 }

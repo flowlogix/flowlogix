@@ -15,6 +15,7 @@
  */
 package com.flowlogix.jeedao.primefaces.interfaces;
 
+import com.flowlogix.jeedao.primefaces.support.SortData;
 import java.io.Serializable;
 import java.util.Iterator;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -36,7 +37,7 @@ public interface Sorter<TT> extends Serializable
      * @param sortCriteria
      * @param cb
      * @param root
-     * @return iterator to sort data, or, more likely same sortCriteria parameter
+     * @return SortData containing iterator to sort data, or, more likely same sortCriteria parameter
      */
-    Iterator<SortMeta> sort(Iterator<SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root);
+    SortData sort(Iterator<SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root);
 }

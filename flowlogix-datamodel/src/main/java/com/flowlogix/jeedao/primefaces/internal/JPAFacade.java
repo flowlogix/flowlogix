@@ -22,12 +22,12 @@ import com.flowlogix.jeedao.primefaces.interfaces.Filter;
 import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
 import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
 import com.flowlogix.jeedao.primefaces.support.FilterData;
+import com.flowlogix.jeedao.primefaces.support.SortData;
 import com.flowlogix.util.TypeConverter;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.Stateless;
@@ -157,29 +157,48 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     
     private List<Order> getSort(List<SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root)
     {
-        Iterator<SortMeta> it;
+        SortData sortData;
         if(getState().getSorterHook().isPresent())
         {
-            it = getState().getSorterHook().get().sort(Lists.newLinkedList(sortCriteria).iterator(), cb, root);          
+            sortData = getState().getSorterHook().get().sort(Lists.newLinkedList(sortCriteria).iterator(), cb, root);          
         }
         else
         {
-            it = sortCriteria.iterator();
+            sortData = new SortData(sortCriteria.iterator(), Lists.newLinkedList(), false);
         }
+
+        List<Order> sortMetaOrdering = processSortMeta(sortData, cb, root);        
         List<Order> rv = Lists.newLinkedList();
-        it.forEachRemaining(sm -> 
+        if(sortData.isAppendSortOrder())
+        {
+            rv.addAll(sortMetaOrdering);
+            rv.addAll(sortData.getSortOrder());
+        }
+        else
+        {
+            rv.addAll(sortData.getSortOrder());            
+            rv.addAll(sortMetaOrdering);
+        }
+        return rv;
+    }
+
+    
+    private List<Order> processSortMeta(SortData sortData, CriteriaBuilder cb, Root<TT> root)
+    {
+        List<Order> sortMetaOrdering = Lists.newLinkedList();
+        sortData.getSortMeta().forEachRemaining(sm ->
         {
             switch(sm.getSortOrder())
             {
                 case ASCENDING:
-                    rv.add(cb.asc(root.get(sm.getSortField())));
+                    sortMetaOrdering.add(cb.asc(root.get(sm.getSortField())));
                     break;
                 case DESCENDING:
-                    rv.add(cb.desc(root.get(sm.getSortField())));
+                    sortMetaOrdering.add(cb.desc(root.get(sm.getSortField())));
                     break;
             }
         });
-        return rv;
+        return sortMetaOrdering;
     }
     
     

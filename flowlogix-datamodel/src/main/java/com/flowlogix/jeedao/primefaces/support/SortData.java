@@ -15,11 +15,12 @@
  */
 package com.flowlogix.jeedao.primefaces.support;
 
-import java.util.Iterator;
+import com.google.common.collect.Lists;
+import java.util.Collection;
 import java.util.List;
 import javax.persistence.criteria.Order;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.primefaces.model.SortMeta;
 
 /**
@@ -27,19 +28,24 @@ import org.primefaces.model.SortMeta;
  * 
  * @author lprimak
  */
-@RequiredArgsConstructor @Getter
+@Getter @Setter
 public class SortData
 {
+    public SortData(Collection<SortMeta> sm)
+    {
+        sortMeta = Lists.newLinkedList(sm);
+    }
+    
     /**
      * Sort based on fields
      */
-    private final Iterator<SortMeta> sortMeta;
+    private final List<SortMeta> sortMeta;
     /**
      * global sort order added by the client
      */
-    private final List<Order> sortOrder;
+    private final List<Order> sortOrder = Lists.newLinkedList();
     /**
      * which goes first - sort by the client (default) or field-based sort
      */
-    private final boolean appendSortOrder;
+    private boolean appendSortOrder = false;
 }

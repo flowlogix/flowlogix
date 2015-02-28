@@ -157,17 +157,13 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     
     private List<Order> getSort(List<SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root)
     {
-        SortData sortData;
+        SortData sortData = new SortData(sortCriteria);
         if(getState().getSorterHook().isPresent())
         {
-            sortData = getState().getSorterHook().get().sort(Lists.newLinkedList(sortCriteria).iterator(), cb, root);          
-        }
-        else
-        {
-            sortData = new SortData(sortCriteria.iterator(), Lists.newLinkedList(), false);
+            getState().getSorterHook().get().sort(sortData, cb, root);          
         }
 
-        List<Order> sortMetaOrdering = processSortMeta(sortData, cb, root);        
+        List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);        
         List<Order> rv = Lists.newLinkedList();
         if(sortData.isAppendSortOrder())
         {
@@ -183,10 +179,10 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     }
 
     
-    private List<Order> processSortMeta(SortData sortData, CriteriaBuilder cb, Root<TT> root)
+    private List<Order> processSortMeta(List<SortMeta> sortMeta, CriteriaBuilder cb, Root<TT> root)
     {
         List<Order> sortMetaOrdering = Lists.newLinkedList();
-        sortData.getSortMeta().forEachRemaining(sm ->
+        sortMeta.forEach(sm ->
         {
             switch(sm.getSortOrder())
             {

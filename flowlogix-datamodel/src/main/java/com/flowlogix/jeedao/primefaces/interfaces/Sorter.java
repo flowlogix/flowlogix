@@ -17,10 +17,8 @@ package com.flowlogix.jeedao.primefaces.interfaces;
 
 import com.flowlogix.jeedao.primefaces.support.SortData;
 import java.io.Serializable;
-import java.util.Iterator;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
-import org.primefaces.model.SortMeta;
 
 /**
  * Sorter Hook
@@ -31,13 +29,12 @@ public interface Sorter<TT> extends Serializable
 {
     /**
      * Hook for sort criteria application
-     * can remove elements from the iterator and do your own action
-     * any elements left will be done via the default mechanism
+     * can remove elements from the SortMeta lists and do your own action
+     * any elements left in SortMeta will be done via the default mechanism
      *
-     * @param sortCriteria
+     * @param sortData
      * @param cb
      * @param root
-     * @return SortData containing iterator to sort data, or, more likely same sortCriteria parameter
      */
-    SortData sort(Iterator<SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root);
+    void sort(SortData sortData, CriteriaBuilder cb, Root<TT> root);
 }

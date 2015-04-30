@@ -68,7 +68,12 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
         boolean rv = super.isLoginRequest(request, response);
         if(rv && HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod()))
         {
-            saveRequest(request, response, true);
+            if(Servlets.getRequestCookie(WebUtils.toHttp(request), WebUtils.SAVED_REQUEST_KEY) == null)
+            {
+                // only save refer when there is no saved request cookie already,
+                // and only as a last resort
+                saveRequest(request, response, true);
+            }
         }
         return rv;
     }
@@ -90,7 +95,7 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
         {
             return;
         }
-        
+            
         Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response), 
                 WebUtils.SAVED_REQUEST_KEY, path.get(), null,
                 PathUtil.getContextPath(WebUtils.toHttp(request)), -1);

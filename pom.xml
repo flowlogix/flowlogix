@@ -15,9 +15,9 @@
         </license>
     </licenses>
     <scm>
-        <url>http://code.google.com/p/flowlogix/source/browse/</url>
-        <connection>scm:hg:http://code.google.com/p/flowlogix/</connection>
-        <developerConnection>scm:hg:https://code.google.com/p/flowlogix/</developerConnection>
+        <url>https://github.com/flowlogix/flowlogix</url>
+        <connection>scm:git:https://github.com/flowlogix/flowlogix.git</connection>
+        <developerConnection>scm:git:https://github.com/flowlogix/flowlogix.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <developers>
@@ -77,7 +77,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

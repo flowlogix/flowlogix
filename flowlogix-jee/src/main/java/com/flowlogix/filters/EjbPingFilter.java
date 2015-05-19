@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.web.session.HttpServletSession;
 import org.omnifaces.filter.HttpFilter;
+import org.omnifaces.util.Servlets;
 
 /**
  *
@@ -53,7 +54,10 @@ public class EjbPingFilter extends HttpFilter
     {
         if (session != null)
         {
-            StatefulUtil.pingStateful(new HttpServletSession(session, null));
+            if(StatefulUtil.pingStateful(new HttpServletSession(session, null)) == false)
+            {
+                log.info("Failed EJB ping(s) for request: {}", Servlets.getRequestURLWithQueryString(request));
+            }
         }
         
         chain.doFilter(request, response);

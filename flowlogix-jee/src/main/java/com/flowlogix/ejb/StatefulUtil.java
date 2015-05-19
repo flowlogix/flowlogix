@@ -37,9 +37,12 @@ public class StatefulUtil
      * Pings all pingable SFSBs in the session
      * 
      * @param session 
+     * @return true if successful, false if any of the pings failed
      */
-    public static void pingStateful(Session session)
+    public static boolean pingStateful(Session session)
     {
+        boolean rv = true;
+        
         List<String> attrNames = FluentIterable.from(session.getAttributeKeys()).transform(new Function<Object, String>()
         {
             @Override
@@ -71,10 +74,13 @@ public class StatefulUtil
                 catch (EJBException e)
                 {
                     log.debug("Failed to Ping Stateful EJB: ", e);
+                    rv = false; // signal failure if any of the pings fail
                     session.removeAttribute(attrName);
                 }
             }
         }
+        
+        return rv;
     }
     
     

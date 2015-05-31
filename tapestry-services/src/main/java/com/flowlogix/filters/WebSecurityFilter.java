@@ -32,7 +32,7 @@ import org.apache.shiro.web.subject.WebSubject;
  * 
  * @author lprimak
  */
-@WebFilter(filterName = "WebSecurityFilter", urlPatterns = {"/*"} )
+@WebFilter(filterName = "WebSecurityFilter", urlPatterns = {"/*"}, asyncSupported = true )
 public class WebSecurityFilter implements Filter
 {
     @Override

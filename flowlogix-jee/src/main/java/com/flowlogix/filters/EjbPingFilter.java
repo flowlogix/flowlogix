@@ -32,10 +32,8 @@ import org.omnifaces.util.Servlets;
  *
  * @author lprimak
  */
-@WebFilter(filterName = "EjbPingFilter", urlPatterns =
-{
-    "/*"
-}, servletNames = "Faces Servlet")
+@WebFilter(filterName = "EjbPingFilter", urlPatterns = { "/*" }, 
+           servletNames = "Faces Servlet", asyncSupported = true)
 @Slf4j
 public class EjbPingFilter extends HttpFilter
 {

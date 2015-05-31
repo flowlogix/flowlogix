@@ -3,7 +3,7 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix-datamodel</artifactId>
-    <version>2.2.2-SNAPSHOT</version>
+    <version>2.2.2</version>
     <packaging>jar</packaging>
 
     <name>Flow Logix PrimeFaces Data Model</name>
@@ -19,7 +19,7 @@
         <groupId>com.flowlogix</groupId>
         <artifactId>build-core</artifactId>
         <relativePath>../build-core/pom.xml</relativePath>
-        <version>2.2.2-SNAPSHOT</version>
+        <version>2.2.2</version>
     </parent>
     
     <dependencies>

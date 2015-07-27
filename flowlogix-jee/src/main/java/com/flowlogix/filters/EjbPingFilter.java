@@ -19,11 +19,12 @@ import com.flowlogix.ejb.StatefulUtil;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.web.servlet.ShiroHttpSession;
 import org.apache.shiro.web.session.HttpServletSession;
 import org.omnifaces.filter.HttpFilter;
 import org.omnifaces.util.Servlets;
@@ -32,8 +33,6 @@ import org.omnifaces.util.Servlets;
  *
  * @author lprimak
  */
-@WebFilter(filterName = "EjbPingFilter", urlPatterns = { "/*" }, 
-           servletNames = "Faces Servlet", asyncSupported = true)
 @Slf4j
 public class EjbPingFilter extends HttpFilter
 {
@@ -42,17 +41,26 @@ public class EjbPingFilter extends HttpFilter
      * 
      * @param request
      * @param response
-     * @param session
+     * @param _session
      * @param chain
      * @throws ServletException
      * @throws IOException 
      */
     @Override
-    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession _session, FilterChain chain) throws ServletException, IOException
     {
-        if (session != null)
+        if (_session != null)
         {
-            if(StatefulUtil.pingStateful(new HttpServletSession(session, null)) == false)
+            Session session;
+            if(_session instanceof ShiroHttpSession)
+            {
+                session = ((ShiroHttpSession)_session).getSession();
+            }
+            else
+            {
+                session = new HttpServletSession(_session, null);
+            }
+            if(StatefulUtil.pingStateful(session) == false)
             {
                 log.info("Failed EJB ping(s) for request: {}", Servlets.getRequestURLWithQueryString(request));
             }

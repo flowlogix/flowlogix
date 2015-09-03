@@ -49,7 +49,7 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release-flowlogix-prod, generate-docs</releaseProfiles>
+                    <releaseProfiles>release-flowlogix-prod,generate-docs</releaseProfiles>
                     <goals>deploy</goals>
                     <tagNameFormat>VERS_@{project.version}-YYYYMMDD</tagNameFormat>
                 </configuration>

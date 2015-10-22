@@ -51,7 +51,7 @@ public class ShiroSessionScopeContext implements Context, Serializable
     @Override
     public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext)
     {
-        if(SecurityUtils.getSecurityManager() instanceof WebSecurityManager)
+        if(isWebContainerSessions())
         {
             Context ctx = CDI.current().getBeanManager().getContext(SessionScoped.class);
             return ctx.get(contextual, creationalContext);            
@@ -85,7 +85,7 @@ public class ShiroSessionScopeContext implements Context, Serializable
     @Override
     public <T> T get(Contextual<T> contextual)
     {
-        if(SecurityUtils.getSecurityManager() instanceof WebSecurityManager)
+        if(isWebContainerSessions())
         {
             Context ctx = CDI.current().getBeanManager().getContext(SessionScoped.class);
             return ctx.get(contextual);
@@ -139,6 +139,17 @@ public class ShiroSessionScopeContext implements Context, Serializable
                 scopeInst.bean.destroy(scopeInst.instance, scopeInst.context);
             }
         }
+    }
+    
+    
+    private boolean isWebContainerSessions()
+    {
+        if(SecurityUtils.getSecurityManager() instanceof WebSecurityManager)
+        {
+            WebSecurityManager wsm = (WebSecurityManager) SecurityUtils.getSecurityManager();
+            return wsm.isHttpSessionMode();
+        }
+        return false;
     }
     
     

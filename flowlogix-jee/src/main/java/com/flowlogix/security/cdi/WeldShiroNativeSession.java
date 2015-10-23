@@ -143,6 +143,6 @@ public class WeldShiroNativeSession implements ServletRequestListener, ServletCo
     
     private final DefaultWebSessionManager blankSessionManager = new DefaultWebSessionManager();
     private ServletContext servletContext;
-    public final String DEFAULT_WELD_LISTENER_PARAM = "org.jboss.weld.servlet.WeldInitialListener";
+    public final String DEFAULT_WELD_LISTENER_PARAM = "com.flowlogix.security.cdi.weldListener";
     private final String DEFAULT_WELD_LISTENER_CLASS = "org.jboss.weld.servlet.WeldInitialListener";
 }

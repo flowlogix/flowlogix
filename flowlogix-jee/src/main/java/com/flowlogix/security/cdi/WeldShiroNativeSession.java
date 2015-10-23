@@ -27,6 +27,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -85,8 +86,8 @@ public class WeldShiroNativeSession implements ServletRequestListener, ServletCo
     @Override
     public void contextInitialized(ServletContextEvent sce)
     {
-        DefaultWebSessionManager dwsm = (DefaultWebSessionManager) getSecurityManager(sce.getServletContext()).getSessionManager();
-        dwsm.getSessionListeners().stream().filter(it -> it instanceof WeldShiroNativeSession)
+        getSessionManager(sce.getServletContext()).getSessionListeners().stream()
+                .filter(it -> it instanceof WeldShiroNativeSession)
                 .map(it -> (WeldShiroNativeSession) it)
                 .forEach(it -> it.servletContext = sce.getServletContext());
     }
@@ -114,6 +115,11 @@ public class WeldShiroNativeSession implements ServletRequestListener, ServletCo
         return (DefaultWebSecurityManager) WebUtils
                 .getRequiredWebEnvironment(context).getSecurityManager();
     }
+    
+    private DefaultWebSessionManager getSessionManager(ServletContext ctx)
+    {
+        return (DefaultWebSessionManager) getSecurityManager(ctx).getSessionManager();
+    }
 
     /**
      * run an action with a subject context need to get a native Shiro session from a web session, since we are outside
@@ -130,7 +136,8 @@ public class WeldShiroNativeSession implements ServletRequestListener, ServletCo
                 new ShiroHttpServletRequest(httpRequest, request.getServletContext(), false));
         Subject.Builder subjectBuilder = new Subject.Builder();
         String sessionId = blankSessionManager.getSessionIdCookie().readValue(httpRequest, null);
-        if (sessionId != null)
+        if (sessionId != null && getSessionManager(request.getServletContext())
+                .isValid(new DefaultSessionKey(sessionId)))
         {
             subjectBuilder.sessionId(sessionId);
         }

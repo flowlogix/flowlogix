@@ -21,7 +21,7 @@
     </parent>
     
     <properties>
-        <java.code.version>1.8</java.code.version>
+        <java.code.version>1.7</java.code.version>
         <skinny.war>false</skinny.war>
     </properties>
     

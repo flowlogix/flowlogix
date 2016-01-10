@@ -27,6 +27,7 @@ import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.WithAnnotations;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 
@@ -37,14 +38,10 @@ import lombok.experimental.Delegate;
  */
 public class ShiroSecurityExtension implements Extension
 {
-    public<T> void addSecurity(@Observes ProcessAnnotatedType<T> pat)
+    public<T> void addSecurity(@Observes @WithAnnotations({Stateless.class, Stateful.class, 
+        Singleton.class}) ProcessAnnotatedType<T> pat)
     {
-        if(pat.getAnnotatedType().isAnnotationPresent(Stateless.class)
-           || pat.getAnnotatedType().isAnnotationPresent(Stateful.class)
-           || pat.getAnnotatedType().isAnnotationPresent(Singleton.class))
-        {
-            pat.setAnnotatedType(new Wrapper<>(pat.getAnnotatedType(), () -> ShiroSecure.class));
-        }
+        pat.setAnnotatedType(new Wrapper<>(pat.getAnnotatedType(), () -> ShiroSecure.class));
     }
     
     

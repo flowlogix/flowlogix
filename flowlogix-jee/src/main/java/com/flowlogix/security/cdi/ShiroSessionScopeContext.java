@@ -65,7 +65,7 @@ public class ShiroSessionScopeContext implements Context, Serializable
                 @SuppressWarnings("unchecked")
                 ScopeInst<T> scopeInst = (ScopeInst<T>) 
                         session.getAttribute(BEAN_PREFIX + bean.getBeanClass());
-                T rv = null;
+                T rv;
                 if(scopeInst == null)
                 {
                     rv = bean.create(creationalContext);

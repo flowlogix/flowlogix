@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.security;
+package com.flowlogix.security.cdi;
 
+import com.flowlogix.cdi.annotations.ShiroSecure;
 import com.flowlogix.security.internal.aop.AopHelper;
 import com.flowlogix.security.internal.aop.SecurityInterceptor;
 import java.io.Serializable;
 import java.util.List;
+import javax.annotation.Priority;
+import javax.enterprise.context.Dependent;
 import javax.interceptor.AroundInvoke;
+import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Enforce Shiro security on EJBs and CDI Beans
@@ -31,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author lprimak
  */
-@Slf4j
+@Interceptor @ShiroSecure @Dependent @Priority(Interceptor.Priority.LIBRARY_BEFORE)
 public class ShiroSecurityInterceptor implements Serializable
 {
     @AroundInvoke

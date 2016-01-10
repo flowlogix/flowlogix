@@ -16,20 +16,13 @@
 package com.flowlogix.security.cdi;
 
 import com.flowlogix.cdi.annotations.ShiroSecure;
-import com.google.common.collect.ImmutableSet;
-import java.lang.annotation.Annotation;
-import java.util.Set;
 import javax.ejb.Singleton;
 import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.Annotated;
-import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
-import lombok.Getter;
-import lombok.experimental.Delegate;
 
 /**
  * Automatically apply Shiro security to all EJBs
@@ -41,34 +34,6 @@ public class ShiroSecurityExtension implements Extension
     public<T> void addSecurity(@Observes @WithAnnotations({Stateless.class, Stateful.class, 
         Singleton.class}) ProcessAnnotatedType<T> pat)
     {
-        pat.setAnnotatedType(new Wrapper<>(pat.getAnnotatedType(), () -> ShiroSecure.class));
-    }
-    
-    
-    private static class Wrapper<T> implements AnnotatedType<T>
-    {
-        public Wrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
-        {
-            this.wrapped = wrapped;
-            annotations = ImmutableSet.<Annotation>builder().addAll(wrapped.getAnnotations())
-                    .add(additionalAnnotations).build();
-        }
-        
-        @Override
-        public boolean isAnnotationPresent(Class<? extends Annotation> annotationType)
-        {
-            return annotations.stream().anyMatch(annotation -> annotationType.isInstance(annotation));
-        }
-        
-        interface Exclusions
-        {
-            boolean isAnnotationPresent(Class<? extends Annotation> annotationType);
-            boolean getAnnotations();
-        }
-        
-        private abstract class AT implements AnnotatedType<T> { };
-        
-        private final @Delegate(types = {AT.class, Annotated.class}, excludes = Exclusions.class) AnnotatedType<T> wrapped;
-        private final @Getter Set<Annotation> annotations;
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroSecure.class));
     }
 }

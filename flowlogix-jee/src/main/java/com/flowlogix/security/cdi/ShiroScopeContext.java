@@ -27,6 +27,7 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.CDI;
 import lombok.RequiredArgsConstructor;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.web.mgt.WebSecurityManager;
@@ -40,9 +41,10 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 public class ShiroScopeContext implements Context, Serializable
 {
 
-    public ShiroScopeContext(Class<? extends Annotation> scopeType)
+    public ShiroScopeContext(Class<? extends Annotation> scopeType, Class<? extends Annotation> webScopeType)
     {
         this.scopeType = scopeType;
+        this.webScopeType = webScopeType;
         BEAN_PREFIX = String.format("FL_S%sSC_", scopeType.getSimpleName());
         bpPattern = Pattern.compile(String.format("^%s.*", BEAN_PREFIX));
     }
@@ -58,9 +60,9 @@ public class ShiroScopeContext implements Context, Serializable
     @Override
     public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext)
     {
-        if(isWebContainerSessions())
+        if(isWebContainerSessions(SecurityUtils.getSecurityManager()))
         {
-            Context ctx = CDI.current().getBeanManager().getContext(scopeType);
+            Context ctx = CDI.current().getBeanManager().getContext(webScopeType);
             return ctx.get(contextual, creationalContext);            
         }
         else
@@ -92,9 +94,9 @@ public class ShiroScopeContext implements Context, Serializable
     @Override
     public <T> T get(Contextual<T> contextual)
     {
-        if(isWebContainerSessions())
+        if(isWebContainerSessions(SecurityUtils.getSecurityManager()))
         {
-            Context ctx = CDI.current().getBeanManager().getContext(scopeType);
+            Context ctx = CDI.current().getBeanManager().getContext(webScopeType);
             return ctx.get(contextual);
         }
         else
@@ -142,11 +144,11 @@ public class ShiroScopeContext implements Context, Serializable
     }
     
     
-    private boolean isWebContainerSessions()
+    public static boolean isWebContainerSessions(SecurityManager sm)
     {
-        if(SecurityUtils.getSecurityManager() instanceof WebSecurityManager)
+        if(sm instanceof WebSecurityManager)
         {
-            WebSecurityManager wsm = (WebSecurityManager) SecurityUtils.getSecurityManager();
+            WebSecurityManager wsm = (WebSecurityManager) sm;
             return wsm.isHttpSessionMode();
         }
         return false;
@@ -164,6 +166,7 @@ public class ShiroScopeContext implements Context, Serializable
 
 
     private final Class<? extends Annotation> scopeType;
+    private final Class<? extends Annotation> webScopeType;
     private final String BEAN_PREFIX;
     private final Pattern bpPattern;
     private static final long serialVersionUID = 1L;    

@@ -15,9 +15,14 @@
  */
 package com.flowlogix.security;
 
+import com.flowlogix.security.cdi.ShiroScopeContext;
+import com.flowlogix.security.cdi.ShiroSessionScopeExtension;
 import java.security.Principal;
+import javax.inject.Inject;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 
 /**
@@ -45,4 +50,18 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
             }
         };
     }
+
+    @Override
+    public void init() throws Exception
+    {
+        super.init();
+        if(!ShiroScopeContext.isWebContainerSessions(super.getSecurityManager())) {
+            DefaultSecurityManager dsm = (DefaultSecurityManager)super.getSecurityManager();
+            DefaultSessionManager sm = (DefaultSessionManager)dsm.getSessionManager();
+            ssse.addDestroyHandlers(sm.getSessionListeners(), dsm);
+        }
+    }
+
+
+    private @Inject ShiroSessionScopeExtension ssse;
 }

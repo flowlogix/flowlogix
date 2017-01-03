@@ -19,10 +19,14 @@ import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
+import javax.faces.view.ViewScoped;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.SessionListenerAdapter;
@@ -34,12 +38,21 @@ import org.apache.shiro.session.SessionListenerAdapter;
  */
 public class ShiroSessionScopeExtension implements Extension, Serializable
 {
+    public void addDestroyHandlers(Collection<SessionListener> sessionListeners) {
+        addDestroyHandlers(sessionListeners, SecurityUtils.getSecurityManager());
+    }
     /**
      * intercept session destroy session listeners and destroy the beans
      * 
      * @param sessionListeners 
      */
-    public void addDestroyHandlers(Collection<SessionListener> sessionListeners)
+
+    /**
+     * intercept session destroy session listeners and destroy the beans
+     * @param sessionListeners
+     * @param sm
+     */
+    public void addDestroyHandlers(Collection<SessionListener> sessionListeners, SecurityManager sm)
     {
         sessionListeners.add(new SessionListenerAdapter()
         {
@@ -71,6 +84,7 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
     
     
     private final List<ShiroScopeContext> contexts = ImmutableList.of(
-            new ShiroScopeContext(ShiroSessionScoped.class), new ShiroScopeContext(ShiroViewScoped.class));
+            new ShiroScopeContext(ShiroSessionScoped.class, SessionScoped.class),
+            new ShiroScopeContext(ShiroViewScoped.class, ViewScoped.class));
     private static final long serialVersionUID = 1L;
 }

@@ -23,6 +23,7 @@ import javax.inject.Scope;
 
 /**
  * @SessionScoped interface that works with Shiro sessions
+ * Primarily for plugging into Shiro destruction pipeline
  * 
  * @author lprimak
  */

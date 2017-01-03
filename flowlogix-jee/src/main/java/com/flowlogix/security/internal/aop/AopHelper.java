@@ -78,7 +78,7 @@ public class AopHelper
      * @param annotation
      * @return
      */
-    public static AuthorizingAnnotationHandler createHandler(Annotation annotation) {
+    static AuthorizingAnnotationHandler createHandler(Annotation annotation) {
         HandlerCreateVisitor visitor = new HandlerCreateVisitor();
         MethodAnnotationCaster.getInstance().accept(visitor, annotation);
         return visitor.getHandler();
@@ -91,12 +91,12 @@ public class AopHelper
      * @param modifiers
      * @return 
      */
-    public static boolean isInterceptOnClassAnnotation(int modifiers) {
+    private static boolean isInterceptOnClassAnnotation(int modifiers) {
         return Modifier.isPublic(modifiers)
                 || Modifier.isProtected(modifiers);
     }
 
-    public static Collection<Class<? extends Annotation>> getAutorizationAnnotationClasses() {
+    private static Collection<Class<? extends Annotation>> getAutorizationAnnotationClasses() {
         return autorizationAnnotationClasses;
     }
 

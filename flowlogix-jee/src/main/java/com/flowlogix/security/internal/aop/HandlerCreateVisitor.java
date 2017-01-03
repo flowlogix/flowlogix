@@ -31,7 +31,7 @@ import org.apache.shiro.authz.aop.UserAnnotationHandler;
 /**
  * Enhanced from Tynamo Security
  */
-public class HandlerCreateVisitor implements MethodAnnotationCasterVisitor 
+class HandlerCreateVisitor implements MethodAnnotationCasterVisitor 
 {
     private @Getter AuthorizingAnnotationHandler handler;
 

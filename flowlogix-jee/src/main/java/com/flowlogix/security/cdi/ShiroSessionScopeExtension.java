@@ -15,8 +15,10 @@
  */
 package com.flowlogix.security.cdi;
 
+import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
@@ -44,7 +46,7 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
             @Override
             public void onStop(Session session)
             {
-                context.onDestroy(session);
+                contexts.forEach(ctx -> ctx.onDestroy(session));
             }
 
             @Override
@@ -58,16 +60,17 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
     
     private void addScope(@Observes final BeforeBeanDiscovery event)
     {
-        event.addScope(ShiroSessionScoped.class, true, true);
+        contexts.forEach(ctx -> event.addScope(ctx.getScope(), true, true));
     }
 
     
     private void registerContext(@Observes final AfterBeanDiscovery event)
     {
-        event.addContext(new ShiroSessionScopeContext());
+        contexts.forEach(ctx -> event.addContext(ctx));
     }
     
     
-    private final ShiroSessionScopeContext context = new ShiroSessionScopeContext();
+    private final List<ShiroScopeContext> contexts = ImmutableList.of(
+            new ShiroScopeContext(ShiroSessionScoped.class), new ShiroScopeContext(ShiroViewScoped.class));
     private static final long serialVersionUID = 1L;
 }

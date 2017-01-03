@@ -15,14 +15,12 @@
  */
 package com.flowlogix.security.cdi;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
@@ -39,12 +37,21 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
  * 
  * @author lprimak
  */
-public class ShiroSessionScopeContext implements Context, Serializable 
+public class ShiroScopeContext implements Context, Serializable
 {
+
+    public ShiroScopeContext(Class<? extends Annotation> scopeType)
+    {
+        this.scopeType = scopeType;
+        BEAN_PREFIX = String.format("FL_S%sSC_", scopeType.getSimpleName());
+        bpPattern = Pattern.compile(String.format("^%s.*", BEAN_PREFIX));
+    }
+
+
     @Override
     public Class<? extends Annotation> getScope()
     {
-        return ShiroSessionScoped.class;
+        return scopeType;
     }
     
 
@@ -53,7 +60,7 @@ public class ShiroSessionScopeContext implements Context, Serializable
     {
         if(isWebContainerSessions())
         {
-            Context ctx = CDI.current().getBeanManager().getContext(SessionScoped.class);
+            Context ctx = CDI.current().getBeanManager().getContext(scopeType);
             return ctx.get(contextual, creationalContext);            
         }
         else
@@ -87,7 +94,7 @@ public class ShiroSessionScopeContext implements Context, Serializable
     {
         if(isWebContainerSessions())
         {
-            Context ctx = CDI.current().getBeanManager().getContext(SessionScoped.class);
+            Context ctx = CDI.current().getBeanManager().getContext(scopeType);
             return ctx.get(contextual);
         }
         else
@@ -120,14 +127,7 @@ public class ShiroSessionScopeContext implements Context, Serializable
     public <T> void onDestroy(Session session)
     {
         List<String> attrNames = FluentIterable.from(session.getAttributeKeys())
-                .transform(new Function<Object, String>()
-                {
-                    @Override
-                    public String apply(Object f)
-                    {
-                        return f instanceof String ? (String) f : null;
-                    }
-                })
+                .transform(f -> f instanceof String ? (String) f : null)
                 .filter(Predicates.and(Predicates.notNull(),
                                 Predicates.contains(bpPattern))).toList();
         for (String attrName : attrNames)
@@ -161,9 +161,10 @@ public class ShiroSessionScopeContext implements Context, Serializable
         private final CreationalContext<T> context;
         private static final long serialVersionUID = 1L;
     }
-    
-    
-    private static final String BEAN_PREFIX = "FL_SSSC_";
-    private static final Pattern bpPattern = Pattern.compile(String.format("^%s.*", BEAN_PREFIX));
+
+
+    private final Class<? extends Annotation> scopeType;
+    private final String BEAN_PREFIX;
+    private final Pattern bpPattern;
     private static final long serialVersionUID = 1L;    
 }

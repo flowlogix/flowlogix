@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright 2014-2017 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,10 +49,7 @@ public class ShiroSecurityInterceptor implements Serializable
     {
         List<SecurityInterceptor> siList = AopHelper.createSecurityInterceptors(ctx.getMethod(), 
                 ctx.getMethod().getDeclaringClass());
-        for(SecurityInterceptor si : siList)
-        {
-            si.intercept();
-        }
+        siList.forEach(SecurityInterceptor::intercept);
     }
     
     

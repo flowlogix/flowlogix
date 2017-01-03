@@ -24,7 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresUser;
 /**
  * Enhanced from Tynamo Security
  */
-public interface MethodAnnotationCasterVisitor
+interface MethodAnnotationCasterVisitor
 {
 
     void visitRequiresPermissions(RequiresPermissions annotation);

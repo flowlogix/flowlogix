@@ -29,7 +29,7 @@ import org.apache.shiro.authz.annotation.RequiresUser;
  * Enhanced from Tynamo Security
  */
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class MethodAnnotationCaster 
+class MethodAnnotationCaster 
 {
     private @Getter static final MethodAnnotationCaster instance = new MethodAnnotationCaster();
 

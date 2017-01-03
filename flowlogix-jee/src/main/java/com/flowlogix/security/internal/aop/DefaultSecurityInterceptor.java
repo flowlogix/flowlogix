@@ -24,7 +24,7 @@ import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
  * Enhanced from Tynamo Security
  */
 @RequiredArgsConstructor
-public class DefaultSecurityInterceptor implements SecurityInterceptor 
+class DefaultSecurityInterceptor implements SecurityInterceptor 
 {
     private final AuthorizingAnnotationHandler handler;
     private @Getter final Annotation annotation;

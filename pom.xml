@@ -7,10 +7,6 @@
     <name>Flow Logix Root</name>
     <description>Flow Logix Utility Library Root POM</description>
 
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
-
     <url>https://github.com/flowlogix/flowlogix</url>
     <licenses>
         <license>

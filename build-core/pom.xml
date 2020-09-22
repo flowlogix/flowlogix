@@ -8,23 +8,17 @@
     <packaging>pom</packaging>
     <version>3.0-SNAPSHOT</version>
 
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
-
-    
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix</artifactId>
-        <relativePath>../pom.xml</relativePath>
         <version>3.0-SNAPSHOT</version>
     </parent>
-    
+
     <properties>
         <java.code.version>1.8</java.code.version>
         <skinny.war>false</skinny.war>
     </properties>
-    
+
     <profiles>
         <profile>
             <id>skinny-war</id>
@@ -136,7 +130,7 @@
             <version>1.7.22</version>
             <optional>${skinny.war}</optional>
         </dependency>
-        
+
         <!-- Optional, Non-Transitive dependencies -->
         <dependency>
             <groupId>commons-beanutils</groupId>
@@ -173,7 +167,7 @@
             <optional>${skinny.war}</optional>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -191,7 +185,7 @@
                 <version>2.18.1</version>
                 <configuration>
                     <includes>
-                        <include>**/test/**</include>                     
+                        <include>**/test/**</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -227,7 +221,7 @@
                                 <goal>testGenerateStubs</goal>
                                 <goal>testCompile</goal>
                                 <goal>removeStubs</goal>
-                                <goal>removeTestStubs</goal>                            
+                                <goal>removeTestStubs</goal>
                             </goals>
                             <configuration>
                                  <invokeDynamic>true</invokeDynamic>

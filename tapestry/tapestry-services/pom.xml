@@ -18,10 +18,10 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>build-core</artifactId>
-        <relativePath>../build-core/pom.xml</relativePath>
+        <relativePath>../../build-core/pom.xml</relativePath>
         <version>2.3.2-SNAPSHOT</version>
     </parent>
-    
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -151,7 +151,7 @@
             <optional>${skinny.war}</optional>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>

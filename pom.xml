@@ -10,7 +10,7 @@
     <prerequisites>
         <maven>3.0.4</maven>
     </prerequisites>
-    
+
     <url>https://github.com/flowlogix/flowlogix</url>
     <licenses>
         <license>
@@ -32,13 +32,12 @@
             <email>lenny@flowlogix.com</email>
         </developer>
     </developers>
-  
+
     <modules>
         <module>build-core</module>
         <module>flowlogix-jee</module>
         <module>flowlogix-datamodel</module>
-        <module>tapestry-services</module>
-        <module>tapestry-services-gwt</module>
+        <module>tapestry</module>
     </modules>
 
     <build>
@@ -56,14 +55,14 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <distributionManagement>
         <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-     
+
     <profiles>
         <profile>
             <id>generate-docs</id>

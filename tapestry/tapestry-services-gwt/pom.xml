@@ -19,10 +19,10 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>build-core</artifactId>
-        <relativePath>../build-core/pom.xml</relativePath>
+        <relativePath>../../build-core/pom.xml</relativePath>
         <version>2.3.2-SNAPSHOT</version>
     </parent>
-    
+
     <build>
         <plugins>
             <plugin>

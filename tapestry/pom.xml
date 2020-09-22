@@ -5,9 +5,14 @@
     <version>3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Tapestry sub-module</name>
-    <description>Flow Logix Tapestry rRoot</description>
+    <description>Flow Logix Tapestry Root</description>
     <modules>
         <module>tapestry-services</module>
         <module>tapestry-services-gwt</module>
     </modules>
+    <parent>
+        <groupId>com.flowlogix</groupId>
+        <artifactId>flowlogix</artifactId>
+        <version>3.0-SNAPSHOT</version>
+    </parent>
 </project>

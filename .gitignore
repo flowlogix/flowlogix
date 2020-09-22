@@ -5,3 +5,5 @@
 \.conflict\~$
 */target/**
 /target/
+/tapestry/tapestry-services-gwt/target/
+/tapestry/tapestry-services/target/

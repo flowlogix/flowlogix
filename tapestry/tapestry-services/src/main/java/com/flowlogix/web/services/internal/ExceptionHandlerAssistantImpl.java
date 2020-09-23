@@ -31,20 +31,19 @@ import org.tynamo.security.services.SecurityService;
 
 /**
  * Detects expired session and sets an attribute
- * 
+ *
  * @author lprimak
  */
 public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssistant
 {
-    public ExceptionHandlerAssistantImpl(SecurityService securityService, LoginContextService contextService, 
+    public ExceptionHandlerAssistantImpl(SecurityService securityService, LoginContextService contextService,
             RequestPageCache pageCache, PageResponseRenderer renderer,
             HttpServletRequest httpRequest, Response response)
     {
-        super(securityService, contextService, pageCache, httpRequest, response, 
-                renderer);
+        super(securityService, contextService, pageCache, response, renderer);
     }
 
-    
+
     @Override
     public Object handleRequestException(Throwable exception, List<Object> exceptionContext) throws IOException
     {
@@ -58,9 +57,9 @@ public class ExceptionHandlerAssistantImpl extends SecurityExceptionHandlerAssis
             }
         }
         return rv;
-    }    
-    
-    
+    }
+
+
     private @Inject Request request;
     private @Inject RequestGlobals rg;
 }

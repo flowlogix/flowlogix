@@ -25,22 +25,21 @@ import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
 import com.flowlogix.jeedao.primefaces.internal.JPAFacadeLocal;
 import com.flowlogix.jeedao.primefaces.support.FilterData;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.apache.commons.lang.StringUtils;
-import org.omnifaces.config.BeanManager;
+import org.omnifaces.util.Beans;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
-import org.primefaces.model.SortOrder;
 
 /**
  * Easy implementation of PrimeFaces lazy data model
  * using Lambdas
- * 
+ *
  * @author lprimak
  * @param <KK> Key Type
  * @param <TT> Data Type
@@ -51,7 +50,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     /**
      * Set up this particular instance of the data model
      * with entity manager, class and key converter
-     * 
+     *
      * @param <K1>
      * @param <T1>
      * @param emg
@@ -64,25 +63,25 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     {
         return createModel(emg, entityClass, converter, null);
     }
-    
-    
+
+
     /**
      * Set up this particular instance of the data model
      * with entity manager, class and key converter
-     * 
+     *
      * @param <K1> Key Type
      * @param <T1> Value Type
      * @param emg
      * @param entityClass
-     * @param converter 
-     * @param initializer 
+     * @param converter
+     * @param initializer
      * @return newly-created data model
      */
     public static<K1, T1> JPALazyDataModel<K1, T1> createModel(EntityManagerGetter emg,
             Class<T1> entityClass, KeyConverter<K1> converter, Initializer<K1, T1> initializer)
     {
         @SuppressWarnings("unchecked")
-        JPALazyDataModel<K1, T1> model = BeanManager.INSTANCE.getReference(JPALazyDataModel.class);
+        JPALazyDataModel<K1, T1> model = Beans.getReference(JPALazyDataModel.class);
         model.emg = emg;
         model.entityClass = entityClass;
         model.converter = converter;
@@ -96,15 +95,15 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
 
     /**
      * set filter hook
-     * 
-     * @param filter 
+     *
+     * @param filter
      */
     public void setFilter(Filter<TT> filter)
     {
         this.filter = Optional.of(filter);
     }
-    
-    
+
+
     /**
      * remove filter hook
      */
@@ -112,11 +111,11 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     {
         filter = Optional.absent();
     }
-    
-     
+
+
     /**
      * Utility method for replacing a predicate in the filter list
-     * 
+     *
      * @param filters filter list
      * @param element element to be replace
      * @param fp lambda to get the new Filter predicate
@@ -126,23 +125,23 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
         FilterData elt = filters.get(element);
         if (elt != null && StringUtils.isNotBlank(elt.getFieldValue()))
         {
-            filters.replace(element, new FilterData(elt.getFieldValue(), 
+            filters.replace(element, new FilterData(elt.getFieldValue(),
                     fp.get(elt.getPredicate(), elt.getFieldValue())));
         }
     }
 
-    
+
     /**
      * set sorter hook
-     * 
-     * @param sorter 
+     *
+     * @param sorter
      */
     public void setSorter(Sorter<TT> sorter)
     {
         this.sorter = Optional.of(sorter);
     }
-    
-    
+
+
     /**
      * remove sorter hook
      */
@@ -150,19 +149,19 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     {
         sorter = Optional.absent();
     }
-    
+
 
     /**
      * add hints to JPA query
-     * 
-     * @param optimizier 
+     *
+     * @param optimizier
      */
     public void addOptimizerHints(Optimizer<TT> optimizier)
     {
         this.optimizer = Optional.of(optimizier);
     }
 
-    
+
     /**
      * remove hints from JPA query
      */
@@ -170,11 +169,11 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     {
         this.optimizer = Optional.absent();
     }
-    
-    
+
+
     /**
      * transforms JPA entity field to format suitable for hints
-     * 
+     *
      * @param val
      * @return JPA field suitable for hints
      */
@@ -182,8 +181,8 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     {
         return String.format("%s.%s", RESULT, val);
     }
-    
-    
+
+
     @Override
     @SuppressWarnings("unchecked")
     @Transactional
@@ -192,37 +191,24 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
         return (KK)emg.get().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
     }
 
-    
+
     @Override
     @Transactional
     public TT getRowData(String rowKey)
-    {   
+    {
         facade.setup(emg, entityClass, optimizer, filter, sorter);
         return facade.find(converter.convert(rowKey));
     }
 
-    
-    @Override
-    @Transactional
-    public List<TT> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters)
-    {
-        SortMeta sm = new SortMeta();
-        sm.setSortField(sortField);
-        sm.setSortOrder(sortOrder);
-        return load(first, pageSize, sortField == null? ImmutableList.of() : ImmutableList.of(sm), filters);
-    }    
 
-    
     @Override
-    @Transactional
-    public List<TT> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, Object> filters)
+    public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy)
     {
         facade.setup(emg, entityClass, optimizer, filter, sorter);
-        setRowCount(facade.count(filters));
-        return facade.findRows(first, pageSize, filters, multiSortMeta == null? ImmutableList.of() : multiSortMeta);
+        setRowCount(facade.count(filterBy));
+        return facade.findRows(first, pageSize, filterBy, sortBy);
     }
 
-    
     private @Inject JPAFacadeLocal<TT, KK> facade;
     private EntityManagerGetter emg;
     private Class<TT> entityClass;

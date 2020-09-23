@@ -16,7 +16,6 @@
 package com.flowlogix.ui;
 
 import static com.flowlogix.ui.AttributeKeys.SESSION_EXPIRED_KEY;
-import java.io.IOException;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.Iterator;
 import javax.faces.FacesException;
@@ -27,14 +26,13 @@ import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.event.ExceptionQueuedEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
 
 /**
  * establishes a session for ajax exceptions
- * 
+ *
  * @author lprimak
  */
 @RequiredArgsConstructor
@@ -45,13 +43,12 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
     {
         return new Handler(wrapped.getExceptionHandler());
     }
-    
+
 
     @RequiredArgsConstructor
     private static class Handler extends ExceptionHandlerWrapper
     {
         @Override
-        @SneakyThrows(IOException.class)
         public void handle() throws FacesException
         {
             Iterator<ExceptionQueuedEvent> it = getUnhandledExceptionQueuedEvents().iterator();
@@ -67,7 +64,7 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
                 }
 
                 if (ex instanceof ViewExpiredException)
-                {               
+                {
                     it.remove();
                     Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
                     Faces.redirect(Faces.getRequestURIWithQueryString());
@@ -81,11 +78,11 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
             }
             getWrapped().handle();
         }
-        
-        
+
+
         private @Getter final ExceptionHandler wrapped;
-    }    
-        
-    
+    }
+
+
     private @Getter final ExceptionHandlerFactory wrapped;
 }

@@ -20,15 +20,15 @@ import com.flowlogix.jeedao.primefaces.interfaces.Filter;
 import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
 import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
 import com.google.common.base.Optional;
-import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 
 /**
  * Typed state, as @TransactionScoped beans cannot be typed
- * 
+ *
  * @author lprimak
  * @param <TT>
  */
@@ -39,6 +39,6 @@ public @Getter @Setter class JPAFacadeTypedState<TT>
     private Optional<Optimizer<TT>> optimizer;
     private Optional<Filter<TT>> filterHook;
     private Optional<Sorter<TT>> sorterHook;
-    private Map<String, Object> filters;
-    private List<SortMeta> sortMeta;
+    private Map<String, FilterMeta> filters;
+    private Map<String, SortMeta> sortMeta;
 }

@@ -24,11 +24,12 @@ import com.google.common.base.Optional;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.Local;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 
 /**
  * JPA DAO facade that supports PrimeFaces lazy table model
- * 
+ *
  * @author lprimak
  * @param <TT>
  * @param <KK>
@@ -38,31 +39,31 @@ public interface JPAFacadeLocal<TT, KK> extends FacadeAPI<TT, KK>
 {
     /**
      * Set up each call to JPA
-     * 
+     *
      * @param emg
      * @param entityClass
      * @param optimizer
      * @param filter
-     * @param sorter 
+     * @param sorter
      */
     void setup(EntityManagerGetter emg, Class<TT> entityClass, Optional<Optimizer<TT>> optimizer,
             Optional<Filter<TT>> filter, Optional<Sorter<TT>> sorter);
     /**
      * row count
-     * 
+     *
      * @param filters
      * @return count
      */
-    int count(Map<String, Object> filters);
-    
+    int count(Map<String, FilterMeta> filters);
+
     /**
      * return paginated entity list to be used in the lazy table model
-     * 
+     *
      * @param first
      * @param pageSize
      * @param filters
      * @param sortMeta
      * @return entity list
      */
-    List<TT> findRows(int first, int pageSize, Map<String, Object> filters, List<SortMeta> sortMeta);
+    List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta);
 }

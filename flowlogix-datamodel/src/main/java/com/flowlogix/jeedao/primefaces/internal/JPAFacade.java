@@ -40,6 +40,7 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 
 /**
@@ -62,39 +63,39 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
         getState().setSorterHook(sorter);
     }
 
-    
+
     @Override
     protected EntityManager getEntityManager()
     {
         return getState().getEmg().get();
     }
 
-    
+
     @Override
     public Class<TT> getEntityClass()
     {
         return getState().getEntityClass();
     }
-    
-    
+
+
     @Override
-    public int count(Map<String, Object> filters)
+    public int count(Map<String, FilterMeta> filters)
     {
         getState().setFilters(filters);
-        getState().setSortMeta(Lists.newLinkedList());
+        getState().setSortMeta(Maps.newHashMap());
         return super.count();
     }
 
-    
+
     @Override
-    public List<TT> findRows(int first, int pageSize, Map<String, Object> filters, List<SortMeta> sortMeta)
+    public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta)
     {
         getState().setFilters(filters);
         getState().setSortMeta(sortMeta);
         return super.findRange(new int[] { first, first + pageSize });
     }
 
-    
+
     @Override
     protected void addToCriteria(CriteriaBuilder cb, Root<TT> root, CriteriaQuery<TT> cq)
     {
@@ -102,15 +103,15 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
         cq.orderBy(getSort(getState().getSortMeta(), cb, root));
         root.alias(JPALazyDataModel.RESULT);
     }
-    
-    
+
+
     @Override
     protected void addToCountCriteria(CriteriaBuilder cb, Root<TT> root, CriteriaQuery<Long> cq)
     {
         cq.where(getFilters(getState().getFilters(), cb, root));
     }
 
-    
+
     @Override
     protected void addHints(TypedQuery<TT> tq, boolean isRange)
     {
@@ -119,11 +120,11 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
             getState().getOptimizer().get().addHints(tq);
         }
     }
-    
-    
-    private Predicate getFilters(Map<String, Object> filters, CriteriaBuilder cb, Root<TT> root)
+
+
+    private Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root)
     {
-        Map<String, FilterData> predicates = Maps.newHashMap();        
+        Map<String, FilterData> predicates = Maps.newHashMap();
         filters.forEach((key, value) ->
         {
             Predicate cond = null;
@@ -148,22 +149,22 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
         {
             getState().getFilterHook().get().filter(predicates, cb, root);
         }
-        
+
         return cb.and(FluentIterable.from(predicates.values())
                 .filter(it -> it.getPredicate() != null)
                 .transform(it -> it.getPredicate()).toArray(Predicate.class));
     }
-    
-    
-    private List<Order> getSort(List<SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root)
+
+
+    private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root)
     {
         SortData sortData = new SortData(sortCriteria);
         if(getState().getSorterHook().isPresent())
         {
-            getState().getSorterHook().get().sort(sortData, cb, root);          
+            getState().getSorterHook().get().sort(sortData, cb, root);
         }
 
-        List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);        
+        List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);
         List<Order> rv = Lists.newLinkedList();
         if(sortData.isAppendSortOrder())
         {
@@ -172,38 +173,38 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
         }
         else
         {
-            rv.addAll(sortData.getSortOrder());            
+            rv.addAll(sortData.getSortOrder());
             rv.addAll(sortMetaOrdering);
         }
         return rv;
     }
 
-    
-    private List<Order> processSortMeta(List<SortMeta> sortMeta, CriteriaBuilder cb, Root<TT> root)
+
+    private List<Order> processSortMeta(Map<String, SortMeta> sortMeta, CriteriaBuilder cb, Root<TT> root)
     {
         List<Order> sortMetaOrdering = Lists.newLinkedList();
-        sortMeta.forEach(sm ->
+        sortMeta.forEach((field, order) ->
         {
-            switch(sm.getSortOrder())
+            switch(order.getSortOrder())
             {
                 case ASCENDING:
-                    sortMetaOrdering.add(cb.asc(root.get(sm.getSortField())));
+                    sortMetaOrdering.add(cb.asc(root.get(order.getSortField())));
                     break;
                 case DESCENDING:
-                    sortMetaOrdering.add(cb.desc(root.get(sm.getSortField())));
+                    sortMetaOrdering.add(cb.desc(root.get(order.getSortField())));
                     break;
             }
         });
         return sortMetaOrdering;
     }
-    
-    
+
+
     @SuppressWarnings("unchecked")
     private JPAFacadeTypedState<TT> getState()
     {
         return (JPAFacadeTypedState<TT>) state.getTypedState();
     }
-    
-    
+
+
     private @Inject JPAFacadeState state;
 }

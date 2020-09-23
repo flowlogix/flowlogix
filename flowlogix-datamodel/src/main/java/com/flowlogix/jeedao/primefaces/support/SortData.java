@@ -16,8 +16,9 @@
 package com.flowlogix.jeedao.primefaces.support;
 
 import com.google.common.collect.Lists;
-import java.util.Collection;
+import com.google.common.collect.Maps;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.criteria.Order;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,21 +26,21 @@ import org.primefaces.model.SortMeta;
 
 /**
  * return type for the sorter hook
- * 
+ *
  * @author lprimak
  */
 @Getter @Setter
 public class SortData
 {
-    public SortData(Collection<SortMeta> sm)
+    public SortData(Map<String, SortMeta> sm)
     {
-        sortMeta = Lists.newLinkedList(sm);
+        sortMeta = Maps.newHashMap(sm);
     }
-    
+
     /**
      * Sort based on fields
      */
-    private final List<SortMeta> sortMeta;
+    private final Map<String, SortMeta> sortMeta;
     /**
      * global sort order added by the client
      */

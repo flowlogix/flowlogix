@@ -36,8 +36,7 @@
 
     <modules>
         <module>flowlogix-bom</module>
-        <module>flowlogix-jee</module>
-        <module>flowlogix-datamodel</module>
+        <module>jakarta-ee</module>
         <module>tapestry</module>
     </modules>
 

@@ -16,7 +16,7 @@
 
     <parent>
         <groupId>com.flowlogix</groupId>
-        <artifactId>build-core</artifactId>
+        <artifactId>flowlogix</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
 </project>

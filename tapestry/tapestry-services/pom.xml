@@ -17,7 +17,7 @@
 
     <parent>
         <groupId>com.flowlogix</groupId>
-        <artifactId>build-core</artifactId>
+        <artifactId>tapestry</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
 
@@ -31,7 +31,6 @@
             <groupId>org.apache.tapestry</groupId>
             <artifactId>tapestry-core</artifactId>
             <version>${tap.version}</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
@@ -59,43 +58,36 @@
                     <artifactId>javax.inject</artifactId>
                 </exclusion>
             </exclusions>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <artifactId>plastic</artifactId>
             <groupId>org.apache.tapestry</groupId>
             <version>${tap.version}</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <artifactId>tapestry5-annotations</artifactId>
             <groupId>org.apache.tapestry</groupId>
             <version>${tap.version}</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
             <artifactId>tapestry-func</artifactId>
             <version>${tap.version}</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
             <artifactId>tapestry-json</artifactId>
             <version>${tap.version}</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
             <artifactId>tapestry-jmx</artifactId>
             <version>${tap.version}</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.tapestry</groupId>
             <artifactId>tapestry-beanvalidator</artifactId>
             <version>${tap.version}</version>
-            <optional>${skinny.war}</optional>
             <exclusions>
                 <exclusion>
                     <groupId>org.hibernate</groupId>
@@ -111,31 +103,26 @@
             <groupId>org.apache.tapestry</groupId>
             <artifactId>tapestry-upload</artifactId>
             <version>${tap.version}</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.tynamo</groupId>
             <artifactId>tapestry-exceptionpage</artifactId>
             <version>0.1.2</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.tynamo</groupId>
             <artifactId>tapestry-security</artifactId>
             <version>0.5.1</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.tynamo</groupId>
             <artifactId>tynamo-common</artifactId>
             <version>0.0.3</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.21.0-GA</version>
-            <optional>${skinny.war}</optional>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
@@ -147,7 +134,6 @@
                     <artifactId>stringtemplate</artifactId>
                 </exclusion>
             </exclusions>
-            <optional>${skinny.war}</optional>
         </dependency>
     </dependencies>
 

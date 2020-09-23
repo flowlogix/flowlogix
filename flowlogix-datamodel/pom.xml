@@ -12,15 +12,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.code.version>1.8</java.code.version>
     </properties>
 
     <parent>
         <groupId>com.flowlogix</groupId>
-        <artifactId>build-core</artifactId>
+        <artifactId>flowlogix</artifactId>
         <version>3.0-SNAPSHOT</version>
     </parent>
-    
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

@@ -29,12 +29,13 @@ import org.apache.tapestry5.ioc.annotations.Local;
 import org.apache.tapestry5.ioc.annotations.Match;
 import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.tynamo.exceptionpage.ExceptionHandlerAssistant;
+import org.tynamo.security.internal.SecurityExceptionHandlerAssistant;
 
 /**
  * patch Tynamo security to load classes from the
  * our package, otherwise the library doesn't have access to our
  * principal classes
- * 
+ *
  * @author lprimak
  */
 public class TynamoSecurityModule
@@ -46,38 +47,38 @@ public class TynamoSecurityModule
         configuration.add(SecurityModule.Symbols.SESSION_EXPIRED_MESSAGE, "Your Session Has Expired");
     }
 
-    
+
     public static void bind(ServiceBinder binder)
     {
-        binder.bind(ExceptionHandlerAssistant.class, ExceptionHandlerAssistantImpl.class).withId("FLSecurityExceptionHandler");
+        binder.bind(SecurityExceptionHandlerAssistant.class, ExceptionHandlerAssistantImpl.class).withId("FLSecurityExceptionHandler");
     }
-    
-    
+
+
     public void contributeMetaDataLocator(MappedConfiguration<String, String> configuration)
     {
         configuration.add(String.format("%s:%s", SECURITY_PATH_PREFIX, MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
         configuration.add(String.format("%s:%s", "security", MetaDataConstants.SECURE_PAGE), Boolean.toString(isSecure));
     }
-    
-    
+
+
     @Match("RememberMeManager")
-    public RememberMeManager decorateRememberMeDefaults(RememberMeManager _mgr, 
+    public RememberMeManager decorateRememberMeDefaults(RememberMeManager _mgr,
         @Symbol(SecurityModule.Symbols.REMEMBER_ME_DURATION) Integer daysToRemember)
     {
         CookieRememberMeManager mgr = (CookieRememberMeManager)_mgr;
         if (productionMode)
         {
             mgr.getCookie().setMaxAge(daysToRemember * 24 * 60 * 60);
-        } 
+        }
         else
         {
             mgr.getCookie().setMaxAge(-1);
         }
-        
+
         return null;
     }
-    
-    
+
+
     /**
      * Detects expired session and sets an attribute to indicate that fact
      * @param configuration
@@ -88,8 +89,8 @@ public class TynamoSecurityModule
     {
         configuration.override(ShiroException.class, assistant);
     }
-    
-    
+
+
     private @Inject @Symbol(SymbolConstants.SECURE_ENABLED) boolean isSecure;
     private @Inject @Symbol(SymbolConstants.PRODUCTION_MODE) boolean productionMode;
 }

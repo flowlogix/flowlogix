@@ -5,9 +5,11 @@
 package com.flowlogix.webgwt.base;
 
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Import;
@@ -23,48 +25,50 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 /**
  * <a href="http://code.google.com/p/flowlogix/wiki/TLGwtSupport"
  *    target="_blank">See Documentation</a>
- * 
+ *
  * @author lprimak
  */
 @Import(library="gwtSupport.js")
 public abstract class GwtSupport
-{    
+{
     protected abstract Class<?> getEntryPoint();
     protected abstract String getModuleName();
-    
-    
+
+
     /**
      * Override to add JavaScript initialization code that module depends on
-     * @return 
+     * @return
      */
     protected List<String> getJavaScriptInitialization()
     {
         return Lists.newLinkedList();
     }
-    
-    
+
+
     /**
      * Override to add parameters to the GWT component
-     * @return 
+     * @return
      */
     protected List<String> getGWTParameters()
     {
         return Lists.newLinkedList();
     }
-    
-    
+
+
+    @SneakyThrows(IOException.class)
     protected String getGwtModulePath()
     {
-        return contextRoot.constructAssetPath(RequestConstants.CONTEXT_FOLDER, getModuleName());
+        // +++ TODO not sure how to set the last argument since incompatible change
+        return contextRoot.constructAssetPath(RequestConstants.CONTEXT_FOLDER, getModuleName(), null);
     }
-    
-    
+
+
     @SetupRender
     public void addScript()
-    {        
-        jsSupport.addScript("GWTComponentController.add('%s','%s')", getEntryPoint().getName(), 
+    {
+        jsSupport.addScript("GWTComponentController.add('%s','%s')", getEntryPoint().getName(),
                 addParameters(resources.getCompleteId(), getGWTParameters()));
-        
+
         final String gwtModule = getModuleName();
         final String supportVariablePath = "flowlogixgwt/js/GwtSupportVariable";
         for (String var : getJavaScriptInitialization())
@@ -75,9 +79,9 @@ public abstract class GwtSupport
         }
         final String gwtModuleJSPath = String.format("context:%s/%s.nocache.js", gwtModule, gwtModule);
         jsSupport.importJavaScriptLibrary(assetSource.getExpandedAsset(gwtModuleJSPath));
-    }    
-   
-    
+    }
+
+
     private String addParameters(String id, List<String> additinalParameters)
     {
         StringBuilder sb = new StringBuilder();
@@ -88,8 +92,8 @@ public abstract class GwtSupport
         }
         return sb.toString();
     }
-    
-    
+
+
     private @Environmental JavaScriptSupport jsSupport;
     private @Inject AssetSource assetSource;
     private @Getter @Inject ComponentResources resources;

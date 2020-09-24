@@ -118,10 +118,9 @@
                 <version>3.0.0-M1</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release-flowlogix-prod,generate-docs</releaseProfiles>
                     <goals>deploy</goals>
-                    <tagNameFormat>VERS_@{project.version}-YYYYMMDD</tagNameFormat>
+                    <tagNameFormat>Version-@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
         </plugins>
@@ -137,11 +136,6 @@
     <profiles>
         <profile>
             <id>generate-docs</id>
-            <activation>
-                <property>
-                    <name>flowlogix.release</name>
-                </property>
-            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -179,11 +173,6 @@
         </profile>
         <profile>
             <id>release-flowlogix-prod</id>
-            <activation>
-                <property>
-                    <name>flowlogix.release</name>
-                </property>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

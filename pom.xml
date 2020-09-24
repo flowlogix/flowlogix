@@ -137,6 +137,11 @@
     <profiles>
         <profile>
             <id>generate-docs</id>
+            <activation>
+                <property>
+                    <name>flowlogix.release</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -174,6 +179,11 @@
         </profile>
         <profile>
             <id>release-flowlogix-prod</id>
+            <activation>
+                <property>
+                    <name>flowlogix.release</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

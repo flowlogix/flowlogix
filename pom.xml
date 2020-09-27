@@ -54,7 +54,7 @@
                 <version>3.0.0-M5</version>
                 <configuration>
                     <includes>
-                        <include>**/test/**</include>
+                        <include>**</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -109,7 +109,7 @@
                 </executions>
             </plugin>
         </plugins>
-        
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -131,7 +131,7 @@
                     <version>3.2.0</version>
                     <configuration>
                         <doclint>none</doclint>
-                        <overview>${basedir}/src/main/java/overview.html</overview>
+                        <overview>${project.basedir}/src/main/java/overview.html</overview>
                     </configuration>
                     <executions>
                         <execution>
@@ -182,6 +182,46 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>checkstyle</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>checkstyle</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <configLocation>${maven.multiModuleProjectDirectory}/checkstyle/checkstyle.xml</configLocation>
+                            <suppressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle/suppressions.xml</suppressionsLocation>
+                            <headerLocation>${maven.multiModuleProjectDirectory}/checkstyle/ClassHeader.txt</headerLocation>
+                            <enableRSS>false</enableRSS>
+                            <linkXRef>true</linkXRef>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>true</failsOnError>
+                            <failOnViolation>true</failOnViolation>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                            <enableRulesSummary>true</enableRulesSummary>
+                            <propertyExpansion>main.basedir=${maven.multiModuleProjectDirectory}</propertyExpansion>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.puppycrawl.tools</groupId>
+                                <artifactId>checkstyle</artifactId>
+                                <version>8.36</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>generate-docs</id>
             <build>

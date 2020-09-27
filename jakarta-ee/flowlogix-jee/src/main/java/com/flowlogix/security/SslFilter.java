@@ -15,7 +15,7 @@
  */
 package com.flowlogix.security;
 
-import com.flowlogix.ejb.JNDIObjectLocator;
+import com.flowlogix.jndi.JNDIObjectLocator;
 import java.io.IOException;
 import javax.faces.application.ProjectStage;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
@@ -43,9 +43,9 @@ public class SslFilter extends org.apache.shiro.web.filter.authz.SslFilter
                 enabled = false;
             }
         } catch (NamingException ex) {}
-        return enabled && super.isEnabled(request, response); 
+        return enabled && super.isEnabled(request, response);
     }
-    
-    
-    private final JNDIObjectLocator locator = new JNDIObjectLocator();
+
+
+    private final JNDIObjectLocator locator = JNDIObjectLocator.builder().build();
 }

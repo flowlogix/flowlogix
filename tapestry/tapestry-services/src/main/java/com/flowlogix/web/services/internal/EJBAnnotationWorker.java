@@ -15,9 +15,8 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.ejb.JNDIConfigurer;
-import com.flowlogix.ejb.JNDIObjectLocator;
-import com.flowlogix.ejb.StatefulUtil;
+import com.flowlogix.jndi.JNDIConfigurer;
+import com.flowlogix.jndi.JNDIObjectLocator;
 import com.flowlogix.web.services.annotations.Stateful;
 import javax.ejb.EJB;
 import javax.naming.NamingException;
@@ -36,7 +35,7 @@ import org.apache.tapestry5.services.transform.TransformationSupport;
 
 /**
  * Inject an EJB into tapestry sources
- * 
+ *
  * @author Magnus
  * Enhancements by Lenny Primak
  */
@@ -54,10 +53,10 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             final String fieldType = field.getTypeName();
             final String fieldName = field.getName();
             final String mappedName = annotation.mappedName();
-            
+
             final JNDIObjectLocator locator = JNDIConfigurer.getInstance().buildLocator(mappedName);
             final String lookupname = getLookupName(annotation, fieldType, locator);
-            
+
             Object injectionValue = lookupBean(field, fieldType, fieldName, lookupname, mappedName, stateful, locator);
             if (injectionValue != null)
             {
@@ -66,7 +65,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         }
     }
 
-    
+
     private String getLookupName(EJB annotation, String fieldType, final JNDIObjectLocator locator)
     {
         String lookupname = null;
@@ -98,23 +97,23 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         lookupname = locator.prependPortableName(lookupname);
         return lookupname;
     }
-    
-    
+
+
     private Object lookupBean(final PlasticField field, final String typeName, final String fieldName,
             final String lookupname, final String mappedName, final Stateful stateful,
             final JNDIObjectLocator locator) throws NamingException
     {
         if(stateful != null)
         {
-            field.setConduit(new EJBFieldConduit(locator, lookupname, 
-                    stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));              
+            field.setConduit(new EJBFieldConduit(locator, lookupname,
+                    stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));
             return true;
         }
         else if(locator.isNoCaching() || typeName.toUpperCase().endsWith(JNDIObjectLocator.REMOTE))
         {
-            field.setConduit(new EJBFieldConduit(locator, lookupname, 
-                    null, "", fieldName));              
-            return true;            
+            field.setConduit(new EJBFieldConduit(locator, lookupname,
+                    null, "", fieldName));
+            return true;
         }
         else
         {
@@ -126,7 +125,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             return rv;
         }
     }
-    
+
 
     private class EJBFieldConduit implements FieldConduit<Object>
     {
@@ -140,7 +139,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             this.locator = locator;
         }
 
-        
+
         @Override
         @SneakyThrows({NamingException.class})
         public Object get(Object instance, InstanceContext context)
@@ -149,9 +148,9 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             {
                 return locator.getJNDIObject(lookupname, true);
             }
-            
+
             final HttpSession session = rg.getHTTPServletRequest().getSession(true);
-            
+
             Object rv;
             synchronized(session.getId().intern())
             {
@@ -165,22 +164,22 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             return rv;
         }
 
-        
+
         @Override
         @SneakyThrows(IllegalAccessException.class)
         public void set(Object instance, InstanceContext context, Object newValue)
         {
             throw new IllegalAccessException(String.format("Field %s is Read Only", fieldName));
         }
-        
-        
+
+
         protected final String lookupname;
         protected final Stateful stateful;
         protected final String attributeName;
         protected final String fieldName;
         protected final JNDIObjectLocator locator;
     }
-    
-    
+
+
     private @Inject RequestGlobals rg;
 }

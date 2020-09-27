@@ -1,9 +1,12 @@
 package com.flowlogix.jndi;
 
+import com.flowlogix.util.Lazy;
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 import javax.ejb.Remote;
 import javax.naming.InitialContext;
@@ -55,9 +58,8 @@ public class JNDIObjectLocator implements Serializable {
 
     @Getter(AccessLevel.PACKAGE)
     private transient final Map<String, Object> jndiObjectCache = new ConcurrentHashMap<>();
-    @Getter(AccessLevel.PACKAGE)
-    private transient final ThreadLocal<InitialContext> initialContext =
-            ThreadLocal.withInitial(this::createInitialContext);
+    private transient final Lazy<InitialContext> initialContext = new Lazy<>(this::createInitialContext);
+    private transient final Lock initialContextLock = new ReentrantLock();
 
     /**
      * naming convention suffix for remote beans
@@ -191,15 +193,23 @@ public class JNDIObjectLocator implements Serializable {
     @SuppressWarnings("unchecked")
     private <T> T getJNDIObject(String jndiName, boolean noCaching) throws NamingException {
         if (noCaching || this.noCaching) {
-            return (T) initialContext.get().lookup(jndiName);
+            initialContextLock.lock();
+            try {
+                return (T) initialContext.get().lookup(jndiName);
+            } finally {
+                initialContextLock.unlock();
+            }
         }
 
         T jndiObject = (T) jndiObjectCache.computeIfAbsent(jndiName, (key) -> {
+            initialContextLock.lock();
             try {
                 return (T) initialContext.get().lookup(jndiName);
             } catch (NamingException ex) {
                 clearCache();
                 throw Lombok.sneakyThrow(ex);
+            } finally {
+                initialContextLock.unlock();
             }
         });
 
@@ -208,7 +218,7 @@ public class JNDIObjectLocator implements Serializable {
 
     /**
      * this deals with transient final fields correctly
-     * 
+     *
      * @return new object
      */
     private Object readResolve() {

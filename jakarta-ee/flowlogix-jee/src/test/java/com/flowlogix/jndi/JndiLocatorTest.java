@@ -65,13 +65,16 @@ public class JndiLocatorTest
                 when(icObject.lookup(anyString())).thenReturn("hello");
             }
         })) {
-            JNDIObjectLocatorBuilder builder = JNDIObjectLocator.builder().environment("oneKey", "oneValue");
+            JNDIObjectLocatorBuilder builder = JNDIObjectLocator.builder()
+                    .environment("oneKey", "oneValue")
+                    .environment("twoKey", "twoValue");
             JNDIObjectLocator.initialHost(builder, "myHost");
             JNDIObjectLocator.initialPort(builder, 12345);
             JNDIObjectLocator locator = builder.build();
             assertEquals("hello", locator.getObject(String.class));
-            assertEquals(3, constructedEnvironment.size());
+            assertEquals(4, constructedEnvironment.size());
             assertEquals("oneValue", constructedEnvironment.get("oneKey"));
+            assertEquals("twoValue", constructedEnvironment.get("twoKey"));
             assertEquals("myHost", constructedEnvironment.get("org.omg.CORBA.ORBInitialHost"));
             assertEquals("12345", constructedEnvironment.get("org.omg.CORBA.ORBInitialPort"));
         }

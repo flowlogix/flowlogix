@@ -28,6 +28,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
@@ -48,8 +49,9 @@
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
         </dependency>
-        
+
         <!-- test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

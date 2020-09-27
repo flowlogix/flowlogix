@@ -15,7 +15,6 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.jndi.JNDIConfigurer;
 import com.flowlogix.jndi.JNDIObjectLocator;
 import com.flowlogix.web.services.annotations.Stateful;
 import javax.ejb.EJB;
@@ -54,7 +53,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
             final String fieldName = field.getName();
             final String mappedName = annotation.mappedName();
 
-            final JNDIObjectLocator locator = JNDIConfigurer.getInstance().buildLocator(mappedName);
+            final JNDIObjectLocator locator = JNDIObjectLocator.builder().build();
             final String lookupname = getLookupName(annotation, fieldType, locator);
 
             Object injectionValue = lookupBean(field, fieldType, fieldName, lookupname, mappedName, stateful, locator);
@@ -109,7 +108,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
                     stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));
             return true;
         }
-        else if(locator.isNoCaching() || typeName.toUpperCase().endsWith(JNDIObjectLocator.REMOTE))
+        else if(typeName.toUpperCase().endsWith(JNDIObjectLocator.REMOTE))
         {
             field.setConduit(new EJBFieldConduit(locator, lookupname,
                     null, "", fieldName));
@@ -117,7 +116,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         }
         else
         {
-            Object rv = locator.getJNDIObject(lookupname, false);
+            Object rv = locator.getObject(lookupname, false);
             if(rv != null)
             {
                 field.inject(rv);
@@ -134,7 +133,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         {
             this.lookupname = lookupname;
             this.stateful = stateful;
-            this.attributeName = StatefulUtil.ejbPrefix + attributeName;
+            this.attributeName = "ejb:" + attributeName;
             this.fieldName = fieldName;
             this.locator = locator;
         }
@@ -146,7 +145,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         {
             if(stateful == null)
             {
-                return locator.getJNDIObject(lookupname, true);
+                return locator.getObject(lookupname, true);
             }
 
             final HttpSession session = rg.getHTTPServletRequest().getSession(true);
@@ -157,7 +156,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
                 rv = session.getAttribute(attributeName);
                 if (rv == null)
                 {
-                    rv = locator.getJNDIObject(lookupname, stateful != null);
+                    rv = locator.getObject(lookupname, stateful != null);
                     session.setAttribute(attributeName, rv);
                 }
             }

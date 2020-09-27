@@ -21,8 +21,8 @@ import lombok.EqualsAndHashCode;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.io.DefaultSerializer;
 import org.apache.shiro.io.Serializer;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -38,12 +38,12 @@ public class PrincipalSerializationTests
         assertEquals(new X(15, "xxx"), ser.deserialize(Base64.decode(encoded)));
     }
 
-    
+
     @EqualsAndHashCode
     @AllArgsConstructor
     static class X implements Serializable
     {
         final Integer x;;
-        final String y;    
+        final String y;
     }
 }

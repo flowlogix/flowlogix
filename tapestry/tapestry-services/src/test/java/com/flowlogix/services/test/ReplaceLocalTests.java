@@ -6,15 +6,15 @@ package com.flowlogix.services.test;
 
 import com.flowlogix.jndi.JNDIObjectLocator;
 import com.flowlogix.web.services.internal.EJBAnnotationWorker;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 
 /**
  *
  * @author lprimak
  */
-public class ReplaceLocalTests 
+public class ReplaceLocalTests
 {
     @Test
     public void stripLocal()

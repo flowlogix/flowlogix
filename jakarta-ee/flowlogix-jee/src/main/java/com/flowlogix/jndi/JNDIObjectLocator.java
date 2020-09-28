@@ -203,13 +203,17 @@ public class JNDIObjectLocator implements Serializable {
 
         T jndiObject = (T) jndiObjectCache.computeIfAbsent(jndiName, (key) -> {
             initialContextLock.lock();
+            boolean shouldClearCache = false;
             try {
                 return (T) initialContext.get().lookup(jndiName);
             } catch (NamingException ex) {
-                clearCache();
+                shouldClearCache = true;
                 throw Lombok.sneakyThrow(ex);
             } finally {
                 initialContextLock.unlock();
+                if (shouldClearCache) {
+                    clearCache();
+                }
             }
         });
 

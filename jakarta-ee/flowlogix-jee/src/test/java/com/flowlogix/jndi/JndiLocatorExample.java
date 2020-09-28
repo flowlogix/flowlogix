@@ -15,7 +15,11 @@
  */
 package com.flowlogix.jndi;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import javax.naming.NamingException;
+//import org.jboss.arquillian.container.test.api.Deployment;
+//import org.jboss.shrinkwrap.api.ShrinkWrap;
+//import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+//import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +31,14 @@ import org.junit.jupiter.api.Test;
 @Tag("Arquillian")
 public class JndiLocatorExample {
     @Test
-    void basicLookup() {
-        assertTrue(false, "not implemented");
+    void basicLookup() throws NamingException {
+        JNDIObjectLocator.builder().build().getObject("hello");
     }
+
+//    @Deployment
+//    public static JavaArchive createDeployment() {
+//        return ShrinkWrap.create(JavaArchive.class)
+//                .addClass(JndiLocatorExample.class)
+//                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+//    }
 }

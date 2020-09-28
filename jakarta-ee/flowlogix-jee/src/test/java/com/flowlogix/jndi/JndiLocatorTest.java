@@ -24,16 +24,25 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.IntStream;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import lombok.Lombok;
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,9 +57,20 @@ import static org.mockito.Mockito.when;
  */
 public class JndiLocatorTest
 {
+    private JNDIObjectLocator locator;
+
+    @BeforeEach
+    void before() {
+        locator = JNDIObjectLocator.builder().build();
+    }
+
+    @AfterEach
+    void after() {
+        locator = null;
+    }
+
     @Test
     void portableNamePrefox() {
-        JNDIObjectLocator locator = JNDIObjectLocator.builder().build();
         assertEquals(JNDIObjectLocator.PORTABLE_NAME_PREFIX + "/hello", locator.prependPortableName("hello"));
         assertEquals("java:hello", locator.prependPortableName("java:hello"));
     }
@@ -83,7 +103,6 @@ public class JndiLocatorTest
 
     @Test
     void basicLocator() throws Exception {
-        JNDIObjectLocator locator = JNDIObjectLocator.builder().build();
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
                 (icObject, context) -> when(icObject.lookup(anyString())).thenReturn("hello"))) {
             assertEquals("hello", locator.getObject(String.class));
@@ -108,7 +127,6 @@ public class JndiLocatorTest
 
     @Test
     void dontCacheRemote() throws NamingException {
-        JNDIObjectLocator locator = JNDIObjectLocator.builder().build();
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
                 (icObject, context) -> when(icObject.lookup(anyString())).thenReturn(new TestRemote()))) {
             assertEquals(TestRemote.class, locator.getObject(TestRemote.class).getClass());
@@ -120,7 +138,6 @@ public class JndiLocatorTest
 
     @Test
     void guessByType() {
-        JNDIObjectLocator locator = JNDIObjectLocator.builder().build();
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
                 (icObject, context) -> {
                     // the '$' denotes inner class
@@ -163,7 +180,6 @@ public class JndiLocatorTest
 
     @Test
     void caching() throws NamingException {
-        JNDIObjectLocator locator = JNDIObjectLocator.builder().build();
         TestLocal result = new TestLocal();
         AtomicInteger numInvocations = new AtomicInteger();
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
@@ -198,7 +214,52 @@ public class JndiLocatorTest
 
     @Test
     @Tag("StressTest")
-    void stressTest() {
-        assertTrue(false, "not implemented");
+    void stressTest() throws InterruptedException, NamingException {
+        int numThreads = 500;
+        int numIterations = 10000;
+        AtomicBoolean failed = new AtomicBoolean();
+        AtomicLong maxCached = new AtomicLong();
+        AtomicInteger numInvocations = new AtomicInteger();
+        TestLocal result = new TestLocal();
+        try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
+                (icObject, context) -> {
+                    when(icObject.lookup(eq("hello"))).thenAnswer(iom -> {
+                        numInvocations.incrementAndGet();
+                        return result;
+                    });
+                    when(icObject.lookup(eq("hello2"))).thenAnswer(iom -> {
+                        numInvocations.incrementAndGet();
+                        return result;
+                    });
+                    when(icObject.lookup(eq("exception"))).thenThrow(NamingException.class);
+                })) {
+            assertEquals(result, locator.getObject("hello", true));
+            assertTrue(locator.getJndiObjectCache().isEmpty(), "cache should be empty");
+        }
+        ExecutorService exec = Executors.newFixedThreadPool(numThreads);
+        IntStream.rangeClosed(0, numIterations).forEach(ii -> exec.submit(() -> {
+            try {
+                assertEquals(result, locator.getObject("hello", true));
+                maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
+                assertEquals(result, locator.getObject("hello"));
+                assertEquals(result, locator.getObject("hello"));
+                maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
+                assertEquals(result, locator.getObject("hello2"));
+                maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
+                assertThrows(NamingException.class, () -> locator.getObject("exception"));
+                maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
+            } catch (NamingException ex) {
+                failed.set(true);
+                throw Lombok.sneakyThrow(ex);
+            } catch (Throwable thr) {
+                failed.set(true);
+                throw Lombok.sneakyThrow(thr);
+            }
+        }));
+        exec.shutdown();
+        assertTrue(exec.awaitTermination(10, TimeUnit.SECONDS), "timed out waiting for result");
+        assertFalse(failed.get(), "somthing went wrong with stress test");
+        assertEquals(2, maxCached.get());
+        assertTrue(numInvocations.get() > numIterations * 1.5, "too few invocations");
     }
 }

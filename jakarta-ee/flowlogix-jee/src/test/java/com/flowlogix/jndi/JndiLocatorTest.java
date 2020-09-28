@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -193,5 +194,11 @@ public class JndiLocatorTest
     @Test
     void simpleFailure() throws NamingException {
         assertThrows(NamingException.class, () -> JNDIObjectLocator.builder().build().getObject("invalid"));
+    }
+
+    @Test
+    @Tag("StressTest")
+    void stressTest() {
+        assertTrue(false, "not implemented");
     }
 }

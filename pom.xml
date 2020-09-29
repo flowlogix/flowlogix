@@ -29,6 +29,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <test.excluded.groups>Arquillian,StressTest</test.excluded.groups>
+        <main.basedir>${project.basedir}</main.basedir>
     </properties>
 
     <modules>
@@ -250,9 +251,9 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <configLocation>${maven.multiModuleProjectDirectory}/checkstyle/checkstyle.xml</configLocation>
-                            <suppressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle/suppressions.xml</suppressionsLocation>
-                            <headerLocation>${maven.multiModuleProjectDirectory}/checkstyle/ClassHeader.txt</headerLocation>
+                            <configLocation>${main.basedir}/checkstyle/checkstyle.xml</configLocation>
+                            <suppressionsLocation>${main.basedir}/checkstyle/suppressions.xml</suppressionsLocation>
+                            <headerLocation>${main.basedir}/checkstyle/ClassHeader.txt</headerLocation>
                             <enableRSS>false</enableRSS>
                             <linkXRef>true</linkXRef>
                             <consoleOutput>true</consoleOutput>
@@ -260,7 +261,7 @@
                             <failOnViolation>true</failOnViolation>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
                             <enableRulesSummary>true</enableRulesSummary>
-                            <propertyExpansion>main.basedir=${maven.multiModuleProjectDirectory}</propertyExpansion>
+                            <propertyExpansion>main.basedir=${main.basedir}</propertyExpansion>
                         </configuration>
                         <dependencies>
                             <dependency>

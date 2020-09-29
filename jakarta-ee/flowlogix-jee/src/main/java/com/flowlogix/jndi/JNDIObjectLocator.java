@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011-2020 Flow Logix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.flowlogix.jndi;
 
 import com.flowlogix.util.Lazy;
@@ -39,6 +55,23 @@ import lombok.SneakyThrows;
 @Builder(toBuilder = true)
 public class JNDIObjectLocator implements Serializable {
     /**
+     * naming convention suffix for remote beans
+     */
+    public static final String REMOTE = "REMOTE";
+    /**
+     * naming convention suffix for local beans
+     */
+    public static final String LOCAL = "LOCAL";
+    static final String PORTABLE_NAME_PREFIX = "java:module";
+    /**
+     * pattern matcher for stripping local or remote suffix from beans
+     */
+    @SuppressWarnings("checkstyle:ConstantName")
+    public static final Pattern StripInterfaceSuffixPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
+
+    private static final long serialVersionUID = 2L;
+
+    /**
      * to be passed into InitialContext()
      */
     private final @Singular("environment") Map<String, String> environment;
@@ -57,25 +90,9 @@ public class JNDIObjectLocator implements Serializable {
     private final boolean cacheRemote;
 
     @Getter(AccessLevel.PACKAGE)
-    private transient final Map<String, Object> jndiObjectCache = new ConcurrentHashMap<>();
-    private transient final Lazy<InitialContext> initialContext = new Lazy<>(this::createInitialContext);
-    private transient final Lock initialContextLock = new ReentrantLock();
-
-    /**
-     * naming convention suffix for remote beans
-     */
-    public static final String REMOTE = "REMOTE";
-    /**
-     * naming convention suffix for local beans
-     */
-    public static final String LOCAL = "LOCAL";
-    static final String PORTABLE_NAME_PREFIX = "java:module";
-    /**
-     * pattern matcher for stripping local or remote suffix from beans
-     */
-    public static final Pattern StripInterfaceSuffixPattern = Pattern.compile(LOCAL + "|" + REMOTE, Pattern.CASE_INSENSITIVE);
-    private static final long serialVersionUID = 2L;
-
+    private final transient Map<String, Object> jndiObjectCache = new ConcurrentHashMap<>();
+    private final transient Lazy<InitialContext> initialContext = new Lazy<>(this::createInitialContext);
+    private final transient Lock initialContextLock = new ReentrantLock();
 
     /**
      * Returns an object from JNDI based on beanClass

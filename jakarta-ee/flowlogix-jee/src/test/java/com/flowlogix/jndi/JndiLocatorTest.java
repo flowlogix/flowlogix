@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 lprimak.
+ * Copyright 2011-2020 Flow Logix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,7 @@ import static org.mockito.Mockito.when;
  *
  * @author lprimak
  */
-public class JndiLocatorTest
-{
+public class JndiLocatorTest {
     private JNDIObjectLocator locator;
 
     @BeforeEach
@@ -76,6 +75,7 @@ public class JndiLocatorTest
     }
 
     @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
     void withEnvironment() throws Exception {
         Map<String, String> constructedEnvironment = new HashMap<>();
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class, (icObject, context) -> {
@@ -168,7 +168,7 @@ public class JndiLocatorTest
         }
         ostrm.writeObject(original);
         ostrm.close();
-        JNDIObjectLocator xferred = (JNDIObjectLocator)new ObjectInputStream(
+        JNDIObjectLocator xferred = (JNDIObjectLocator) new ObjectInputStream(
                 new ByteArrayInputStream(bostrm.toByteArray())).readObject();
         assertEquals(0, xferred.getJndiObjectCache().size());
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
@@ -214,6 +214,7 @@ public class JndiLocatorTest
 
     @Test
     @Tag("StressTest")
+    @SuppressWarnings("checkstyle:MagicNumber")
     void stressTest() throws InterruptedException, NamingException {
         int numThreads = 500;
         int numIterations = 10000;

@@ -10,12 +10,16 @@
     <description>Flow Logix Utility Library for JavaEE</description>
     <url>http://code.google.com/p/flowlogix</url>
 
+    <properties>
+        <main.basedir>${project.parent.basedir}/..</main.basedir>
+    </properties>
+
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>jakarta-ee</artifactId>
         <version>3.0.1-SNAPSHOT</version>
     </parent>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>

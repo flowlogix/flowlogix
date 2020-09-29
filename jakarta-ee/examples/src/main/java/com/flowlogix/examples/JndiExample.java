@@ -20,6 +20,8 @@ import com.flowlogix.jndi.JNDIObjectLocator;
 
 /**
  * Examples of JNDI object locator, ServiceLocator pattern
+ * Locator is thread-safe, caching and serializable
+ *
  * @author lprimak
  */
 public class JndiExample {
@@ -33,6 +35,23 @@ public class JndiExample {
      */
     JNDIObjectLocator getLocator() {
         return locator;
+    }
+
+    /**
+     *
+     * @return new thread-safe locator with environment
+     */
+    JNDIObjectLocator createLocatorWithEnvironment() {
+        return JNDIObjectLocator.builder().environment("oneKey", "oneValue")
+                .environment("twoKey", "twoValue")
+                .build();
+    }
+
+    /**
+     * @return new thread-safe locator with no caching
+     */
+    JNDIObjectLocator createLocatorWithNoCaching() {
+        return JNDIObjectLocator.builder().noCaching(true).build();
     }
 
     /**

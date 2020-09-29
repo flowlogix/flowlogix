@@ -20,7 +20,7 @@ import lombok.Singular;
 import lombok.SneakyThrows;
 
 /**
- * JNDIObjectLocator is used to centralize all JNDI lookups. It minimizes the overhead of JNDI lookups by caching the
+ * JNDIObjectLocator is used to centralize JNDI lookups. It minimizes the overhead of JNDI lookups by caching the
  * objects it looks up.
  *
  * Implements the ServiceLocator design pattern

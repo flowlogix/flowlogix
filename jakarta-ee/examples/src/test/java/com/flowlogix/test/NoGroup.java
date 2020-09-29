@@ -1,5 +1,7 @@
 package com.flowlogix.test;
 
+
+
 /*
  * Copyright 2020 lprimak.
  *
@@ -16,11 +18,10 @@ package com.flowlogix.test;
  * limitations under the License.
  */
 
-
 /**
  *
  * @author lprimak
  */
-public interface ArquillianTest {
+public interface NoGroup {
 
 }

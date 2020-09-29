@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.security.cdi;
+package com.flowlogix.shiro.ee.cdi;
 
-import com.google.common.collect.ImmutableList;
+import com.flowlogix.shiro.ee.annotations.ShiroSessionScoped;
+import com.flowlogix.shiro.ee.annotations.ShiroViewScoped;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -33,7 +36,7 @@ import org.apache.shiro.session.SessionListenerAdapter;
 
 /**
  * Entry point for Shiro Session scope CDI extension
- * 
+ *
  * @author lprimak
  */
 public class ShiroSessionScopeExtension implements Extension, Serializable
@@ -43,8 +46,8 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
     }
     /**
      * intercept session destroy session listeners and destroy the beans
-     * 
-     * @param sessionListeners 
+     *
+     * @param sessionListeners
      */
 
     /**
@@ -70,21 +73,22 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
         });
     }
 
-    
+
     private void addScope(@Observes final BeforeBeanDiscovery event)
     {
         contexts.forEach(ctx -> event.addScope(ctx.getScope(), true, true));
     }
 
-    
+
     private void registerContext(@Observes final AfterBeanDiscovery event)
     {
         contexts.forEach(ctx -> event.addContext(ctx));
     }
-    
-    
-    private final List<ShiroScopeContext> contexts = ImmutableList.of(
+
+
+    private final List<ShiroScopeContext> contexts = Stream.of(
             new ShiroScopeContext(ShiroSessionScoped.class, SessionScoped.class),
-            new ShiroScopeContext(ShiroViewScoped.class, ViewScoped.class));
+            new ShiroScopeContext(ShiroViewScoped.class, ViewScoped.class))
+            .collect(Collectors.toList());
     private static final long serialVersionUID = 1L;
 }

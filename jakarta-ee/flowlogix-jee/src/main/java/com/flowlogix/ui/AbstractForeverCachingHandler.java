@@ -21,11 +21,11 @@ import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.application.ResourceWrapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * adds foreer caching functionality to the JSF resources
- * 
+ *
  * @author lprimak
  */
 @RequiredArgsConstructor
@@ -36,15 +36,15 @@ public abstract class AbstractForeverCachingHandler extends ResourceHandlerWrapp
      * @return versino string
      */
     protected abstract String getVersionString();
-    
-    
+
+
     @Override
     public Resource createResource(String resourceName)
     {
         return createResource(resourceName, null);
     }
-    
-    
+
+
     @Override
     public Resource createResource(String resourceName, String libraryName)
     {
@@ -55,11 +55,11 @@ public abstract class AbstractForeverCachingHandler extends ResourceHandlerWrapp
         Resource resource;
         if(StringUtils.isEmpty(libraryName))
         {
-            resource = super.createResource(resourceName);             
+            resource = super.createResource(resourceName);
         }
         else
         {
-            resource = super.createResource(resourceName, libraryName); 
+            resource = super.createResource(resourceName, libraryName);
         }
         if(resource == null)
         {
@@ -76,7 +76,7 @@ public abstract class AbstractForeverCachingHandler extends ResourceHandlerWrapp
         return new CachingWrapper(resource, getVersionString());
     }
 
-    
+
     private @Getter final ResourceHandler wrapped;
 
 
@@ -84,7 +84,7 @@ public abstract class AbstractForeverCachingHandler extends ResourceHandlerWrapp
     private static class CachingWrapper extends ResourceWrapper
     {
         @Override
-        public String getRequestPath() 
+        public String getRequestPath()
         {
             String requestPath = wrapped.getRequestPath();
             if(!requestPath.contains(ResourceHandler.RESOURCE_IDENTIFIER))
@@ -92,7 +92,7 @@ public abstract class AbstractForeverCachingHandler extends ResourceHandlerWrapp
                 // do not touch CDN resources
                 return requestPath;
             }
-                  
+
             if(requestPath.contains("?"))
             {
                 requestPath = requestPath + "&rv=" + versionString;
@@ -101,13 +101,13 @@ public abstract class AbstractForeverCachingHandler extends ResourceHandlerWrapp
             {
                 requestPath = requestPath + "?rv=" + versionString;
             }
- 
+
             return requestPath;
         }
- 
+
 
         @Override
-        public String getContentType() 
+        public String getContentType()
         {
             return getWrapped().getContentType();
         }

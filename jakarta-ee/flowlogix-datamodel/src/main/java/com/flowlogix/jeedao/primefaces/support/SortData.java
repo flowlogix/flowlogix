@@ -15,8 +15,8 @@
  */
 package com.flowlogix.jeedao.primefaces.support;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.criteria.Order;
@@ -34,7 +34,7 @@ public class SortData
 {
     public SortData(Map<String, SortMeta> sm)
     {
-        sortMeta = Maps.newHashMap(sm);
+        sortMeta = new HashMap<>(sm);
     }
 
     /**
@@ -44,7 +44,7 @@ public class SortData
     /**
      * global sort order added by the client
      */
-    private final List<Order> sortOrder = Lists.newLinkedList();
+    private final List<Order> sortOrder = new ArrayList<>();
     /**
      * which sort gets priority - sort by the UI (default) or application-based sort
      */

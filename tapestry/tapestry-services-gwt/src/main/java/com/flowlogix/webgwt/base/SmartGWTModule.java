@@ -4,8 +4,9 @@
  */
 package com.flowlogix.webgwt.base;
 
-import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -18,6 +19,6 @@ public abstract class SmartGWTModule extends GwtSupport
     protected List<String> getJavaScriptInitialization()
     {
         final String modulePathValue = String.format("%s/sc/", getGwtModulePath());
-        return Lists.newArrayList(String.format("var isomorphicDir = \"%s\";", modulePathValue));
+        return Stream.of(String.format("var isomorphicDir = \"%s\";", modulePathValue)).collect(Collectors.toList());
     }
 }

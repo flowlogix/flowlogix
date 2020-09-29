@@ -20,12 +20,12 @@ import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.omnifaces.util.Faces;
 
 /**
  * Automatically loads minimized CSS / JS files in production mode, if available
- * 
+ *
  * @author lprimak
  */
 @RequiredArgsConstructor
@@ -38,10 +38,10 @@ public class MinimizedHandler extends ResourceHandlerWrapper
         {
             return null;
         }
-        return super.createResource(toMinimized(resourceName)); 
+        return super.createResource(toMinimized(resourceName));
     }
 
-    
+
     @Override
     public Resource createResource(String resourceName, String libraryName)
     {
@@ -49,10 +49,10 @@ public class MinimizedHandler extends ResourceHandlerWrapper
         {
             return null;
         }
-        return super.createResource(libraryName == null? toMinimized(resourceName) : resourceName, libraryName); 
+        return super.createResource(libraryName == null? toMinimized(resourceName) : resourceName, libraryName);
     }
 
-    
+
     private String toMinimized(String resourceName)
     {
         if(!Faces.isDevelopment() && !resourceName.matches(".*\\.min\\.(js|css)$"))
@@ -61,10 +61,10 @@ public class MinimizedHandler extends ResourceHandlerWrapper
             {
                 return resourceName.replaceFirst("(.*)(\\.css|\\.js)$", "$1.min$2");
             }
-        }        
+        }
         return resourceName;
     }
-    
-    
+
+
     private @Getter final ResourceHandler wrapped;
 }

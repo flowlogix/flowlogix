@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.security.cdi;
+package com.flowlogix.shiro.ee.cdi;
 
-import com.flowlogix.cdi.annotations.ShiroSecure;
-import com.flowlogix.security.internal.aop.AopHelper;
-import com.flowlogix.security.internal.aop.SecurityInterceptor;
+import com.flowlogix.shiro.ee.annotations.ShiroSecure;
+import com.flowlogix.shiro.ee.internal.aop.AopHelper;
+import com.flowlogix.shiro.ee.internal.aop.SecurityInterceptor;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.Priority;

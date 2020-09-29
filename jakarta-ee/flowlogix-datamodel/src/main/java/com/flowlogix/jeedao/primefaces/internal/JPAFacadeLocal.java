@@ -20,7 +20,6 @@ import com.flowlogix.jeedao.primefaces.interfaces.EntityManagerGetter;
 import com.flowlogix.jeedao.primefaces.interfaces.Filter;
 import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
 import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
-import com.google.common.base.Optional;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.Local;
@@ -46,8 +45,8 @@ public interface JPAFacadeLocal<TT, KK> extends FacadeAPI<TT, KK>
      * @param filter
      * @param sorter
      */
-    void setup(EntityManagerGetter emg, Class<TT> entityClass, Optional<Optimizer<TT>> optimizer,
-            Optional<Filter<TT>> filter, Optional<Sorter<TT>> sorter);
+    void setup(EntityManagerGetter emg, Class<TT> entityClass, Optimizer<TT> optimizer,
+            Filter<TT> filter, Sorter<TT> sorter);
     /**
      * row count
      *

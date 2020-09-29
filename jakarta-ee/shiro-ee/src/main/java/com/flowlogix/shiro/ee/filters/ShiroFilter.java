@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.security;
+package com.flowlogix.shiro.ee.filters;
 
-import com.flowlogix.security.cdi.ShiroScopeContext;
-import com.flowlogix.security.cdi.ShiroSessionScopeExtension;
+import com.flowlogix.shiro.ee.cdi.ShiroScopeContext;
+import com.flowlogix.shiro.ee.cdi.ShiroSessionScopeExtension;
 import java.security.Principal;
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;

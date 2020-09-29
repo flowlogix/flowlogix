@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright 2015 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.security.internal.aop;
+package com.flowlogix.shiro.ee.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.inject.Scope;
 
 /**
- * Enhanced from Tynamo Security
+ * @SessionScoped interface that works with Shiro sessions
+ * Primarily for plugging into Shiro destruction pipeline
+ * 
+ * @author lprimak
  */
-public interface SecurityInterceptor
-{
-    /**
-     * The method which is performed before the method that you want to check.
-     */
-    public abstract void intercept();
-}
+@Scope
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
+public @interface ShiroSessionScoped {}

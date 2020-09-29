@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.security;
+package com.flowlogix.shiro.ee.filters;
 
 import com.flowlogix.ui.AttributeKeys;
 import com.flowlogix.util.PathUtil;
-import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterators;
-import com.google.common.net.HttpHeaders;
 import java.io.IOException;
+import java.util.stream.Stream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -29,13 +26,14 @@ import javax.ws.rs.HttpMethod;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 import org.omnifaces.util.Servlets;
 
 /**
  * Implements JSF Ajax redirection via OmniFaces
- * 
+ *
  * @author lprimak
  */
 @Slf4j
@@ -48,20 +46,20 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
         return subject.isAuthenticated() || (useRemembered && subject.isRemembered());
     }
 
-    
+
     @Override
     protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException
     {
         boolean isGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
-        String sessionExpired = Iterators.getLast(Splitter.on('.')
-                .split(AttributeKeys.SESSION_EXPIRED_KEY).iterator());
+        String sessionExpired = Stream.of(StringUtils.split(AttributeKeys.SESSION_EXPIRED_KEY, '.'))
+                .reduce((first, second) -> second).get();
         Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
                 Servlets.getRequestBaseURL(WebUtils.toHttp(request))
-                + getLoginUrl().replaceFirst("^/", "") + (isGetRequest? "" : "?%s=true"), 
+                + getLoginUrl().replaceFirst("^/", "") + (isGetRequest? "" : "?%s=true"),
                 sessionExpired);
     }
 
-    
+
     @Override
     protected boolean isLoginRequest(ServletRequest request, ServletResponse response)
     {
@@ -78,7 +76,7 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
         return rv;
     }
 
-    
+
     @Override
     protected void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException
     {
@@ -86,25 +84,25 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
         redirectToLogin(request, response);
     }
 
-     
+
     private void saveRequest(ServletRequest request, ServletResponse response, boolean useReferer)
     {
-        Optional<String> path = useReferer? getReferer(WebUtils.toHttp(request)) 
-                : Optional.of(Servlets.getRequestURLWithQueryString(WebUtils.toHttp(request)));
-        if(!path.isPresent())
+        String path = useReferer? getReferer(WebUtils.toHttp(request))
+                : Servlets.getRequestURLWithQueryString(WebUtils.toHttp(request));
+        if(path == null)
         {
             return;
         }
-            
-        Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response), 
-                WebUtils.SAVED_REQUEST_KEY, path.get(), null,
+
+        Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
+                WebUtils.SAVED_REQUEST_KEY, path, null,
                 PathUtil.getContextPath(WebUtils.toHttp(request)), -1);
-    }    
-    
-    
-    private static Optional<String> getReferer(HttpServletRequest request)
+    }
+
+
+    private static String getReferer(HttpServletRequest request)
     {
-        String referer = request.getHeader(HttpHeaders.REFERER);
+        String referer = request.getHeader("referer");
         if (referer != null)
         {
             // do not switch to https if custom port is specified
@@ -114,16 +112,16 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
             }
         }
 
-        return Optional.fromNullable(referer);
-    }    
-    
+        return referer;
+    }
+
 
     @Override
     protected void saveRequest(ServletRequest request)
     {
         throw new UnsupportedOperationException("bad op");
     }
-    
-    
+
+
     private @Getter @Setter boolean useRemembered = false;
 }

@@ -19,20 +19,19 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import javax.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
-import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.web.util.WebUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * builds absolute path URI when needed for redirection from Web and REST API
  * for web pages
- * 
+ *
  * @author lprimak
  */
 public class PathUtil
 {
     /**
      * Returns full path URI for a relative path
-     * 
+     *
      * @param request
      * @param relativePath
      * @return relative URI
@@ -45,8 +44,8 @@ public class PathUtil
 
         return new URI(absolutePath);
     }
-    
-    
+
+
     /**
      * @param request
      * @return complete server path i.e. https://www.glowlogix.com:8080
@@ -69,19 +68,19 @@ public class PathUtil
                 }
                 break;
         }
-        
-        return String.format("%s://%s%s", 
+
+        return String.format("%s://%s%s",
                 request.getScheme(), request.getServerName(), port);
     }
-    
-    
+
+
     /**
      * @param request
      * @return context path or "/" if there is no context path
      */
     public static String getContextPath(HttpServletRequest request)
     {
-        String contextPath = WebUtils.toHttp(request).getContextPath();
+        String contextPath = request.getContextPath();
         if(StringUtils.isBlank(contextPath))
         {
             contextPath = "/";

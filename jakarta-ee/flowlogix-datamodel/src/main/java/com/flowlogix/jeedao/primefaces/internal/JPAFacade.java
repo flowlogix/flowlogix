@@ -24,12 +24,11 @@ import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
 import com.flowlogix.jeedao.primefaces.support.FilterData;
 import com.flowlogix.jeedao.primefaces.support.SortData;
 import com.flowlogix.util.TypeConverter;
-import com.google.common.base.Optional;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -53,8 +52,8 @@ import org.primefaces.model.SortMeta;
 public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFacadeLocal<TT, KK>
 {
     @Override
-    public void setup(EntityManagerGetter emg, Class<TT> entityClass, Optional<Optimizer<TT>> optimizer,
-            Optional<Filter<TT>> filter, Optional<Sorter<TT>> sorter)
+    public void setup(EntityManagerGetter emg, Class<TT> entityClass, Optimizer<TT> optimizer,
+            Filter<TT> filter, Sorter<TT> sorter)
     {
         getState().setEmg(emg);
         getState().setEntityClass(entityClass);
@@ -82,7 +81,7 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     public int count(Map<String, FilterMeta> filters)
     {
         getState().setFilters(filters);
-        getState().setSortMeta(Maps.newHashMap());
+        getState().setSortMeta(new HashMap<>());
         return super.count();
     }
 
@@ -115,16 +114,16 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
     @Override
     protected void addHints(TypedQuery<TT> tq, boolean isRange)
     {
-        if(getState().getOptimizer().isPresent())
+        if(getState().getOptimizer() != null)
         {
-            getState().getOptimizer().get().addHints(tq);
+            getState().getOptimizer().addHints(tq);
         }
     }
 
 
     private Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root)
     {
-        Map<String, FilterData> predicates = Maps.newHashMap();
+        Map<String, FilterData> predicates = new HashMap<>();
         filters.forEach((key, value) ->
         {
             Predicate cond = null;
@@ -145,27 +144,25 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
             catch(IllegalArgumentException e) { /* ignore possibly extra filter fields */}
             predicates.put(key, new FilterData(value.toString(), cond));
         });
-        if(getState().getFilterHook().isPresent())
+        if(getState().getFilterHook() != null)
         {
-            getState().getFilterHook().get().filter(predicates, cb, root);
+            getState().getFilterHook().filter(predicates, cb, root);
         }
-
-        return cb.and(FluentIterable.from(predicates.values())
-                .filter(it -> it.getPredicate() != null)
-                .transform(it -> it.getPredicate()).toArray(Predicate.class));
+        return cb.and(predicates.values().stream().map(FilterData::getPredicate)
+                .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
 
 
     private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root)
     {
         SortData sortData = new SortData(sortCriteria);
-        if(getState().getSorterHook().isPresent())
+        if(getState().getSorterHook() != null)
         {
-            getState().getSorterHook().get().sort(sortData, cb, root);
+            getState().getSorterHook().sort(sortData, cb, root);
         }
 
         List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);
-        List<Order> rv = Lists.newLinkedList();
+        List<Order> rv = new ArrayList<>();
         if(sortData.isAppendSortOrder())
         {
             rv.addAll(sortMetaOrdering);
@@ -182,7 +179,7 @@ public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFaca
 
     private List<Order> processSortMeta(Map<String, SortMeta> sortMeta, CriteriaBuilder cb, Root<TT> root)
     {
-        List<Order> sortMetaOrdering = Lists.newLinkedList();
+        List<Order> sortMetaOrdering = new ArrayList<>();
         sortMeta.forEach((field, order) ->
         {
             switch(order.getSortOrder())

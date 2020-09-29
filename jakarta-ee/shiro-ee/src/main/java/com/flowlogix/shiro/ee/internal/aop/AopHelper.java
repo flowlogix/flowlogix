@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.security.internal.aop;
+package com.flowlogix.shiro.ee.internal.aop;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.security.cdi;
+package com.flowlogix.shiro.ee.cdi;
 
-import com.google.common.collect.ImmutableSet;
 import java.lang.annotation.Annotation;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.AnnotatedType;
 import lombok.Getter;
@@ -25,37 +26,38 @@ import lombok.experimental.Delegate;
 
 /**
  * Wraps annotation types to facilitate additional annotations for CDI
- * 
+ *
  * @author lprimak
  * @param <T> type of annotated class
  */
-public class AnnotatedTypeWrapper<T> implements AnnotatedType<T> 
+public class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
 {
     public AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
     {
         this(wrapped, true, additionalAnnotations);
     }
-    
-    
+
+
     public AnnotatedTypeWrapper(AnnotatedType<T> wrapped, boolean keepOriginalAnnotations,
             Annotation... additionalAnnotations)
     {
         this.wrapped = wrapped;
-        ImmutableSet.Builder<Annotation> builder = ImmutableSet.<Annotation>builder();
+        Stream.Builder<Annotation> builder = Stream.builder();
         if(keepOriginalAnnotations)
         {
-            builder.addAll(wrapped.getAnnotations());
+            wrapped.getAnnotations().forEach(builder::add);
         }
-        annotations = builder.add(additionalAnnotations).build();
+        Stream.of(additionalAnnotations).forEach(builder::add);
+        annotations = builder.build().collect(Collectors.toSet());
     }
 
-    
+
     @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationType)
     {
         return annotations.stream().anyMatch((annotation) -> annotationType.isInstance(annotation));
     }
-    
+
 
     interface Exclusions
     {
@@ -63,9 +65,9 @@ public class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
         boolean getAnnotations();
     }
 
-    
+
     private abstract class AT implements AnnotatedType<T> { }
-    private final @Delegate(types = { AT.class, Annotated.class }, 
+    private final @Delegate(types = { AT.class, Annotated.class },
             excludes = Exclusions.class) AnnotatedType<T> wrapped;
     private final @Getter Set<Annotation> annotations;
 }

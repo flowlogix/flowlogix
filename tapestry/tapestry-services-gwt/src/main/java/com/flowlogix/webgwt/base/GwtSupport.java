@@ -4,8 +4,8 @@
  */
 package com.flowlogix.webgwt.base;
 
-import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import lombok.Getter;
@@ -41,7 +41,7 @@ public abstract class GwtSupport
      */
     protected List<String> getJavaScriptInitialization()
     {
-        return Lists.newLinkedList();
+        return new ArrayList<>();
     }
 
 
@@ -51,7 +51,7 @@ public abstract class GwtSupport
      */
     protected List<String> getGWTParameters()
     {
-        return Lists.newLinkedList();
+        return new ArrayList<>();
     }
 
 

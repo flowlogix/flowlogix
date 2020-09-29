@@ -19,7 +19,6 @@ import com.flowlogix.jeedao.primefaces.interfaces.EntityManagerGetter;
 import com.flowlogix.jeedao.primefaces.interfaces.Filter;
 import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
 import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
-import com.google.common.base.Optional;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,9 +35,9 @@ public @Getter @Setter class JPAFacadeTypedState<TT>
 {
     private EntityManagerGetter emg;
     private Class<TT> entityClass;
-    private Optional<Optimizer<TT>> optimizer;
-    private Optional<Filter<TT>> filterHook;
-    private Optional<Sorter<TT>> sorterHook;
+    private Optimizer<TT> optimizer;
+    private Filter<TT> filterHook;
+    private Sorter<TT> sorterHook;
     private Map<String, FilterMeta> filters;
     private Map<String, SortMeta> sortMeta;
 }

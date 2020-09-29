@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.security;
+package com.flowlogix.shiro.ee.filters;
 
 import com.flowlogix.jndi.JNDIObjectLocator;
 import java.io.IOException;

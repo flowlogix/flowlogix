@@ -24,13 +24,13 @@ import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
 import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
 import com.flowlogix.jeedao.primefaces.internal.JPAFacadeLocal;
 import com.flowlogix.jeedao.primefaces.support.FilterData;
-import com.google.common.base.Optional;
 import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import org.apache.commons.lang.StringUtils;
+import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.omnifaces.util.Beans;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
@@ -98,9 +98,9 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
      *
      * @param filter
      */
-    public void setFilter(Filter<TT> filter)
+    public void setFilter(@NonNull Filter<TT> filter)
     {
-        this.filter = Optional.of(filter);
+        this.filter = filter;
     }
 
 
@@ -109,7 +109,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
      */
     public void removeFilter()
     {
-        filter = Optional.absent();
+        filter = null;
     }
 
 
@@ -136,9 +136,9 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
      *
      * @param sorter
      */
-    public void setSorter(Sorter<TT> sorter)
+    public void setSorter(@NonNull Sorter<TT> sorter)
     {
-        this.sorter = Optional.of(sorter);
+        this.sorter = sorter;
     }
 
 
@@ -147,7 +147,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
      */
     public void removeSorter()
     {
-        sorter = Optional.absent();
+        sorter = null;
     }
 
 
@@ -156,9 +156,9 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
      *
      * @param optimizier
      */
-    public void addOptimizerHints(Optimizer<TT> optimizier)
+    public void addOptimizerHints(@NonNull Optimizer<TT> optimizier)
     {
-        this.optimizer = Optional.of(optimizier);
+        this.optimizer = optimizier;
     }
 
 
@@ -167,7 +167,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
      */
     public void removeOptimizerHints()
     {
-        this.optimizer = Optional.absent();
+        this.optimizer = null;
     }
 
 
@@ -213,9 +213,9 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     private EntityManagerGetter emg;
     private Class<TT> entityClass;
     private KeyConverter<KK> converter;
-    private Optional<Filter<TT>> filter = Optional.absent();
-    private Optional<Sorter<TT>> sorter = Optional.absent();
-    private Optional<Optimizer<TT>> optimizer = Optional.absent();
+    private Filter<TT> filter;
+    private Sorter<TT> sorter;
+    private Optimizer<TT> optimizer;
     public static final String RESULT = "result";
 
     private static final long serialVersionUID = 1L;

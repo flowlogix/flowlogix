@@ -4,3 +4,4 @@
 \.rej$
 \.conflict\~$
 target
+/jakarta-ee/examples/nbproject/

@@ -28,7 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <test.excluded.groups>Arquillian,StressTest</test.excluded.groups>
+        <test.excluded.groups>Arquillian,StressTest,com.flowlogix.test.ArquillianTest</test.excluded.groups>
     </properties>
 
     <modules>
@@ -196,7 +196,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <groups>Arquillian</groups>
+                            <groups>Arquillian,com.flowlogix.test.ArquillianTest</groups>
                         </configuration>
                     </plugin>
                 </plugins>

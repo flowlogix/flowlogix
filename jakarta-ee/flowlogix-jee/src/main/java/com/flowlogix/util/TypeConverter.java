@@ -17,109 +17,80 @@ package com.flowlogix.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.Lombok;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Converts from any String to any type dynamically
- * 
+ * Example:
+ *
+ * {@code
+ * int one = TypeConverter.valueOf("1", int.class);
+ * }
+ *
  * @author lprimak
  */
 @Slf4j
-@SuppressWarnings("unchecked")
-public class TypeConverter 
-{
-    public static<TT> TT valueOf(String strValue, Class<TT> type) throws IllegalArgumentException
-    {
-        boolean isInteger = false;
-        if(type.equals(String.class))
-        {
-            return (TT)strValue;
-        }        
-        else if(type.equals(Double.class) || type.equals(double.class) 
-                || type.equals(float.class) || type.equals(Float.class))
-        {
-            switch (strValue)
-            {
-                case "nan":
-                    strValue = "NaN";
-                    break;
-                case "inf":
-                    strValue = "Infinity";
-                    break;
-                case "-inf":
-                    strValue = "-Infinity";
-                    break;
-                case "":
-                    strValue = "0.0";
-                    break;
-            }
-        }
-        else if(type.equals(Integer.class) || type.equals(Long.class)
-                || type.equals(int.class) || type.equals(long.class))
-        {
-            isInteger = true;
-        }
+public class TypeConverter {
+    private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
+    private static final Map<Class<?>, MethodHandle> valueOfMethod = new ConcurrentHashMap<>();
 
-        try
-        {
-            if(strValue == null)
-            {
-                return null;
-            }
-            else
-            {
-                return (TT)callValueOf(strValue, type);
-            }
+    /**
+     *
+     * @param <TT> type of result objects
+     * @param strValue input
+     * @param type type of result
+     * @return value
+     */
+    @SuppressWarnings("unchecked")
+    public static <TT> TT valueOf(@NonNull String strValue, @NonNull Class<TT> type) {
+        if (type.equals(String.class)) {
+            return (TT) strValue;
         }
-        catch (Exception e)
-        {
-            if(isInteger)
-            {
-                try
-                {
-                    return (TT)(Long)((Double)callValueOf(strValue, Double.class)).longValue();
-                }
-                catch(Exception e1)
-                {
-                    throw new IllegalArgumentException(type.toString() + ": " + strValue, e);
-                }
-            }
-            else
-            {
-                throw new IllegalArgumentException(type.toString() + ": " + strValue, e);
-            }
+        String method = "valueOf";
+        Class<?> targetType = null;
+        if (type.equals(Double.class) || type.equals(double.class)) {
+            strValue = processNumbers(strValue);
+            targetType = Double.class;
+        } else if (type.equals(Float.class) || type.equals(float.class)) {
+            strValue = processNumbers(strValue);
+            targetType = Float.class;
+        } else if (type.equals(Integer.class) || type.equals(int.class)) {
+            strValue = processNumbers(strValue);
+            targetType = Integer.class;
+        } else if (type.equals(Long.class) || type.equals(long.class)) {
+            strValue = processNumbers(strValue);
+            targetType = Long.class;
         }
+        return (TT) callMethod(strValue, method, targetType != null ? targetType : type);
     }
 
-    
     /**
      * Convert string to object given a type name
-     * 
+     *
      * @param strValue
      * @param type
      * @return object after conversion
-     * @throws IllegalArgumentException 
+     * @throws IllegalArgumentException
      */
-    public static Object valueOf(String strValue, String type) throws IllegalArgumentException
-    {
+    public static Object valueOf(@NonNull String strValue, @NonNull String type) throws IllegalArgumentException {
         String dataTypeString = type;
-        if(type.equals(String.class.getName()))
-        {
+        if (type.equals(String.class.getName())) {
             // special case for strings
             dataTypeString = null;
         }
         Object value = strValue;
-        if (dataTypeString != null)
-        {
-            try
-            {
+        if (dataTypeString != null) {
+            try {
                 Class<?> dataObjectClass = Class.forName(dataTypeString);
                 value = valueOf(strValue, dataObjectClass);
-            } 
-            catch (ClassNotFoundException e)
-            {
+            } catch (ClassNotFoundException e) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 pw.append(e.toString() + " Value: " + strValue + ", Type: " + type + ", Stack Trace: ");
@@ -131,26 +102,21 @@ public class TypeConverter
 
         return value;
     }
-    
-    
+
     /**
      * Check if conversion will succeed
-     * 
+     *
      * @param value
      * @param type
      * @return true if conversion is good
      */
-    public static boolean checkType(String value, Class<?> type)
-    {
-        try
-        {
+    public static boolean checkType(@NonNull String value, @NonNull Class<?> type) {
+        try {
             Object cv = TypeConverter.valueOf(value, type);
-            if (value.equals(cv.toString()))
-            {
+            if (value.equals(cv.toString())) {
                 return true;
             }
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
         }
         return false;
     }
@@ -159,15 +125,37 @@ public class TypeConverter
      * @param strValue
      * @param type
      * @return
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
      */
-    private static Object callValueOf(String strValue, Class<?> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        Method valueOfMethod = type.getMethod(
-                "valueOf", new Class<?>[]
-                                     { String.class });
-        return valueOfMethod.invoke(null, new Object[] { strValue });
+    private static <TT> TT callMethod(String strValue, String methodName, Class<?> type) {
+        try {
+            MethodHandle method = valueOfMethod.computeIfAbsent(type, (k) -> {
+                try {
+                    return lookup.findStatic(type, methodName, MethodType.methodType(type, String.class));
+                } catch (ReflectiveOperationException ex) {
+                    throw Lombok.sneakyThrow(ex);
+                }
+            });
+            return (TT)method.invoke(strValue);
+        } catch(Throwable thr) {
+            throw Lombok.sneakyThrow(thr);
+        }
+    }
+
+    private static String processNumbers(String strValue) {
+        switch (strValue) {
+            case "nan":
+                strValue = "NaN";
+                break;
+            case "inf":
+                strValue = "Infinity";
+                break;
+            case "-inf":
+                strValue = "-Infinity";
+                break;
+            case "":
+                strValue = "0";
+                break;
+        }
+        return strValue;
     }
 }

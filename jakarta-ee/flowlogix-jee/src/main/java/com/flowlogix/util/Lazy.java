@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * implements lazy-initialized object primarily for final and transient fields
+ * Utilizes double-checked locking for optimization
  *
  * Example:
  *

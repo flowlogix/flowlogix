@@ -5,3 +5,5 @@
 \.conflict\~$
 target
 /jakarta-ee/examples/nbproject/
+/jakarta-ee/flowlogix-examples/nbproject/
+/jakarta-ee/jee-examples/nbproject/

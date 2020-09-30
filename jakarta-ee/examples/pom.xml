@@ -87,7 +87,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <groups>com.flowlogix.test.ArquillianTest</groups>
-                            <excludedGroups>com.flowlogix.test.NoGroup</excludedGroups>
+                            <excludedGroups>com.flowlogix.test.StressTest</excludedGroups>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -102,7 +102,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <groups>com.flowlogix.test.StressTest</groups>
-                            <excludedGroups>com.flowlogix.test.NoGroup</excludedGroups>
+                            <excludedGroups>com.flowlogix.test.ArquillianTest</excludedGroups>
                         </configuration>
                     </plugin>
                 </plugins>

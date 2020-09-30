@@ -189,7 +189,7 @@
         <profile>
             <id>arquillian-test</id>
             <properties>
-                <test.excluded.groups>none</test.excluded.groups>
+                <test.excluded.groups>StressTest</test.excluded.groups>
             </properties>
             <build>
                 <plugins>
@@ -206,7 +206,7 @@
         <profile>
             <id>stress-test</id>
             <properties>
-                <test.excluded.groups>none</test.excluded.groups>
+                <test.excluded.groups>Arquillian</test.excluded.groups>
             </properties>
             <build>
                 <plugins>

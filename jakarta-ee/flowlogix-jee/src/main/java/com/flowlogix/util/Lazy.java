@@ -23,12 +23,17 @@ import lombok.RequiredArgsConstructor;
 /**
  * implements lazy-initialized object primarily for final and transient fields
  * Utilizes double-checked locking for optimization
- *
+ * <p>
  * Example:
- *
+ * <pre>
  * {@code
  * private final Lazy<Object> lazy = new Lazy<>(Object::new);
+ * Object lazyInstance = lazy.get();
  * }
+ * </pre>
+ *
+ * <a href="https://github.com/flowlogix/flowlogix/blob/master/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/LazyExample.java"
+ * target="_blank">Example Code (GitHub)</a>
  *
  * @author lprimak
  * @param <TT> type of object

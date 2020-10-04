@@ -38,8 +38,10 @@ import lombok.SneakyThrows;
 /**
  * JNDIObjectLocator is used to centralize JNDI lookups. It minimizes the overhead of JNDI lookups by caching the
  * objects it looks up.
- *
+ * <p>
  * Implements the ServiceLocator design pattern
+ *
+ * <pre>
  *
  * Major features are:
  * - thread-safe
@@ -47,8 +49,16 @@ import lombok.SneakyThrows;
  * - serializable
  * - selectively disables the cache if objects are remote
  *
- * <a href="http://code.google.com/p/flowlogix/wiki/TLJNDIObjectLocator
- * " *    target="_blank">See Documentation</a>
+ * Examples:
+ *
+ * {@code locator = JNDIObjectLocator.builder().build();
+ * MyEJB myEJB1 = locator.getObject(MyEJB.class);
+ * MyEJB myEJB2 = locator.getObject("java:module/MyEJB");
+ * }
+ * </pre>
+ *
+ * <a href="https://github.com/flowlogix/flowlogix/blob/master/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/JndiExample.java"
+ * target="_blank">Example Code (GitHub)</a>
  *
  * @author Geoff Callendar Enhancements by Lenny Primak
  */

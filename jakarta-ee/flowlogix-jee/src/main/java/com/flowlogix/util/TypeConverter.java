@@ -27,13 +27,16 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Converts from any String to any type dynamically
+ * Converts from any String to any type dynamically,
+ * using static <p>{@code valueOf(String input)} method of the target type
+ * <p>
  * Example:
  *
+ * <pre>
  * {@code
  * int one = TypeConverter.valueOf("1", int.class);
  * }
- *
+ * </pre>
  * @author lprimak
  */
 @Slf4j

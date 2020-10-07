@@ -1,2 +1,2 @@
-com.flowlogix.security.cdi.ShiroSessionScopeExtension
-com.flowlogix.security.cdi.ShiroSecurityExtension
+com.flowlogix.shiro.ee.cdi.ShiroSessionScopeExtension
+com.flowlogix.shiro.ee.cdi.ShiroSecurityExtension

@@ -18,8 +18,6 @@ package com.flowlogix.ui;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.omnifaces.util.Faces;
 
@@ -28,9 +26,12 @@ import org.omnifaces.util.Faces;
  *
  * @author lprimak
  */
-@RequiredArgsConstructor
 public class MinimizedHandler extends ResourceHandlerWrapper
 {
+    public MinimizedHandler(ResourceHandler wrapped) {
+        super(wrapped);
+    }
+
     @Override
     public Resource createResource(String resourceName)
     {
@@ -64,7 +65,4 @@ public class MinimizedHandler extends ResourceHandlerWrapper
         }
         return resourceName;
     }
-
-
-    private @Getter final ResourceHandler wrapped;
 }

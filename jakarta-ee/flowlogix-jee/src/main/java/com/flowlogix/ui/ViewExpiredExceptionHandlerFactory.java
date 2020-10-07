@@ -24,8 +24,6 @@ import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerFactory;
 import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.event.ExceptionQueuedEvent;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
@@ -35,19 +33,25 @@ import org.omnifaces.util.Faces;
  *
  * @author lprimak
  */
-@RequiredArgsConstructor
 public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
 {
+    public ViewExpiredExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
+        super(wrapped);
+    }
+
     @Override
     public ExceptionHandler getExceptionHandler()
     {
-        return new Handler(wrapped.getExceptionHandler());
+        return new Handler(getWrapped().getExceptionHandler());
     }
 
 
-    @RequiredArgsConstructor
     private static class Handler extends ExceptionHandlerWrapper
     {
+        public Handler(ExceptionHandler wrapped) {
+            super(wrapped);
+        }
+
         @Override
         public void handle() throws FacesException
         {
@@ -78,11 +82,5 @@ public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
             }
             getWrapped().handle();
         }
-
-
-        private @Getter final ExceptionHandler wrapped;
     }
-
-
-    private @Getter final ExceptionHandlerFactory wrapped;
 }

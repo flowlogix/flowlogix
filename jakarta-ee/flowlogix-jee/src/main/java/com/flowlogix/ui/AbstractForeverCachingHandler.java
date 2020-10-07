@@ -19,8 +19,6 @@ import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.application.ResourceWrapper;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -28,9 +26,12 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author lprimak
  */
-@RequiredArgsConstructor
 public abstract class AbstractForeverCachingHandler extends ResourceHandlerWrapper
 {
+    public AbstractForeverCachingHandler(ResourceHandlerWrapper wrapped) {
+        super(wrapped);
+    }
+
     /**
      * Override this function in your child class to get version string
      * @return versino string
@@ -77,16 +78,17 @@ public abstract class AbstractForeverCachingHandler extends ResourceHandlerWrapp
     }
 
 
-    private @Getter final ResourceHandler wrapped;
-
-
-    @RequiredArgsConstructor
     private static class CachingWrapper extends ResourceWrapper
     {
+        public CachingWrapper(Resource wrapped, String versionString) {
+            super(wrapped);
+            this.versionString = versionString;
+        }
+
         @Override
         public String getRequestPath()
         {
-            String requestPath = wrapped.getRequestPath();
+            String requestPath = getWrapped().getRequestPath();
             if(!requestPath.contains(ResourceHandler.RESOURCE_IDENTIFIER))
             {
                 // do not touch CDN resources
@@ -113,7 +115,6 @@ public abstract class AbstractForeverCachingHandler extends ResourceHandlerWrapp
         }
 
 
-        private @Getter final Resource wrapped;
         private final String versionString;
     }
 }

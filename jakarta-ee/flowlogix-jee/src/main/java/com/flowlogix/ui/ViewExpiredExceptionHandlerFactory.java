@@ -33,49 +33,36 @@ import org.omnifaces.util.Faces;
  *
  * @author lprimak
  */
-public class ViewExpiredExceptionHandlerFactory  extends ExceptionHandlerFactory
-{
+public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory {
     public ViewExpiredExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
         super(wrapped);
     }
 
     @Override
-    public ExceptionHandler getExceptionHandler()
-    {
+    public ExceptionHandler getExceptionHandler() {
         return new Handler(getWrapped().getExceptionHandler());
     }
 
+    private static class Handler extends ExceptionHandlerWrapper {
 
-    private static class Handler extends ExceptionHandlerWrapper
-    {
         public Handler(ExceptionHandler wrapped) {
             super(wrapped);
         }
 
         @Override
-        public void handle() throws FacesException
-        {
+        public void handle() throws FacesException {
             Iterator<ExceptionQueuedEvent> it = getUnhandledExceptionQueuedEvents().iterator();
-            while(it.hasNext())
-            {
-                ExceptionQueuedEvent evt = it.next();
-                Throwable ex = Exceptions.unwrap(evt.getContext().getException());
+            while (it.hasNext()) {
+                Throwable queuedException = it.next().getContext().getException();
+                Throwable unwrappedException = Exceptions.unwrap(queuedException);
+                Throwable pureRootCause = ExceptionUtils.getRootCause(queuedException);
 
-                Throwable pureRootCause = ExceptionUtils.getRootCause(evt.getContext().getException());
-                if(pureRootCause == null)
-                {
-                    pureRootCause = ex;
-                }
-
-                if (ex instanceof ViewExpiredException)
-                {
+                if (unwrappedException instanceof ViewExpiredException) {
                     it.remove();
                     Faces.setFlashAttribute(SESSION_EXPIRED_KEY, Boolean.TRUE);
                     Faces.redirect(Faces.getRequestURIWithQueryString());
                     return;
-                }
-                else if(pureRootCause instanceof ClosedByInterruptException)
-                {
+                } else if (pureRootCause instanceof ClosedByInterruptException) {
                     // ignore browser exists
                     it.remove();
                 }

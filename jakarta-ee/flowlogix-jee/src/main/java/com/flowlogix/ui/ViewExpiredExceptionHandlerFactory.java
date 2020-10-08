@@ -29,7 +29,15 @@ import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
 
 /**
- * establishes a session for ajax exceptions
+ * Redirects back to the same page in case of {@link ViewExpiredException}
+ * <p>
+ * Other libraries will display a message, which, from the user's perspective is useless.
+ * This handler goes a step further, and will redirect to the same page, which will probably
+ * either establish a new session, redirect to a login screen, or something similar,
+ * which will remove one additional click for the users, and removes a cryptic message that's meaningless.
+ * <p>
+ * In addition, ignores {@link ClosedByInterruptException} exception, which sometimes happen
+ * when browsers or other clients disconnect unexpectedly
  *
  * @author lprimak
  */

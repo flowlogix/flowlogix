@@ -17,4 +17,7 @@
 /**
  * This package contains the JNDI locator class
  */
+@PackageMarker
 package com.flowlogix.jndi;
+
+import com.flowlogix.PackageMarker;

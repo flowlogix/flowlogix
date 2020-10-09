@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2020 Flow Logix, Inc.
+ * Copyright 2020 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.flowlogix;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * This package contains the JNDI locator tests
+ * dummy interface for {@code package-info.java}
+ * so maven doesn't recompile every time
+ *
+ * @author lprimak
  */
-@PackageMarker
-package com.flowlogix.jndi;
-
-import com.flowlogix.PackageMarker;
+@Retention(RetentionPolicy.SOURCE)
+public @interface PackageMarker { }

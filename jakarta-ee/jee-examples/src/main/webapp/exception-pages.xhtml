@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:o="http://omnifaces.org/ui">
+    <h:head>
+        <title>Exception Pages Example</title>
+    </h:head>
+    <body>
+        <h:form>
+            <p>
+                <input type="button" value="Invalidate session"
+                       var opts = {
+                       onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
+            </p>
+            <p/>
+            <h:commandButton value="Throw ClosedByInterruptException" action="#{exceptionBean.throwClosedByInterruptException()}">
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+            <p/>
+            <h:commandButton value="Throw Anoter exception" action="#{exceptionBean.throwGeneric()}" >
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+            <p/>
+            <h:commandButton value="no action" action="#{exceptionBean.success()}" >
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+            <p/>
+            <h:outputText value="hello #{exceptionBean.value}"/>
+        </h:form>
+    </body>
+</html>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/WEB-INF/errorpages/invalidErrorPage.xhtml</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/errorpages/invalidErrorPage.xhtml</location>
+    </error-page>
+    <context-param>
+        <param-name>org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING</param-name>
+        <param-value>javax.faces.application.ViewExpiredException, java.nio.channels.ClosedByInterruptException</param-value>
+    </context-param>
+</web-app>

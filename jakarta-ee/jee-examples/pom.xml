@@ -82,7 +82,7 @@
 <!--            <dependency>
                 <groupId>fish.payara.api</groupId>
                 <artifactId>payara-bom</artifactId>
-                <version>5.2020.5-SNAPSHOT</version>
+                <version>5.2020.6-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>-->

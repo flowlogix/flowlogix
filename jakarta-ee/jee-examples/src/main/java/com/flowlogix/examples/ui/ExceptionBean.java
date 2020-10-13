@@ -23,6 +23,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.omnifaces.util.Faces;
 import java.nio.channels.ClosedByInterruptException;
 import static com.flowlogix.examples.ui.ResponseExceptionSupplier.RUN_BEFORE_RESPONSE;
+import static com.flowlogix.ui.AttributeKeys.SESSION_EXPIRED_KEY;
 
 /**
  *
@@ -43,11 +44,27 @@ public class ExceptionBean implements Serializable {
         Faces.setRequestAttribute(RUN_BEFORE_RESPONSE, before);
     }
 
+    public void throwExceptionFromMethod() {
+        ExceptionUtils.rethrow(new SQLException("sql-from-method"));
+    }
+
     public void success() {
 
     }
 
-    public String getValue() {
-        return "hello";
+    public void invalidateSession() {
+        Faces.invalidateSession();
+    }
+
+    public String getSessionValue() {
+        return Faces.getSessionId();
+    }
+
+    public String expired() {
+        Boolean loggedOut = false;
+        if (!Faces.isAjaxRequest()) {
+            loggedOut = Faces.getFlashAttribute(SESSION_EXPIRED_KEY, () -> false);
+        }
+        return loggedOut ? "Logged Out" : "Logged In";
     }
 }

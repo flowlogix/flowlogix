@@ -37,6 +37,7 @@ public class ResponseExceptionSupplier implements PhaseListener {
     public void beforePhase(PhaseEvent event) {
         Runnable before = Faces.getRequestAttribute(RUN_BEFORE_RESPONSE);
         if (before != null) {
+            event.getFacesContext().responseComplete();
             before.run();
         }
     }

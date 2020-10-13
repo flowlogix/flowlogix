@@ -3,6 +3,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:of="http://omnifaces.org/functions"
       xmlns:o="http://omnifaces.org/ui">
     <h:head>
         <title>Exception Pages Example</title>
@@ -10,8 +11,7 @@
     <body>
         <h:form>
             <p>
-                <input type="button" value="Invalidate session"
-                       var opts = {
+                <input type="button" value="Invalidate session via Servlet"
                        onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
             </p>
             <p/>
@@ -27,7 +27,17 @@
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>
-            <h:outputText value="hello #{exceptionBean.value}"/>
+            <h:commandButton value="throw from method" action="#{exceptionBean.throwExceptionFromMethod()}" >
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+            <p/>
+            <h:commandButton value="Invalidate Session via Faces" action="#{exceptionBean.invalidateSession()}" >
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+            <p/>
+            <h:outputText value="Session: #{exceptionBean.sessionValue}"/>
+            <p/>
+            Security Status: #{exceptionBean.expired()}
         </h:form>
     </body>
 </html>

@@ -9,13 +9,13 @@
         <title>Exception Pages Example</title>
     </h:head>
     <body>
-        <h:form>
+        <h:form id="form">
             <p>
                 <input type="button" value="Invalidate session via Servlet"
                        onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
             </p>
             <p/>
-            <h:commandButton value="Throw ClosedByInterruptException" action="#{exceptionBean.throwClosedByInterruptException()}">
+            <h:commandButton id="closeByIntr" value="Throw ClosedByInterruptException" action="#{exceptionBean.throwClosedByInterruptException()}">
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>

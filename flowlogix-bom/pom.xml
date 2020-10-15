@@ -7,6 +7,7 @@
     <artifactId>flowlogix-bom</artifactId>
     <version>3.0.1-SNAPSHOT</version>
     <name>FlowLogix Bill of Materials</name>
+    <packaging>pom</packaging>
 
     <properties>
         <slf4j.version>1.7.30</slf4j.version>
@@ -156,7 +157,7 @@
         </dependencies>
     </dependencyManagement>
 
-    <build>
+<!--    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -166,5 +167,5 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
 </project>

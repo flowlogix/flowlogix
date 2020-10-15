@@ -29,6 +29,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
 import javax.faces.event.ExceptionQueuedEventContext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,9 +37,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
 import org.mockito.MockedStatic;
 import org.mockito.MockedStatic.Verification;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+import org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory;
 import org.omnifaces.util.Faces;
 
 /**
@@ -46,18 +50,23 @@ import org.omnifaces.util.Faces;
  * @author lprimak
  */
 public class ViewExpiredExceptionTest {
-    ExceptionHandlerFactory mockedFactory;
     ExceptionHandler mockedHandler;
     FacesContext facesContext;
-    ViewExpiredExceptionHandlerFactory fact;
+    ViewExpiredExceptionHandlerFactory mockedFactory;
 
     @BeforeEach
     void init() {
-        mockedFactory = mock(ExceptionHandlerFactory.class);
+        ExceptionHandlerFactory fact = mock(ExceptionHandlerFactory.class);
         mockedHandler = mock(ExceptionHandler.class);
         facesContext = mock(FacesContext.class);
-        when(mockedFactory.getExceptionHandler()).thenReturn(mockedHandler);
-        fact = new ViewExpiredExceptionHandlerFactory(mockedFactory);
+        when(fact.getExceptionHandler()).thenReturn(mockedHandler);
+        try (MockedStatic<ViewExpiredExceptionHandlerFactory> mockUs = mockStatic(ViewExpiredExceptionHandlerFactory.class,
+                withSettings().defaultAnswer(CALLS_REAL_METHODS))) {
+            mockUs.when(() -> ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(any(), any())).thenReturn(false);
+            mockUs.when(() -> ViewExpiredExceptionHandlerFactory.getTypesToIgnore()).thenReturn(
+                    Stream.of(ClosedByInterruptException.class).toArray(Class<?>[]::new));
+            mockedFactory = new ViewExpiredExceptionHandlerFactory(fact);
+        }
     }
 
     @Test
@@ -77,7 +86,7 @@ public class ViewExpiredExceptionTest {
                 assertTrue(inv.getArgument(1, Boolean.class));
                 return null;
             });
-            fact.getExceptionHandler().handle();
+            mockedFactory.getExceptionHandler().handle();
             facesMock.verify(flashVerification);
             facesMock.verify(() -> Faces.redirect(nullable(String.class)));
         }
@@ -96,7 +105,7 @@ public class ViewExpiredExceptionTest {
                 .collect(Collectors.toList());
         when(mockedHandler.getUnhandledExceptionQueuedEvents()).thenReturn(exceptions);
         try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
-            fact.getExceptionHandler().handle();
+            mockedFactory.getExceptionHandler().handle();
         }
         assertEquals(5, exceptions.size());
     }
@@ -107,5 +116,27 @@ public class ViewExpiredExceptionTest {
 
     private ExceptionQueuedEvent buildWithoutWrapping(Exception exc) {
         return new ExceptionQueuedEvent(new ExceptionQueuedEventContext(facesContext, exc));
+    }
+
+    private static class NestedFactory extends ExceptionHandlerFactory {
+        public NestedFactory(ExceptionHandlerFactory wrapped) {
+            super(wrapped);
+        }
+
+        @Override
+        public ExceptionHandler getExceptionHandler() {
+            throw new UnsupportedOperationException("Not supported");
+        }
+    }
+
+    @Test
+    void omniFacesInstances() {
+        assertTrue(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new FullAjaxExceptionHandlerFactory(new NestedFactory(mockedFactory)),
+                FullAjaxExceptionHandlerFactory.class));
+        assertTrue(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new NestedFactory(
+                new FullAjaxExceptionHandlerFactory(mockedFactory)), FullAjaxExceptionHandlerFactory.class));
+        assertFalse(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new NestedFactory(mockedFactory), FullAjaxExceptionHandlerFactory.class));
+        assertFalse(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new NestedFactory(null), FullAjaxExceptionHandlerFactory.class));
+        assertFalse(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(null, FullAjaxExceptionHandlerFactory.class));
     }
 }

@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
 import javax.faces.FacesException;
 import javax.faces.application.ViewExpiredException;
 import javax.faces.context.ExceptionHandler;
@@ -34,6 +35,8 @@ import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.event.ExceptionQueuedEvent;
 import lombok.NonNull;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
+import org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
 
@@ -59,13 +62,21 @@ public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory 
         Function<ExceptionQueuedEvent, Boolean> viewExpired = this::viewExpiredFn;
         Function<ExceptionQueuedEvent, Boolean> ignored = this::ignoredFn;
 
-        handlers = Stream.of(
-                // trigger same-page redirect for ViewExpired exception
-                new AbstractMap.SimpleEntry<>(ViewExpiredException.class, viewExpired),
-                // ignore unexpected client disconnects, nothing to do here
-                new AbstractMap.SimpleEntry<>(ClosedByInterruptException.class, ignored))
-                .collect(Collectors.collectingAndThen(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue),
-                        Collections::<Class<?>, Function<ExceptionQueuedEvent, Boolean>>unmodifiableMap));
+        Builder<Map.Entry<Class<?>, Function<ExceptionQueuedEvent, Boolean>>> handlerStreamBuilder = Stream.builder();
+
+        // trigger same-page redirect for ViewExpired exception
+        handlerStreamBuilder.add(new AbstractMap.SimpleEntry<>(ViewExpiredException.class, viewExpired));
+
+        // now add ignored logging instances
+        if (!isIgnoreLoggingAlreadyHandled(wrapped, FullAjaxExceptionHandlerFactory.class)) {
+            for (Class<? extends Throwable> cls : getTypesToIgnore()) {
+                handlerStreamBuilder.add(new AbstractMap.SimpleEntry<>(cls, ignored));
+            }
+        }
+
+        handlers = handlerStreamBuilder.build().
+                collect(Collectors.collectingAndThen(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue),
+                Collections::<Class<?>, Function<ExceptionQueuedEvent, Boolean>>unmodifiableMap));
     }
 
     @Override
@@ -81,6 +92,19 @@ public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory 
 
     private Boolean ignoredFn(ExceptionQueuedEvent evt) {
         return true;
+    }
+
+    static boolean isIgnoreLoggingAlreadyHandled(ExceptionHandlerFactory wrapped, Class<?> target) {
+        boolean matched = false;
+        while (wrapped != null && !matched) {
+            matched = target.isInstance(wrapped);
+            wrapped = wrapped.getWrapped();
+        }
+        return matched;
+    }
+
+    static Class<? extends Throwable>[] getTypesToIgnore() {
+        return FullAjaxExceptionHandler.getExceptionTypesToIgnoreInLogging(Faces.getServletContext());
     }
 
     private static class Handler extends ExceptionHandlerWrapper {
@@ -109,16 +133,15 @@ public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory 
                 Throwable unwrappedException = Exceptions.unwrap(queuedException);
                 Throwable pureRootCause = ExceptionUtils.getRootCause(queuedException);
 
-                List<Function<ExceptionQueuedEvent, Boolean>> handlerList =
-                        Stream.of(unwrappedException, pureRootCause).map(thr -> handlers.get(thr.getClass()))
-                        .filter(Objects::nonNull).collect(Collectors.toList());
+                List<Function<ExceptionQueuedEvent, Boolean>> handlerList
+                        = Stream.of(unwrappedException, pureRootCause).map(thr -> handlers.get(thr.getClass()))
+                                .filter(Objects::nonNull).collect(Collectors.toList());
                 if (!handlerList.isEmpty()) {
                     // an exception is matched, remove it from the queue and handle it next
                     it.remove();
                 }
                 for (Function<ExceptionQueuedEvent, Boolean> handler : handlerList) {
-                    if (!handler.apply(event))
-                    {
+                    if (!handler.apply(event)) {
                         return;
                     }
                 }

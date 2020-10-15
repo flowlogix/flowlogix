@@ -51,19 +51,54 @@ public class ExceptionPageTest {
     @FindBy(id = "form:closeByIntr")
     private WebElement closedByIntrButton;
 
+    @FindBy(id = "invalidate")
+    private WebElement invalidateSession;
+
+    @FindBy(id = "form:noAction")
+    private WebElement noAction;
+
+    @FindBy(id = "isExpired")
+    private WebElement isExpired;
+
+    @FindBy(id = "form:lateSqlThrow")
+    private WebElement lateSqlThrow;
+
+    private static final String APP_NAME = "exctest";
+    private static final String URL = "http://localhost:8080/";
 
     @Test
     public void closedByInterrupted() {
-        webDriver.get("http://localhost:8080/exctest" + "/exception-pages.xhtml");
+        webDriver.get(URL + APP_NAME + "/exception-pages.xhtml");
         waitGui(webDriver);
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
     }
 
+    @Test
+    public void invalidSession() {
+        webDriver.get(URL + APP_NAME + "/exception-pages.xhtml");
+        waitGui(webDriver);
+        invalidateSession.click();
+        webDriver.switchTo().alert().accept();
+        noAction.click();
+        assertEquals("Logged Out", isExpired.getText());
+        noAction.click();
+        assertEquals("Logged In", isExpired.getText());
+    }
+
+    @Test
+    public void lateSqlThrow() {
+        webDriver.get(URL + APP_NAME + "/exception-pages.xhtml");
+        waitGui(webDriver);
+        guardAjax(lateSqlThrow).click();
+        assertEquals("Exception happened", exceptionHeading.getText());
+        assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
+    }
+
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
-        return ShrinkWrap.create(MavenImporter.class, "exctest.war")
+        return ShrinkWrap.create(MavenImporter.class, APP_NAME + ".war")
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
     }

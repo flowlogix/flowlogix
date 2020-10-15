@@ -11,7 +11,7 @@
     <body>
         <h:form id="form">
             <p>
-                <input type="button" value="Invalidate session via Servlet"
+                <input type="button" id="invalidate" value="Invalidate session via Servlet"
                        onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
             </p>
             <p/>
@@ -19,11 +19,11 @@
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>
-            <h:commandButton value="Throw SQL Exception Late (before response)" action="#{exceptionBean.throwSqlBeforeResponse()}" >
+            <h:commandButton id="lateSqlThrow" value="Throw SQL Exception Late (before response)" action="#{exceptionBean.throwSqlBeforeResponse()}" >
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>
-            <h:commandButton value="no action" action="#{exceptionBean.success()}" >
+            <h:commandButton id="noAction" value="no action" action="#{exceptionBean.success()}" >
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>
@@ -37,7 +37,7 @@
             <p/>
             <h:outputText value="Session: #{exceptionBean.sessionValue}"/>
             <p/>
-            Security Status: #{exceptionBean.expired()}
+            Security Status: <span id="isExpired"> #{exceptionBean.expired()} </span>
         </h:form>
     </body>
 </html>

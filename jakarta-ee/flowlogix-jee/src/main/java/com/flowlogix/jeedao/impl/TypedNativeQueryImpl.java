@@ -35,8 +35,8 @@ public class TypedNativeQueryImpl<T> implements TypedNativeQuery<T>
     {
         return (T)q.getSingleResult();
     }
-    
-    
+
+
     @Override
     @SuppressWarnings("unchecked")
     public List<T> getResultList()
@@ -44,6 +44,6 @@ public class TypedNativeQueryImpl<T> implements TypedNativeQuery<T>
         return q.getResultList();
     }
 
-    
+
     private final @Delegate(excludes = TypedNativeQuery.class) Query q;
 }

@@ -75,7 +75,7 @@ public class ViewExpiredExceptionTest {
                 build(new SQLException("sql")),
                 buildWithoutWrapping(new SQLException("sql")),
                 build(new ClosedByInterruptException()),
-                buildWithoutWrapping(new ClosedByInterruptException()),
+                buildWithoutWrapping(new IllegalStateException(new ClosedByInterruptException())),
                 build(new ViewExpiredException("expired", "myView")))
                 .collect(Collectors.toList());
         when(mockedHandler.getUnhandledExceptionQueuedEvents()).thenReturn(exceptions);
@@ -96,6 +96,8 @@ public class ViewExpiredExceptionTest {
     @Test
     void returnFromRedirect() {
         List<ExceptionQueuedEvent> exceptions = Stream.of(
+                buildWithoutWrapping(new IllegalStateException(new ClosedByInterruptException())),
+                build(new ClosedByInterruptException()),
                 build(new ViewExpiredException("expired", "myView")),
                 build(new SQLException("sql")),
                 build(new ViewExpiredException("expired", "myView")),
@@ -133,12 +135,38 @@ public class ViewExpiredExceptionTest {
 
     @Test
     void omniFacesInstances() {
-        assertTrue(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new FullAjaxExceptionHandlerFactory(new NestedFactory(mockedFactory)),
-                FullAjaxExceptionHandlerFactory.class));
+        assertTrue(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new FullAjaxExceptionHandlerFactory(
+                new NestedFactory(mockedFactory)), FullAjaxExceptionHandlerFactory.class));
         assertTrue(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new NestedFactory(
                 new FullAjaxExceptionHandlerFactory(mockedFactory)), FullAjaxExceptionHandlerFactory.class));
-        assertFalse(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new NestedFactory(mockedFactory), FullAjaxExceptionHandlerFactory.class));
-        assertFalse(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new NestedFactory(null), FullAjaxExceptionHandlerFactory.class));
+        assertFalse(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new NestedFactory(mockedFactory),
+                FullAjaxExceptionHandlerFactory.class));
+        assertFalse(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(new NestedFactory(null),
+                FullAjaxExceptionHandlerFactory.class));
         assertFalse(ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(null, FullAjaxExceptionHandlerFactory.class));
+    }
+
+    @Test
+    void priority() {
+        List<ExceptionQueuedEvent> exceptions = Stream.of(
+                build(new ViewExpiredException("expired", new ClosedByInterruptException(), "myView")),
+                build(new IllegalStateException(new ViewExpiredException(new SQLException(), "myView"))),
+                buildWithoutWrapping(new IllegalStateException(new ClosedByInterruptException())))
+                .collect(Collectors.toList());
+        when(mockedHandler.getUnhandledExceptionQueuedEvents()).thenReturn(exceptions);
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            Verification flashVerification = () -> Faces.setFlashAttribute(any(String.class), any(Boolean.class));
+            facesMock.when(flashVerification).then((inv) -> {
+                assertEquals(SESSION_EXPIRED_KEY, inv.getArgument(0));
+                assertTrue(inv.getArgument(1, Boolean.class));
+                return null;
+            });
+            // test an assumption that unwrapped exception can never be ViewExpiredException,
+            // if it has a "root cause"
+            // thus it's not possible to override it with a lower-priority ignored exception
+            mockedFactory.getExceptionHandler().handle();
+            facesMock.verifyNoInteractions();
+        }
+        assertEquals(1, exceptions.size());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright 2014-2020 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 package com.flowlogix.ui;
 
 import static com.flowlogix.ui.AttributeKeys.SESSION_EXPIRED_KEY;
-import java.nio.channels.ClosedByInterruptException;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,8 +49,8 @@ import org.omnifaces.util.Faces;
  * either establish a new session, redirect to a login screen, or something similar,
  * which will remove one additional click for the users, and removes a cryptic message that's meaningless.
  * <p>
- * In addition, ignores {@link ClosedByInterruptException} exception, which sometimes happen
- * when browsers or other clients disconnect unexpectedly
+ * In addition, ignores exception, which sometimes happen
+ * when browsers or other clients disconnect unexpectedly, as specified in {@link FullAjaxExceptionHandlerFactory}
  *
  * @author lprimak
  */
@@ -97,7 +96,7 @@ public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory 
         return true;
     }
 
-    private void addToStreamBuilderIfNew(
+    private static void addToStreamBuilderIfNew(
             Builder<Map.Entry<Class<?>, Function<ExceptionQueuedEvent, Boolean>>> handlerStreamBuilder,
             Set<Class<?>> existing, Class<?> cls, Function<ExceptionQueuedEvent, Boolean> fn) {
         if (!existing.contains(cls)) {
@@ -145,15 +144,13 @@ public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory 
                 Throwable unwrappedException = Exceptions.unwrap(queuedException);
                 Throwable pureRootCause = ExceptionUtils.getRootCause(queuedException);
 
-                List<Function<ExceptionQueuedEvent, Boolean>> handlerList
-                        = Stream.of(unwrappedException, pureRootCause).map(thr -> handlers.get(thr.getClass()))
-                                .filter(Objects::nonNull).collect(Collectors.toList());
-                if (!handlerList.isEmpty()) {
+                Optional<Function<ExceptionQueuedEvent, Boolean>> handler =
+                        Stream.of(unwrappedException, pureRootCause).map(thr -> handlers.get(thr.getClass()))
+                                .filter(Objects::nonNull).findFirst();
+                if (handler.isPresent()) {
                     // an exception is matched, remove it from the queue and handle it next
                     it.remove();
-                }
-                for (Function<ExceptionQueuedEvent, Boolean> handler : handlerList) {
-                    if (!handler.apply(event)) {
+                    if (!handler.get().apply(event)) {
                         return;
                     }
                 }

@@ -49,7 +49,7 @@ import org.omnifaces.util.Faces;
  * either establish a new session, redirect to a login screen, or something similar,
  * which will remove one additional click for the users, and removes a cryptic message that's meaningless.
  * <p>
- * If used alone or with PrimeFaces, it will prevent exceptions from processing or logging,
+ * If used alone or with PrimeFaces, it will additionally prevent exceptions from processing or logging,
  * as specified in web.xml via <br>
  * {@code org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING} property.
  * <p>

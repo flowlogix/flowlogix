@@ -39,7 +39,7 @@ public class ExceptionBean implements Serializable {
         Faces.setRequestAttribute(RUN_BEFORE_RESPONSE, before);
     }
 
-    public void throwGeneric() {
+    public void throwSqlBeforeResponse() {
         Runnable before = () -> ExceptionUtils.rethrow(new SQLException("sql"));
         Faces.setRequestAttribute(RUN_BEFORE_RESPONSE, before);
     }

@@ -44,14 +44,46 @@ import org.omnifaces.util.Faces;
 /**
  * Redirects back to the same page in case of {@link ViewExpiredException}
  * <p>
- * Other libraries will display a message, which, from the user's perspective is useless.
+ * Other handlers alone will display a message, which, from the user's perspective is useless.
  * This handler goes a step further, and will redirect to the same page, which will probably
  * either establish a new session, redirect to a login screen, or something similar,
  * which will remove one additional click for the users, and removes a cryptic message that's meaningless.
  * <p>
- * In addition, ignores exception, which sometimes happen
- * when browsers or other clients disconnect unexpectedly, as specified in {@link FullAjaxExceptionHandlerFactory}
+ * If used alone or with PrimeFaces, it will prevent exceptions from processing or logging,
+ * as specified in web.xml via <br>
+ * {@code org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING} property.
+ * <p>
+ * If used in conjunction with OmniFaces exception handler, it will delegate this filtering to OmniFaces.
+ * See {@link FullAjaxExceptionHandlerFactory}
+ * <p>
+ * Works together with OmniFaces and PrimeFaces exceptions handlers, or separately on it's own
+ * <p>
+ * Example:
+ * <pre>
+ * faces-config.xml:
+ * {@code
+ *   <factory>
+ *       <!-- the following line is optional, or could be PrimeFaces instead of OmniFaces exception handler
+ *            The order is important, as ViewExpiredExceptionHandlerFactory needs to appear last
+ *       -->
+ *       <exception-handler-factory>org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory</exception-handler-factory>
+ *       <exception-handler-factory>com.flowlogix.ui.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
+ *   </factory>
+ * }
  *
+ * web.xml:
+ * {@code
+ *   <error-page>
+ *       <error-code>500</error-code>
+ *       <location>/WEB-INF/errorpages/invalidErrorPage.xhtml</location>
+ *   </error-page>
+ *   <context-param>
+ *       <param-name>org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING</param-name>
+ *       <param-value>java.nio.channels.ClosedByInterruptException, java.nio.channels.llegalSelectorException</param-value>
+ *   </context-param>
+ * }
+ *
+ * </pre>
  * @author lprimak
  */
 public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory {

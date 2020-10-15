@@ -19,7 +19,7 @@
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>
-            <h:commandButton value="Throw Anoter exception" action="#{exceptionBean.throwGeneric()}" >
+            <h:commandButton value="Throw SQL Exception Late (before response)" action="#{exceptionBean.throwSqlBeforeResponse()}" >
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>
@@ -27,7 +27,7 @@
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>
-            <h:commandButton value="throw from method" action="#{exceptionBean.throwExceptionFromMethod()}" >
+            <h:commandButton value="throw SQL exception from method" action="#{exceptionBean.throwExceptionFromMethod()}" >
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>

@@ -19,10 +19,12 @@ import static com.flowlogix.ui.AttributeKeys.SESSION_EXPIRED_KEY;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,14 +65,15 @@ public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory 
         Function<ExceptionQueuedEvent, Boolean> ignored = this::ignoredFn;
 
         Builder<Map.Entry<Class<?>, Function<ExceptionQueuedEvent, Boolean>>> handlerStreamBuilder = Stream.builder();
+        Set<Class<?>> existingClasses = new HashSet<>();
 
         // trigger same-page redirect for ViewExpired exception
-        handlerStreamBuilder.add(new AbstractMap.SimpleEntry<>(ViewExpiredException.class, viewExpired));
+        addToStreamBuilderIfNew(handlerStreamBuilder, existingClasses, ViewExpiredException.class, viewExpired);
 
         // now add ignored logging instances
         if (!isIgnoreLoggingAlreadyHandled(wrapped, FullAjaxExceptionHandlerFactory.class)) {
             for (Class<? extends Throwable> cls : getTypesToIgnore()) {
-                handlerStreamBuilder.add(new AbstractMap.SimpleEntry<>(cls, ignored));
+                addToStreamBuilderIfNew(handlerStreamBuilder, existingClasses, cls, ignored);
             }
         }
 
@@ -92,6 +95,15 @@ public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory 
 
     private Boolean ignoredFn(ExceptionQueuedEvent evt) {
         return true;
+    }
+
+    private void addToStreamBuilderIfNew(
+            Builder<Map.Entry<Class<?>, Function<ExceptionQueuedEvent, Boolean>>> handlerStreamBuilder,
+            Set<Class<?>> existing, Class<?> cls, Function<ExceptionQueuedEvent, Boolean> fn) {
+        if (!existing.contains(cls)) {
+            existing.add(cls);
+            handlerStreamBuilder.add(new AbstractMap.SimpleEntry<>(cls, fn));
+        }
     }
 
     static boolean isIgnoreLoggingAlreadyHandled(ExceptionHandlerFactory wrapped, Class<?> target) {

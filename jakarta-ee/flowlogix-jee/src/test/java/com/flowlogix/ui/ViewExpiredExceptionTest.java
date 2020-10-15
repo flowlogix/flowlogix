@@ -64,7 +64,7 @@ public class ViewExpiredExceptionTest {
                 withSettings().defaultAnswer(CALLS_REAL_METHODS))) {
             mockUs.when(() -> ViewExpiredExceptionHandlerFactory.isIgnoreLoggingAlreadyHandled(any(), any())).thenReturn(false);
             mockUs.when(() -> ViewExpiredExceptionHandlerFactory.getTypesToIgnore()).thenReturn(
-                    Stream.of(ClosedByInterruptException.class).toArray(Class<?>[]::new));
+                    Stream.of(ClosedByInterruptException.class, ViewExpiredException.class).toArray(Class<?>[]::new));
             mockedFactory = new ViewExpiredExceptionHandlerFactory(fact);
         }
     }
@@ -108,6 +108,8 @@ public class ViewExpiredExceptionTest {
             mockedFactory.getExceptionHandler().handle();
         }
         assertEquals(5, exceptions.size());
+        assertEquals(SQLException.class, exceptions.get(0).getContext().getException().getCause().getClass());
+        assertEquals(SQLException.class, exceptions.get(2).getContext().getException().getClass());
     }
 
     private ExceptionQueuedEvent build(Exception exc) {

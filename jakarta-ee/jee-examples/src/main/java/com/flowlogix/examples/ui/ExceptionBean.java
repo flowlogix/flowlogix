@@ -62,7 +62,7 @@ public class ExceptionBean implements Serializable {
 
     public String expired() {
         Boolean loggedOut = false;
-        if (!Faces.isAjaxRequest()) {
+        if (!Faces.isAjaxRequest() && !Faces.isSessionNew()) {
             loggedOut = Faces.getFlashAttribute(SESSION_EXPIRED_KEY, () -> false);
         }
         return loggedOut ? "Logged Out" : "Logged In";

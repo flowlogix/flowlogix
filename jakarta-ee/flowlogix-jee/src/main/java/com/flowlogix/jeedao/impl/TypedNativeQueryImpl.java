@@ -45,5 +45,5 @@ public class TypedNativeQueryImpl<T> implements TypedNativeQuery<T>
     }
 
 
-    private final @Delegate(excludes = TypedNativeQuery.class) Query q;
+    private final @Delegate Query q;
 }

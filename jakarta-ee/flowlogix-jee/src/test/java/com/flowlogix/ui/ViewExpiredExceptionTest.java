@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
 import org.mockito.MockedStatic;
 import org.mockito.MockedStatic.Verification;
 import static org.mockito.Mockito.mock;
@@ -78,6 +79,7 @@ public class ViewExpiredExceptionTest {
             });
             fact.getExceptionHandler().handle();
             facesMock.verify(flashVerification);
+            facesMock.verify(() -> Faces.redirect(nullable(String.class)));
         }
         assertEquals(2, exceptions.size());
     }

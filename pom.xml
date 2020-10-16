@@ -80,7 +80,8 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M5</version>
                     <configuration>
-                        <forkCount>2.5C</forkCount>
+                        <parallel>all</parallel>
+                        <threadCount>10</threadCount>
                         <excludedGroups>${test.excluded.groups}</excludedGroups>
                         <includes>
                             <include>**</include>

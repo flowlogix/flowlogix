@@ -18,7 +18,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <test.excluded.groups>com.flowlogix.test.ArquillianTest,com.flowlogix.test.StressTest</test.excluded.groups>
+        <test.excluded.groups>
+            com.flowlogix.test.ArquillianTest,
+            com.flowlogix.test.UserInterfaceTest,
+            com.flowlogix.test.StressTest
+        </test.excluded.groups>
     </properties>
 
     <dependencies>
@@ -155,6 +159,22 @@
             </build>
         </profile>
         <profile>
+            <id>ui-test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <parallel>none</parallel>
+                            <groups>com.flowlogix.test.UserInterfaceTest</groups>
+                            <excludedGroups>com.flowlogix.test.StressTest</excludedGroups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>stress-test</id>
             <build>
                 <plugins>
@@ -177,6 +197,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <parallel>none</parallel>
                             <excludedGroups>com.flowlogix.test.NoGroup</excludedGroups>
                         </configuration>
                     </plugin>

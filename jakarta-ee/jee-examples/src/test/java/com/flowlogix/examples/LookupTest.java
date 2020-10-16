@@ -18,7 +18,7 @@ import javax.naming.NamingException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -84,8 +84,8 @@ public class LookupTest {
     }
 
     @Deployment
-    public static JavaArchive createDeployment() {
-        return ShrinkWrap.create(JavaArchive.class)
+    public static WebArchive createDeployment() {
+        return ShrinkWrap.create(WebArchive.class, "LookupTest.war")
                 .addPackages(true, "com.flowlogix");
     }
 }

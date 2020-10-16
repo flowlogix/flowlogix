@@ -15,7 +15,7 @@
  */
 package com.flowlogix.examples;
 
-import com.flowlogix.test.ArquillianTest;
+import com.flowlogix.test.UserInterfaceTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
@@ -37,7 +37,7 @@ import org.openqa.selenium.support.FindBy;
  * @author lprimak
  */
 @RunWith(Arquillian.class)
-@Category(ArquillianTest.class)
+@Category(UserInterfaceTest.class)
 public class ExceptionPageTest {
     @Drone
     private WebDriver webDriver;

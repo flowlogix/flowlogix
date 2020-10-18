@@ -17,6 +17,7 @@ package com.flowlogix.ui;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.faces.application.Resource;
@@ -33,14 +34,17 @@ import org.omnifaces.util.Faces;
 public class MinimizedHandler extends DefaultResourceHandler {
     private final String minimizedPrefix;
     private final Set<String> minimizedExtensions;
+    private final Pattern alreadyMinimizedPattern;
+    private final Pattern extensionsPattern;
+    private final String replacementMatchPattern;
+    private final String replacementString;
 
 
     public MinimizedHandler(ResourceHandler wrapped) {
-        super(wrapped);
-        minimizedPrefix = Optional.ofNullable(Faces.getExternalContext()
-                .getInitParameter("com.flowlogix.MINIMIZED_PREFIX")).orElse("min");
-        minimizedExtensions = parseExtensions(Optional.ofNullable(Faces.getExternalContext()
-                .getInitParameter("com.flowlogix.MINIMIZED_FILE_TYPES")).orElse("css, js"));
+        this(wrapped, Optional.ofNullable(Faces.getExternalContext()
+                .getInitParameter("com.flowlogix.MINIMIZED_PREFIX")).orElse("min"),
+                parseExtensions(Optional.ofNullable(Faces.getExternalContext()
+                        .getInitParameter("com.flowlogix.MINIMIZED_FILE_TYPES")).orElse("css, js")));
     }
 
     /**
@@ -49,10 +53,15 @@ public class MinimizedHandler extends DefaultResourceHandler {
      * @param minimizedPrefix
      * @param minimizedExtensions
      */
-    MinimizedHandler(String minimizedPrefix, Set<String> minimizedExtensions) {
-        super(null);
+    MinimizedHandler(ResourceHandler wrapped, String minimizedPrefix, Set<String> minimizedExtensions) {
+        super(wrapped);
         this.minimizedPrefix = minimizedPrefix;
         this.minimizedExtensions = minimizedExtensions;
+        alreadyMinimizedPattern = Pattern.compile(String.format(".*\\.%s\\.(%s)$", minimizedPrefix, String.join("|", minimizedExtensions)));
+        extensionsPattern = Pattern.compile(String.format(".*\\.(%s)$", String.join("|", minimizedExtensions)));
+        replacementMatchPattern = String.format("(.*)(%s)$", minimizedExtensions.stream()
+                .map(str -> "\\.".concat(str)).collect(Collectors.joining("|")));
+        replacementString = String.format("$1.%s$2", minimizedPrefix);
     }
 
     @Override
@@ -64,12 +73,8 @@ public class MinimizedHandler extends DefaultResourceHandler {
     }
 
     String toMinimized(String resourceName) {
-        if (!resourceName.matches(String.format(".*\\.%s\\.(%s)$", minimizedPrefix, String.join("|", minimizedExtensions)))) {
-            if (resourceName.matches(String.format(".*\\.(%s)$", String.join("|", minimizedExtensions)))) {
-                return resourceName.replaceFirst(String.format("(.*)(%s)$", minimizedExtensions.stream()
-                        .map(str -> "\\.".concat(str)).collect(Collectors.joining("|"))),
-                        String.format("$1.%s$2", minimizedPrefix));
-            }
+        if (!alreadyMinimizedPattern.matcher(resourceName).matches() && extensionsPattern.matcher(resourceName).matches()) {
+            return resourceName.replaceFirst(replacementMatchPattern, replacementString);
         }
         return resourceName;
     }

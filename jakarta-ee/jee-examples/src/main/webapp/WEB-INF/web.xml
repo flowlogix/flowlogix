@@ -26,6 +26,6 @@
     </context-param>
     <context-param>
         <param-name>javax.faces.PROJECT_STAGE</param-name>
-        <param-value>Development</param-value>
+        <param-value>${ProductionMode}</param-value>
     </context-param>
 </web-app>

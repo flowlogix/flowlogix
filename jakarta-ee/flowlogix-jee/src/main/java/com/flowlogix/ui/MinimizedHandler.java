@@ -57,7 +57,8 @@ public class MinimizedHandler extends DefaultResourceHandler {
         super(wrapped);
         this.minimizedPrefix = minimizedPrefix;
         this.minimizedExtensions = minimizedExtensions;
-        alreadyMinimizedPattern = Pattern.compile(String.format(".*\\.%s\\.(%s)$", minimizedPrefix, String.join("|", minimizedExtensions)));
+        alreadyMinimizedPattern = Pattern.compile(String.format(".*\\.%s\\.(%s)$", minimizedPrefix,
+                String.join("|", minimizedExtensions)));
         extensionsPattern = Pattern.compile(String.format(".*\\.(%s)$", String.join("|", minimizedExtensions)));
         replacementMatchPattern = String.format("(.*)(%s)$", minimizedExtensions.stream()
                 .map(str -> "\\.".concat(str)).collect(Collectors.joining("|")));

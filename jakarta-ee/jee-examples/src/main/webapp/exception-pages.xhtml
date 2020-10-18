@@ -7,6 +7,7 @@
       xmlns:o="http://omnifaces.org/ui">
     <h:head>
         <title>Exception Pages Example</title>
+        <h:outputScript name="components.js" library="primefaces"/>
     </h:head>
     <body>
         <h:form id="form">
@@ -35,9 +36,13 @@
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>
-            <h:outputText value="Session: #{exceptionBean.sessionValue}"/>
+            <h:outputText value="Session: #{exceptionBean.sessionValue} Version #{environmentInfo.version}"/>
             <p/>
             Security Status: <span id="isExpired"> #{exceptionBean.expired()} </span>
         </h:form>
+        <p/>
+        <span id="end-of-page">
+            <h:outputScript name="test-resource.js"/>
+        </span>
     </body>
 </html>

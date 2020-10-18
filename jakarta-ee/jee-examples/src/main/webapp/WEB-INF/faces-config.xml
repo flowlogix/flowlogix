@@ -30,4 +30,8 @@
     <lifecycle>
         <phase-listener>com.flowlogix.examples.ui.ResponseExceptionSupplier</phase-listener>
     </lifecycle>
+    <application>
+        <resource-handler>com.flowlogix.ui.CacheResourcesForever</resource-handler>
+        <resource-handler>com.flowlogix.ui.MinimizedHandler</resource-handler>
+    </application>
 </faces-config>

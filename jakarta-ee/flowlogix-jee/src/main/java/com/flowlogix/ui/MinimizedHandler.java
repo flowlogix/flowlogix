@@ -15,10 +15,14 @@
  */
 package com.flowlogix.ui;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
-import javax.faces.application.ResourceHandlerWrapper;
 import org.apache.commons.lang3.StringUtils;
+import org.omnifaces.resourcehandler.DefaultResourceHandler;
 import org.omnifaces.util.Faces;
 
 /**
@@ -26,43 +30,45 @@ import org.omnifaces.util.Faces;
  *
  * @author lprimak
  */
-public class MinimizedHandler extends ResourceHandlerWrapper
-{
+public class MinimizedHandler extends DefaultResourceHandler {
+
+    private final String minimizedPrefix;
+    private final Set<String> minimizedExtensions;
+
     public MinimizedHandler(ResourceHandler wrapped) {
         super(wrapped);
+        minimizedPrefix = Optional.ofNullable(Faces.getExternalContext()
+                .getInitParameter("com.flowlogix.MINIMIZED_PREFIX")).orElse("min");
+        minimizedExtensions = parseExtensions(Optional.ofNullable(Faces.getExternalContext()
+                .getInitParameter("com.flowlogix.MINIMIZED_FILE_TYPES")).orElse("css, js"));
+    }
+
+    public MinimizedHandler(String minimizedPrefix, Set<String> minimizedExtensions) {
+        super(null);
+        this.minimizedPrefix = minimizedPrefix;
+        this.minimizedExtensions = minimizedExtensions;
     }
 
     @Override
-    public Resource createResource(String resourceName)
-    {
-        if(StringUtils.isEmpty(resourceName))
-        {
-            return null;
+    public Resource decorateResource(Resource resource) {
+        if (resource != null && !Faces.isDevelopment() && resource.getLibraryName() == null) {
+            resource.setResourceName(toMinimized(resource.getResourceName()));
         }
-        return super.createResource(toMinimized(resourceName));
+        return resource;
     }
 
-
-    @Override
-    public Resource createResource(String resourceName, String libraryName)
-    {
-        if(StringUtils.isEmpty(resourceName))
-        {
-            return null;
-        }
-        return super.createResource(libraryName == null? toMinimized(resourceName) : resourceName, libraryName);
-    }
-
-
-    private String toMinimized(String resourceName)
-    {
-        if(!Faces.isDevelopment() && !resourceName.matches(".*\\.min\\.(js|css)$"))
-        {
-            if(resourceName.matches(".*\\.(css|js)$"))
-            {
-                return resourceName.replaceFirst("(.*)(\\.css|\\.js)$", "$1.min$2");
+    String toMinimized(String resourceName) {
+        if (!resourceName.matches(String.format(".*\\.%s\\.(%s)$", minimizedPrefix, String.join("|", minimizedExtensions)))) {
+            if (resourceName.matches(String.format(".*\\.(%s)$", String.join("|", minimizedExtensions)))) {
+                return resourceName.replaceFirst(String.format("(.*)(%s)$", minimizedExtensions.stream()
+                        .map(str -> "\\.".concat(str)).collect(Collectors.joining("|"))),
+                        String.format("$1.%s$2", minimizedPrefix));
             }
         }
         return resourceName;
+    }
+
+    static Set<String> parseExtensions(String extensions) {
+        return Stream.of(StringUtils.split(extensions, ", ")).collect(Collectors.toSet());
     }
 }

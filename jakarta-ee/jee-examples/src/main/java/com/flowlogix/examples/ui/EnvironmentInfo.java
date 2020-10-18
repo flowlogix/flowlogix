@@ -50,4 +50,8 @@ public class EnvironmentInfo {
     public String getVersion() {
         return String.join("-", version, gitId);
     }
+
+    public String getBuildTime() {
+        return buildTime;
+    }
 }

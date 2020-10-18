@@ -28,6 +28,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -76,10 +77,15 @@ public class ExceptionPageTest {
     private static final String APP_NAME = "exctest";
     private static final String URL = "http://localhost:8080/";
 
-    @Test
-    public void closedByInterrupted() {
+    @Before
+    public void before() {
+        webDriver.manage().deleteAllCookies();
         webDriver.get(URL + APP_NAME + "/exception-pages.xhtml");
         waitGui(webDriver);
+    }
+
+    @Test
+    public void closedByInterrupted() {
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
@@ -87,8 +93,6 @@ public class ExceptionPageTest {
 
     @Test
     public void invalidSession() {
-        webDriver.get(URL + APP_NAME + "/exception-pages.xhtml");
-        waitGui(webDriver);
         invalidateSession.click();
         webDriver.switchTo().alert().accept();
         noAction.click();
@@ -99,8 +103,6 @@ public class ExceptionPageTest {
 
     @Test
     public void lateSqlThrow() {
-        webDriver.get(URL + APP_NAME + "/exception-pages.xhtml");
-        waitGui(webDriver);
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
@@ -108,8 +110,6 @@ public class ExceptionPageTest {
 
     @Test
     public void versions() {
-        webDriver.get(URL + APP_NAME + "/exception-pages.xhtml");
-        waitGui(webDriver);
         String expected = "end of page";
         if ("Production".equals(modeField.getText())) {
             expected = "end of page - minimized";

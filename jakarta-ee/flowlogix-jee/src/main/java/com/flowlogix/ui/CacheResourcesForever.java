@@ -15,6 +15,7 @@
  */
 package com.flowlogix.ui;
 
+import com.flowlogix.util.Lazy;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceWrapper;
@@ -31,17 +32,18 @@ import org.omnifaces.util.Faces;
  */
 public class CacheResourcesForever extends DefaultResourceHandler {
     private static final String VERSION_SUFFIX = "v=";
-    private final String versionString;
+    private final Lazy<String> versionString;
 
 
     public CacheResourcesForever(ResourceHandler wrapped) {
         super(wrapped);
-        versionString = Faces.getExternalContext().getInitParameter("com.flowlogix.VERSION_STRING");
+        versionString = new Lazy<>(() -> Faces.evaluateExpressionGet(
+                Faces.getExternalContext().getInitParameter("com.flowlogix.VERSION_STRING")));
     }
 
     @Override
     public Resource decorateResource(Resource resource) {
-        if (resource == null || StringUtils.isBlank(versionString)) {
+        if (resource == null || StringUtils.isBlank(versionString.get())) {
             return resource;
         }
         String requestPath = resource.getRequestPath();
@@ -66,11 +68,10 @@ public class CacheResourcesForever extends DefaultResourceHandler {
                 return requestPath;
             }
 
-            String version = Faces.evaluateExpressionGet(versionString);
             if (requestPath.contains("?")) {
-                requestPath = requestPath + '&' + VERSION_SUFFIX + version;
+                requestPath = requestPath + '&' + VERSION_SUFFIX + versionString.get();
             } else {
-                requestPath = requestPath + '?' + VERSION_SUFFIX + version;
+                requestPath = requestPath + '?' + VERSION_SUFFIX + versionString.get();
             }
 
             return requestPath;

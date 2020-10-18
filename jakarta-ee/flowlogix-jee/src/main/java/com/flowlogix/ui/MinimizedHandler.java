@@ -31,9 +31,9 @@ import org.omnifaces.util.Faces;
  * @author lprimak
  */
 public class MinimizedHandler extends DefaultResourceHandler {
-
     private final String minimizedPrefix;
     private final Set<String> minimizedExtensions;
+
 
     public MinimizedHandler(ResourceHandler wrapped) {
         super(wrapped);
@@ -43,7 +43,13 @@ public class MinimizedHandler extends DefaultResourceHandler {
                 .getInitParameter("com.flowlogix.MINIMIZED_FILE_TYPES")).orElse("css, js"));
     }
 
-    public MinimizedHandler(String minimizedPrefix, Set<String> minimizedExtensions) {
+    /**
+     * for testing purposes only
+     *
+     * @param minimizedPrefix
+     * @param minimizedExtensions
+     */
+    MinimizedHandler(String minimizedPrefix, Set<String> minimizedExtensions) {
         super(null);
         this.minimizedPrefix = minimizedPrefix;
         this.minimizedExtensions = minimizedExtensions;

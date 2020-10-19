@@ -16,7 +16,7 @@
         <param-value>javax.faces.application.ViewExpiredException, java.nio.channels.ClosedByInterruptException</param-value>
     </context-param>
     <context-param>
-        <!-- effects production mode only -->
+        <!-- 1 year cache, effects production mode only -->
         <param-name>com.sun.faces.defaultResourceMaxAge</param-name>
         <param-value>31536000000</param-value>
     </context-param>

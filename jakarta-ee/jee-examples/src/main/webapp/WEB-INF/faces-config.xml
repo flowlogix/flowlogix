@@ -28,6 +28,7 @@
         <exception-handler-factory>com.flowlogix.ui.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
     </factory>
     <lifecycle>
+        <!-- the line below is only for testing purposes -->
         <phase-listener>com.flowlogix.examples.ui.ResponseExceptionSupplier</phase-listener>
     </lifecycle>
     <application>

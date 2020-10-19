@@ -15,10 +15,8 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import com.flowlogix.ui.AttributeKeys;
 import com.flowlogix.util.PathUtil;
 import java.io.IOException;
-import java.util.stream.Stream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +24,6 @@ import javax.ws.rs.HttpMethod;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 import org.omnifaces.util.Servlets;
@@ -51,12 +48,10 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException
     {
         boolean isGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
-        String sessionExpired = Stream.of(StringUtils.split(AttributeKeys.SESSION_EXPIRED_KEY, '.'))
-                .reduce((first, second) -> second).get();
         Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
                 Servlets.getRequestBaseURL(WebUtils.toHttp(request))
                 + getLoginUrl().replaceFirst("^/", "") + (isGetRequest? "" : "?%s=true"),
-                sessionExpired);
+                "sessionExpired");
     }
 
 

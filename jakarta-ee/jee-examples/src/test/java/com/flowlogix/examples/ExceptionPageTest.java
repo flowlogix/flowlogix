@@ -16,13 +16,16 @@
 package com.flowlogix.examples;
 
 import com.flowlogix.test.UserInterfaceTest;
+import java.net.URL;
 import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
@@ -46,6 +49,9 @@ import org.openqa.selenium.support.FindBy;
 public class ExceptionPageTest {
     @Drone
     private WebDriver webDriver;
+
+    @ArquillianResource
+    protected URL baseURL;
 
     @FindBy(id = "exception")
     private WebElement exceptionHeading;
@@ -74,17 +80,16 @@ public class ExceptionPageTest {
     @FindBy(id = "mode")
     private WebElement modeField;
 
-    private static final String APP_NAME = "exctest";
-    private static final String URL = "http://localhost:8080/";
 
     @Before
     public void before() {
         webDriver.manage().deleteAllCookies();
-        webDriver.get(URL + APP_NAME + "/exception-pages.xhtml");
+        webDriver.get(baseURL + "exception-pages.xhtml");
         waitGui(webDriver);
     }
 
     @Test
+    @OperateOnDeployment("DevMode")
     public void closedByInterrupted() {
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
@@ -92,6 +97,7 @@ public class ExceptionPageTest {
     }
 
     @Test
+    @OperateOnDeployment("DevMode")
     public void invalidSession() {
         invalidateSession.click();
         webDriver.switchTo().alert().accept();
@@ -102,6 +108,7 @@ public class ExceptionPageTest {
     }
 
     @Test
+    @OperateOnDeployment("DevMode")
     public void lateSqlThrow() {
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
@@ -109,11 +116,18 @@ public class ExceptionPageTest {
     }
 
     @Test
-    public void versions() {
-        String expected = "end of page";
-        if ("Production".equals(modeField.getText())) {
-            expected = "end of page - minimized";
-        }
+    @OperateOnDeployment("DevMode")
+    public void versionsOnDev() {
+        versions("end of page");
+    }
+
+    @Test
+    @OperateOnDeployment("ProdMode")
+    public void versionsOnProd() {
+        versions("end of page - minimized");
+    }
+
+    void versions(String expected) {
         assertEquals(expected, endOfPage.getText());
         List<WebElement> scripts = webDriver.findElements(By.tagName("script"));
         int count = 0;
@@ -140,10 +154,19 @@ public class ExceptionPageTest {
         assertEquals(1, count);
     }
 
-    @Deployment(testable = false)
+    @Deployment(testable = false, name = "DevMode")
     public static WebArchive createDeployment() {
-        return ShrinkWrap.create(MavenImporter.class, APP_NAME + ".war")
+        return ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
+    }
+
+    @Deployment(testable = false, name = "ProdMode")
+    public static WebArchive createDeploymentProdMode() {
+        WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest-prod.war")
+                .loadPomFromFile("pom.xml").importBuildOutput()
+                .as(WebArchive.class);
+        archive.setWebXML(archive.get("WEB-INF/web-production.xml").getAsset());
+        return archive;
     }
 }

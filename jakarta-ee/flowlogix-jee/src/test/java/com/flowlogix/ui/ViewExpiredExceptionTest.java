@@ -15,7 +15,7 @@
  */
 package com.flowlogix.ui;
 
-import static com.flowlogix.ui.AttributeKeys.SESSION_EXPIRED_KEY;
+import static com.flowlogix.ui.ViewExpiredExceptionHandlerFactory.SESSION_EXPIRED_KEY;
 import java.nio.channels.ClosedByInterruptException;
 import java.sql.SQLException;
 import java.util.List;

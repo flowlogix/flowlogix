@@ -15,7 +15,6 @@
  */
 package com.flowlogix.ui;
 
-import static com.flowlogix.ui.AttributeKeys.SESSION_EXPIRED_KEY;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashSet;
@@ -83,10 +82,20 @@ import org.omnifaces.util.Faces;
  *   </context-param>
  * }
  *
+ * Java code:
+ * // check if last action caused {@link ViewExpiredException}
+ * {@code
+ * boolean loggedOut = ViewExpiredExceptionHandlerFactory.isSessionExpired();
+ * }
  * </pre>
  * @author lprimak
  */
 public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory {
+   /**
+     * Flash attribute name that signifies an expired session
+     */
+    static final String SESSION_EXPIRED_KEY = "com.flowlogix.ui.sessionExpired";
+
     private final Map<Class<?>, Function<ExceptionQueuedEvent, Boolean>> handlers;
 
 
@@ -116,6 +125,20 @@ public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory 
     @Override
     public ExceptionHandler getExceptionHandler() {
         return new Handler(getWrapped().getExceptionHandler(), handlers);
+    }
+
+    /**
+     * Used to show the user if they have been logged out or redirected due to
+     * {@link ViewExpiredException}
+     * @return true if last request caused {@link ViewExpiredException} and was
+     * re-directed to the same page (or login page) due to that fact
+     */
+    public static boolean isSessionExpired() {
+        boolean sessionExpired = false;
+        if (!Faces.isAjaxRequest() && !Faces.isSessionNew()) {
+            sessionExpired = Faces.getFlashAttribute(SESSION_EXPIRED_KEY, () -> false);
+        }
+        return sessionExpired;
     }
 
     private Boolean viewExpiredFn(ExceptionQueuedEvent evt) {

@@ -24,10 +24,35 @@ import org.omnifaces.resourcehandler.DefaultResourceHandler;
 import org.omnifaces.util.Faces;
 
 /**
- * adds forever caching functionality to the JSF resources
+ * Automatically adds version parameter to all resource URLs so, in production mode,
+ * they will be cached forever (or as configured in web.xml),
+ * but will not be stale when a new version of the app is deployed.
+ * <p>
+ * Example:
+ * <pre>
+ * faces-config.xml:
+ * {@code
+ *   <application>
+ *       <resource-handler>com.flowlogix.ui.CacheResourcesForever</resource-handler>
+ *   </application>
+ * }
  *
- * +++ TODO documentation
- *
+ * web.xml:
+ * {@code
+ *   <context-param>
+ *       <!-- Mojarra: 1 year cache, effects production mode only -->
+ *       <param-name>com.sun.faces.defaultResourceMaxAge</param-name>
+ *       <param-value>31536000000</param-value>
+ *   </context-param>
+ *   <context-param>
+ *       <param-name>com.flowlogix.VERSION_STRING</param-name>
+ *       <!-- Version string could be any string here, or taken from @Named bean -->
+ *       <param-value>#{environmentInfo.version}</param-value>
+ *   </context-param>
+ * }
+ * <a href="https://github.com/flowlogix/flowlogix/blob/master/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/ui/EnvironmentInfo.java"
+ * target="_blank">Example Code (GitHub)</a>
+ * </pre>
  * @author lprimak
  */
 public class CacheResourcesForever extends DefaultResourceHandler {

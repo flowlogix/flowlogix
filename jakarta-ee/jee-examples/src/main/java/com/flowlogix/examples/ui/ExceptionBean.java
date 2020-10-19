@@ -23,7 +23,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.omnifaces.util.Faces;
 import java.nio.channels.ClosedByInterruptException;
 import static com.flowlogix.examples.ui.ResponseExceptionSupplier.RUN_BEFORE_RESPONSE;
-import static com.flowlogix.ui.AttributeKeys.SESSION_EXPIRED_KEY;
+import static com.flowlogix.ui.ViewExpiredExceptionHandlerFactory.isSessionExpired;
 
 /**
  *
@@ -61,10 +61,6 @@ public class ExceptionBean implements Serializable {
     }
 
     public String expired() {
-        Boolean loggedOut = false;
-        if (!Faces.isAjaxRequest() && !Faces.isSessionNew()) {
-            loggedOut = Faces.getFlashAttribute(SESSION_EXPIRED_KEY, () -> false);
-        }
-        return loggedOut ? "Logged Out" : "Logged In";
+        return isSessionExpired() ? "Logged Out" : "Logged In";
     }
 }

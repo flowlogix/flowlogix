@@ -27,13 +27,41 @@ import org.omnifaces.resourcehandler.DefaultResourceHandler;
 import org.omnifaces.util.Faces;
 
 /**
- * Automatically loads minimized CSS / JS files in production mode, if available
+ * Automatically transforms CSS / JS, etc. resource URLs to there minimized versions in non-development mode.
+ * In it's default form, it will transform my.js into my.min.js or my.css into my.min.css
+ * This works for JSF resource references only, as this is a JSF handler
+ * <p>
+ * Works together with Maven minimize plugin, or other build tools what will generate
+ * minimized versions of resources. Requires that all resources have their minimized versions
+ * generated in production mode, otherwise links will point to files that do not exist.
+ * <p>
+ * Example:
+ * <pre>
+ * faces-config.xml:
+ * {@code
+ *   <application>
+ *       <resource-handler>com.flowlogix.ui.MinimizedHandler</resource-handler>
+ *   </application>
+ * }
  *
+ * web.xml:
+ * {@code
+ *   <!-- Optional, default is "min" -->
+ *   <context-param>
+ *       <param-name>com.flowlogix.MINIMIZED_PREFIX</param-name>
+ *       <param-value>minimized</param-value>
+ *   </context-param>
+
+ *   <!-- Optional, default is "css,js" -->
+ *   <context-param>
+ *       <param-name>com.flowlogix.MINIMIZED_FILE_TYPES</param-name>
+ *       <param-value>css,js,tsx, sass, less</param-value>
+ *   </context-param>
+ * }
+ * </pre>
  * @author lprimak
  */
 public class MinimizedHandler extends DefaultResourceHandler {
-    private final String minimizedPrefix;
-    private final Set<String> minimizedExtensions;
     private final Pattern alreadyMinimizedPattern;
     private final Pattern extensionsPattern;
     private final String replacementMatchPattern;
@@ -55,8 +83,6 @@ public class MinimizedHandler extends DefaultResourceHandler {
      */
     MinimizedHandler(ResourceHandler wrapped, String minimizedPrefix, Set<String> minimizedExtensions) {
         super(wrapped);
-        this.minimizedPrefix = minimizedPrefix;
-        this.minimizedExtensions = minimizedExtensions;
         alreadyMinimizedPattern = Pattern.compile(String.format(".*\\.%s\\.(%s)$", minimizedPrefix,
                 String.join("|", minimizedExtensions)));
         extensionsPattern = Pattern.compile(String.format(".*\\.(%s)$", String.join("|", minimizedExtensions)));

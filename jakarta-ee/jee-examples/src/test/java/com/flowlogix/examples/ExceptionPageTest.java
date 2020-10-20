@@ -94,6 +94,9 @@ public class ExceptionPageTest {
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
+        webDriver.get(baseURL + "lastException");
+        waitGui(webDriver);
+        assertEquals("", webDriver.findElement(By.tagName("body")).getText());
     }
 
     @Test

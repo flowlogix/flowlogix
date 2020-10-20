@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.examples.ui;
+package com.flowlogix.logcapture;
 
 import java.util.Deque;
 import java.util.Objects;

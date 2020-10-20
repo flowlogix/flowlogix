@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.examples.ui;
+package com.flowlogix.examples.ui.servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.logging.LogRecord;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -28,24 +26,13 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author lprimak
  */
-@WebServlet("/lastException")
-public class ExceptionServlet extends HttpServlet {
+@WebServlet("/invalidatesession")
+public class InvalidateSessionServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        PrintWriter out = resp.getWriter();
-        resp.setContentType("text/plain");
-        resp.setCharacterEncoding("UTF-8");
 
-        LogRecord record = LogCapture.get().poll();
-        while (record != null) {
-            if (record.getThrown() != null) {
-                out.print(record.getThrown());
-                out.print(System.lineSeparator());
-            }
-            record = LogCapture.get().poll();
-        }
-        out.flush();
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getSession().invalidate();
     }
 }

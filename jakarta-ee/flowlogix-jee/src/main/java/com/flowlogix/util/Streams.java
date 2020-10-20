@@ -23,7 +23,8 @@ import java.util.stream.Collectors;
 
 /**
  * Read String from Stream
- * 
+ * Does not close the stream afterwards
+ *
  * @author lprimak
  */
 public class Streams {

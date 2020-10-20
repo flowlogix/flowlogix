@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
  * Converts from any String to any type dynamically,
  * using static <p>{@code valueOf(String input)} method of the target type
  * <p>
+ * Accepts database special values, such as {@literal inf, -inf, and nan}
+ * <p>
  * Example:
  *
  * <pre>

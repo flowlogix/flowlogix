@@ -37,6 +37,10 @@ public class LogCapture {
         return instance;
     }
 
+    private LogCapture() {
+        // nothing
+    }
+
     public void setupLogging(int capacity) {
         if (!handler.compareAndSet(null, new LoggingHandler(capacity))) {
             throw new IllegalStateException("Trying to turn on logging twice");

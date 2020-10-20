@@ -19,25 +19,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 /**
- * <a href="http://code.google.com/p/flowlogix/wiki/TLUtil"
- *    target="_blank">See Documentation</a>
+ * Read String from Stream
  * 
  * @author lprimak
  */
-public class Streams 
-{
-    public static String readString(InputStream strm) throws IOException
-    {
-        BufferedReader br = new BufferedReader(new InputStreamReader(strm));
-        StringBuilder sb = new StringBuilder();
-        String line;
-
-        while ((line = br.readLine()) != null) {
-            sb.append(line).append("\n");
-        }
-
-        return sb.toString();
+public class Streams {
+    public static String readString(InputStream strm) throws IOException {
+        return new BufferedReader(new InputStreamReader(strm)).lines()
+                .collect(Collectors.joining("\n"));
     }
 }

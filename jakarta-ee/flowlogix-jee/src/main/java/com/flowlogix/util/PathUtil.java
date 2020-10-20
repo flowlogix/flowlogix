@@ -31,6 +31,7 @@ public class PathUtil
 {
     /**
      * Returns full path URI for a relative path
+     * // TODO needs testing / doc / simplifying
      *
      * @param request
      * @param relativePath

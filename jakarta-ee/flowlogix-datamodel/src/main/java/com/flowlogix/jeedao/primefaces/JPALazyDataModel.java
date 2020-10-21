@@ -202,6 +202,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
 
 
     @Override
+    @Transactional
     public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy)
     {
         facade.setup(emg, entityClass, optimizer, filter, sorter);

@@ -15,15 +15,18 @@
  */
 package com.flowlogix.examples.data;
 
+import com.flowlogix.examples.data.control.UserService;
 import com.flowlogix.examples.entities.UserEntity;
-import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import java.io.Serializable;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import lombok.Getter;
+import org.omnifaces.optimusfaces.model.PagedDataModel;
 
 /**
  *
@@ -31,10 +34,12 @@ import lombok.Getter;
  */
 @Named
 @ViewScoped
-public class UserViewer implements Serializable {
+public class UserViewerOmni implements Serializable {
     private static final long serialVersionUID = 1L;
     @PersistenceContext
     private EntityManager em;
+    @Inject
+    private UserService service;
 
 
     public String getUsers() {
@@ -42,7 +47,10 @@ public class UserViewer implements Serializable {
                 .map(UserEntity::getFullName).collect(Collectors.joining(", "));
     }
 
-    private @Getter final JPALazyDataModel<Long, UserEntity> lazyModel =
-            JPALazyDataModel.createModel(() -> em, UserEntity.class,
-                    key -> Long.parseLong(key));
+    private @Getter PagedDataModel<UserEntity> lazyModel;
+
+    @PostConstruct
+    public void init() {
+        lazyModel = PagedDataModel.lazy(service).build();
+    }
 }

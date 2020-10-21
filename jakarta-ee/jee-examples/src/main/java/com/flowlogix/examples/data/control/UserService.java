@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright 2020 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.examples.data.control;
 
-import java.util.List;
+import com.flowlogix.examples.entities.UserEntity;
+import javax.ejb.Stateless;
+import org.omnifaces.persistence.service.BaseEntityService;
 
 /**
- * Basic Facade API
- * 
+ * OptimusFaces version
+ *
  * @author lprimak
- * @param <TT> Entity Type
- * @param <KT> Primary Key Type
  */
-public interface FacadeAPI<TT, KT>
-{
-    void create(TT entity);
-    void edit(TT entity);
-    void remove(TT entity);
-    TT find(KT id);
-    List<TT> findAll();
-    List<TT> findRange(int[] range);
-    int count();
-    boolean isXA();
-    void markForXA(boolean tf);
-    public Class<TT> getEntityClass();
+@Stateless
+public class UserService extends BaseEntityService<Long, UserEntity> {
+
 }

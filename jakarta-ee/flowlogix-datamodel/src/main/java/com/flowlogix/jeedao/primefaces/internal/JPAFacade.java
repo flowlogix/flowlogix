@@ -15,7 +15,7 @@
  */
 package com.flowlogix.jeedao.primefaces.internal;
 
-import com.flowlogix.jeedao.impl.AbstractFacade;
+import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.interfaces.EntityManagerGetter;
 import com.flowlogix.jeedao.primefaces.interfaces.Filter;
@@ -49,8 +49,15 @@ import org.primefaces.model.SortMeta;
  * @param <KK>
  */
 @Stateless @Slf4j
-public class JPAFacade<TT, KK> extends AbstractFacade<TT, KK> implements JPAFacadeLocal<TT, KK>
+public class JPAFacade<TT, KK> extends DaoHelper<TT, KK> implements JPAFacadeLocal<TT, KK>
 {
+    public JPAFacade(JPAFacadeState state, Class<TT> entityClass)
+    {
+        super(entityClass);
+        this.state = state;
+    }
+
+
     @Override
     public void setup(EntityManagerGetter emg, Class<TT> entityClass, Optimizer<TT> optimizer,
             Filter<TT> filter, Sorter<TT> sorter)

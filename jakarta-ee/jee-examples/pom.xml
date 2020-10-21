@@ -31,7 +31,17 @@
             <artifactId>flowlogix-jee</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--        <dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>flowlogix-datamodel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.omnifaces</groupId>
+            <artifactId>optimusfaces</artifactId>
+            <version>0.12</version>
+        </dependency>
+    <!--        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.faces</artifactId>
             <scope>provided</scope>

@@ -16,15 +16,38 @@
 package com.flowlogix.jeedao;
 
 import java.util.List;
+import java.util.stream.Stream;
 import javax.persistence.Query;
+import lombok.RequiredArgsConstructor;
 
 /**
- *
+ * type-safe native query, avoids casts or unchecked warnings
+ * <p>
+ * Example:
+ * <pre>
+ * {@code
+ * List<Integer> intList = new TypedNativeQuery(em
+ *      .createNativeQuery("myQuery", Integer.class)).getResultList();
+ * }
+ * </pre>
  * @author lprimak
- * @param <T> Type of Result
  */
-public interface TypedNativeQuery<T> extends Query
-{
-    @Override public List<T> getResultList();
-    @Override public T getSingleResult();
+@RequiredArgsConstructor
+public class TypedNativeQuery {
+    private final Query q;
+
+    @SuppressWarnings("unchecked")
+    public <T> T getSingleResult() {
+        return (T) q.getSingleResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public<T> List<T> getResultList() {
+        return q.getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public<T> Stream<T> getResultStream() {
+        return q.getResultStream();
+    }
 }

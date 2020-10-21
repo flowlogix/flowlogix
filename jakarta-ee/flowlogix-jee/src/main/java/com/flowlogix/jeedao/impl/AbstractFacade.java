@@ -31,7 +31,7 @@ import lombok.experimental.Delegate;
 
 /**
  * Base class for DAOs
- * 
+ *
  * @author Petro
  * @param <T> Entity Type
  * @param <I> Primary Key Type
@@ -95,37 +95,37 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
         addToCountCriteria(getEntityManager().getCriteriaBuilder(), rt, cq);
         TypedQuery<Long> q = getEntityManager().createQuery(cq);
         return q.getSingleResult().intValue();
-    }  
-    
-    
+    }
+
+
     protected QueryCriteria<T> buildQueryCriteria()
     {
         return buildQueryCriteria(getEntityClass());
     }
 
-    
+
     protected<RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls)
     {
         CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
         CriteriaQuery<RR> cq = cb.createQuery(cls);
         return new QueryCriteria<>(cb, cq.from(cls), cq);
     }
-    
-    
-    protected<R> TypedNativeQuery<R> createNativeQuery(String sql, Class<R> resultClass)
+
+
+    protected TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass)
     {
         Query q = getEntityManager().createNativeQuery(sql, resultClass);
-        return new TypedNativeQueryImpl<>(q);
+        return new TypedNativeQuery(q);
     }
 
-    
-    protected<R> TypedNativeQuery<R> createNativeQuery(String sql, String resultMapping)
+
+    protected TypedNativeQuery createNativeQuery(String sql, String resultMapping)
     {
         Query q = getEntityManager().createNativeQuery(sql, resultMapping);
-        return new TypedNativeQueryImpl<>(q);
+        return new TypedNativeQuery(q);
     }
 
-    
+
     /**
      * Override the default entity class getter
      * @return Entity class
@@ -138,8 +138,8 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
         }
         return entityClass;
     }
-    
-    
+
+
     /**
      * Return Entity Manager
      * @return Entity Manager
@@ -149,24 +149,24 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
      * Add additional criteria
      * @param cb
      * @param root
-     * @param cq 
+     * @param cq
      */
     protected void addToCriteria(CriteriaBuilder cb, Root<T> root, CriteriaQuery<T> cq) { /* override */ };
     /**
      * Add additional criteria for count() operation
      * @param cb
      * @param root
-     * @param cq 
+     * @param cq
      */
     protected void addToCountCriteria(CriteriaBuilder cb, Root<T> root, CriteriaQuery<Long> cq) { /* override */ };
     /**
      * add hints to query
      * @param tq
-     * @param isRange 
+     * @param isRange
      */
     protected void addHints(TypedQuery<T> tq, boolean isRange) {}
-    
-    
+
+
     public void checkForRequiredXA()
     {
         if(xaEnabled && !isXA())
@@ -175,7 +175,7 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
         }
     }
 
-    
+
     /**
      * mark transaction for XA
      * @param tf True/False
@@ -184,9 +184,9 @@ public @RequiredArgsConstructor abstract class AbstractFacade<T, I>
     {
         xaFlag.setXA(tf && xaEnabled);
     }
-            
-    
-    private final Class<T> entityClass;   
+
+
+    private final Class<T> entityClass;
     private @Inject @Delegate XAFlag xaFlag;
 
     private static final boolean xaEnabled = Boolean.getBoolean(AbstractFacade.XA_ENABLED_PROP);

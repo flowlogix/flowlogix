@@ -36,16 +36,31 @@ import lombok.RequiredArgsConstructor;
 public class TypedNativeQuery {
     private final Query q;
 
+    /**
+     * @param <T> return type
+     * @see Query#getSingleResult()
+     * @return single result
+     */
     @SuppressWarnings("unchecked")
     public <T> T getSingleResult() {
         return (T) q.getSingleResult();
     }
 
+    /**
+     * @param <T> return type
+     * @see Query#getResultList()
+     * @return result list
+     */
     @SuppressWarnings("unchecked")
     public<T> List<T> getResultList() {
         return q.getResultList();
     }
 
+    /**
+     * @param <T> return type
+     * @see Query#getResultStream()
+     * @return result stream
+     */
     @SuppressWarnings("unchecked")
     public<T> Stream<T> getResultStream() {
         return q.getResultStream();

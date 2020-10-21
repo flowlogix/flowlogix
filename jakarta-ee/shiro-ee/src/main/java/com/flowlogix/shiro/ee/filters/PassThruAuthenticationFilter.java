@@ -15,7 +15,6 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import com.flowlogix.util.PathUtil;
 import java.io.IOException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -91,7 +90,7 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
 
         Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
                 WebUtils.SAVED_REQUEST_KEY, path, null,
-                PathUtil.getContextPath(WebUtils.toHttp(request)), -1);
+                WebUtils.toHttp(request).getContextPath(), -1);
     }
 
 

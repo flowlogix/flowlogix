@@ -18,6 +18,8 @@ package com.flowlogix.jeedao.primefaces.internal;
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.QueryCriteria;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import com.flowlogix.jeedao.primefaces.interfaces.Filter;
+import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
 import com.flowlogix.jeedao.primefaces.support.FilterData;
 import com.flowlogix.jeedao.primefaces.support.SortData;
 import com.flowlogix.util.TypeConverter;
@@ -26,10 +28,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.SuperBuilder;
+import static lombok.Builder.Default;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 
@@ -39,14 +47,28 @@ import org.primefaces.model.SortMeta;
  * @param <TT>
  * @param <KK>
  */
+@SuperBuilder
 public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
-    private final JPALazyDataModel<KK, TT> model;
+    /**
+     * convert String key into {@link KK} object
+     */
+    private final @Getter @NonNull Function<String, KK> converter;
+    /**
+     * adds {@link Filter} object
+     */
+    @Default
+    private final @Getter @NonNull Filter<TT> filter = (a, b, c) -> { };
+    /**
+     * adds {@link Sorter} object
+     */
+    @Default
+    private final @Getter @NonNull Sorter<TT> sorter = (a, b, c) -> { };
+    /**
+     * add optimizer hints here
+     */
+    @Default
+    private final @Getter @NonNull Function<TypedQuery<TT>, TypedQuery<TT>> optimizer = (a) -> a;
 
-
-    public JPAModelImpl(JPALazyDataModel<KK, TT> model, Class<TT> entityClass) {
-        super(model.getEmg(), entityClass);
-        this.model = model;
-    }
 
     public int count(Map<String, FilterMeta> filters) {
         return super.count(Parameters.<TT>builder()
@@ -59,7 +81,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         return super.findRange(first, first + pageSize,
                 Parameters.<TT>builder()
                         .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
-                        .hints(tq -> model.getOptimizer().addHints(tq))
+                        .hints(tq -> optimizer.apply(tq))
                         .build());
     }
 
@@ -92,7 +114,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
             catch(IllegalArgumentException e) { /* ignore possibly extra filter fields */}
             predicates.put(key, new FilterData(value.toString(), cond));
         });
-        model.getFilter().filter(predicates, cb, root);
+        filter.filter(predicates, cb, root);
         return cb.and(predicates.values().stream().map(FilterData::getPredicate)
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
@@ -101,7 +123,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root)
     {
         SortData sortData = new SortData(sortCriteria);
-        model.getSorter().sort(sortData, cb, root);
+        sorter.sort(sortData, cb, root);
 
         List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);
         List<Order> rv = new ArrayList<>();

@@ -13,34 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.internal;
+package com.flowlogix.jeedao.primefaces.interfaces;
 
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
 import java.io.Serializable;
 
 /**
  *
  * @author lprimak
  */
-public class MySer<KK, TT> implements Serializable
-{
-    private static final long serialVersionUID = 1L;
-    private final ModelBuilder<KK, TT> builder;
-    private final transient MyModel<KK, TT> model;
-
-    public MySer(ModelBuilder<KK, TT> builder)
-    {
-        this.builder = builder;
-        this.model = builder.build(MyModel.builder());
-    }
-
-
-
-    @FunctionalInterface
-    public interface ModelBuilder<KK, TT> extends Serializable {
-        MyModel<KK, TT> build(MyModel.MyModelBuilder<KK, TT> builder);
-    }
-
-    MySer<KK, TT> readResolve() {
-        return new MySer<>(builder);
-    }
+@FunctionalInterface
+public interface ModelBuilder<TT, KK> extends Serializable {
+    JPAModelImpl<TT, KK> build(JPAModelImplBuilder<TT, KK, ?, ?> builder);
 }

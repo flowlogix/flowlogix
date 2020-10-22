@@ -28,6 +28,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 
 /**
@@ -36,18 +37,34 @@ import lombok.RequiredArgsConstructor;
  *
  * @author lprimak
  */
+@SuperBuilder
 @RequiredArgsConstructor
 public class DaoHelper<TT, KT>
 {
+    /**
+     * Return entity manager to operate on
+     */
     private final @NonNull Supplier<EntityManager> entityManagerSupplier;
+    /**
+     * entity class
+     */
     private final @NonNull @Getter Class<TT> entityClass;
 
     @Builder
     public static class Parameters<TT> {
+        /**
+         * add hints to queries here
+         */
         @Builder.Default
         private final Consumer<TypedQuery<TT>> hints = (tq) -> { };
+        /**
+         * add query criteria here
+         */
         @Builder.Default
         private final Consumer<QueryCriteria<TT>> queryCriteria = (c) -> { };
+        /**
+         * add query criteria to count operation here
+         */
         @Builder.Default
         private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = (c) -> { };
     }
@@ -56,6 +73,12 @@ public class DaoHelper<TT, KT>
         return findAll(Parameters.<TT>builder().build());
     }
 
+    /**
+     * find all with added criteria and hints
+     *
+     * @param parms
+     * @return
+     */
     public List<TT> findAll(Parameters<TT> parms)
     {
         CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
@@ -71,6 +94,14 @@ public class DaoHelper<TT, KT>
         return findRange(min, max, Parameters.<TT>builder().build());
     }
 
+    /**
+     * find range with added criteria and hints
+     *
+     * @param min
+     * @param max
+     * @param parms
+     * @return
+     */
     public List<TT> findRange(int min, int max, Parameters<TT> parms)
     {
         CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
@@ -98,6 +129,9 @@ public class DaoHelper<TT, KT>
         return q.getSingleResult().intValue();
     }
 
+    /**
+     * @return entity manager
+     */
     public EntityManager getEntityManager() {
         return entityManagerSupplier.get();
     }

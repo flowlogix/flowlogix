@@ -42,7 +42,10 @@ public class UserViewer implements Serializable {
                 .map(UserEntity::getFullName).collect(Collectors.joining(", "));
     }
 
-    private @Getter final JPALazyDataModel<Long, UserEntity> lazyModel =
-            JPALazyDataModel.createModel(() -> em, UserEntity.class,
-                    key -> Long.parseLong(key));
+    private @Getter final JPALazyDataModel<UserEntity, Long> lazyModel =
+            JPALazyDataModel.create(builder -> builder
+                    .entityManagerSupplier(() -> em)
+                    .entityClass(UserEntity.class)
+                    .converter(key -> Long.parseLong(key))
+                    .build());
 }

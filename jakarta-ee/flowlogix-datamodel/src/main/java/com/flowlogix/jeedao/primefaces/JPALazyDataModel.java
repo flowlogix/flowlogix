@@ -15,13 +15,18 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
+import com.flowlogix.jeedao.primefaces.interfaces.ModelBuilder;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.support.FilterData;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 import javax.enterprise.context.Dependent;
-import javax.persistence.EntityManager;
+import javax.enterprise.context.SessionScoped;
+import javax.faces.view.ViewScoped;
+import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.omnifaces.util.Beans;
@@ -32,55 +37,49 @@ import org.primefaces.model.SortMeta;
 /**
  * Easy implementation of PrimeFaces lazy data model
  * using Lambdas
+ * <p>
+ * An instance of this class is to be put into your {@link ViewScoped} or {@link SessionScoped} beans
+ * The implementation is serializable and works with failover to a different server instances
  *
  * @author lprimak
- * @param <KK> Key Type
  * @param <TT> Data Type
+ * @param <KK> Key Type
+ *
+ * <p>
+ * Example:
+ * <pre>
+ * {@code
+ *     private @Getter final JPALazyDataModel<UserEntity, Long> lazyModel =
+ *           JPALazyDataModel.createModel(builder -> builder
+ *                   .entityManagerSupplier(() -> em)
+ *                   .entityClass(UserEntity.class)
+ *                   .converter(key -> Long.parseLong(key))
+ *                   .build());
+ * }
+ * </pre>
  */
 @Dependent
-public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT> {
+public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
+    public static final String RESULT = "result";
     private static final long serialVersionUID = 2L;
-    private final JPAModelImpl impl;
+    private transient JPAModelImpl<TT, KK> impl;
+    private ModelBuilder<TT, KK> builder;
 
     /**
      * Set up this particular instance of the data model
      * with entity manager, class and key converter
      *
-     * @param <K1>
-     * @param <T1>
-     * @param emg
-     * @param entityClass
-     * @param converter
+     * @param <TT> Value Type
+     * @param <KK> Key Type
+     * @param builder
      * @return newly-created data model
      */
-    public static<K1, T1> JPALazyDataModel<K1, T1> createModel(Supplier<EntityManager> emg,
-            Class<T1> entityClass, KeyConverter<K1> converter)
-    {
-        return createModel(emg, entityClass, converter, (in) -> {});
-    }
-
-
-    /**
-     * Set up this particular instance of the data model
-     * with entity manager, class and key converter
-     *
-     * @param <K1> Key Type
-     * @param <T1> Value Type
-     * @param emg
-     * @param entityClass
-     * @param converter
-     * @param initializer
-     * @return newly-created data model
-     */
-    public static<K1, T1> JPALazyDataModel<K1, T1> createModel(Supplier<EntityManager> emg,
-            Class<T1> entityClass, KeyConverter<K1> converter, Initializer<K1, T1> initializer)
+    public static<TT, KK> JPALazyDataModel<TT, KK> create(ModelBuilder<TT, KK> builder)
     {
         @SuppressWarnings("unchecked")
-        JPALazyDataModel<K1, T1> model = Beans.getReference(JPALazyDataModel.class);
-        model.emg = emg;
-        model.facade = new JPAModelImpl<>(model, entityClass);
-        model.converter = converter;
-        initializer.init(model);
+        JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
+        model.builder = builder;
+        model.impl = builder.build(JPAModelImpl.builder());
         return model;
     }
 
@@ -91,13 +90,14 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT> {
      * @param element element to be replace
      * @param fp lambda to get the new Filter predicate
      */
-    public void replaceFilter(Map<String, FilterData> filters, String element, FilterReplacer fp)
+    public static void replaceFilter(Map<String, FilterData> filters, String element,
+            BiFunction<Predicate, Object, Predicate> fp)
     {
         FilterData elt = filters.get(element);
         if (elt != null && StringUtils.isNotBlank(elt.getFieldValue()))
         {
             filters.replace(element, new FilterData(elt.getFieldValue(),
-                    fp.get(elt.getPredicate(), elt.getFieldValue())));
+                    fp.apply(elt.getPredicate(), elt.getFieldValue())));
         }
     }
 
@@ -107,7 +107,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT> {
      * @param val
      * @return JPA field suitable for hints
      */
-    public String getResultField(String val)
+    public static String getResultField(String val)
     {
         return String.format("%s.%s", RESULT, val);
     }
@@ -118,7 +118,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT> {
     @Transactional
     public KK getRowKey(TT entity)
     {
-        return (KK)emg.get().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
+        return (KK)impl.getEntityManager().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
     }
 
 
@@ -126,7 +126,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT> {
     @Transactional
     public TT getRowData(String rowKey)
     {
-        return emg.get().find(facade.getEntityClass(), converter.convert(rowKey));
+        return impl.getEntityManager().find(impl.getEntityClass(), impl.getConverter().apply(rowKey));
     }
 
 
@@ -134,7 +134,13 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT> {
     @Transactional
     public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy)
     {
-        setRowCount(facade.count(filterBy));
-        return facade.findRows(first, pageSize, filterBy, sortBy);
+        setRowCount(impl.count(filterBy));
+        return impl.findRows(first, pageSize, filterBy, sortBy);
+    }
+
+
+    void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+         stream.defaultReadObject();
+         impl = builder.build(JPAModelImpl.builder());
     }
 }

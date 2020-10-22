@@ -38,15 +38,15 @@ public class Initializer {
     void init() {
         List<UserEntity> userList = Stream.of(
                 UserEntity.builder().userId("lprimak").fullName("Lenny Primak")
-                .address("3000 Summit Blvd").zipCode(68502).build(),
-                UserEntity.builder().userId("jprimak").fullName("Jill Primak")
-                .address("3000 Summit Blvd").zipCode(68502).build(),
-                UserEntity.builder().userId("anya").fullName("Anya Primak")
-                .address("3000 Summit Blvd").zipCode(68502).build(),
-                UserEntity.builder().userId("gene").fullName("Gene Volovich")
+                .address("Tree-Lined Blvd").zipCode(68502).build(),
+                UserEntity.builder().userId("jprimak").fullName("Lovely Lady")
+                .address("Tree-Lined Street").zipCode(68502).build(),
+                UserEntity.builder().userId("anya").fullName("Lovely Daughter")
+                .address("Tree-Lined Hill").zipCode(68502).build(),
+                UserEntity.builder().userId("friend").fullName("Friendly Pal")
                 .address("NY, Somewhere").zipCode(10012).build(),
-                UserEntity.builder().userId("lilah").fullName("Lilah Keiser")
-                .address("5151 Bison Drive").zipCode(68502).build()
+                UserEntity.builder().userId("cousin").fullName("Cool Cousin")
+                .address("Beastly Court").zipCode(68502).build()
         ).collect(Collectors.toList());
         userList.forEach(em::merge);
     }

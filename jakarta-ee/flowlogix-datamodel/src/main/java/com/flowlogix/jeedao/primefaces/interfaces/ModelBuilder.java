@@ -20,7 +20,10 @@ import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder
 import java.io.Serializable;
 
 /**
- *
+ * this interfaces only exists because it needs to be forced serializable,
+ * the only serializable interface here because build() has to be
+ * portable over-the-wire
+ * 
  * @author lprimak
  */
 @FunctionalInterface

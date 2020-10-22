@@ -35,6 +35,7 @@ import org.omnifaces.persistence.model.BaseEntity;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+// BaseEntity inheritance is not necessary for the FlowLogix JPALazyDataModel variant
 public class UserEntity extends BaseEntity<Long> implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

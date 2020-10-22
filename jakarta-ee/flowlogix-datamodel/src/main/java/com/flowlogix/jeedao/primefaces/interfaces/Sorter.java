@@ -16,7 +16,6 @@
 package com.flowlogix.jeedao.primefaces.interfaces;
 
 import com.flowlogix.jeedao.primefaces.support.SortData;
-import java.io.Serializable;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
 
@@ -25,7 +24,7 @@ import javax.persistence.criteria.Root;
  * @param <TT> Entity Type
  */
 @FunctionalInterface
-public interface Sorter<TT> extends Serializable 
+public interface Sorter<TT>
 {
     /**
      * Hook for sort criteria application

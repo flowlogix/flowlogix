@@ -53,7 +53,7 @@ import org.primefaces.model.SortMeta;
  *           JPALazyDataModel.createModel(builder -> builder
  *                   .entityManagerSupplier(() -> em)
  *                   .entityClass(UserEntity.class)
- *                   .converter(key -> Long.parseLong(key))
+ *                   .converter(Long::parseLong)
  *                   .build());
  * }
  * </pre>

@@ -16,7 +16,6 @@
 package com.flowlogix.jeedao.primefaces.interfaces;
 
 import com.flowlogix.jeedao.primefaces.support.FilterData;
-import java.io.Serializable;
 import java.util.Map;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
@@ -27,7 +26,7 @@ import javax.persistence.criteria.Root;
  * @param <TT> Entity Type
  */
 @FunctionalInterface
-public interface Filter<TT> extends Serializable
+public interface Filter<TT>
 {
     /**
      * hook to supply custom filter

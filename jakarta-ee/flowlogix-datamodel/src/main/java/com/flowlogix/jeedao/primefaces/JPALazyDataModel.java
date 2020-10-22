@@ -15,21 +15,14 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.interfaces.EntityManagerGetter;
-import com.flowlogix.jeedao.primefaces.interfaces.Filter;
-import com.flowlogix.jeedao.primefaces.interfaces.FilterReplacer;
-import com.flowlogix.jeedao.primefaces.interfaces.Initializer;
-import com.flowlogix.jeedao.primefaces.interfaces.KeyConverter;
-import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
-import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
-import com.flowlogix.jeedao.primefaces.internal.JPAFacadeLocal;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.support.FilterData;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.omnifaces.util.Beans;
 import org.primefaces.model.FilterMeta;
@@ -45,8 +38,10 @@ import org.primefaces.model.SortMeta;
  * @param <TT> Data Type
  */
 @Dependent
-public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
-{
+public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT> {
+    private static final long serialVersionUID = 2L;
+    private final JPAModelImpl impl;
+
     /**
      * Set up this particular instance of the data model
      * with entity manager, class and key converter
@@ -58,10 +53,10 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
      * @param converter
      * @return newly-created data model
      */
-    public static<K1, T1> JPALazyDataModel<K1, T1> createModel(EntityManagerGetter emg,
+    public static<K1, T1> JPALazyDataModel<K1, T1> createModel(Supplier<EntityManager> emg,
             Class<T1> entityClass, KeyConverter<K1> converter)
     {
-        return createModel(emg, entityClass, converter, null);
+        return createModel(emg, entityClass, converter, (in) -> {});
     }
 
 
@@ -77,41 +72,17 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
      * @param initializer
      * @return newly-created data model
      */
-    public static<K1, T1> JPALazyDataModel<K1, T1> createModel(EntityManagerGetter emg,
+    public static<K1, T1> JPALazyDataModel<K1, T1> createModel(Supplier<EntityManager> emg,
             Class<T1> entityClass, KeyConverter<K1> converter, Initializer<K1, T1> initializer)
     {
         @SuppressWarnings("unchecked")
         JPALazyDataModel<K1, T1> model = Beans.getReference(JPALazyDataModel.class);
         model.emg = emg;
-        model.entityClass = entityClass;
+        model.facade = new JPAModelImpl<>(model, entityClass);
         model.converter = converter;
-        if(initializer != null)
-        {
-            initializer.init(model);
-        }
+        initializer.init(model);
         return model;
     }
-
-
-    /**
-     * set filter hook
-     *
-     * @param filter
-     */
-    public void setFilter(@NonNull Filter<TT> filter)
-    {
-        this.filter = filter;
-    }
-
-
-    /**
-     * remove filter hook
-     */
-    public void removeFilter()
-    {
-        filter = null;
-    }
-
 
     /**
      * Utility method for replacing a predicate in the filter list
@@ -129,47 +100,6 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
                     fp.get(elt.getPredicate(), elt.getFieldValue())));
         }
     }
-
-
-    /**
-     * set sorter hook
-     *
-     * @param sorter
-     */
-    public void setSorter(@NonNull Sorter<TT> sorter)
-    {
-        this.sorter = sorter;
-    }
-
-
-    /**
-     * remove sorter hook
-     */
-    public void removeSorter()
-    {
-        sorter = null;
-    }
-
-
-    /**
-     * add hints to JPA query
-     *
-     * @param optimizier
-     */
-    public void addOptimizerHints(@NonNull Optimizer<TT> optimizier)
-    {
-        this.optimizer = optimizier;
-    }
-
-
-    /**
-     * remove hints from JPA query
-     */
-    public void removeOptimizerHints()
-    {
-        this.optimizer = null;
-    }
-
 
     /**
      * transforms JPA entity field to format suitable for hints
@@ -196,8 +126,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     @Transactional
     public TT getRowData(String rowKey)
     {
-        facade.setup(emg, entityClass, optimizer, filter, sorter);
-        return facade.find(converter.convert(rowKey));
+        return emg.get().find(facade.getEntityClass(), converter.convert(rowKey));
     }
 
 
@@ -205,19 +134,7 @@ public class JPALazyDataModel<KK, TT> extends LazyDataModel<TT>
     @Transactional
     public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy)
     {
-        facade.setup(emg, entityClass, optimizer, filter, sorter);
         setRowCount(facade.count(filterBy));
         return facade.findRows(first, pageSize, filterBy, sortBy);
     }
-
-    private @Inject JPAFacadeLocal<TT, KK> facade;
-    private EntityManagerGetter emg;
-    private Class<TT> entityClass;
-    private KeyConverter<KK> converter;
-    private Filter<TT> filter;
-    private Sorter<TT> sorter;
-    private Optimizer<TT> optimizer;
-    public static final String RESULT = "result";
-
-    private static final long serialVersionUID = 1L;
 }

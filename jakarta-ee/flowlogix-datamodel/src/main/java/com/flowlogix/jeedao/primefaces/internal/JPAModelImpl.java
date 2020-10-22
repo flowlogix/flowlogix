@@ -16,11 +16,8 @@
 package com.flowlogix.jeedao.primefaces.internal;
 
 import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.jeedao.QueryCriteria;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import com.flowlogix.jeedao.primefaces.interfaces.EntityManagerGetter;
-import com.flowlogix.jeedao.primefaces.interfaces.Filter;
-import com.flowlogix.jeedao.primefaces.interfaces.Optimizer;
-import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
 import com.flowlogix.jeedao.primefaces.support.FilterData;
 import com.flowlogix.jeedao.primefaces.support.SortData;
 import com.flowlogix.util.TypeConverter;
@@ -29,16 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import lombok.extern.slf4j.Slf4j;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 
@@ -48,85 +39,35 @@ import org.primefaces.model.SortMeta;
  * @param <TT>
  * @param <KK>
  */
-@Stateless @Slf4j
-public class JPAFacade<TT, KK> extends DaoHelper<TT, KK> implements JPAFacadeLocal<TT, KK>
-{
-    public JPAFacade(JPAFacadeState state, Class<TT> entityClass)
-    {
-        super(entityClass);
-        this.state = state;
+public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
+    private final JPALazyDataModel<KK, TT> model;
+
+
+    public JPAModelImpl(JPALazyDataModel<KK, TT> model, Class<TT> entityClass) {
+        super(model.getEmg(), entityClass);
+        this.model = model;
     }
 
-
-    @Override
-    public void setup(EntityManagerGetter emg, Class<TT> entityClass, Optimizer<TT> optimizer,
-            Filter<TT> filter, Sorter<TT> sorter)
-    {
-        getState().setEmg(emg);
-        getState().setEntityClass(entityClass);
-        getState().setOptimizer(optimizer);
-        getState().setFilterHook(filter);
-        getState().setSorterHook(sorter);
+    public int count(Map<String, FilterMeta> filters) {
+        return super.count(Parameters.<TT>builder()
+                .countQueryCriteria(cqc -> cqc.getQuery().where(getFilters(filters, cqc.getBuilder(), cqc.getRoot())))
+                .build());
     }
 
-
-    @Override
-    protected EntityManager getEntityManager()
-    {
-        return getState().getEmg().get();
-    }
-
-
-    @Override
-    public Class<TT> getEntityClass()
-    {
-        return getState().getEntityClass();
-    }
-
-
-    @Override
-    public int count(Map<String, FilterMeta> filters)
-    {
-        getState().setFilters(filters);
-        getState().setSortMeta(new HashMap<>());
-        return super.count();
-    }
-
-
-    @Override
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta)
     {
-        getState().setFilters(filters);
-        getState().setSortMeta(sortMeta);
-        return super.findRange(new int[] { first, first + pageSize });
+        return super.findRange(first, first + pageSize,
+                Parameters.<TT>builder()
+                        .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
+                        .hints(tq -> model.getOptimizer().addHints(tq))
+                        .build());
     }
 
-
-    @Override
-    protected void addToCriteria(CriteriaBuilder cb, Root<TT> root, CriteriaQuery<TT> cq)
-    {
-        cq.where(getFilters(getState().getFilters(), cb, root));
-        cq.orderBy(getSort(getState().getSortMeta(), cb, root));
-        root.alias(JPALazyDataModel.RESULT);
+    private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
+        qc.getQuery().where(getFilters(filters, qc.getBuilder(), qc.getRoot()));
+        qc.getQuery().orderBy(getSort(sortMeta, qc.getBuilder(), qc.getRoot()));
+        qc.getRoot().alias(JPALazyDataModel.RESULT);
     }
-
-
-    @Override
-    protected void addToCountCriteria(CriteriaBuilder cb, Root<TT> root, CriteriaQuery<Long> cq)
-    {
-        cq.where(getFilters(getState().getFilters(), cb, root));
-    }
-
-
-    @Override
-    protected void addHints(TypedQuery<TT> tq, boolean isRange)
-    {
-        if(getState().getOptimizer() != null)
-        {
-            getState().getOptimizer().addHints(tq);
-        }
-    }
-
 
     private Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root)
     {
@@ -151,10 +92,7 @@ public class JPAFacade<TT, KK> extends DaoHelper<TT, KK> implements JPAFacadeLoc
             catch(IllegalArgumentException e) { /* ignore possibly extra filter fields */}
             predicates.put(key, new FilterData(value.toString(), cond));
         });
-        if(getState().getFilterHook() != null)
-        {
-            getState().getFilterHook().filter(predicates, cb, root);
-        }
+        model.getFilter().filter(predicates, cb, root);
         return cb.and(predicates.values().stream().map(FilterData::getPredicate)
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
@@ -163,10 +101,7 @@ public class JPAFacade<TT, KK> extends DaoHelper<TT, KK> implements JPAFacadeLoc
     private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root)
     {
         SortData sortData = new SortData(sortCriteria);
-        if(getState().getSorterHook() != null)
-        {
-            getState().getSorterHook().sort(sortData, cb, root);
-        }
+        model.getSorter().sort(sortData, cb, root);
 
         List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);
         List<Order> rv = new ArrayList<>();
@@ -201,14 +136,4 @@ public class JPAFacade<TT, KK> extends DaoHelper<TT, KK> implements JPAFacadeLoc
         });
         return sortMetaOrdering;
     }
-
-
-    @SuppressWarnings("unchecked")
-    private JPAFacadeTypedState<TT> getState()
-    {
-        return (JPAFacadeTypedState<TT>) state.getTypedState();
-    }
-
-
-    private @Inject JPAFacadeState state;
 }

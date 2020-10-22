@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 lprimak.
+ * Copyright 2020 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.interfaces;
+package com.flowlogix.jeedao;
 
-import java.io.Serializable;
-import javax.persistence.TypedQuery;
+import com.flowlogix.jeedao.primefaces.internal.MySer;
+import org.junit.jupiter.api.Test;
 
 /**
- * Hook to add hints to the JPA query
  *
- * @param <TT> Entity Type
+ * @author lprimak
  */
-@FunctionalInterface
-public interface Optimizer<TT> extends Serializable 
+public class UsageTest
 {
-    /**
-     * Add hints to the JPA query
-     * Mostly used for batch fetch
-     *
-     * @param query to add hints to
-     * @return the same query
-     */
-    TypedQuery<TT> addHints(TypedQuery<TT> query);   
+    @Test
+    void modelTest() {
+        MySer<Integer, Long> model = new MySer<>(builder -> {
+            return builder
+//                    .emg(() -> null)
+                    .converter(key -> Long.parseLong(key))
+                    .build();
+        });
+    }
 }

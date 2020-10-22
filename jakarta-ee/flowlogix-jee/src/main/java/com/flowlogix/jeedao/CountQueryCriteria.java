@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 lprimak.
+ * Copyright 2014 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.interfaces;
+package com.flowlogix.jeedao;
 
-import java.io.Serializable;
-import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 /**
- * Provides Entity Manager
- */
-@FunctionalInterface
-public interface EntityManagerGetter extends Serializable 
+ *
+ * @author lprimak
+ * @param <TT> Type of Query
+*/
+@Data @RequiredArgsConstructor
+public class CountQueryCriteria<TT>
 {
-    /**
-     * @return Entity Manager
-     */
-    EntityManager get();
+    private final CriteriaBuilder builder;
+    private final Root<TT> root;
+    private final CriteriaQuery<Long> query;
 }

@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Data @RequiredArgsConstructor
 public class QueryCriteria<TT>
 {
-    private final CriteriaBuilder cb;
+    private final CriteriaBuilder builder;
     private final Root<TT> root;
-    private final CriteriaQuery<TT> cq;
+    private final CriteriaQuery<TT> query;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 lprimak.
+ * Copyright 2020 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,31 @@
 package com.flowlogix.jeedao.primefaces.internal;
 
 import java.io.Serializable;
-import javax.transaction.TransactionScoped;
-import lombok.Getter;
 
 /**
- * Transaction-scoped state for DataTable parameters
- * 
+ *
  * @author lprimak
  */
-@TransactionScoped
-public class JPAFacadeState implements Serializable
-{    
-    private final @Getter JPAFacadeTypedState<?> typedState = new JPAFacadeTypedState<>();
+public class MySer<KK, TT> implements Serializable
+{
     private static final long serialVersionUID = 1L;
+    private final ModelBuilder<KK, TT> builder;
+    private final transient MyModel<KK, TT> model;
+
+    public MySer(ModelBuilder<KK, TT> builder)
+    {
+        this.builder = builder;
+        this.model = builder.build(MyModel.builder());
+    }
+
+
+
+    @FunctionalInterface
+    public interface ModelBuilder<KK, TT> extends Serializable {
+        MyModel<KK, TT> build(MyModel.MyModelBuilder<KK, TT> builder);
+    }
+
+    MySer<KK, TT> readResolve() {
+        return new MySer<>(builder);
+    }
 }

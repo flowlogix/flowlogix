@@ -16,6 +16,7 @@
 package com.flowlogix.jeedao;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -23,6 +24,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -40,37 +42,58 @@ public class DaoHelper<TT, KT>
     private final @NonNull Supplier<EntityManager> entityManagerSupplier;
     private final @NonNull @Getter Class<TT> entityClass;
 
+    @Builder
+    public static class Parameters<TT> {
+        @Builder.Default
+        private final Consumer<TypedQuery<TT>> hints = (tq) -> { };
+        @Builder.Default
+        private final Consumer<QueryCriteria<TT>> queryCriteria = (c) -> { };
+        @Builder.Default
+        private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = (c) -> { };
+    }
 
-    public List<TT> findAll()
+    public List<TT> findAll() {
+        return findAll(Parameters.<TT>builder().build());
+    }
+
+    public List<TT> findAll(Parameters<TT> parms)
     {
         CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
         Root<TT> root = cq.from(entityClass);
         cq.select(root);
-        addToCriteria(getEntityManager().getCriteriaBuilder(), root, cq);
+        parms.queryCriteria.accept(new QueryCriteria<>(getEntityManager().getCriteriaBuilder(), root, cq));
         TypedQuery<TT> tq = getEntityManager().createQuery(cq);
-        addHints(tq, false);
+        parms.hints.accept(tq);
         return tq.getResultList();
     }
 
-    public List<TT> findRange(int min, int max)
+    public List<TT> findRange(int min, int max) {
+        return findRange(min, max, Parameters.<TT>builder().build());
+    }
+
+    public List<TT> findRange(int min, int max, Parameters<TT> parms)
     {
         CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
         Root<TT> root = cq.from(entityClass);
         cq.select(root);
-        addToCriteria(getEntityManager().getCriteriaBuilder(), root, cq);
+        parms.queryCriteria.accept(new QueryCriteria<>(getEntityManager().getCriteriaBuilder(), root, cq));
         TypedQuery<TT> q = getEntityManager().createQuery(cq);
         q.setMaxResults(max - min);
         q.setFirstResult(min);
-        addHints(q, true);
+        parms.hints.accept(q);
         return q.getResultList();
     }
 
-    public int count()
+    public int count() {
+        return count(Parameters.<TT>builder().build());
+    }
+
+    public int count(Parameters<TT> parms)
     {
         CriteriaQuery<Long> cq = getEntityManager().getCriteriaBuilder().createQuery(Long.class);
         Root<TT> rt = cq.from(entityClass);
         cq.select(getEntityManager().getCriteriaBuilder().count(rt));
-        addToCountCriteria(getEntityManager().getCriteriaBuilder(), rt, cq);
+        parms.countQueryCriteria.accept(new CountQueryCriteria<>(getEntityManager().getCriteriaBuilder(), rt, cq));
         TypedQuery<Long> q = getEntityManager().createQuery(cq);
         return q.getSingleResult().intValue();
     }
@@ -80,13 +103,13 @@ public class DaoHelper<TT, KT>
     }
 
 
-    protected QueryCriteria<TT> buildQueryCriteria()
+    public QueryCriteria<TT> buildQueryCriteria()
     {
         return buildQueryCriteria(entityClass);
     }
 
 
-    protected<RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls)
+    public<RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls)
     {
         CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
         CriteriaQuery<RR> cq = cb.createQuery(cls);
@@ -94,7 +117,7 @@ public class DaoHelper<TT, KT>
     }
 
 
-    protected TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass)
+    public TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass)
     {
         Query q = getEntityManager().createNativeQuery(sql, resultClass);
         return new TypedNativeQuery(q);
@@ -106,25 +129,4 @@ public class DaoHelper<TT, KT>
         Query q = getEntityManager().createNativeQuery(sql, resultMapping);
         return new TypedNativeQuery(q);
     }
-
-    /**
-     * Add additional criteria
-     * @param cb
-     * @param root
-     * @param cq
-     */
-    protected void addToCriteria(CriteriaBuilder cb, Root<TT> root, CriteriaQuery<TT> cq) { /* override */ };
-    /**
-     * Add additional criteria for count() operation
-     * @param cb
-     * @param root
-     * @param cq
-     */
-    protected void addToCountCriteria(CriteriaBuilder cb, Root<TT> root, CriteriaQuery<Long> cq) { /* override */ };
-    /**
-     * add hints to query
-     * @param tq
-     * @param isRange
-     */
-    protected void addHints(TypedQuery<TT> tq, boolean isRange) {}
 }

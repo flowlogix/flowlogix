@@ -16,7 +16,7 @@
 package com.flowlogix.jeedao.primefaces.internal;
 
 import com.flowlogix.jeedao.DaoHelper;
-import com.flowlogix.jeedao.QueryCriteria;
+import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.interfaces.Filter;
 import com.flowlogix.jeedao.primefaces.interfaces.Sorter;

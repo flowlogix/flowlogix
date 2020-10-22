@@ -35,7 +35,10 @@ public class FacadeTest {
     private final EntityManager em = mock(EntityManager.class, RETURNS_DEEP_STUBS);
     class MyControl {
         @Delegate
-        DaoHelper<Integer, Long> facade = new DaoHelper<>(() -> em, Integer.class);
+        final DaoHelper<Integer, Long> facade = DaoHelper.<Integer, Long>builder()
+                .entityClass(Integer.class)
+                .entityManagerSupplier(() -> em)
+                .build();
 
         public MyControl() {
             when(em.find(facade.getEntityClass(), 1L)).thenReturn(5);

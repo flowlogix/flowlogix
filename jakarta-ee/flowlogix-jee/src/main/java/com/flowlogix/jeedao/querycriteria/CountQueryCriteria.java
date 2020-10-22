@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.jeedao.querycriteria;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -27,9 +27,9 @@ import lombok.RequiredArgsConstructor;
  * @param <TT> Type of Query
 */
 @Data @RequiredArgsConstructor
-public class QueryCriteria<TT>
+public class CountQueryCriteria<TT>
 {
     private final CriteriaBuilder builder;
     private final Root<TT> root;
-    private final CriteriaQuery<TT> query;
+    private final CriteriaQuery<Long> query;
 }

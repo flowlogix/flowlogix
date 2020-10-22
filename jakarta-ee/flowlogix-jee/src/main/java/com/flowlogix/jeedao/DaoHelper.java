@@ -15,9 +15,12 @@
  */
 package com.flowlogix.jeedao;
 
+import com.flowlogix.jeedao.querycriteria.QueryCriteria;
+import com.flowlogix.jeedao.querycriteria.CountQueryCriteria;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -32,6 +35,17 @@ import lombok.experimental.SuperBuilder;
 
 
 /**
+ * Lightweight wrapper around common JPA methods
+ * This is the primary class in the {@link com.flowlogix.jeedao} package
+ * <p>
+ * Main value-add is ability to easily add hints and query criteria to
+ * {@link #findAll()} and {@link #findRange(int, int)} methods,
+ * as well as {@link #count()} methods
+ * <p>
+ * Another differentiator is that this class doesn't require inheritance,
+ * although one of the use cases is for EJB {@link Stateless} bean to
+ * inherit from this class.
+ *
  * @param <TT> Entity Type
  * @param <KT> Primary Key Type
  *

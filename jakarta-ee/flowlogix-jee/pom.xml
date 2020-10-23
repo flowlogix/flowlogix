@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix-jee</artifactId>
-    <version>4.0</version>
+    <version>4.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Flow Logix JEE Services</name>
@@ -17,7 +17,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>jakarta-ee</artifactId>
-        <version>4.0</version>
+        <version>4.0.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>

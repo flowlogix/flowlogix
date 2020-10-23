@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>4.0</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Utility Library Root POM</description>
@@ -195,7 +195,7 @@
         <profile>
             <id>all-tests</id>
             <properties>
-                <test.excluded.groups></test.excluded.groups>
+                <test.excluded.groups />
             </properties>
             <build>
                 <plugins>
@@ -282,7 +282,7 @@
         <url>https://github.com/flowlogix/flowlogix</url>
         <connection>scm:git:https://github.com/flowlogix/flowlogix.git</connection>
         <developerConnection>scm:git:https://github.com/flowlogix/flowlogix.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>Version-4.0</tag>
     </scm>
 
     <distributionManagement>

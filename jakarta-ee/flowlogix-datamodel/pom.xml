@@ -3,7 +3,7 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix-datamodel</artifactId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>4.0</version>
     <packaging>jar</packaging>
 
     <name>Flow Logix PrimeFaces Data Model</name>
@@ -12,7 +12,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>jakarta-ee</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>4.0</version>
     </parent>
 
     <dependencies>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.flowlogix</groupId>
             <artifactId>flowlogix-jee</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>4.0</version>
         </dependency>
     </dependencies>
 </project>

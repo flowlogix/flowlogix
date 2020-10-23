@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>jee-examples</artifactId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>4.0</version>
     <packaging>war</packaging>
     <name>JEE Services and PrimeFaces Examples</name>
 
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>4.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 

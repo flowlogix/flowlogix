@@ -15,7 +15,7 @@
  */
 package com.flowlogix.examples;
 
-import com.flowlogix.util.Lazy;
+import org.omnifaces.util.Lazy;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

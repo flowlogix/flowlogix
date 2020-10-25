@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.util;
+package org.omnifaces.util;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.omnifaces.util.Lazy;
 
 
 /**
@@ -45,17 +46,6 @@ public class LazyTest {
         Expensive() {
             numCreations.incrementAndGet();
         }
-    }
-
-    @Test
-    void lazy() {
-        Expensive expensive = new Expensive();
-        Lazy<Expensive> cheap = new Lazy<>(Expensive::new);
-        assertEquals(1, numCreations.get());
-        assertEquals(Expensive.class, cheap.get().getClass());
-        assertEquals(2, numCreations.get());
-        assertEquals(Expensive.class, cheap.get().getClass());
-        assertEquals(2, numCreations.get());
     }
 
     @Test

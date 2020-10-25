@@ -15,7 +15,7 @@
  */
 package com.flowlogix.ui;
 
-import com.flowlogix.util.Lazy;
+import org.omnifaces.util.Lazy;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceWrapper;

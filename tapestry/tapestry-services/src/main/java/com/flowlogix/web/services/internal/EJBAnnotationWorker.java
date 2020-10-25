@@ -15,7 +15,7 @@
  */
 package com.flowlogix.web.services.internal;
 
-import com.flowlogix.jndi.JNDIObjectLocator;
+import org.omnifaces.util.JNDIObjectLocator;
 import com.flowlogix.web.services.annotations.Stateful;
 import javax.ejb.EJB;
 import javax.naming.NamingException;

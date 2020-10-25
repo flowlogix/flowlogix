@@ -15,7 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import com.flowlogix.jndi.JNDIObjectLocator;
+import org.omnifaces.util.JNDIObjectLocator;
 import java.io.IOException;
 import javax.faces.application.ProjectStage;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;

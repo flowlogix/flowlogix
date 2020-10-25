@@ -4,7 +4,7 @@
  */
 package com.flowlogix.services.test;
 
-import com.flowlogix.jndi.JNDIObjectLocator;
+import org.omnifaces.util.JNDIObjectLocator;
 import com.flowlogix.web.services.internal.EJBAnnotationWorker;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;

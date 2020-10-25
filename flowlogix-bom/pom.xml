@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>org.omnifaces</groupId>
                 <artifactId>omnifaces</artifactId>
-                <version>3.8</version>
+                <version>3.9-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.primefaces</groupId>

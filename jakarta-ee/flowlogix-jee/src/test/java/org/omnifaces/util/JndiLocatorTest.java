@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jndi;
+package org.omnifaces.util;
 
-import com.flowlogix.jndi.JNDIObjectLocator.JNDIObjectLocatorBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,6 +49,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.MockedConstruction;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.when;
+import org.omnifaces.util.JNDIObjectLocator;
+import org.omnifaces.util.JNDIObjectLocator.JNDIObjectLocatorBuilder;
 
 /**
  *

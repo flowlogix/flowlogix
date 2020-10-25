@@ -16,7 +16,7 @@
 package com.flowlogix.examples;
 
 import com.flowlogix.examples.jndi.ejbs.NumberGetter;
-import com.flowlogix.jndi.JNDIObjectLocator;
+import org.omnifaces.util.JNDIObjectLocator;
 
 /**
  * Examples of JNDI object locator, ServiceLocator pattern

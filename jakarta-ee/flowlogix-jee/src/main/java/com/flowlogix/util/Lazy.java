@@ -47,7 +47,7 @@ public final class Lazy<TT> {
 
     /**
      *
-     * @return underlying object, initialize within Tenant Control when necessary
+     * @return underlying object, initialize when necessary
      */
     public TT get() {
         boolean localInitialized = this.initialized;

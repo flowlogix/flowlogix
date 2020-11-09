@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 lprimak.
+ * Copyright 2020 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.shiro.ee.annotations;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import javax.inject.Scope;
+package com.flowlogix.jndi;
 
 /**
- * {@code @SessionScoped} interface that works with Shiro sessions
- * Primarily for plugging into Shiro destruction pipeline
  *
  * @author lprimak
  */
-@Scope
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
-public @interface ShiroSessionScoped {}
+public class JNDI {
+    public static final String ENV_ENTRY_PREFIX = "java:comp/env/";
+}

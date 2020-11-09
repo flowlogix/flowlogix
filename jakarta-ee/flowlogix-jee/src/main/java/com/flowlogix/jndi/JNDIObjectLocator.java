@@ -16,6 +16,7 @@
 
 package com.flowlogix.jndi;
 
+import static com.flowlogix.jndi.JNDI.ENV_ENTRY_PREFIX;
 import com.flowlogix.util.Lazy;
 import java.io.Serializable;
 import java.util.Hashtable;
@@ -118,6 +119,17 @@ public class JNDIObjectLocator implements Serializable {
         boolean remote = beanClass.isAnnotationPresent(Remote.class);
         String name = guessByType(beanClass.getName());
         return getObject(prependPortableName(name), remote && !cacheRemote);
+    }
+
+    /**
+     * @see JNDI#getEnvEntry(String)
+     * @param <T> object return type
+     * @param name environment entry name
+     * @return entry
+     */
+    @SneakyThrows(NamingException.class)
+    public <T> T getEnvEntry(String name) {
+        return getObject(ENV_ENTRY_PREFIX + name);
     }
 
     /**

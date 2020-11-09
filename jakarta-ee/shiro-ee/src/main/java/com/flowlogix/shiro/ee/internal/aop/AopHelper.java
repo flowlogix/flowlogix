@@ -31,14 +31,14 @@ import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
 /**
  * Enhanced from Tynamo Security
  */
-public class AopHelper 
+public class AopHelper
 {
     /**
      * Create list of
      * {@link org.tynamo.shiro.extension.authz.aop.SecurityInterceptor}
      * instances for method. This method search all method and class annotations
      * and use annotation data for create interceptors.
-     * <p/>
+     * <p>
      * This method considers only those annotations that have been declared in
      * the set through parameters of the method and class, regardless of the
      * inheritance or interface implementations
@@ -89,7 +89,7 @@ public class AopHelper
      * <p/>
      * All public and protected methods.
      * @param modifiers
-     * @return 
+     * @return
      */
     private static boolean isInterceptOnClassAnnotation(int modifiers) {
         return Modifier.isPublic(modifiers)

@@ -22,9 +22,9 @@ import java.lang.annotation.Target;
 import javax.inject.Scope;
 
 /**
- * @ViewScoped interface that works with Shiro sessions
+ * {@code @ViewScoped} interface that works with Shiro sessions
  * Primarily for plugging into Shiro destruction pipeline
- * 
+ *
  * @author lprimak
  */
 @Scope

@@ -106,7 +106,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.2.0</version>
                     <configuration>
-                        <doclint>none</doclint>
+                        <doclint>all,-reference</doclint>
                         <overview>${project.basedir}/src/main/java/overview.html</overview>
                     </configuration>
                     <executions>

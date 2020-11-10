@@ -86,6 +86,11 @@ public class LookupTest {
     @Deployment
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class, "LookupTest.war")
-                .addPackages(true, "com.flowlogix");
+                .addPackages(true, "com.flowlogix")
+                .deletePackages(true, "com.flowlogix.examples.data")
+                .deletePackages(true, "com.flowlogix.examples.entities")
+                .deletePackages(true, "com.flowlogix.examples.ui")
+                .deletePackages(true, "com.flowlogix.logcapture")
+                .deleteClass(ExceptionPageTest.class);
     }
 }

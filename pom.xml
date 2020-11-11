@@ -28,7 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <test.excluded.groups>Arquillian,StressTest</test.excluded.groups>
+        <test.excluded.groups>Arquillian,UserInterface,StressTest</test.excluded.groups>
         <main.basedir>${project.basedir}</main.basedir>
     </properties>
 
@@ -195,16 +195,8 @@
         <profile>
             <id>all-tests</id>
             <properties>
-                <test.excluded.groups />
+                <test.excluded.groups/>
             </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>checkstyle</id>

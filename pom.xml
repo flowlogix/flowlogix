@@ -28,7 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <test.excluded.groups>Arquillian,UserInterface,StressTest</test.excluded.groups>
+        <excludedGroups>Arquillian,UserInterface,StressTest</excludedGroups>
         <main.basedir>${project.basedir}</main.basedir>
     </properties>
 
@@ -82,7 +82,6 @@
                     <configuration>
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
-                        <excludedGroups>${test.excluded.groups}</excludedGroups>
                         <includes>
                             <include>**</include>
                         </includes>
@@ -159,43 +158,37 @@
 
     <profiles>
         <profile>
-            <id>arquillian-test</id>
+            <id>arq-test</id>
             <properties>
-                <test.excluded.groups>StressTest</test.excluded.groups>
+                <groups>Arquillian</groups>
+                <excludedGroups>StressTest</excludedGroups>
             </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <groups>Arquillian</groups>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>stress-test</id>
             <properties>
-                <test.excluded.groups>Arquillian</test.excluded.groups>
+                <groups>StressTest</groups>
+                <excludedGroups>Arquillian,UserInterface</excludedGroups>
             </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <groups>StressTest</groups>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+        </profile>
+        <profile>
+            <id>arq-stress-test</id>
+            <properties>
+                <groups>Arquillian</groups>
+                <excludedGroups/>
+            </properties>
+        </profile>
+        <profile>
+            <id>ui-test</id>
+            <properties>
+                <groups>UserInterface</groups>
+                <excludedGroups/>
+            </properties>
         </profile>
         <profile>
             <id>all-tests</id>
             <properties>
-                <test.excluded.groups/>
+                <excludedGroups/>
             </properties>
         </profile>
         <profile>

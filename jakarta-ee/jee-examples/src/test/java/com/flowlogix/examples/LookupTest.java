@@ -7,44 +7,44 @@ package com.flowlogix.examples;
 
 import com.flowlogix.examples.jndi.ejbs.AnotherEJB;
 import com.flowlogix.examples.jndi.ejbs.NumberGetter;
-import com.flowlogix.test.ArquillianTest;
-import com.flowlogix.test.StressTest;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 import javax.naming.NamingException;
+import lombok.Lombok;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  *
  * @author lprimak
  */
-@RunWith(Arquillian.class)
-@Category(ArquillianTest.class)
+@ExtendWith(ArquillianExtension.class)
+@Tag("Arquillian")
 public class LookupTest {
     private JndiExample example;
 
 
-    @Before
+    @BeforeEach
     public void before() {
         example = new JndiExample();
     }
 
-    @After
+    @AfterEach
     public void after() {
         example = null;
     }
@@ -52,7 +52,7 @@ public class LookupTest {
     @Test
     public void happyPath() {
         assertEquals(5, example.getNumber());
-        assertNotNull("should not be null", example.getLocator().getObject(AnotherEJB.class));
+        assertNotNull(example.getLocator().getObject(AnotherEJB.class), "should not be null");
     }
 
     @Test
@@ -60,8 +60,9 @@ public class LookupTest {
         assertThrows(NamingException.class, () -> example.getLocator().getObject("hello"));
     }
 
-    @Test(timeout = 10 * 1000)
-    @Category(StressTest.class)
+    @Test
+    @Timeout(10)
+    @Tag("StressTest")
     public void stressTest() throws InterruptedException {
         ExecutorService exec = Executors.newFixedThreadPool(500);
         AtomicBoolean failed = new AtomicBoolean();
@@ -75,17 +76,22 @@ public class LookupTest {
                 assertThrows(NamingException.class, () -> example.getLocator().getObject("hello"));
             } catch (Throwable thr) {
                 failed.set(true);
-                throw new RuntimeException(thr);
+                throw Lombok.sneakyThrow(thr);
             }
         }));
         exec.shutdown();
         exec.awaitTermination(10, TimeUnit.SECONDS);
-        assertFalse("stress test failed", failed.get());
+        assertFalse(failed.get(), "stress test failed");
     }
 
     @Deployment
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class, "LookupTest.war")
-                .addPackages(true, "com.flowlogix");
+                .addPackages(true, "com.flowlogix")
+                .deletePackages(true, "com.flowlogix.examples.data")
+                .deletePackages(true, "com.flowlogix.examples.entities")
+                .deletePackages(true, "com.flowlogix.examples.ui")
+                .deletePackages(true, "com.flowlogix.logcapture")
+                .deleteClass(ExceptionPageTest.class);
     }
 }

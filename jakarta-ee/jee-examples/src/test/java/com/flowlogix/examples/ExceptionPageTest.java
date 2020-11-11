@@ -15,7 +15,6 @@
  */
 package com.flowlogix.examples;
 
-import com.flowlogix.test.UserInterfaceTest;
 import java.net.URL;
 import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
@@ -24,17 +23,17 @@ import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -44,8 +43,8 @@ import org.openqa.selenium.support.FindBy;
  *
  * @author lprimak
  */
-@RunWith(Arquillian.class)
-@Category(UserInterfaceTest.class)
+@ExtendWith(ArquillianExtension.class)
+@Tag("UserInterface")
 public class ExceptionPageTest {
     @Drone
     private WebDriver webDriver;
@@ -81,7 +80,7 @@ public class ExceptionPageTest {
     private WebElement modeField;
 
 
-    @Before
+    @BeforeEach
     public void before() {
         webDriver.manage().deleteAllCookies();
         webDriver.get(baseURL + "exception-pages.xhtml");
@@ -139,7 +138,7 @@ public class ExceptionPageTest {
             if (StringUtils.isBlank(href)) {
                 continue;
             }
-            assertTrue("not versioned", href.contains("v="));
+            assertTrue(href.contains("v="), "not versioned");
             ++count;
         }
         assertEquals(3, count);
@@ -151,7 +150,7 @@ public class ExceptionPageTest {
             if (StringUtils.isBlank(href)) {
                 continue;
             }
-            assertTrue("not versioned", href.contains("v="));
+            assertTrue(href.contains("v="), "not versioned");
             ++count;
         }
         assertEquals(1, count);

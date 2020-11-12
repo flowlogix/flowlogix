@@ -92,7 +92,7 @@
         <dependency>
             <groupId>org.jboss.arquillian.junit5</groupId>
             <artifactId>arquillian-junit5-container</artifactId>
-            <version>1.7.0.Final-SNAPSHOT</version>
+            <version>1.7.0.payara-p1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -163,7 +163,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
-                <version>1.7.0.Final-SNAPSHOT</version>
+                <version>1.7.0.payara-p1</version>
                 <type>pom</type>
                 <scope>test</scope>
             </dependency>
@@ -197,4 +197,11 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>payara</id>
+            <url>https://nexus.payara.fish/repository/payara-artifacts</url>
+        </repository>
+    </repositories>
 </project>

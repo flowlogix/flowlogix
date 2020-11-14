@@ -154,9 +154,8 @@ public class JNDIObjectLocator implements Serializable {
      * @return
      * @throws NamingException
      */
-    @SuppressWarnings("unchecked")
     public <T> T getObject(String jndiName, boolean noCaching) throws NamingException {
-        return (T) getJNDIObject(jndiName, noCaching);
+        return getJNDIObject(jndiName, noCaching);
     }
 
     /**

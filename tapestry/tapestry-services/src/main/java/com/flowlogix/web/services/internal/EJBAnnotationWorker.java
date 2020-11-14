@@ -145,7 +145,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         {
             if(stateful == null)
             {
-                return locator.getObject(lookupname, true);
+                return locator.getObject(lookupname);
             }
 
             final HttpSession session = rg.getHTTPServletRequest().getSession(true);

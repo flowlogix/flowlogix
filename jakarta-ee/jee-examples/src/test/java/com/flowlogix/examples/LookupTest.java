@@ -22,7 +22,7 @@ import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ public class LookupTest {
 
     @Test
     public void unhappyPath() throws NamingException {
-        assertThrows(NamingException.class, () -> example.getLocator().getObject("hello"));
+        assertNull(example.getLocator().getObject("hello"));
     }
 
     @Test
@@ -68,12 +68,12 @@ public class LookupTest {
         AtomicBoolean failed = new AtomicBoolean();
         IntStream.rangeClosed(1, 10000).forEach(ii -> exec.submit(() -> {
             try {
-                NumberGetter target1 = example.getLocator().getObject("java:module/NumberGetter", true);
+                NumberGetter target1 = example.getLocator().getObjectNoCache("java:module/NumberGetter");
                 assertEquals(5, target1.getNumber());
                 NumberGetter target2 = example.getLocator().getObject(NumberGetter.class);
                 assertEquals(5, target2.getNumber());
                 assertNotNull(example.getLocator().getObject(AnotherEJB.class));
-                assertThrows(NamingException.class, () -> example.getLocator().getObject("hello"));
+                assertNull(example.getLocator().getObject("hello"));
             } catch (Throwable thr) {
                 failed.set(true);
                 throw Lombok.sneakyThrow(thr);
@@ -87,6 +87,7 @@ public class LookupTest {
     @Deployment
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class, "LookupTest.war")
+                .addPackages(true, "org.omnifaces")
                 .addPackages(true, "com.flowlogix")
                 .deletePackages(true, "com.flowlogix.examples.data")
                 .deletePackages(true, "com.flowlogix.examples.entities")

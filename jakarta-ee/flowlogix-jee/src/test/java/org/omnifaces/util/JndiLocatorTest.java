@@ -49,7 +49,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.MockedConstruction;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.when;
-import org.omnifaces.util.JNDIObjectLocator;
 import org.omnifaces.util.JNDIObjectLocator.JNDIObjectLocatorBuilder;
 
 /**
@@ -71,8 +70,8 @@ public class JndiLocatorTest {
 
     @Test
     void portableNamePrefox() {
-        assertEquals(JNDIObjectLocator.PORTABLE_NAME_PREFIX + "/hello", locator.prependPortableName("hello"));
-        assertEquals("java:hello", locator.prependPortableName("java:hello"));
+        assertEquals(JNDI.JNDI_NAMESPACE_MODULE + "/hello", locator.prependNamespaceIfNecessary("hello"));
+        assertEquals("java:hello", locator.prependNamespaceIfNecessary("java:hello"));
     }
 
     @Test
@@ -90,8 +89,8 @@ public class JndiLocatorTest {
             JNDIObjectLocatorBuilder builder = JNDIObjectLocator.builder()
                     .environment("oneKey", "oneValue")
                     .environment("twoKey", "twoValue");
-            JNDIObjectLocator.initialHost(builder, "myHost");
-            JNDIObjectLocator.initialPort(builder, 12345);
+            builder.initialHost("myHost");
+            builder.initialPort(12345);
             JNDIObjectLocator locator = builder.build();
             assertEquals("hello", locator.getObject(String.class));
             assertEquals(4, constructedEnvironment.size());
@@ -114,8 +113,8 @@ public class JndiLocatorTest {
     void basicLocatorBuilder() throws Exception {
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
                 (icObject, context) -> when(icObject.lookup(anyString())).thenReturn("hello"))) {
-            String myString = JNDIObjectLocator.builder().portableNamePrefix("abc")
-                    .cacheRemote(true).build().getObject(String.class);
+            String myString = JNDIObjectLocator.builder().namespace("abc")
+                    .cacheRemote().build().getObject(String.class);
             assertEquals("hello", myString);
         }
     }
@@ -157,7 +156,7 @@ public class JndiLocatorTest {
     @Test
     void serialization() throws IOException, NamingException, ClassNotFoundException {
         JNDIObjectLocator original = JNDIObjectLocator.builder().environment("one", "two")
-                .cacheRemote(true)
+                .cacheRemote()
                 .build();
         ByteArrayOutputStream bostrm = new ByteArrayOutputStream();
         ObjectOutputStream ostrm = new ObjectOutputStream(bostrm);
@@ -195,14 +194,14 @@ public class JndiLocatorTest {
                     });
                     when(icObject.lookup(eq("exception"))).thenThrow(NamingException.class);
                 })) {
-            assertEquals(result, locator.getObject("hello", true));
+            assertEquals(result, locator.getObjectNoCache("hello"));
             assertTrue(locator.getJndiObjectCache().isEmpty(), "cache should be empty");
             assertEquals(result, locator.getObject("hello"));
             assertEquals(result, locator.getObject("hello"));
             assertEquals(1, locator.getJndiObjectCache().size());
             assertEquals(result, locator.getObject("hello2"));
             assertEquals(2, locator.getJndiObjectCache().size());
-            assertThrows(NamingException.class, () -> locator.getObject("exception"));
+            assertThrows(IllegalStateException.class, () -> locator.getObject("exception"));
             assertEquals(0, locator.getJndiObjectCache().size());
             assertEquals(3, numInvocations.get());
         }
@@ -210,7 +209,7 @@ public class JndiLocatorTest {
 
     @Test
     void simpleFailure() throws NamingException {
-        assertThrows(NamingException.class, () -> JNDIObjectLocator.builder().build().getObject("invalid"));
+        assertThrows(IllegalStateException.class, () -> JNDIObjectLocator.builder().build().getObject("invalid"));
     }
 
     @Test
@@ -235,24 +234,21 @@ public class JndiLocatorTest {
                     });
                     when(icObject.lookup(eq("exception"))).thenThrow(NamingException.class);
                 })) {
-            assertEquals(result, locator.getObject("hello", true));
+            assertEquals(result, locator.getObjectNoCache("hello"));
             assertTrue(locator.getJndiObjectCache().isEmpty(), "cache should be empty");
         }
         ExecutorService exec = Executors.newFixedThreadPool(numThreads);
         IntStream.rangeClosed(0, numIterations).forEach(ii -> exec.submit(() -> {
             try {
-                assertEquals(result, locator.getObject("hello", true));
+                assertEquals(result, locator.getObjectNoCache("hello"));
                 maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
                 assertEquals(result, locator.getObject("hello"));
                 assertEquals(result, locator.getObject("hello"));
                 maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
                 assertEquals(result, locator.getObject("hello2"));
                 maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
-                assertThrows(NamingException.class, () -> locator.getObject("exception"));
+                assertThrows(IllegalStateException.class, () -> locator.getObject("exception"));
                 maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
-            } catch (NamingException ex) {
-                failed.set(true);
-                throw Lombok.sneakyThrow(ex);
             } catch (Throwable thr) {
                 failed.set(true);
                 throw Lombok.sneakyThrow(thr);

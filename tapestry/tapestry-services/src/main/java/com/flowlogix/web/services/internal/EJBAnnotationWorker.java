@@ -31,6 +31,7 @@ import org.apache.tapestry5.plastic.PlasticField;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.transform.ComponentClassTransformWorker2;
 import org.apache.tapestry5.services.transform.TransformationSupport;
+import org.omnifaces.util.JNDI;
 
 /**
  * Inject an EJB into tapestry sources
@@ -90,10 +91,10 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         //use type
         if (lookupname == null)
         {
-            lookupname = JNDIObjectLocator.guessByType(fieldType);
+            lookupname = JNDI.guessJNDIName(fieldType);
         }
 
-        lookupname = locator.prependPortableName(lookupname);
+        lookupname = locator.prependNamespaceIfNecessary(lookupname);
         return lookupname;
     }
 
@@ -108,7 +109,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
                     stateful, stateful.isSessionAttribute()? fieldName : typeName, fieldName));
             return true;
         }
-        else if(typeName.toUpperCase().endsWith(JNDIObjectLocator.REMOTE))
+        else if(typeName.toUpperCase().endsWith("REMOTE"))
         {
             field.setConduit(new EJBFieldConduit(locator, lookupname,
                     null, "", fieldName));
@@ -116,7 +117,7 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
         }
         else
         {
-            Object rv = locator.getObject(lookupname, false);
+            Object rv = locator.getObject(lookupname);
             if(rv != null)
             {
                 field.inject(rv);
@@ -140,12 +141,11 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
 
 
         @Override
-        @SneakyThrows({NamingException.class})
         public Object get(Object instance, InstanceContext context)
         {
             if(stateful == null)
             {
-                return locator.getObject(lookupname, true);
+                return locator.getObjectNoCache(lookupname);
             }
 
             final HttpSession session = rg.getHTTPServletRequest().getSession(true);
@@ -156,7 +156,11 @@ public class EJBAnnotationWorker implements ComponentClassTransformWorker2
                 rv = session.getAttribute(attributeName);
                 if (rv == null)
                 {
-                    rv = locator.getObject(lookupname, stateful != null);
+                    if (stateful != null) {
+                        rv = locator.getObjectNoCache(lookupname);
+                    } else {
+                        rv = locator.getObject(lookupname);
+                    }
                     session.setAttribute(attributeName, rv);
                 }
             }

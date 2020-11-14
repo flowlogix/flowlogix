@@ -4,10 +4,10 @@
  */
 package com.flowlogix.services.test;
 
-import org.omnifaces.util.JNDIObjectLocator;
 import com.flowlogix.web.services.internal.EJBAnnotationWorker;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
+import org.omnifaces.util.JNDI;
 
 
 /**
@@ -20,7 +20,7 @@ public class ReplaceLocalTests
     public void stripLocal()
     {
         EJBAnnotationWorker worker = new EJBAnnotationWorker();
-        assertEquals("java:module/WebusersFacade", JNDIObjectLocator.StripInterfaceSuffixPattern.matcher("java:module/WebusersFacadeLocal").replaceFirst(""));
-        assertEquals("java:module/WebusersFacade", JNDIObjectLocator.StripInterfaceSuffixPattern.matcher("java:module/WebusersFacadeRemote").replaceFirst(""));
+        assertEquals("java:module/WebusersFacade", JNDI.PATTERN_EJB_INTERFACE_SUFFIX.matcher("java:module/WebusersFacadeLocal").replaceFirst(""));
+        assertEquals("java:module/WebusersFacade", JNDI.PATTERN_EJB_INTERFACE_SUFFIX.matcher("java:module/WebusersFacadeRemote").replaceFirst(""));
     }
 }

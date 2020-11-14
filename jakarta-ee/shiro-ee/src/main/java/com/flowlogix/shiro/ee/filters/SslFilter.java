@@ -19,7 +19,6 @@ import org.omnifaces.util.JNDIObjectLocator;
 import java.io.IOException;
 import javax.faces.application.ProjectStage;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -35,14 +34,10 @@ public class SslFilter extends org.apache.shiro.web.filter.authz.SslFilter
     protected boolean isEnabled(ServletRequest request, ServletResponse response) throws ServletException, IOException
     {
         boolean enabled = true;
-        try
-        {
-            String stageOverride = locator.getObject(PROJECT_STAGE_JNDI_NAME);
-            if(stageOverride == null || ProjectStage.Development.name().equalsIgnoreCase(stageOverride))
-            {
-                enabled = false;
-            }
-        } catch (NamingException ex) {}
+        String stageOverride = locator.getObject(PROJECT_STAGE_JNDI_NAME);
+        if (stageOverride == null || ProjectStage.Development.name().equalsIgnoreCase(stageOverride)) {
+            enabled = false;
+        }
         return enabled && super.isEnabled(request, response);
     }
 

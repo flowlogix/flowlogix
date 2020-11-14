@@ -51,7 +51,7 @@ public class JndiExample {
      * @return new thread-safe locator with no caching
      */
     JNDIObjectLocator createLocatorWithNoCaching() {
-        return JNDIObjectLocator.builder().noCaching(true).build();
+        return JNDIObjectLocator.builder().noCaching().build();
     }
 
     /**

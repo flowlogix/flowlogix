@@ -130,9 +130,9 @@ public class JndiLocatorTest {
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
                 (icObject, context) -> when(icObject.lookup(anyString())).thenReturn(new TestRemote()))) {
             assertEquals(TestRemote.class, locator.getObject(TestRemote.class).getClass());
-            assertTrue(locator.getJndiObjectCache().isEmpty(), "object should not be cached");
+            assertTrue(locator.getJNDIObjectCache().isEmpty(), "object should not be cached");
             locator.getObject(TestLocal.class);
-            assertFalse(locator.getJndiObjectCache().isEmpty(), "object should be cached");
+            assertFalse(locator.getJNDIObjectCache().isEmpty(), "object should be cached");
         }
     }
 
@@ -164,17 +164,17 @@ public class JndiLocatorTest {
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
                 (icObject, context) -> when(icObject.lookup(anyString())).thenReturn("hello"))) {
             assertEquals("hello", original.getObject("hello"));
-            assertEquals(1, original.getJndiObjectCache().size());
+            assertEquals(1, original.getJNDIObjectCache().size());
         }
         ostrm.writeObject(original);
         ostrm.close();
         JNDIObjectLocator xferred = (JNDIObjectLocator) new ObjectInputStream(
                 new ByteArrayInputStream(bostrm.toByteArray())).readObject();
-        assertEquals(0, xferred.getJndiObjectCache().size());
+        assertEquals(0, xferred.getJNDIObjectCache().size());
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
                 (icObject, context) -> when(icObject.lookup(anyString())).thenReturn("hello"))) {
             assertEquals("hello", original.getObject("hello"));
-            assertEquals(1, original.getJndiObjectCache().size());
+            assertEquals(1, original.getJNDIObjectCache().size());
         }
     }
 
@@ -195,14 +195,14 @@ public class JndiLocatorTest {
                     when(icObject.lookup(eq("exception"))).thenThrow(NamingException.class);
                 })) {
             assertEquals(result, locator.getObjectNoCache("hello"));
-            assertTrue(locator.getJndiObjectCache().isEmpty(), "cache should be empty");
+            assertTrue(locator.getJNDIObjectCache().isEmpty(), "cache should be empty");
             assertEquals(result, locator.getObject("hello"));
             assertEquals(result, locator.getObject("hello"));
-            assertEquals(1, locator.getJndiObjectCache().size());
+            assertEquals(1, locator.getJNDIObjectCache().size());
             assertEquals(result, locator.getObject("hello2"));
-            assertEquals(2, locator.getJndiObjectCache().size());
+            assertEquals(2, locator.getJNDIObjectCache().size());
             assertThrows(IllegalStateException.class, () -> locator.getObject("exception"));
-            assertEquals(0, locator.getJndiObjectCache().size());
+            assertEquals(0, locator.getJNDIObjectCache().size());
             assertEquals(3, numInvocations.get());
         }
     }
@@ -235,20 +235,20 @@ public class JndiLocatorTest {
                     when(icObject.lookup(eq("exception"))).thenThrow(NamingException.class);
                 })) {
             assertEquals(result, locator.getObjectNoCache("hello"));
-            assertTrue(locator.getJndiObjectCache().isEmpty(), "cache should be empty");
+            assertTrue(locator.getJNDIObjectCache().isEmpty(), "cache should be empty");
         }
         ExecutorService exec = Executors.newFixedThreadPool(numThreads);
         IntStream.rangeClosed(0, numIterations).forEach(ii -> exec.submit(() -> {
             try {
                 assertEquals(result, locator.getObjectNoCache("hello"));
-                maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
+                maxCached.accumulateAndGet(locator.getJNDIObjectCache().keySet().stream().count(), Math::max);
                 assertEquals(result, locator.getObject("hello"));
                 assertEquals(result, locator.getObject("hello"));
-                maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
+                maxCached.accumulateAndGet(locator.getJNDIObjectCache().keySet().stream().count(), Math::max);
                 assertEquals(result, locator.getObject("hello2"));
-                maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
+                maxCached.accumulateAndGet(locator.getJNDIObjectCache().keySet().stream().count(), Math::max);
                 assertThrows(IllegalStateException.class, () -> locator.getObject("exception"));
-                maxCached.accumulateAndGet(locator.getJndiObjectCache().keySet().stream().count(), Math::max);
+                maxCached.accumulateAndGet(locator.getJNDIObjectCache().keySet().stream().count(), Math::max);
             } catch (Throwable thr) {
                 failed.set(true);
                 throw Lombok.sneakyThrow(thr);

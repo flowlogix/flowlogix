@@ -82,7 +82,6 @@ public class ExceptionPageTest {
 
     @BeforeEach
     public void before() {
-        webDriver.manage().deleteAllCookies();
         webDriver.get(baseURL + "exception-pages.xhtml");
         waitGui(webDriver);
     }
@@ -103,9 +102,9 @@ public class ExceptionPageTest {
     public void invalidSession() {
         invalidateSession.click();
         webDriver.switchTo().alert().accept();
-        noAction.click();
+        guardAjax(noAction).click();
         assertEquals("Logged Out", isExpired.getText());
-        noAction.click();
+        guardAjax(noAction).click();
         assertEquals("Logged In", isExpired.getText());
     }
 

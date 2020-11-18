@@ -24,6 +24,7 @@ import org.omnifaces.util.Faces;
 import java.nio.channels.ClosedByInterruptException;
 import static com.flowlogix.examples.ui.ResponseExceptionSupplier.RUN_BEFORE_RESPONSE;
 import static com.flowlogix.ui.ViewExpiredExceptionHandlerFactory.isSessionExpired;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
@@ -31,6 +32,7 @@ import static com.flowlogix.ui.ViewExpiredExceptionHandlerFactory.isSessionExpir
  */
 @Named
 @ViewScoped
+@Slf4j
 public class ExceptionBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -40,12 +42,17 @@ public class ExceptionBean implements Serializable {
     }
 
     public void throwSqlBeforeResponse() {
-        Runnable before = () -> ExceptionUtils.rethrow(new SQLException("sql"));
+        Runnable before = () -> doThrowSQLException("sql");
         Faces.setRequestAttribute(RUN_BEFORE_RESPONSE, before);
     }
 
     public void throwExceptionFromMethod() {
-        ExceptionUtils.rethrow(new SQLException("sql-from-method"));
+        doThrowSQLException("sql-from-method");
+    }
+
+    private void doThrowSQLException(String msg) {
+        log.info("*-*- Please ignore the next SEVERE message, it is expected");
+        ExceptionUtils.rethrow(new SQLException(msg));
     }
 
     public void success() {

@@ -24,8 +24,7 @@ import org.omnifaces.util.Faces;
 import java.nio.channels.ClosedByInterruptException;
 import static com.flowlogix.examples.ui.ResponseExceptionSupplier.RUN_BEFORE_RESPONSE;
 import lombok.extern.slf4j.Slf4j;
-import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.FLASH_ATTRIBUTE_VIEW_EXPIRED;
-//import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
+import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
 
 /**
  *
@@ -69,15 +68,6 @@ public class ExceptionBean implements Serializable {
     }
 
     public String expired() {
-        // return wasViewExpired() ? "Logged Out" : "Logged In";
-        return isSessionExpired() ? "Logged Out" : "Logged In";
-    }
-
-    public static boolean isSessionExpired() {
-        boolean sessionExpired = false;
-        if (!Faces.isAjaxRequest() && !Faces.isSessionNew()) {
-            sessionExpired = Faces.getFlashAttribute(FLASH_ATTRIBUTE_VIEW_EXPIRED, () -> false);
-        }
-        return sessionExpired;
+        return wasViewExpired() ? "Logged Out" : "Logged In";
     }
 }

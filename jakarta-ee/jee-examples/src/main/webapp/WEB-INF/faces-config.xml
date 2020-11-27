@@ -26,8 +26,7 @@
     <factory>
         <!-- OmniFaces variant -->
         <exception-handler-factory>org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory</exception-handler-factory>
-
-        <!-- PrimeFaces variant -->
+        <!-- PrimeFaces variant, uncomment below and comment above to check PrimeFaces (breaks automated test) -->
 <!--        <exception-handler-factory>
             org.primefaces.application.exceptionhandler.PrimeExceptionHandlerFactory
         </exception-handler-factory>-->

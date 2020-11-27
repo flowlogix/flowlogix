@@ -24,16 +24,29 @@
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_3.xsd">
     <factory>
+        <!-- OmniFaces variant -->
         <exception-handler-factory>org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory</exception-handler-factory>
+
+        <!-- PrimeFaces variant -->
+<!--    <exception-handler-factory>
+            org.primefaces.application.exceptionhandler.PrimeExceptionHandlerFactory
+        </exception-handler-factory>-->
+
         <!-- order is important, the following line needs to appear last -->
-        <exception-handler-factory>com.flowlogix.ui.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
+        <!-- OmniFaces variant -->
+        <exception-handler-factory>org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
+        <!-- FlowLogix variant -->
+        <!-- <exception-handler-factory>com.flowlogix.ui.ViewExpiredExceptionHandlerFactory</exception-handler-factory> -->
     </factory>
     <lifecycle>
         <!-- the line below is only for testing purposes -->
         <phase-listener>com.flowlogix.examples.ui.ResponseExceptionSupplier</phase-listener>
     </lifecycle>
     <application>
-        <resource-handler>com.flowlogix.ui.CacheResourcesForever</resource-handler>
+        <resource-handler>org.omnifaces.resourcehandler.VersionedResourceHandler</resource-handler>
         <resource-handler>com.flowlogix.ui.MinimizedHandler</resource-handler>
+        <el-resolver>
+            org.primefaces.application.exceptionhandler.PrimeExceptionHandlerELResolver
+        </el-resolver>
     </application>
 </faces-config>

@@ -33,10 +33,7 @@
         </exception-handler-factory>-->
 
         <!-- order is important, the following line needs to appear last -->
-        <!-- OmniFaces variant -->
         <exception-handler-factory>org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
-        <!-- FlowLogix variant -->
-        <!-- <exception-handler-factory>com.flowlogix.ui.ViewExpiredExceptionHandlerFactory</exception-handler-factory> -->
     </factory>
     <lifecycle>
         <!-- the line below is only for testing purposes -->

@@ -101,6 +101,7 @@ public class ExceptionPageTest {
     @OperateOnDeployment("DevMode")
     public void invalidSession() {
         invalidateSession.click();
+        waitGui(webDriver);
         webDriver.switchTo().alert().accept();
         guardAjax(noAction).click();
         assertEquals("Logged Out", isExpired.getText());

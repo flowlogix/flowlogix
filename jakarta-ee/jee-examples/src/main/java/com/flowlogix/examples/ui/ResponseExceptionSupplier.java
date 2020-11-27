@@ -37,6 +37,10 @@ public class ResponseExceptionSupplier implements PhaseListener {
     public void beforePhase(PhaseEvent event) {
         Runnable before = Faces.getRequestAttribute(RUN_BEFORE_RESPONSE);
         if (before != null) {
+            // The next line forces (Omni | Prime) exception handler to
+            // actually see / handle the exception, and not just show it in the server log.
+            // To see the exception in the server log, the next line should be commented out,
+            // otherwise it will never show up in the server log
             event.getFacesContext().responseComplete();
             before.run();
         }

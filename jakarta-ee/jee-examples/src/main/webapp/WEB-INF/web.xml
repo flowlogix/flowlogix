@@ -24,7 +24,7 @@
         <param-value>31536000000</param-value>
     </context-param>
     <context-param>
-        <param-name>com.flowlogix.VERSION_STRING</param-name>
+        <param-name>org.omnifaces.VERSIONED_RESOURCE_HANDLER_VERSION</param-name>
         <param-value>#{environmentInfo.version}</param-value>
     </context-param>
     <context-param>

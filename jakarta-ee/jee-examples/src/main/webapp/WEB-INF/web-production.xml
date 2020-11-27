@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
     <context-param>
-        <param-name>com.flowlogix.VERSION_STRING</param-name>
+        <param-name>org.omnifaces.VERSIONED_RESOURCE_HANDLER_VERSION</param-name>
         <param-value>#{environmentInfo.version}</param-value>
     </context-param>
     <context-param>

@@ -16,7 +16,12 @@
                        onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
             </p>
             <p/>
-            <h:commandButton id="closeByIntr" value="Throw ClosedByInterruptException" action="#{exceptionBean.throwClosedByInterruptException()}">
+            <h:commandButton id="closeByIntr" value="Throw ClosedByInterruptException" action="#{exceptionBean.throwClosedByInterruptException(true)}">
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+            <p/>
+            <h:commandButton id="closeByIntrNoRespComplete" value="Throw ClosedByInterruptException - no responseComplete()"
+                             action="#{exceptionBean.throwClosedByInterruptException(false)}">
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>

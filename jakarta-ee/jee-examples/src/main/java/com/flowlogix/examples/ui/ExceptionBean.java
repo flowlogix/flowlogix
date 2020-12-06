@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples.ui;
 
+import static com.flowlogix.examples.ui.ResponseExceptionSupplier.CALL_RESPONSE_COMPLETE;
 import java.io.Serializable;
 import java.sql.SQLException;
 import javax.faces.view.ViewScoped;
@@ -36,9 +37,10 @@ import lombok.extern.slf4j.Slf4j;
 public class ExceptionBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public void throwClosedByInterruptException() {
+    public void throwClosedByInterruptException(boolean responseComplete) {
         Runnable before = () -> ExceptionUtils.rethrow(new ClosedByInterruptException());
         Faces.setRequestAttribute(RUN_BEFORE_RESPONSE, before);
+        Faces.setRequestAttribute(CALL_RESPONSE_COMPLETE, responseComplete);
     }
 
     public void throwSqlBeforeResponse() {

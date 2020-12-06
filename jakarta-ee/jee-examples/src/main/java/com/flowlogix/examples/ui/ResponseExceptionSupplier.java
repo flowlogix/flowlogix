@@ -26,6 +26,7 @@ import org.omnifaces.util.Faces;
  */
 public class ResponseExceptionSupplier implements PhaseListener {
     static final String RUN_BEFORE_RESPONSE = "com.flowlogix.response.runBefore";
+    static final String CALL_RESPONSE_COMPLETE = "com.flowlogix.response.responseComplete";
 
     private static final long serialVersionUID = 1L;
 
@@ -39,9 +40,11 @@ public class ResponseExceptionSupplier implements PhaseListener {
         if (before != null) {
             // The next line forces (Omni | Prime) exception handler to
             // actually see / handle the exception, and not just show it in the server log.
-            // To see the exception in the server log, the next line should be commented out,
+            // To see the exception in the server log, responseComlete() shouldn't be called,
             // otherwise it will never show up in the server log
-            event.getFacesContext().responseComplete();
+            if (Faces.getRequestAttribute(CALL_RESPONSE_COMPLETE, () -> true)) {
+                event.getFacesContext().responseComplete();
+            }
             before.run();
         }
     }

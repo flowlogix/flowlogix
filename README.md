@@ -1,8 +1,8 @@
 # Welcome to Flow Logix Project Home Page #
 
 ## Current Projects ##
-  * Jakarta EE Lazy Data Model for PrimeFaces
-  * Apache Shiro Security / Jakarta EE integration
+  * Jakarta EE Lazy Data Model for <a href="https://www.primefaces.org">PrimeFaces DataTable</a>
+  * <a href="https://shiro.apache.org">Apache Shiro Security</a> / Jakarta EE integration
   * Jakarta EE DAO Helper
   * Jakarta EE JSF JavaScript Minimized resource handler
   * Utilities (String / Object Type Converter, Stream reader)
@@ -12,7 +12,7 @@
 <ul>
  <li>
   12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel
-<br> Major refactor and contributed many EE and JSF modules to OmniFaces
+<br> Major refactor and contributed many EE and JSF modules to <a href="https://omnifaces.org">OmniFaces</a>
  </li>
  </ul>
 

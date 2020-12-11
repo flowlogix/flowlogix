@@ -77,6 +77,8 @@ public class LogCapture {
 
         @Override
         public void publish(LogRecord record) {
+            // the below line is if integrating with Payara due to race condition
+//            records.offer(new GFLogRecord(record));
             records.offer(record);
             if (records.size() > capacity) {
                 records.poll();

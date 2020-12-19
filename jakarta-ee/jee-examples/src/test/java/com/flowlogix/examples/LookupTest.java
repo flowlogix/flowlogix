@@ -93,6 +93,7 @@ public class LookupTest {
                 .deletePackages(true, "com.flowlogix.examples.entities")
                 .deletePackages(true, "com.flowlogix.examples.ui")
                 .deletePackages(true, "com.flowlogix.logcapture")
+                .deletePackages(true, "org.omnifaces.persistence")
                 .deleteClass(ExceptionPageTest.class);
     }
 }

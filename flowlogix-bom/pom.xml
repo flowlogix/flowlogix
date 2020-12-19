@@ -44,13 +44,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
-                <version>3.5.13</version>
+                <version>3.6.28</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-inline</artifactId>
-                <version>3.5.13</version>
+                <version>3.6.28</version>
                 <scope>test</scope>
             </dependency>
 
@@ -99,18 +99,18 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>3.0.6</version>
+                <version>3.0.7</version>
                 <classifier>indy</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-web</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

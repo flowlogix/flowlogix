@@ -6,6 +6,7 @@ pipeline {
             steps {
                 echo 'Hello World from master'
             }
+        }
         stage('Hello') {
             steps {
                 echo 'Hello World'

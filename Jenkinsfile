@@ -9,7 +9,7 @@ pipeline {
             }
         }
     }
-  post {
+/*  post {
     success {
         setBuildStatus("Build succeeded", "SUCCESS");
     }
@@ -17,5 +17,6 @@ pipeline {
         setBuildStatus("Build failed", "FAILURE");
     }
   }
+*/
 }
 

@@ -14,5 +14,10 @@ pipeline {
             }
         }
     }
+
+post {
+    success {
+        githubNotify description: 'Wait for Nightly', context: 'continuous-integration/jenkins/nightly',  status: 'PENDING'}
+    }
 }
 

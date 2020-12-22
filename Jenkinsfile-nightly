@@ -4,7 +4,7 @@
       return true
     }
 
-    currentBuild.rawBuild.getCauses().each { cause ->
+    currentBuild.getBuildCauses().each { cause ->
       if (cause instanceof jenkins.branch.BranchIndexingCause) {
         isBranchIndexing = true
       }

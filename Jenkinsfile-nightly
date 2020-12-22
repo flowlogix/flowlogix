@@ -9,18 +9,17 @@
     return isBranchIndexing
   }
 
+def doRun = isBranchIndexingCause();
+
 pipeline {
     agent any
 
     stages {
         stage('Nightly') {
+            when {
+                expression { doRun }
+            }
             steps {
-                script {
-                    if (!isBranchIndexingCause()) {
-                        currentBuild.result = 'SUCCESS'
-                        return
-                    }
-                }
                 echo 'Nightly Build ...'
             }
         }
@@ -28,7 +27,11 @@ pipeline {
 
     post {
         success {
-            githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'SUCCESS'
+            script {
+                if (doRun) {
+                    githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'SUCCESS'
+                }
+            }
         }
         failure {
             githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'FAILURE'

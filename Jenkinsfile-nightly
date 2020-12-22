@@ -11,7 +11,8 @@ pipeline {
 
     post {
         success {
-            githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'SUCCESS'
+            githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'FAILURE'
+//            githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'SUCCESS'
         }
         failure {
             githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'FAILURE'

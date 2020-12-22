@@ -9,7 +9,9 @@
     return isBranchIndexing
   }
 
-def doRun = isBranchIndexingCause();
+if (!isBranchIndexingCause()) {
+    return
+}
 
 pipeline {
     agent any
@@ -27,11 +29,7 @@ pipeline {
 
     post {
         success {
-            script {
-                if (doRun) {
-                    githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'SUCCESS'
-                }
-            }
+            githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'SUCCESS'
         }
         failure {
             githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'FAILURE'

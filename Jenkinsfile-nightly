@@ -1,8 +1,8 @@
  boolean isBranchIndexingCause() {
     def isBranchIndexing = false
-    if (!currentBuild.rawBuild) {
-      return true
-    }
+//    if (!currentBuild.rawBuild) {
+//      return true
+//    }
 
     currentBuild.getBuildCauses().each { cause ->
       if (cause instanceof jenkins.branch.BranchIndexingCause) {

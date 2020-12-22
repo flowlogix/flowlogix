@@ -1,27 +1,8 @@
- boolean isBranchIndexingCause() {
-    def isBranchIndexing = false
-
-    currentBuild.getBuildCauses().each { cause ->
-      if (cause instanceof jenkins.branch.BranchIndexingCause) {
-        isBranchIndexing = true
-      }
-    }
-    return isBranchIndexing
-  }
-
-if (!isBranchIndexingCause()) {
-    currentBuild.result = 'ABORTED'
-    return
-}
-
 pipeline {
     agent any
 
     stages {
         stage('Nightly') {
-            when {
-                expression { doRun }
-            }
             steps {
                 echo 'Nightly Build ...'
             }

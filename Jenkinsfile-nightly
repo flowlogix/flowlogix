@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Nightly') {
             steps {
-                echo 'Nightly Build ...'
+                echo 'Nightly Build 2...'
             }
         }
     }

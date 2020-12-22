@@ -10,6 +10,7 @@
   }
 
 if (!isBranchIndexingCause()) {
+    currentBuild.result = 'ABORTED'
     return
 }
 

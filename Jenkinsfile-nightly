@@ -16,10 +16,10 @@ pipeline {
     agent any
 
     stages {
-        when {
-            expression { isBranchIndexingCause() }
-        }
         stage('Nightly') {
+            when {
+                expression { isBranchIndexingCause() }
+            }
             steps {
                 echo 'Nightly Build ...'
             }

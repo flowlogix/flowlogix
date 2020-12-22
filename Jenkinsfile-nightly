@@ -1,0 +1,20 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Nightly') {
+            steps {
+                echo 'Nightly Build ...'
+            }
+        }
+    }
+
+    post {
+        success {
+            githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'SUCCESS'
+        }
+        failure {
+            githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'FAILURE'
+        }
+    }
+}

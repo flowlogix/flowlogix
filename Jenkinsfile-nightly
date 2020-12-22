@@ -1,8 +1,5 @@
  boolean isBranchIndexingCause() {
     def isBranchIndexing = false
-//    if (!currentBuild.rawBuild) {
-//      return true
-//    }
 
     currentBuild.getBuildCauses().each { cause ->
       if (cause instanceof jenkins.branch.BranchIndexingCause) {
@@ -17,10 +14,13 @@ pipeline {
 
     stages {
         stage('Nightly') {
-            when {
-                expression { isBranchIndexingCause() }
-            }
             steps {
+                script {
+                    if (!isBranchIndexingCause()) {
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+                }
                 echo 'Nightly Build ...'
             }
         }

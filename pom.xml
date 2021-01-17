@@ -28,6 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
         <excludedGroups>Arquillian,UserInterface,StressTest</excludedGroups>
         <main.basedir>${project.basedir}</main.basedir>
     </properties>

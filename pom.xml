@@ -123,7 +123,7 @@
                     <version>3.0.0-M1</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <pushChanges>false</pushChanges>
+                        <pushChanges>true</pushChanges>
                         <releaseProfiles>release-flowlogix-prod,generate-docs</releaseProfiles>
                         <goals>deploy</goals>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>

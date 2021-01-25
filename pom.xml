@@ -61,12 +61,17 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
         </plugins>
 
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
                     <configuration>
@@ -77,7 +82,6 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M5</version>
                     <configuration>
@@ -89,12 +93,12 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>3.2.1</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
+                            <phase>deploy</phase>
                             <goals>
                                 <goal>jar-no-fork</goal>
                             </goals>
@@ -102,7 +106,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.2.0</version>
                     <configuration>
@@ -112,8 +115,24 @@
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
+                            <phase>deploy</phase>
                             <goals>
                                 <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>default-deploy</id>
+                            <phase>none</phase>
+                        </execution>
+                        <execution>
+                            <id>deploy</id>
+                            <goals>
+                                <goal>deploy</goal>
                             </goals>
                         </execution>
                     </executions>
@@ -124,7 +143,7 @@
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <pushChanges>true</pushChanges>
-                        <releaseProfiles>release-flowlogix-prod,generate-docs</releaseProfiles>
+                        <releaseProfiles>release-flowlogix-prod</releaseProfiles>
                         <goals>deploy</goals>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>
                     </configuration>
@@ -141,7 +160,6 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>1.6</version>
                     <configuration>
@@ -233,21 +251,6 @@
                                 <version>8.36</version>
                             </dependency>
                         </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>generate-docs</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>

@@ -54,10 +54,9 @@ public class LogCapture {
             if (curr == null) {
                 throw new IllegalStateException("Trying to turn logging off twice");
             }
+            GLOBAL_LOGGER.removeHandler(curr);
             return nullv;
         });
-
-        GLOBAL_LOGGER.removeHandler(handler.get());
     }
 
     public LogRecord poll() {

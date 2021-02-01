@@ -274,8 +274,8 @@
 
     <scm>
         <url>https://github.com/flowlogix/flowlogix</url>
-        <connection>scm:git:https://github.com/flowlogix/flowlogix.git</connection>
-        <developerConnection>scm:git:https://github.com/flowlogix/flowlogix.git</developerConnection>
+        <connection>scm:git:git@github.com:flowlogix/flowlogix.git</connection>
+        <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 

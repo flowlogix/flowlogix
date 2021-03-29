@@ -31,6 +31,7 @@
         <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
         <excludedGroups>Arquillian,UserInterface,StressTest</excludedGroups>
         <main.basedir>${project.basedir}</main.basedir>
+        <docs.phase>deploy</docs.phase>
     </properties>
 
     <modules>
@@ -67,6 +68,10 @@
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -98,7 +103,7 @@
                     <executions>
                         <execution>
                             <id>attach-sources</id>
-                            <phase>deploy</phase>
+                            <phase>${docs.phase}</phase>
                             <goals>
                                 <goal>jar-no-fork</goal>
                             </goals>
@@ -115,7 +120,7 @@
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
-                            <phase>deploy</phase>
+                            <phase>${docs.phase}</phase>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
@@ -139,12 +144,10 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.0-M1</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <pushChanges>true</pushChanges>
                         <releaseProfiles>release-flowlogix-prod</releaseProfiles>
-                        <goals>deploy</goals>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>
                     </configuration>
                 </plugin>
@@ -156,7 +159,7 @@
                     <configuration>
                         <serverId>flowlogix-maven-central</serverId>
                         <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                        <autoReleaseAfterClose>true</autoReleaseAfterClose>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -257,6 +260,9 @@
         </profile>
         <profile>
             <id>release-flowlogix-prod</id>
+            <properties>
+                <docs.phase>package</docs.phase>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -264,7 +270,6 @@
                         <artifactId>nexus-staging-maven-plugin</artifactId>
                     </plugin>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
                 </plugins>

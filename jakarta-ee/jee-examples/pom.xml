@@ -91,7 +91,7 @@
         <dependency>
             <groupId>org.jboss.arquillian.junit5</groupId>
             <artifactId>arquillian-junit5-container</artifactId>
-            <version>1.7.0.Alpha6-payara</version>
+            <version>1.7.0.Alpha9</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -162,7 +162,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
-                <version>1.7.0.Alpha6-payara</version>
+                <version>1.7.0.Alpha9</version>
                 <type>pom</type>
                 <scope>test</scope>
             </dependency>

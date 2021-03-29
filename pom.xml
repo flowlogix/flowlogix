@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.1</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Utility Library Root POM</description>
@@ -202,20 +202,20 @@
             <id>arq-stress-test</id>
             <properties>
                 <groups>Arquillian</groups>
-                <excludedGroups/>
+                <excludedGroups />
             </properties>
         </profile>
         <profile>
             <id>ui-test</id>
             <properties>
                 <groups>UserInterface</groups>
-                <excludedGroups/>
+                <excludedGroups />
             </properties>
         </profile>
         <profile>
             <id>all-tests</id>
             <properties>
-                <excludedGroups/>
+                <excludedGroups />
             </properties>
         </profile>
         <profile>
@@ -281,7 +281,7 @@
         <url>https://github.com/flowlogix/flowlogix</url>
         <connection>scm:git:git@github.com:flowlogix/flowlogix.git</connection>
         <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>Version-4.0.1</tag>
     </scm>
 
     <distributionManagement>

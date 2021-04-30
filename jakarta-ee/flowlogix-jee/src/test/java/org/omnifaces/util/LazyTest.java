@@ -52,13 +52,14 @@ public class LazyTest {
     @Tag("StressTest")
     @Timeout(10)
     void threadedLazy() throws InterruptedException {
-        int numInstances = 5000;
+        final int numInstances = 5000;
         List<Lazy<Expensive>> cheap = IntStream.rangeClosed(1, numInstances)
                 .mapToObj(ii -> new Lazy<>(Expensive::new)).collect(Collectors.toList());
         assertEquals(0, numCreations.get());
-        ExecutorService exec = Executors.newFixedThreadPool(50 *
-                Runtime.getRuntime().availableProcessors());
-        cheap.forEach(ii -> IntStream.rangeClosed(1, 500).forEach(iter -> exec.submit(() -> ii.get())));
+        final int numThreads = 50 * Runtime.getRuntime().availableProcessors();
+        ExecutorService exec = Executors.newFixedThreadPool(numThreads);
+        cheap.forEach(ii -> IntStream.rangeClosed(1, numThreads)
+                .forEach(iter -> exec.submit(() -> ii.get())));
         exec.shutdown();
         exec.awaitTermination(10, TimeUnit.SECONDS);
         assertEquals(numInstances, numCreations.get());

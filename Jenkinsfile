@@ -10,7 +10,7 @@ pipeline {
         stage('Hello') {
             steps {
                 echo 'Hello World old style new branch'
-                echo 'Hello World from new branch'
+                echo 'Hello World from new branch XXX'
             }
         }
     }

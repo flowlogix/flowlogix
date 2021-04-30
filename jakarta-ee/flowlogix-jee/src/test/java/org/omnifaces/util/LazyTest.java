@@ -56,7 +56,8 @@ public class LazyTest {
         List<Lazy<Expensive>> cheap = IntStream.rangeClosed(1, numInstances)
                 .mapToObj(ii -> new Lazy<>(Expensive::new)).collect(Collectors.toList());
         assertEquals(0, numCreations.get());
-        ExecutorService exec = Executors.newFixedThreadPool(500);
+        ExecutorService exec = Executors.newFixedThreadPool(50 *
+                Runtime.getRuntime().availableProcessors());
         cheap.forEach(ii -> IntStream.rangeClosed(1, 500).forEach(iter -> exec.submit(() -> ii.get())));
         exec.shutdown();
         exec.awaitTermination(10, TimeUnit.SECONDS);

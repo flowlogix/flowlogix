@@ -64,7 +64,8 @@ public class LookupTest {
     @Timeout(10)
     @Tag("StressTest")
     public void stressTest() throws InterruptedException {
-        ExecutorService exec = Executors.newFixedThreadPool(500);
+        ExecutorService exec = Executors.newFixedThreadPool(50 *
+                Runtime.getRuntime().availableProcessors());
         AtomicBoolean failed = new AtomicBoolean();
         IntStream.rangeClosed(1, 10000).forEach(ii -> exec.submit(() -> {
             try {

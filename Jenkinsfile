@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Another Hello') {
             steps {
-                githubNotify description: 'Quick Build', context: 'CI/master',  status: 'PENDING'
+                githubNotify description: 'Quick Build - Pending', context: 'CI/master',  status: 'PENDING'
                 echo 'Hello World from master'
             }
         }
@@ -18,7 +18,7 @@ pipeline {
 
     post {
         success {
-            githubNotify description: 'Quick Build', context: 'CI/master',  status: 'SUCCESS'
+            githubNotify description: 'Quick Build - Success', context: 'CI/master',  status: 'SUCCESS'
         }
     }
 }

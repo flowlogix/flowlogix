@@ -11,7 +11,7 @@
 <h2>News</h2>
 <ul>
  <li>
-    4/30/2021: Version 4.0.1 has been released 
+    4/30/2021: Version 4.0.1 has been released
  <li>
   12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel
 <br> Major refactor and contributed many EE and JSF modules to <a href="https://omnifaces.org">OmniFaces</a>

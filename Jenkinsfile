@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Another Hello') {
             steps {
+            	githubNotify description: 'Nightly Build', context: 'CI/master',  status: 'PENDING'
                 echo 'Hello World from master'
             }
         }
@@ -17,7 +18,7 @@ pipeline {
 
     post {
         success {
-            githubNotify description: 'Nightly Build', context: 'continuous-integration/jenkins/nightly',  status: 'PENDING'
+            githubNotify description: 'Nightly Build', context: 'CI/master',  status: 'SUCCESS'
         }
     }
 }

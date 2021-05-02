@@ -103,7 +103,8 @@ public class ExceptionPageTest {
         invalidateSession.click();
         waitGui(webDriver);
         webDriver.switchTo().alert().accept();
-        guardAjax(noAction).click();
+        waitGui(webDriver);
+        noAction.click();
         assertEquals("Logged Out", isExpired.getText());
         guardAjax(noAction).click();
         assertEquals("Logged In", isExpired.getText());

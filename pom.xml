@@ -98,6 +98,26 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.0.0-M5</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <parallel>all</parallel>
+                        <threadCount>10</threadCount>
+                        <includes>
+                            <include>**</include>
+                        </includes>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>3.2.1</version>
                     <executions>

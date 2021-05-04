@@ -19,7 +19,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <payara.start.skip>false</payara.start.skip>
+        <payara.start.skip>${skipITs}</payara.start.skip>
+        <payara.version>5.2021.2</payara.version>
     </properties>
 
     <dependencies>
@@ -146,6 +147,32 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
             <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <overWrite>false</overWrite>
+                    <outputDirectory>${flowlogix.basedir}/target</outputDirectory>
+                    <markersDirectory>${flowlogix.basedir}/target/dependency-maven-plugin-markers</markersDirectory>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>fish.payara.distributions</groupId>
+                            <artifactId>payara</artifactId>
+                            <version>${payara.version}</version>
+                            <type>zip</type>
+                        </artifactItem>
+                    </artifactItems>
+                    <skip>${skipITs}</skip>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
@@ -214,7 +241,7 @@
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>3.0.0</version>
                     <configuration>
-                        <executable>asadmin</executable>
+                        <executable>${flowlogix.basedir}/target/payara5/bin/asadmin</executable>
                         <skip>${payara.start.skip}</skip>
                     </configuration>
                 </plugin>

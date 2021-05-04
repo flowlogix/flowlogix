@@ -30,7 +30,6 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
         <excludedGroups>Arquillian,UserInterface,StressTest</excludedGroups>
-        <main.basedir>${project.basedir}</main.basedir>
         <docs.phase>deploy</docs.phase>
     </properties>
 
@@ -71,6 +70,27 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.commonjava.maven.plugins</groupId>
+                <artifactId>directory-maven-plugin</artifactId>
+                <version>0.3.1</version>
+                <executions>
+                    <execution>
+                        <id>directories</id>
+                        <goals>
+                            <goal>directory-of</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <property>flowlogix.basedir</property>
+                            <project>
+                                <groupId>com.flowlogix</groupId>
+                                <artifactId>flowlogix</artifactId>
+                            </project>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 
@@ -255,9 +275,9 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <configLocation>${main.basedir}/checkstyle/checkstyle.xml</configLocation>
-                            <suppressionsLocation>${main.basedir}/checkstyle/suppressions.xml</suppressionsLocation>
-                            <headerLocation>${main.basedir}/checkstyle/ClassHeader.txt</headerLocation>
+                            <configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</configLocation>
+                            <suppressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</suppressionsLocation>
+                            <headerLocation>${flowlogix.basedir}/checkstyle/ClassHeader.txt</headerLocation>
                             <enableRSS>false</enableRSS>
                             <linkXRef>true</linkXRef>
                             <consoleOutput>true</consoleOutput>
@@ -265,7 +285,7 @@
                             <failOnViolation>true</failOnViolation>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
                             <enableRulesSummary>true</enableRulesSummary>
-                            <propertyExpansion>main.basedir=${main.basedir}</propertyExpansion>
+                            <propertyExpansion>flowlogix.basedir=${flowlogix.basedir}</propertyExpansion>
                         </configuration>
                         <dependencies>
                             <dependency>

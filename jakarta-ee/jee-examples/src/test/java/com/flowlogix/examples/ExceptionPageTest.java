@@ -30,7 +30,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -80,15 +79,10 @@ public class ExceptionPageTest {
     private WebElement modeField;
 
 
-    @BeforeEach
-    public void before() {
-        webDriver.get(baseURL + "exception-pages.xhtml");
-        waitGui(webDriver);
-    }
-
     @Test
     @OperateOnDeployment("DevMode")
-    public void closedByInterrupted() {
+    void closedByInterrupted() {
+        fetchExceptionPage();
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
@@ -99,12 +93,12 @@ public class ExceptionPageTest {
 
     @Test
     @OperateOnDeployment("DevMode")
-    public void invalidSession() {
+    void invalidSession() {
+        fetchExceptionPage();
         invalidateSession.click();
         waitGui(webDriver);
         webDriver.switchTo().alert().accept();
-        waitGui(webDriver);
-        noAction.click();
+        guardAjax(noAction).click();
         assertEquals("Logged Out", isExpired.getText());
         guardAjax(noAction).click();
         assertEquals("Logged In", isExpired.getText());
@@ -112,7 +106,8 @@ public class ExceptionPageTest {
 
     @Test
     @OperateOnDeployment("DevMode")
-    public void lateSqlThrow() {
+    void lateSqlThrow() {
+        fetchExceptionPage();
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
@@ -120,17 +115,19 @@ public class ExceptionPageTest {
 
     @Test
     @OperateOnDeployment("DevMode")
-    public void versionsOnDev() {
+    void versionsOnDev() {
+        fetchExceptionPage();
         versions("end of page");
     }
 
     @Test
     @OperateOnDeployment("ProdMode")
-    public void versionsOnProd() {
+    void versionsOnProd() {
+        fetchExceptionPage();
         versions("end of page - minimized");
     }
 
-    void versions(String expected) {
+    private void versions(String expected) {
         assertEquals(expected, endOfPage.getText());
         List<WebElement> scripts = webDriver.findElements(By.tagName("script"));
         int count = 0;
@@ -155,6 +152,11 @@ public class ExceptionPageTest {
             ++count;
         }
         assertEquals(1, count);
+    }
+
+    private void fetchExceptionPage() {
+        webDriver.get(baseURL + "exception-pages.xhtml");
+        waitGui(webDriver);
     }
 
     @Deployment(testable = false, name = "DevMode")

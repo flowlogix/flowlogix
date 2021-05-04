@@ -10,9 +10,9 @@
     <!-- parent is only present for testing profiles -->
     <parent>
         <groupId>com.flowlogix</groupId>
-        <artifactId>flowlogix</artifactId>
+        <artifactId>flowlogix-bom</artifactId>
         <version>4.0.2-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../../flowlogix-bom</relativePath>
     </parent>
 
     <properties>
@@ -257,13 +257,6 @@
                 <version>1.7.0.Alpha9</version>
                 <type>pom</type>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.flowlogix</groupId>
-                <artifactId>flowlogix-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian.extension</groupId>

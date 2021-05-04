@@ -14,8 +14,9 @@
 
     <parent>
         <groupId>com.flowlogix</groupId>
-        <artifactId>flowlogix</artifactId>
+        <artifactId>flowlogix-bom</artifactId>
         <version>4.0.2-SNAPSHOT</version>
+        <relativePath>../flowlogix-bom</relativePath>
     </parent>
 
     <properties>
@@ -144,7 +145,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <!-- test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -174,16 +175,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.flowlogix</groupId>
-                <artifactId>flowlogix-bom</artifactId>
-                <version>4.0.2-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>

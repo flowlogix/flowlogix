@@ -21,6 +21,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <payara.start.skip>${skipITs}</payara.start.skip>
         <payara.version>5.2021.2</payara.version>
+        <payara.domain.name>test-domain</payara.domain.name>
     </properties>
 
     <dependencies>
@@ -177,11 +178,26 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>create-domain</id>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <arguments>
+                                <argument>create-domain</argument>
+                                <argument>--nopassword</argument>
+                                <argument>${payara.domain.name}</argument>
+                            </arguments>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                    <execution>
                         <id>start-domain</id>
                         <phase>pre-integration-test</phase>
                         <configuration>
                             <arguments>
                                 <argument>start-domain</argument>
+                                <argument>${payara.domain.name}</argument>
                             </arguments>
                         </configuration>
                         <goals>
@@ -194,6 +210,20 @@
                         <configuration>
                             <arguments>
                                 <argument>stop-domain</argument>
+                                <argument>${payara.domain.name}</argument>
+                            </arguments>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>delete-domain</id>
+                        <phase>post-integration-test</phase>
+                        <configuration>
+                            <arguments>
+                                <argument>delete-domain</argument>
+                                <argument>${payara.domain.name}</argument>
                             </arguments>
                         </configuration>
                         <goals>

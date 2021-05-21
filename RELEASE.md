@@ -2,7 +2,8 @@
 
 # To deploy a release:
 mvn release:prepare # -DdryRun=true
-mvn release:perform # -DdryRun=truex
+
+mvn release:perform # -DdryRun=true
 
 # To deploy a snapshot
 mvn clean deploy

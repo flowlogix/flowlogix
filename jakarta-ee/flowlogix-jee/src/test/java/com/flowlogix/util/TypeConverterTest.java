@@ -18,7 +18,6 @@ package com.flowlogix.util;
 import java.sql.Time;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,7 +38,7 @@ public class TypeConverterTest {
 
     @Test
     void cornerCases() {
-        fail("hello");
+//        fail("hello");
         assertThrows(NullPointerException.class, () -> TypeConverter.valueOf(null, int.class));
         assertEquals(0, TypeConverter.valueOf("", Double.class));
         assertEquals(0, TypeConverter.valueOf("", double.class));

@@ -186,6 +186,7 @@
                                 <argument>--nopassword</argument>
                                 <argument>${payara.domain.name}</argument>
                             </arguments>
+                            <successCodes>0,1</successCodes>
                         </configuration>
                         <goals>
                             <goal>exec</goal>
@@ -210,19 +211,6 @@
                         <configuration>
                             <arguments>
                                 <argument>stop-domain</argument>
-                                <argument>${payara.domain.name}</argument>
-                            </arguments>
-                        </configuration>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>delete-domain</id>
-                        <phase>post-integration-test</phase>
-                        <configuration>
-                            <arguments>
-                                <argument>delete-domain</argument>
                                 <argument>${payara.domain.name}</argument>
                             </arguments>
                         </configuration>

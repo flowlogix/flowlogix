@@ -1,4 +1,4 @@
-# How to Deploy Flow Logix Library 
+# Deploy Flow Logix Library 
 
 # To deploy a release:
 mvn release:prepare # -DdryRun=true

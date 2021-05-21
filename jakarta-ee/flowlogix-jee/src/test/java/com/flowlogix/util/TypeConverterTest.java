@@ -38,7 +38,7 @@ public class TypeConverterTest {
 
     @Test
     void cornerCases() {
-        fail("hello");
+//        fail("hello");
         assertThrows(NullPointerException.class, () -> TypeConverter.valueOf(null, int.class));
         assertEquals(0, TypeConverter.valueOf("", Double.class));
         assertEquals(0, TypeConverter.valueOf("", double.class));

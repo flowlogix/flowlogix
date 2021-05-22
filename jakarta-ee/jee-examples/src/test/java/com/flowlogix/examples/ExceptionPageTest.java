@@ -15,7 +15,6 @@
  */
 package com.flowlogix.examples;
 
-import io.github.artsok.RepeatedIfExceptionsTest;
 import java.net.URL;
 import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
@@ -23,6 +22,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
+import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -98,13 +98,13 @@ public class ExceptionPageTest {
         assertEquals("", webDriver.findElement(By.tagName("body")).getText());
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @Test
     @OperateOnDeployment("DevMode")
     void invalidSession() {
         invalidateSession.click();
         waitGui(webDriver);
         webDriver.switchTo().alert().accept();
-        guardAjax(noAction).click();
+        waitForHttp(noAction).click();
         assertEquals("Logged Out", isExpired.getText());
         guardAjax(noAction).click();
         assertEquals("Logged In", isExpired.getText());

@@ -98,7 +98,6 @@ public class ExceptionPageTest {
         assertEquals("", webDriver.findElement(By.tagName("body")).getText());
     }
 
-    @Test
     @RepeatedIfExceptionsTest(repeats = 3)
     @OperateOnDeployment("DevMode")
     void invalidSession() {

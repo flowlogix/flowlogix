@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples;
 
+import io.github.artsok.RepeatedIfExceptionsTest;
 import java.net.URL;
 import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
@@ -34,7 +35,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.RetryingTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -98,7 +98,8 @@ public class ExceptionPageTest {
         assertEquals("", webDriver.findElement(By.tagName("body")).getText());
     }
 
-    @RetryingTest(3)
+    @Test
+    @RepeatedIfExceptionsTest(repeats = 3)
     @OperateOnDeployment("DevMode")
     void invalidSession() {
         invalidateSession.click();

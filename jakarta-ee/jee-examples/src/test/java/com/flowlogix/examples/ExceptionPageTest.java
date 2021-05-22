@@ -30,6 +30,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,10 +80,15 @@ public class ExceptionPageTest {
     private WebElement modeField;
 
 
+    @BeforeEach
+    void fetchExceptionPage() {
+        webDriver.get(baseURL + "exception-pages.xhtml");
+        waitGui(webDriver);
+    }
+
     @Test
     @OperateOnDeployment("DevMode")
     void closedByInterrupted() {
-        fetchExceptionPage();
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
@@ -94,7 +100,6 @@ public class ExceptionPageTest {
     @Test
     @OperateOnDeployment("DevMode")
     void invalidSession() {
-        fetchExceptionPage();
         invalidateSession.click();
         waitGui(webDriver);
         webDriver.switchTo().alert().accept();
@@ -107,7 +112,6 @@ public class ExceptionPageTest {
     @Test
     @OperateOnDeployment("DevMode")
     void lateSqlThrow() {
-        fetchExceptionPage();
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
@@ -116,14 +120,12 @@ public class ExceptionPageTest {
     @Test
     @OperateOnDeployment("DevMode")
     void versionsOnDev() {
-        fetchExceptionPage();
         versions("end of page");
     }
 
     @Test
     @OperateOnDeployment("ProdMode")
     void versionsOnProd() {
-        fetchExceptionPage();
         versions("end of page - minimized");
     }
 
@@ -152,11 +154,6 @@ public class ExceptionPageTest {
             ++count;
         }
         assertEquals(1, count);
-    }
-
-    private void fetchExceptionPage() {
-        webDriver.get(baseURL + "exception-pages.xhtml");
-        waitGui(webDriver);
     }
 
     @Deployment(testable = false, name = "DevMode")

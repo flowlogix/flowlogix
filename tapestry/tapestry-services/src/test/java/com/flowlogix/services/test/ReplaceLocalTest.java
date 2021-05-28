@@ -14,7 +14,7 @@ import org.omnifaces.util.JNDI;
  *
  * @author lprimak
  */
-public class ReplaceLocalTests
+public class ReplaceLocalTest
 {
     @Test
     public void stripLocal()

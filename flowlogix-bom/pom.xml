@@ -5,19 +5,19 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix-bom</artifactId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.x-SNAPSHOT</version>
     <name>FlowLogix Bill of Materials</name>
     <packaging>pom</packaging>
 
     <properties>
         <slf4j.version>1.7.30</slf4j.version>
-        <junit.version>5.7.0</junit.version>
+        <junit.version>5.7.2</junit.version>
     </properties>
 
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix</artifactId>
-        <version>4.0.1-SNAPSHOT</version>
+        <version>4.x-SNAPSHOT</version>
     </parent>
 
     <dependencyManagement>
@@ -44,13 +44,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
-                <version>3.6.28</version>
+                <version>3.10.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-inline</artifactId>
-                <version>3.6.28</version>
+                <version>3.10.0</version>
                 <scope>test</scope>
             </dependency>
 
@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>org.omnifaces</groupId>
                 <artifactId>omnifaces</artifactId>
-                <version>3.9</version>
+                <version>3.10.1</version>
             </dependency>
             <dependency>
                 <groupId>org.primefaces</groupId>
@@ -68,12 +68,13 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.11</version>
+                <version>3.12.0</version>
             </dependency>
             <dependency>
                 <groupId>javax</groupId>
                 <artifactId>javaee-api</artifactId>
                 <version>8.0.1</version>
+                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <artifactId>activation</artifactId>
@@ -86,9 +87,21 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
+                <version>1.2.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>2.3.3</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.12</version>
+                <version>1.18.20</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -99,18 +112,18 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>3.0.7</version>
+                <version>3.0.8</version>
                 <classifier>indy</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
-                <version>1.7.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-web</artifactId>
-                <version>1.7.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

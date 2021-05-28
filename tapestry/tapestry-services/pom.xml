@@ -3,7 +3,7 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix-tapestry</artifactId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.x-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Flow Logix Tapestry Services</name>
@@ -13,7 +13,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>tapestry</artifactId>
-        <version>4.0.1-SNAPSHOT</version>
+        <version>4.x-SNAPSHOT</version>
     </parent>
 
     <build>

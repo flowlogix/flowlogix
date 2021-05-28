@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.x-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Utility Library Root POM</description>
@@ -28,8 +28,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <excludedGroups>Arquillian,UserInterface,StressTest</excludedGroups>
-        <main.basedir>${project.basedir}</main.basedir>
+        <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
+        <docs.phase>deploy</docs.phase>
+        <payara.start.skip>${skipITs}</payara.start.skip>
+        <auto.release>true</auto.release>
     </properties>
 
     <modules>
@@ -60,12 +62,111 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.commonjava.maven.plugins</groupId>
+                <artifactId>directory-maven-plugin</artifactId>
+                <version>0.3.1</version>
+                <executions>
+                    <execution>
+                        <id>directories</id>
+                        <goals>
+                            <goal>directory-of</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <property>flowlogix.basedir</property>
+                            <project>
+                                <groupId>com.flowlogix</groupId>
+                                <artifactId>flowlogix</artifactId>
+                            </project>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>1.12.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-all</artifactId>
+                        <version>3.0.8</version>
+                        <scope>runtime</scope>
+                        <type>pom</type>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>testGroups</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <!-- combine individual test profiles into a single test group property -->
+                                <script>
+                                    <![CDATA[
+                                    def groups = System.getProperty 'maven.test.property.profiles'
+                                    if (!groups) {
+                                        groups = 'none(),'
+                                        (project.activeProfiles).each{ profile ->
+                                            def test_group = profile.properties.test_groups
+                                            if (test_group) {
+                                                groups += test_group + ","
+                                            }
+                                        }
+                                        project.properties.groups = groups.substring(0, groups.length() - 1)
+                                        System.setProperty 'maven.test.property.profiles', project.properties.groups
+                                    } else {
+                                        project.properties.groups = groups
+                                    }
+                                    ]]>
+                                </script>
+                            </scripts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.soebes.maven.plugins</groupId>
+                <artifactId>echo-maven-plugin</artifactId>
+                <version>0.4.0</version>
+                <executions>
+                    <execution>
+                        <id>echo test groups</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>echo</goal>
+                        </goals>
+                        <configuration>
+                            <echos>
+                                <echo>Test Groups (Tags): ${groups}</echo>
+                            </echos>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-maven-plugin</artifactId>
+            </plugin>
         </plugins>
 
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
                     <configuration>
@@ -76,24 +177,37 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M5</version>
                     <configuration>
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
-                        <includes>
-                            <include>**</include>
-                        </includes>
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.0.0-M5</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <parallel>all</parallel>
+                        <threadCount>10</threadCount>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>3.2.1</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
+                            <phase>${docs.phase}</phase>
                             <goals>
                                 <goal>jar-no-fork</goal>
                             </goals>
@@ -101,16 +215,17 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <doclint>all,-reference</doclint>
                         <overview>${project.basedir}/src/main/java/overview.html</overview>
+                        <sourcepath>${project.build.directory}/generated-sources/delombok</sourcepath>
                     </configuration>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
+                            <phase>${docs.phase}</phase>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
@@ -118,12 +233,45 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok-maven-plugin</artifactId>
+                    <version>1.18.20.0</version>
+                    <configuration>
+                        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                        <addOutputDirectory>false</addOutputDirectory>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>delombok</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>default-deploy</id>
+                            <phase>none</phase>
+                        </execution>
+                        <execution>
+                            <id>deploy</id>
+                            <goals>
+                                <goal>deploy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.0-M1</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <releaseProfiles>release-flowlogix-prod,generate-docs</releaseProfiles>
-                        <goals>deploy</goals>
+                        <pushChanges>false</pushChanges>
+                        <localCheckout>true</localCheckout>
+                        <preparationGoals>validate</preparationGoals>
+                        <releaseProfiles>release-flowlogix-prod</releaseProfiles>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>
                     </configuration>
                 </plugin>
@@ -133,15 +281,18 @@
                     <version>1.6.8</version>
                     <extensions>true</extensions>
                     <configuration>
-                        <serverId>sonatype-nexus-staging</serverId>
+                        <serverId>flowlogix-maven-central</serverId>
                         <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                        <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        <autoReleaseAfterClose>${auto.release}</autoReleaseAfterClose>
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>3.0.1</version>
+                    <configuration>
+                        <keyname>${gpg.keyname}</keyname>
+                        <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
@@ -158,37 +309,27 @@
 
     <profiles>
         <profile>
-            <id>arq-test</id>
+            <id>payara-server-remote</id>
             <properties>
-                <groups>Arquillian</groups>
-                <excludedGroups>StressTest</excludedGroups>
+                <payara.start.skip>true</payara.start.skip>
             </properties>
         </profile>
         <profile>
             <id>stress-test</id>
             <properties>
-                <groups>StressTest</groups>
-                <excludedGroups>Arquillian,UserInterface</excludedGroups>
-            </properties>
-        </profile>
-        <profile>
-            <id>arq-stress-test</id>
-            <properties>
-                <groups>Arquillian</groups>
-                <excludedGroups/>
+                <test_groups>StressTest</test_groups>
             </properties>
         </profile>
         <profile>
             <id>ui-test</id>
             <properties>
-                <groups>UserInterface</groups>
-                <excludedGroups/>
+                <test_groups>UserInterface</test_groups>
             </properties>
         </profile>
         <profile>
             <id>all-tests</id>
             <properties>
-                <excludedGroups/>
+                <test_groups>any()</test_groups>
             </properties>
         </profile>
         <profile>
@@ -198,7 +339,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-checkstyle-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>3.1.2</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
@@ -208,9 +349,9 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <configLocation>${main.basedir}/checkstyle/checkstyle.xml</configLocation>
-                            <suppressionsLocation>${main.basedir}/checkstyle/suppressions.xml</suppressionsLocation>
-                            <headerLocation>${main.basedir}/checkstyle/ClassHeader.txt</headerLocation>
+                            <configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</configLocation>
+                            <suppressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</suppressionsLocation>
+                            <headerLocation>${flowlogix.basedir}/checkstyle/ClassHeader.txt</headerLocation>
                             <enableRSS>false</enableRSS>
                             <linkXRef>true</linkXRef>
                             <consoleOutput>true</consoleOutput>
@@ -218,7 +359,7 @@
                             <failOnViolation>true</failOnViolation>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
                             <enableRulesSummary>true</enableRulesSummary>
-                            <propertyExpansion>main.basedir=${main.basedir}</propertyExpansion>
+                            <propertyExpansion>flowlogix.basedir=${flowlogix.basedir}</propertyExpansion>
                         </configuration>
                         <dependencies>
                             <dependency>
@@ -232,22 +373,10 @@
             </build>
         </profile>
         <profile>
-            <id>generate-docs</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>release-flowlogix-prod</id>
+            <properties>
+                <docs.phase>package</docs.phase>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -255,7 +384,6 @@
                         <artifactId>nexus-staging-maven-plugin</artifactId>
                     </plugin>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
                 </plugins>
@@ -265,14 +393,18 @@
 
     <scm>
         <url>https://github.com/flowlogix/flowlogix</url>
-        <connection>scm:git:https://github.com/flowlogix/flowlogix.git</connection>
-        <developerConnection>scm:git:https://github.com/flowlogix/flowlogix.git</developerConnection>
+        <connection>scm:git:git@github.com:flowlogix/flowlogix.git</connection>
+        <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
+        <repository>
+            <id>flowlogix-maven-central</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
         <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
+            <id>flowlogix-maven-central</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>

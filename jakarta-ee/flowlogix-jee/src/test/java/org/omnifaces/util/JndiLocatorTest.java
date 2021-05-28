@@ -216,7 +216,7 @@ public class JndiLocatorTest {
     @Tag("StressTest")
     @SuppressWarnings("checkstyle:MagicNumber")
     void stressTest() throws InterruptedException, NamingException {
-        int numThreads = 500;
+        int numThreads = 50 * Runtime.getRuntime().availableProcessors();
         int numIterations = 10000;
         AtomicBoolean failed = new AtomicBoolean();
         AtomicLong maxCached = new AtomicLong();

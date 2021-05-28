@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author lprimak
  */
-public class PrincipalSerializationTests
+public class PrincipalSerializationTest
 {
     @Test
     public void serializer()

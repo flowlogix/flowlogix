@@ -22,6 +22,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
+import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -45,7 +46,7 @@ import org.openqa.selenium.support.FindBy;
  */
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
-public class ExceptionPageTest {
+public class ExceptionPageIT {
     @Drone
     private WebDriver webDriver;
 
@@ -81,14 +82,14 @@ public class ExceptionPageTest {
 
 
     @BeforeEach
-    public void before() {
+    void fetchExceptionPage() {
         webDriver.get(baseURL + "exception-pages.xhtml");
         waitGui(webDriver);
     }
 
     @Test
     @OperateOnDeployment("DevMode")
-    public void closedByInterrupted() {
+    void closedByInterrupted() {
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
@@ -99,11 +100,11 @@ public class ExceptionPageTest {
 
     @Test
     @OperateOnDeployment("DevMode")
-    public void invalidSession() {
+    void invalidSession() {
         invalidateSession.click();
         waitGui(webDriver);
         webDriver.switchTo().alert().accept();
-        guardAjax(noAction).click();
+        waitForHttp(noAction).click();
         assertEquals("Logged Out", isExpired.getText());
         guardAjax(noAction).click();
         assertEquals("Logged In", isExpired.getText());
@@ -111,7 +112,7 @@ public class ExceptionPageTest {
 
     @Test
     @OperateOnDeployment("DevMode")
-    public void lateSqlThrow() {
+    void lateSqlThrow() {
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
@@ -119,17 +120,17 @@ public class ExceptionPageTest {
 
     @Test
     @OperateOnDeployment("DevMode")
-    public void versionsOnDev() {
+    void versionsOnDev() {
         versions("end of page");
     }
 
     @Test
     @OperateOnDeployment("ProdMode")
-    public void versionsOnProd() {
+    void versionsOnProd() {
         versions("end of page - minimized");
     }
 
-    void versions(String expected) {
+    private void versions(String expected) {
         assertEquals(expected, endOfPage.getText());
         List<WebElement> scripts = webDriver.findElements(By.tagName("script"));
         int count = 0;

@@ -34,8 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @author lprimak
  */
 @ExtendWith(ArquillianExtension.class)
-@Tag("Arquillian")
-public class LookupTest {
+public class LookupIT {
     private JndiExample example;
 
 
@@ -64,7 +63,8 @@ public class LookupTest {
     @Timeout(10)
     @Tag("StressTest")
     public void stressTest() throws InterruptedException {
-        ExecutorService exec = Executors.newFixedThreadPool(500);
+        ExecutorService exec = Executors.newFixedThreadPool(50 *
+                Runtime.getRuntime().availableProcessors());
         AtomicBoolean failed = new AtomicBoolean();
         IntStream.rangeClosed(1, 10000).forEach(ii -> exec.submit(() -> {
             try {
@@ -93,6 +93,7 @@ public class LookupTest {
                 .deletePackages(true, "com.flowlogix.examples.entities")
                 .deletePackages(true, "com.flowlogix.examples.ui")
                 .deletePackages(true, "com.flowlogix.logcapture")
-                .deleteClass(ExceptionPageTest.class);
+                .deletePackages(true, "org.omnifaces.persistence")
+                .deleteClass(ExceptionPageIT.class);
     }
 }

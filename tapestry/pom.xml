@@ -20,7 +20,7 @@
     </parent>
 
     <properties>
-        <tap.version>5.6.1</tap.version>
+        <tap.version>5.6.3</tap.version>
     </properties>
 
     <dependencies>

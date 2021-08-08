@@ -8,15 +8,15 @@
   * Utilities (String / Object Type Converter, Stream reader)
   * Apache Shiro / Jakarta EE integration
 
-<h2>News</h2>
-<ul>
- <li>
-    4/30/2021: Version 4.0.1 has been released
- <li>
-  12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel
-<br> Major refactor and contributed many EE and JSF modules to <a href="https://omnifaces.org">OmniFaces</a>
- </li>
- </ul>
+## Maven Central Coordinates ##
+Releases are available [Here](https://search.maven.org/search?q=g:com.flowlogix)  
+Snapshots are automatically released by Jenkins for the current head: `https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/`
+
+## News ##
+- 7/31/2021: Version 4.0.3 has been released
+- 4/30/2021: Version 4.0.1 has been released
+- 12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel  
+Major refactor and contributed many EE and JSF modules to [OmniFaces](https://omnifaces.org)
 
 ## Deprecated Projects ##
   * [Flow Logix Tapestry Library](wiki/TapestryLibrary)  

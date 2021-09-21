@@ -11,7 +11,7 @@
 
     <properties>
         <slf4j.version>1.7.32</slf4j.version>
-        <junit.version>5.7.2</junit.version>
+        <junit.version>5.8.0</junit.version>
     </properties>
 
     <parent>
@@ -44,13 +44,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
-                <version>3.11.2</version>
+                <version>3.12.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-inline</artifactId>
-                <version>3.11.2</version>
+                <version>3.12.4</version>
                 <scope>test</scope>
             </dependency>
 
@@ -112,18 +112,18 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>3.0.8</version>
+                <version>3.0.9</version>
                 <classifier>indy</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-web</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

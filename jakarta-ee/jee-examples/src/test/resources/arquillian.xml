@@ -15,4 +15,12 @@
 	<extension qualifier="webdriver">
 		<property name="browser">chromeheadless</property>
 	</extension>
+    <container qualifier="payara-docker">
+        <configuration>
+            <property name="adminHttps">true</property>
+            <property name="ignoreCertificates">true</property>
+            <property name="adminUser">admin</property>
+            <property name="adminPassword">admin</property>
+        </configuration>
+    </container>
 </arquillian>

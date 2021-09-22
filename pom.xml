@@ -199,6 +199,9 @@
                     <configuration>
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
+                        <systemPropertyVariables>
+                            <arquillian.launch>${arquillian.launch}</arquillian.launch>
+                        </systemPropertyVariables>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -312,6 +315,13 @@
             <id>payara-server-remote</id>
             <properties>
                 <payara.start.skip>true</payara.start.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>payara-docker</id>
+            <properties>
+                <payara.start.skip>true</payara.start.skip>
+                <arquillian.launch>payara-docker</arquillian.launch>
             </properties>
         </profile>
         <profile>

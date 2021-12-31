@@ -100,7 +100,7 @@
                     <dependency>
                         <groupId>org.codehaus.groovy</groupId>
                         <artifactId>groovy-all</artifactId>
-                        <version>3.0.8</version>
+                        <version>3.0.9</version>
                         <scope>runtime</scope>
                         <type>pom</type>
                     </dependency>

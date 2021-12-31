@@ -44,13 +44,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
-                <version>3.12.4</version>
+                <version>4.2.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-inline</artifactId>
-                <version>3.12.4</version>
+                <version>4.2.0</version>
                 <scope>test</scope>
             </dependency>
 
@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>org.omnifaces</groupId>
                 <artifactId>omnifaces</artifactId>
-                <version>3.11.1</version>
+                <version>3.12</version>
             </dependency>
             <dependency>
                 <groupId>org.primefaces</groupId>
@@ -101,7 +101,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.20</version>
+                <version>1.18.22</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>

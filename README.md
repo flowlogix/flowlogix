@@ -6,13 +6,14 @@
   * Jakarta EE DAO Helper
   * Jakarta EE JSF JavaScript Minimized resource handler
   * Utilities (String / Object Type Converter, Stream reader)
-  * Apache Shiro / Jakarta EE integration
 
 ## Maven Central Coordinates ##
 Releases are available [Here](https://search.maven.org/search?q=g:com.flowlogix)  
 Snapshots are automatically released by Jenkins for the current head: `https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/`
 
-## News ##
+## News #
+
+- 1/3/2022: Version 4.0.6 has been released
 - 9/21/2021: Version 4.0.4 has been released
 - 7/31/2021: Version 4.0.3 has been released
 - 4/30/2021: Version 4.0.1 has been released

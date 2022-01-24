@@ -8,8 +8,8 @@
   * Utilities (String / Object Type Converter, Stream reader)
 
 ## Maven Central Coordinates ##
-Releases are available [Here](https://search.maven.org/search?q=g:com.flowlogix)  
-Snapshots are automatically released by Jenkins for the current head: `https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/`
+Releases are available on [Maven Central](https://search.maven.org/search?q=g:com.flowlogix)  
+[Maven Snapshots](https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/) are automatically released by Jenkins for the current head
 
 ## News ##
 

@@ -141,7 +141,7 @@
             <plugin>
                 <groupId>com.soebes.maven.plugins</groupId>
                 <artifactId>echo-maven-plugin</artifactId>
-                <version>0.4.0</version>
+                <version>0.5.0</version>
                 <executions>
                     <execution>
                         <id>echo test groups</id>

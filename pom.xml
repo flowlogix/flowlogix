@@ -200,7 +200,7 @@
                         <threadCount>10</threadCount>
                         <systemPropertyVariables>
                             <arquillian.launch>${arquillian.launch}</arquillian.launch>
-                            <webdriver.chrome.driver>${chromedriver.path}</webdriver.chrome.driver>
+                            <webdriver.chrome.driver>${webdriver.chrome.driver}</webdriver.chrome.driver>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

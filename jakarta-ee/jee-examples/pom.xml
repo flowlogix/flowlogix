@@ -24,8 +24,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <chrome.path/>
-        <chromedriver.path/>
+        <chrome.path>none</chrome.path>
+        <chromedriver.path>none</chromedriver.path>
     </properties>
 
     <dependencies>

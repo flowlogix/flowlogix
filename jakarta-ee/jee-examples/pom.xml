@@ -23,6 +23,9 @@
         <!-- Unfortunately ShrinkWrap only understands the older compiler source / target flags -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
+        <chrome.path/>
+        <chromedriver.path/>
     </properties>
 
     <dependencies>

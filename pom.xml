@@ -201,6 +201,7 @@
                         <systemPropertyVariables>
                             <arquillian.launch>${arquillian.launch}</arquillian.launch>
                             <webdriver.chrome.driver>${webdriver.chrome.driver}</webdriver.chrome.driver>
+                            <webdriver.gecko.driver>${webdriver.gecko.driver}</webdriver.gecko.driver>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

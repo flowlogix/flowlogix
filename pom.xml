@@ -31,6 +31,7 @@
         <docs.phase>deploy</docs.phase>
         <payara.start.skip>${skipITs}</payara.start.skip>
         <auto.release>true</auto.release>
+        <webdriver.browser>chromeheadless</webdriver.browser>
     </properties>
 
     <modules>
@@ -200,7 +201,9 @@
                         <threadCount>10</threadCount>
                         <systemPropertyVariables>
                             <arquillian.launch>${arquillian.launch}</arquillian.launch>
+                            <webdriver.browser>${webdriver.browser}</webdriver.browser>
                             <webdriver.chrome.driver>${webdriver.chrome.driver}</webdriver.chrome.driver>
+                            <webdriver.chrome.binary>${webdriver.chrome.binary}</webdriver.chrome.binary>
                             <webdriver.gecko.driver>${webdriver.gecko.driver}</webdriver.gecko.driver>
                         </systemPropertyVariables>
                     </configuration>

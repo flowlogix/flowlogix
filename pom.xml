@@ -99,9 +99,9 @@
                 <version>1.13.1</version>
                 <dependencies>
                     <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
+                        <groupId>org.apache.groovy</groupId>
                         <artifactId>groovy-all</artifactId>
-                        <version>3.0.10</version>
+                        <version>4.0.0</version>
                         <scope>runtime</scope>
                         <type>pom</type>
                     </dependency>

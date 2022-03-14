@@ -17,7 +17,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <payara.version>5.2022.1</payara.version>
 
         <maven.compiler.release>8</maven.compiler.release>
         <!-- Unfortunately ShrinkWrap only understands the older compiler source / target flags -->
@@ -154,18 +153,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <overWrite>false</overWrite>
                     <outputDirectory>${flowlogix.basedir}/target</outputDirectory>
                     <markersDirectory>${flowlogix.basedir}/target/dependency-maven-plugin-markers</markersDirectory>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>fish.payara.distributions</groupId>
-                            <artifactId>payara</artifactId>
-                            <version>${payara.version}</version>
-                            <type>zip</type>
-                        </artifactItem>
-                    </artifactItems>
-                    <skip>${payara.start.skip}</skip>
                 </configuration>
             </plugin>
             <plugin>

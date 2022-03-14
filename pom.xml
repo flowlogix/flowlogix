@@ -32,6 +32,7 @@
         <payara.start.skip>${skipITs}</payara.start.skip>
         <auto.release>true</auto.release>
         <webdriver.browser>chromeheadless</webdriver.browser>
+        <payara.version>5.2022.1</payara.version>
     </properties>
 
     <modules>
@@ -259,6 +260,18 @@
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.2.0</version>
+                    <configuration>
+                        <overWrite>false</overWrite>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>fish.payara.distributions</groupId>
+                                <artifactId>payara</artifactId>
+                                <version>${payara.version}</version>
+                                <type>zip</type>
+                            </artifactItem>
+                        </artifactItems>
+                        <skip>${payara.start.skip}</skip>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>

@@ -13,10 +13,8 @@ Releases are available on [Maven Central](https://search.maven.org/search?q=g:co
 
 ## News ##
 
+- 3/15/2022: Version 4.0.7 has been released. Java 8 through 18 compatible.
 - 1/3/2022: Version 4.0.6 has been released
-- 9/21/2021: Version 4.0.4 has been released
-- 7/31/2021: Version 4.0.3 has been released
-- 4/30/2021: Version 4.0.1 has been released
 - 12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel  
 Major refactor and contributed many EE and JSF modules to [OmniFaces](https://omnifaces.org)
 

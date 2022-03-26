@@ -111,10 +111,9 @@
                 <version>3.0.2</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>3.0.9</version>
-                <classifier>indy</classifier>
+                <version>4.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>

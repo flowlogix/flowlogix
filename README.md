@@ -27,3 +27,4 @@ This library is what you would write while developing Tapestry 5 applications.<b
 a.k.a 'Web Stuff'</li></ul>
 test 5
 additional 5.1
+additional 5.2

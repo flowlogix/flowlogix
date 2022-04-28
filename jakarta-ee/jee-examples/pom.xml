@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-            <version>3.1.0-M1</version>
+            <version>4.0.0-M3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -33,6 +33,7 @@
         <auto.release>true</auto.release>
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>5.2022.2</payara.version>
+        <groovy.version>4.0.2</groovy.version>
     </properties>
 
     <modules>
@@ -102,7 +103,7 @@
                     <dependency>
                         <groupId>org.apache.groovy</groupId>
                         <artifactId>groovy-all</artifactId>
-                        <version>4.0.2</version>
+                        <version>${groovy.version}</version>
                         <scope>runtime</scope>
                         <type>pom</type>
                     </dependency>

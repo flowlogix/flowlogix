@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>tapestry</artifactId>
-    <version>4.x-SNAPSHOT</version>
+    <version>4.0.8</version>
     <packaging>pom</packaging>
     <name>Tapestry sub-module</name>
     <description>Flow Logix Tapestry Root</description>
@@ -15,7 +15,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix-bom</artifactId>
-        <version>4.x-SNAPSHOT</version>
+        <version>4.0.8</version>
         <relativePath>../flowlogix-bom</relativePath>
     </parent>
 
@@ -175,4 +175,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>Version-4.0.8</tag>
+  </scm>
 </project>

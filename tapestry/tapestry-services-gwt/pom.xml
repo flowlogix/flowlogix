@@ -12,7 +12,7 @@
     <url>http://code.google.com/p/flowlogix</url>
 
     <properties>
-        <gwt.version>2.9.0</gwt.version>
+        <gwt.version>2.10.0</gwt.version>
     </properties>
 
     <parent>

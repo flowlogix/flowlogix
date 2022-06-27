@@ -20,9 +20,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.naming.InitialContext;
@@ -238,7 +242,10 @@ public class JndiLocatorTest {
             assertTrue(locator.getJNDIObjectCache().isEmpty(), "cache should be empty");
         }
         ExecutorService exec = Executors.newFixedThreadPool(numThreads);
+        Set<Thread> runningThreads = Collections.newSetFromMap(new ConcurrentHashMap<Thread, Boolean>());
+
         IntStream.rangeClosed(0, numIterations).forEach(ii -> exec.submit(() -> {
+            runningThreads.add(Thread.currentThread());
             try {
                 assertEquals(result, locator.getObjectNoCache("hello"));
                 maxCached.accumulateAndGet(locator.getJNDIObjectCache().keySet().stream().count(), Math::max);
@@ -252,10 +259,21 @@ public class JndiLocatorTest {
             } catch (Throwable thr) {
                 failed.set(true);
                 throw Lombok.sneakyThrow(thr);
+            } finally {
+                runningThreads.remove(Thread.currentThread());
             }
         }));
         exec.shutdown();
-        assertTrue(exec.awaitTermination(10, TimeUnit.SECONDS), "timed out waiting for result");
+        boolean isShutdownCompleted = exec.awaitTermination(10, TimeUnit.SECONDS);
+        assertEquals(isShutdownCompleted, runningThreads.isEmpty(), "completed but outstanding threads remain");
+        if (!isShutdownCompleted) {
+            System.out.printf("Unfinished threads: %d\n", runningThreads.size());
+            for (Thread thr : runningThreads) {
+                System.out.printf("\nStack Dump for Thread %d\n", thr.getId());
+                Stream.of(thr.getStackTrace()).forEach(System.out::println);
+            }
+        }
+        assertTrue(isShutdownCompleted, "timed out waiting for result");
         assertFalse(failed.get(), "somthing went wrong with stress test");
         assertEquals(2, maxCached.get());
         assertTrue(numInvocations.get() > numIterations * 1.5, "too few invocations");

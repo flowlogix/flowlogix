@@ -8,18 +8,19 @@
   * Utilities (String / Object Type Converter, Stream reader)
 
 ## Maven Central Coordinates ##
-Releases are available on [Maven Central](https://search.maven.org/search?q=g:com.flowlogix)  
+Releases are available on [Maven Central](https://search.maven.org/search?q=g:com.flowlogix)
 [Maven Snapshots](https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/) are automatically released by Jenkins for the current head
 
 ## News ##
-
+- 7/16/2022: Moving on to 5.x with Java 17 being the minimum default
+- 7/16/2022: Version 4.0.9 has been released.
 - 3/15/2022: Version 4.0.7 has been released. Java 8 through 18 compatible.
 - 1/3/2022: Version 4.0.6 has been released
-- 12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel  
+- 12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel
 Major refactor and contributed many EE and JSF modules to [OmniFaces](https://omnifaces.org)
 
-## Deprecated Projects ##
-  * [Flow Logix Tapestry Library](wiki/TapestryLibrary)  
+## Deprecated Projects (up to 4.x only) ##
+  * [Flow Logix Tapestry Library](wiki/TapestryLibrary)
 What is [Flow Logix Tapestry Library](wiki/TapestryLibrary)? <br>
 Makes Tapestry work easily with JEE/EJBs, GWT, Shiro Security and JEE Servers like Glassfish.<br>
 While writing applications in Tapestry, the common components were itching to be housed in it's own library. This is it.<br>

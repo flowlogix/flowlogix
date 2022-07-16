@@ -23,6 +23,7 @@ import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.omnifaces.persistence.model.BaseEntity;
 
@@ -32,6 +33,7 @@ import org.omnifaces.persistence.model.BaseEntity;
  */
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -32,7 +32,7 @@
         <payara.start.skip>${skipITs}</payara.start.skip>
         <auto.release>true</auto.release>
         <webdriver.browser>chromeheadless</webdriver.browser>
-        <payara.version>5.2022.2</payara.version>
+        <payara.version>5.2022.2-lp1</payara.version>
         <groovy.version>4.0.3</groovy.version>
     </properties>
 

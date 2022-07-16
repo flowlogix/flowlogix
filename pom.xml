@@ -39,7 +39,6 @@
     <modules>
         <module>flowlogix-bom</module>
         <module>jakarta-ee</module>
-        <module>tapestry</module>
     </modules>
 
     <build>

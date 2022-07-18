@@ -18,6 +18,7 @@ package com.flowlogix.shiro.ee.internal.aop;
 /**
  * Enhanced from Tynamo Security
  */
+@FunctionalInterface
 public interface SecurityInterceptor
 {
     /**

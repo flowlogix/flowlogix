@@ -59,15 +59,7 @@ public class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
     }
 
 
-    interface Exclusions
-    {
-        boolean isAnnotationPresent(Class<? extends Annotation> annotationType);
-        boolean getAnnotations();
-    }
-
-
     private abstract class AT implements AnnotatedType<T> { }
-    private final @Delegate(types = { AT.class, Annotated.class },
-            excludes = Exclusions.class) AnnotatedType<T> wrapped;
+    private final @Delegate(types = { AT.class, Annotated.class }) AnnotatedType<T> wrapped;
     private final @Getter Set<Annotation> annotations;
 }

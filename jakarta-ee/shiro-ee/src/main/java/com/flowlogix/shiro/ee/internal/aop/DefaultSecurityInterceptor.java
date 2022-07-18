@@ -24,10 +24,10 @@ import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
  * Enhanced from Tynamo Security
  */
 @RequiredArgsConstructor
-class DefaultSecurityInterceptor implements SecurityInterceptor 
+class DefaultSecurityInterceptor implements SecurityInterceptor
 {
     private final AuthorizingAnnotationHandler handler;
-    private @Getter final Annotation annotation;
+    private final @Getter Annotation annotation;
 
     /**
      * Initialize {@link #handler} field use annotation.
@@ -38,11 +38,10 @@ class DefaultSecurityInterceptor implements SecurityInterceptor
     public DefaultSecurityInterceptor(Annotation annotation) {
 
         this.annotation = annotation;
-        AuthorizingAnnotationHandler _handler = AopHelper.createHandler(annotation);
-        if (_handler == null) {
+        this.handler = AopHelper.createHandler(annotation);
+        if (handler == null) {
             throw new IllegalStateException("No handler for " + annotation + "annotation");
         }
-        this.handler = _handler;
     }
 
     /* (non-Javadoc)

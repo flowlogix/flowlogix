@@ -74,13 +74,13 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
     }
 
 
-    private void addScope(@Observes final BeforeBeanDiscovery event)
+    void addScope(@Observes final BeforeBeanDiscovery event)
     {
         contexts.forEach(ctx -> event.addScope(ctx.getScope(), true, true));
     }
 
 
-    private void registerContext(@Observes final AfterBeanDiscovery event)
+    void registerContext(@Observes final AfterBeanDiscovery event)
     {
         contexts.forEach(ctx -> event.addContext(ctx));
     }

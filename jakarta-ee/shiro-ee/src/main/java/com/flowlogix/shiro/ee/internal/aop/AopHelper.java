@@ -21,12 +21,20 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import lombok.SneakyThrows;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.authz.annotation.RequiresUser;
+import org.apache.shiro.authz.aop.AuthenticatedAnnotationHandler;
 import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
+import org.apache.shiro.authz.aop.GuestAnnotationHandler;
+import org.apache.shiro.authz.aop.PermissionAnnotationHandler;
+import org.apache.shiro.authz.aop.RoleAnnotationHandler;
+import org.apache.shiro.authz.aop.UserAnnotationHandler;
 
 /**
  * Enhanced from Tynamo Security
@@ -78,10 +86,9 @@ public class AopHelper
      * @param annotation
      * @return
      */
+    @SneakyThrows
     static AuthorizingAnnotationHandler createHandler(Annotation annotation) {
-        HandlerCreateVisitor visitor = new HandlerCreateVisitor();
-        MethodAnnotationCaster.getInstance().accept(visitor, annotation);
-        return visitor.getHandler();
+        return autorizationAnnotationClasses.get(annotation.getClass()).call();
     }
 
     /**
@@ -97,23 +104,17 @@ public class AopHelper
     }
 
     private static Collection<Class<? extends Annotation>> getAutorizationAnnotationClasses() {
-        return autorizationAnnotationClasses;
+        return autorizationAnnotationClasses.keySet();
     }
 
     /**
      * List annotations classes which can be applied (either method or a class).
      */
-    private final static Collection<Class<? extends Annotation>> autorizationAnnotationClasses;
-
-    /**
-     * Initialize annotations lists.
-     */
-    static {
-        autorizationAnnotationClasses = new ArrayList<>(5);
-        autorizationAnnotationClasses.add(RequiresPermissions.class);
-        autorizationAnnotationClasses.add(RequiresRoles.class);
-        autorizationAnnotationClasses.add(RequiresUser.class);
-        autorizationAnnotationClasses.add(RequiresGuest.class);
-        autorizationAnnotationClasses.add(RequiresAuthentication.class);
-    }
+    private final static Map<Class<? extends Annotation>, Callable<AuthorizingAnnotationHandler>> autorizationAnnotationClasses
+            = Map.of(
+                    RequiresPermissions.class, PermissionAnnotationHandler::new,
+                    RequiresRoles.class, RoleAnnotationHandler::new,
+                    RequiresUser.class, UserAnnotationHandler::new,
+                    RequiresGuest.class, GuestAnnotationHandler::new,
+                    RequiresAuthentication.class, AuthenticatedAnnotationHandler::new);
 }

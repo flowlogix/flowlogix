@@ -21,10 +21,5 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>flowlogix-jee</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>

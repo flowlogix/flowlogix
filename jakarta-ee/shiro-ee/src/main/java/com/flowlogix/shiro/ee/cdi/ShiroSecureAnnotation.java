@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright 2013 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.shiro.ee.internal.aop;
+package com.flowlogix.shiro.ee.cdi;
+
+import static java.lang.annotation.ElementType.*;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.*;
+import java.lang.annotation.Target;
+import javax.interceptor.InterceptorBinding;
 
 /**
- * Enhanced from Tynamo Security
+ * CDI Marker Annotation to use Shiro
+ * to secure the bean
+ * @author lprimak
  */
-public interface SecurityInterceptor
+@Inherited
+@InterceptorBinding
+@Target({TYPE, METHOD})
+@Retention(RUNTIME)
+@interface ShiroSecureAnnotation
 {
-    /**
-     * The method which is performed before the method that you want to check.
-     */
-    public abstract void intercept();
 }

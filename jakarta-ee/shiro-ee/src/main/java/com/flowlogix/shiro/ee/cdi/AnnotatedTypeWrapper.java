@@ -19,7 +19,6 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.AnnotatedType;
 import lombok.Getter;
 import lombok.experimental.Delegate;
@@ -55,19 +54,10 @@ public class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
     @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationType)
     {
-        return annotations.stream().anyMatch((annotation) -> annotationType.isInstance(annotation));
+        return annotations.stream().anyMatch(annotation -> annotationType.isInstance(annotation));
     }
 
 
-    interface Exclusions
-    {
-        boolean isAnnotationPresent(Class<? extends Annotation> annotationType);
-        boolean getAnnotations();
-    }
-
-
-    private abstract class AT implements AnnotatedType<T> { }
-    private final @Delegate(types = { AT.class, Annotated.class },
-            excludes = Exclusions.class) AnnotatedType<T> wrapped;
+    private final @Delegate(types = AnnotatedType.class) AnnotatedType<T> wrapped;
     private final @Getter Set<Annotation> annotations;
 }

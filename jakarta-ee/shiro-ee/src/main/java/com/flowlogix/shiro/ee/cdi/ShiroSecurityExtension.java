@@ -15,25 +15,25 @@
  */
 package com.flowlogix.shiro.ee.cdi;
 
-import com.flowlogix.shiro.ee.annotations.ShiroSecure;
-import javax.ejb.Singleton;
-import javax.ejb.Stateful;
-import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresGuest;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.apache.shiro.authz.annotation.RequiresUser;
 
 /**
- * Automatically apply Shiro security to all EJBs
- * 
+ * Automatically apply Shiro security to all appropriate beans
+ *
  * @author lprimak
  */
-public class ShiroSecurityExtension implements Extension
-{
-    public<T> void addSecurity(@Observes @WithAnnotations({Stateless.class, Stateful.class, 
-        Singleton.class}) ProcessAnnotatedType<T> pat)
-    {
-        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroSecure.class));
+public class ShiroSecurityExtension implements Extension {
+    public <T> void addSecurity(@Observes @WithAnnotations({
+        RequiresAuthentication.class, RequiresGuest.class, RequiresPermissions.class,
+        RequiresRoles.class, RequiresUser.class}) ProcessAnnotatedType<T> pat) {
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroSecureAnnotation.class));
     }
 }

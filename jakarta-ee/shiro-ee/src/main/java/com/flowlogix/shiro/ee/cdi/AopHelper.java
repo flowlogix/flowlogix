@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.shiro.ee.internal.aop;
+package com.flowlogix.shiro.ee.cdi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -21,17 +21,27 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.authz.annotation.RequiresUser;
+import org.apache.shiro.authz.aop.AuthenticatedAnnotationHandler;
 import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
+import org.apache.shiro.authz.aop.GuestAnnotationHandler;
+import org.apache.shiro.authz.aop.PermissionAnnotationHandler;
+import org.apache.shiro.authz.aop.RoleAnnotationHandler;
+import org.apache.shiro.authz.aop.UserAnnotationHandler;
 
 /**
  * Enhanced from Tynamo Security
  */
-public class AopHelper
+class AopHelper
 {
     /**
      * Create list of
@@ -47,7 +57,7 @@ public class AopHelper
      * @param clazz
      * @return
      */
-    public static List<SecurityInterceptor> createSecurityInterceptors(Method method, Class<?> clazz) {
+    static List<SecurityInterceptor> createSecurityInterceptors(Method method, Class<?> clazz) {
         List<SecurityInterceptor> result = new ArrayList<>();
 
         if (isInterceptOnClassAnnotation(method.getModifiers())) {
@@ -55,7 +65,7 @@ public class AopHelper
                     : getAutorizationAnnotationClasses()) {
                 Annotation annotationOnClass = clazz.getAnnotation(ac);
                 if (annotationOnClass != null) {
-                    result.add(new DefaultSecurityInterceptor(annotationOnClass));
+                    result.add(new SecurityInterceptor(annotationOnClass));
                 }
             }
         }
@@ -64,7 +74,7 @@ public class AopHelper
                 : getAutorizationAnnotationClasses()) {
             Annotation annotation = method.getAnnotation(ac);
             if (annotation != null) {
-                result.add(new DefaultSecurityInterceptor(annotation));
+                result.add(new SecurityInterceptor(annotation));
             }
         }
 
@@ -78,10 +88,9 @@ public class AopHelper
      * @param annotation
      * @return
      */
+    @SneakyThrows
     static AuthorizingAnnotationHandler createHandler(Annotation annotation) {
-        HandlerCreateVisitor visitor = new HandlerCreateVisitor();
-        MethodAnnotationCaster.getInstance().accept(visitor, annotation);
-        return visitor.getHandler();
+        return autorizationAnnotationClasses.get(annotation.getClass()).call();
     }
 
     /**
@@ -97,23 +106,44 @@ public class AopHelper
     }
 
     private static Collection<Class<? extends Annotation>> getAutorizationAnnotationClasses() {
-        return autorizationAnnotationClasses;
+        return autorizationAnnotationClasses.keySet();
+    }
+
+    @RequiredArgsConstructor
+    static class SecurityInterceptor {
+        private final AuthorizingAnnotationHandler handler;
+        private final @Getter Annotation annotation;
+
+        /**
+         * Initialize {@link #handler} field use annotation.
+         *
+         * @param annotation annotation for create handler and use during
+         * {@link #intercept()} invocation.
+         */
+        SecurityInterceptor(Annotation annotation) {
+            this.annotation = annotation;
+            this.handler = AopHelper.createHandler(annotation);
+            if (handler == null) {
+                throw new IllegalStateException("No handler for " + annotation + "annotation");
+            }
+        }
+
+        /* (non-Javadoc)
+         * @see org.tynamo.shiro.extension.authz.aop.SecurityInterceptor#intercept()
+         */
+        void intercept() {
+            handler.assertAuthorized(getAnnotation());
+        }
     }
 
     /**
      * List annotations classes which can be applied (either method or a class).
      */
-    private final static Collection<Class<? extends Annotation>> autorizationAnnotationClasses;
-
-    /**
-     * Initialize annotations lists.
-     */
-    static {
-        autorizationAnnotationClasses = new ArrayList<>(5);
-        autorizationAnnotationClasses.add(RequiresPermissions.class);
-        autorizationAnnotationClasses.add(RequiresRoles.class);
-        autorizationAnnotationClasses.add(RequiresUser.class);
-        autorizationAnnotationClasses.add(RequiresGuest.class);
-        autorizationAnnotationClasses.add(RequiresAuthentication.class);
-    }
+    private final static Map<Class<? extends Annotation>, Callable<AuthorizingAnnotationHandler>> autorizationAnnotationClasses
+            = Map.of(
+                    RequiresPermissions.class, PermissionAnnotationHandler::new,
+                    RequiresRoles.class, RoleAnnotationHandler::new,
+                    RequiresUser.class, UserAnnotationHandler::new,
+                    RequiresGuest.class, GuestAnnotationHandler::new,
+                    RequiresAuthentication.class, AuthenticatedAnnotationHandler::new);
 }

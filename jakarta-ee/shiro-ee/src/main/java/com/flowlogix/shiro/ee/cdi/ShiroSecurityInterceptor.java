@@ -16,8 +16,7 @@
 package com.flowlogix.shiro.ee.cdi;
 
 import com.flowlogix.shiro.ee.annotations.ShiroSecure;
-import com.flowlogix.shiro.ee.internal.aop.AopHelper;
-import com.flowlogix.shiro.ee.internal.aop.SecurityInterceptor;
+import com.flowlogix.shiro.ee.cdi.AopHelper.SecurityInterceptor;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.Priority;
@@ -28,10 +27,10 @@ import javax.interceptor.InvocationContext;
 
 /**
  * Enforce Shiro security on EJBs and CDI Beans
- * 
+ *
  * <a href="http://code.google.com/p/flowlogix/wiki/TLShiroSecurityInterceptor"
  *    target="_blank">See Documentation</a>
- * 
+ *
  * @author lprimak
  */
 @Interceptor @ShiroSecure @Dependent @Priority(Interceptor.Priority.LIBRARY_BEFORE)
@@ -43,15 +42,15 @@ public class ShiroSecurityInterceptor implements Serializable
         checkPermissions(ctx);
         return ctx.proceed();
     }
-    
-        
+
+
     private void checkPermissions(final InvocationContext ctx) throws Exception
     {
-        List<SecurityInterceptor> siList = AopHelper.createSecurityInterceptors(ctx.getMethod(), 
+        List<SecurityInterceptor> siList = AopHelper.createSecurityInterceptors(ctx.getMethod(),
                 ctx.getMethod().getDeclaringClass());
         siList.forEach(SecurityInterceptor::intercept);
     }
-    
-    
+
+
     private static final long serialVersionUID = 1L;
 }

@@ -15,7 +15,6 @@
  */
 package com.flowlogix.shiro.ee.cdi;
 
-import com.flowlogix.shiro.ee.annotations.ShiroSecure;
 import com.flowlogix.shiro.ee.cdi.AopHelper.SecurityInterceptor;
 import java.io.Serializable;
 import java.util.List;
@@ -33,7 +32,7 @@ import javax.interceptor.InvocationContext;
  *
  * @author lprimak
  */
-@Interceptor @ShiroSecure @Dependent @Priority(Interceptor.Priority.LIBRARY_BEFORE)
+@Interceptor @ShiroSecureAnnotation @Dependent @Priority(Interceptor.Priority.LIBRARY_BEFORE)
 public class ShiroSecurityInterceptor implements Serializable
 {
     @AroundInvoke

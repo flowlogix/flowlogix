@@ -15,8 +15,6 @@
  */
 package com.flowlogix.shiro.ee.cdi;
 
-import com.flowlogix.shiro.ee.annotations.ShiroSessionScoped;
-import com.flowlogix.shiro.ee.annotations.ShiroViewScoped;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +25,8 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.WithAnnotations;
 import javax.faces.view.ViewScoped;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.SecurityUtils;
@@ -73,16 +73,25 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
         });
     }
 
+    <T> void addSessionScoped(@Observes @WithAnnotations(SessionScoped.class) ProcessAnnotatedType<T> pat) {
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroSessionScoped.class));
+    }
 
-    void addScope(@Observes final BeforeBeanDiscovery event)
+    <T> void addViewScoped(@Observes @WithAnnotations(ViewScoped.class) ProcessAnnotatedType<T> pat) {
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroViewScoped.class));
+    }
+
+    void addScope(@Observes @WithAnnotations({
+        SessionScoped.class, ViewScoped.class} ) final BeforeBeanDiscovery event)
     {
         contexts.forEach(ctx -> event.addScope(ctx.getScope(), true, true));
     }
 
 
-    void registerContext(@Observes final AfterBeanDiscovery event)
+    void registerContext(@Observes @WithAnnotations({
+        SessionScoped.class, ViewScoped.class} ) final AfterBeanDiscovery event)
     {
-        contexts.forEach(ctx -> event.addContext(ctx));
+        contexts.forEach(event::addContext);
     }
 
 

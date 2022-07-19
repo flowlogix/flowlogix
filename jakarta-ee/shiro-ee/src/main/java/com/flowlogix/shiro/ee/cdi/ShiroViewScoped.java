@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.shiro.ee.annotations;
+package com.flowlogix.shiro.ee.cdi;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -30,4 +30,4 @@ import javax.inject.Scope;
 @Scope
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
-public @interface ShiroViewScoped {}
+@interface ShiroViewScoped {}

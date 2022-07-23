@@ -58,6 +58,8 @@ class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
     }
 
 
-    private final @Delegate(types = AnnotatedType.class) AnnotatedType<T> wrapped;
+    // the below is so the compiler doesn't complain about unchecked casts
+    private abstract class AT implements AnnotatedType<T> { }
+    private final @Delegate(types = AT.class) AnnotatedType<T> wrapped;
     private final @Getter Set<Annotation> annotations;
 }

@@ -85,7 +85,7 @@ class AopHelperTest {
     @Test
     @SneakyThrows
     void checkAllAnnotationTypes() {
-        assertEquals(5, autorizationAnnotationClasses.size());
+        assertEquals(5, autorizationAnnotationClasses.keySet().stream().distinct().count());
         for (Class<? extends Annotation> clz : autorizationAnnotationClasses.keySet()) {
             assertEquals(clz, autorizationAnnotationClasses.get(clz).call().getAnnotationClass());
         }

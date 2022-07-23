@@ -39,13 +39,13 @@ import org.apache.shiro.authz.aop.RoleAnnotationHandler;
 import org.apache.shiro.authz.aop.UserAnnotationHandler;
 
 /**
- * Enhanced from Tynamo Security
+ * Security decorator instantiation helper
  */
 class AopHelper
 {
     /**
      * Create list of
-     * {@link org.tynamo.shiro.extension.authz.aop.SecurityInterceptor}
+     * {@link SecurityInterceptor}
      * instances for method. This method search all method and class annotations
      * and use annotation data for create interceptors.
      * <p>
@@ -90,7 +90,7 @@ class AopHelper
      */
     @SneakyThrows
     static AuthorizingAnnotationHandler createHandler(Annotation annotation) {
-        return autorizationAnnotationClasses.get(annotation.getClass()).call();
+        return autorizationAnnotationClasses.get(annotation.annotationType()).call();
     }
 
     /**
@@ -139,7 +139,7 @@ class AopHelper
     /**
      * List annotations classes which can be applied (either method or a class).
      */
-    private final static Map<Class<? extends Annotation>, Callable<AuthorizingAnnotationHandler>> autorizationAnnotationClasses
+    final static Map<Class<? extends Annotation>, Callable<AuthorizingAnnotationHandler>> autorizationAnnotationClasses
             = Map.of(
                     RequiresPermissions.class, PermissionAnnotationHandler::new,
                     RequiresRoles.class, RoleAnnotationHandler::new,

@@ -34,7 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author lprimak
  */
 @ExtendWith(MockitoExtension.class)
-public class AnnotatedTypeWrapperTest {
+class AnnotatedTypeWrapperTest {
     @Mock
     private AnnotatedType<Void> annotatedType;
 

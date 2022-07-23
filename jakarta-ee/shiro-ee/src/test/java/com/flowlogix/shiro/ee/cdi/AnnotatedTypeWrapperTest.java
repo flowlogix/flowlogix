@@ -97,6 +97,14 @@ public class AnnotatedTypeWrapperTest {
         assertEquals(Void.class, wrapper.getJavaClass());
     }
 
+    @Test
+    void decreaseAnnotationsToZero() {
+        initializeStubs();
+        assertEquals(3, annotatedType.getAnnotations().size());
+        var wrapper = new AnnotatedTypeWrapper<>(annotatedType, false);
+        assertEquals(0, wrapper.getAnnotations().size());
+    }
+
     private void initializeStubs() {
         when(annotatedType.getAnnotations()).thenReturn(Stream.of(Annotated.class.getDeclaredAnnotations())
                 .collect(Collectors.toSet()));

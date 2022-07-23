@@ -29,15 +29,15 @@ import lombok.experimental.Delegate;
  * @author lprimak
  * @param <T> type of annotated class
  */
-public class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
+class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
 {
-    public AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
+    AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
     {
         this(wrapped, true, additionalAnnotations);
     }
 
 
-    public AnnotatedTypeWrapper(AnnotatedType<T> wrapped, boolean keepOriginalAnnotations,
+    AnnotatedTypeWrapper(AnnotatedType<T> wrapped, boolean keepOriginalAnnotations,
             Annotation... additionalAnnotations)
     {
         this.wrapped = wrapped;

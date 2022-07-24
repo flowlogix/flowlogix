@@ -153,10 +153,10 @@ public class ShiroScopeContextTest {
     void webSessionsGet() {
         setupWebSessions();
         try (var cdim = mockStatic(CDI.class, Answers.RETURNS_DEEP_STUBS)) {
-            when(CDI.current().getBeanManager().getContext(any()).get(contextual)).thenReturn(bean);
+            when(CDI.current().getBeanManager().getContext(SessionScoped.class).get(contextual)).thenReturn(bean);
             assertEquals(bean, ctx.get(contextual));
             assertNull(ctx.get(null));
-            verify(CDI.current().getBeanManager(), atLeast(2)).getContext(SessionScoped.class);
+            verify(CDI.current().getBeanManager(), atLeast(2)).getContext(any());
         }
     }
 
@@ -164,11 +164,11 @@ public class ShiroScopeContextTest {
     void webSessionsCreate() {
         setupWebSessions();
         try (var cdim = mockStatic(CDI.class, Answers.RETURNS_DEEP_STUBS)) {
-            when(CDI.current().getBeanManager().getContext(any())
+            when(CDI.current().getBeanManager().getContext(SessionScoped.class)
                     .get(contextual, creationalContext)).thenReturn(bean);
             assertEquals(bean, ctx.get(contextual, creationalContext));
             assertNull(ctx.get(null));
-            verify(CDI.current().getBeanManager(), atLeast(2)).getContext(SessionScoped.class);
+            verify(CDI.current().getBeanManager(), atLeast(2)).getContext(any());
         }
     }
 

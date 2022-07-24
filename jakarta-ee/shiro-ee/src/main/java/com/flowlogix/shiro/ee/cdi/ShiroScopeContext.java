@@ -40,7 +40,6 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
  */
 public class ShiroScopeContext implements Context, Serializable
 {
-
     public ShiroScopeContext(Class<? extends Annotation> scopeType, Class<? extends Annotation> webScopeType)
     {
         this.scopeType = scopeType;
@@ -157,7 +156,7 @@ public class ShiroScopeContext implements Context, Serializable
 
 
     @RequiredArgsConstructor
-    private static class ScopeInst<T> implements Serializable
+    static class ScopeInst<T> implements Serializable
     {
         private final Bean<T> bean;
         private final T instance;

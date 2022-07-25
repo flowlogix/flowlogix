@@ -21,7 +21,5 @@ package com.flowlogix.shiro.ee.cdi;
  */
 public class ShiroSecurityIT {
     // TODO +++
-    // - ShiroScopeContext stress tests
     // ShiroScopeContext IT (both native and shiro sessions_
-
 }

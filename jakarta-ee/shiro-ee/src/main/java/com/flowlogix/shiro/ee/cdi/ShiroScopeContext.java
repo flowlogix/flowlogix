@@ -68,16 +68,17 @@ public class ShiroScopeContext implements Context, Serializable
         {
             Session session = SecurityUtils.getSubject().getSession();
             Bean<T> bean = (Bean<T>)contextual;
+            // TODO +++ chage - see https://stackoverflow.com/questions/133988/synchronizing-on-string-objects-in-java
             synchronized(session.getId().toString().intern())
             {
                 @SuppressWarnings("unchecked")
                 ScopeInst<T> scopeInst = (ScopeInst<T>)
-                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass());
+                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass().getName());
                 T rv;
                 if(scopeInst == null)
                 {
                     rv = bean.create(creationalContext);
-                    session.setAttribute(BEAN_PREFIX + bean.getBeanClass(),
+                    session.setAttribute(BEAN_PREFIX + bean.getBeanClass().getName(),
                             new ScopeInst<>(bean, rv, creationalContext));
                 }
                 else
@@ -107,7 +108,7 @@ public class ShiroScopeContext implements Context, Serializable
                 Bean<T> bean = (Bean<T>)contextual;
                 @SuppressWarnings("unchecked")
                 ScopeInst<T> scopeInst = (ScopeInst<T>)
-                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass());
+                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass().getName());
                 if(scopeInst != null)
                 {
                     rv = scopeInst.instance;

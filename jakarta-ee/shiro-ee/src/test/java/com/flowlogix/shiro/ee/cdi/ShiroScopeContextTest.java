@@ -32,7 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -41,6 +43,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -71,12 +74,14 @@ public class ShiroScopeContextTest {
             throw new UnsupportedOperationException("Not supported");
         }
     }
+    private static final String ATTR_KEY = "FL_SViewScopedSC_com.flowlogix.shiro.ee.cdi.ShiroScopeContextTest$MyBean";
 
     @BeforeEach
     void setup() {
         bean = new MyBean();
         ctx = new ShiroScopeContext(ViewScoped.class, SessionScoped.class);
         secMock = mockStatic(SecurityUtils.class, Answers.RETURNS_DEEP_STUBS);
+        lenient().when(contextual.getBeanClass()).thenAnswer((inv) -> MyBean.class);
     }
 
     @AfterEach
@@ -97,7 +102,7 @@ public class ShiroScopeContextTest {
                 .thenReturn(new ShiroScopeContext.ScopeInst<>(contextual,
                         bean, null));
         assertEquals(bean, ctx.get(contextual));
-        verify(SecurityUtils.getSubject().getSession(false)).getAttribute("FL_SViewScopedSC_null");
+        verify(SecurityUtils.getSubject().getSession(false)).getAttribute(ATTR_KEY);
         verify(SecurityUtils.getSubject(), never()).getSession();
         verify(SecurityUtils.getSubject(), never()).getSession(true);
     }
@@ -106,7 +111,7 @@ public class ShiroScopeContextTest {
     void nativeSessionsGetWhenNotExist() {
         assertFalse(isWebContainerSessions(SecurityUtils.getSecurityManager()));
         assertNull(ctx.get(contextual));
-        verify(SecurityUtils.getSubject().getSession(false)).getAttribute("FL_SViewScopedSC_null");
+        verify(SecurityUtils.getSubject().getSession(false)).getAttribute(ATTR_KEY);
         verify(SecurityUtils.getSubject(), never()).getSession();
         verify(SecurityUtils.getSubject(), never()).getSession(true);
     }
@@ -115,8 +120,8 @@ public class ShiroScopeContextTest {
     void nativeSessionsCreate() {
         when(contextual.create(creationalContext)).thenReturn(bean);
         assertEquals(bean, ctx.get(contextual, creationalContext));
-        verify(SecurityUtils.getSubject().getSession()).getAttribute("FL_SViewScopedSC_null");
-        verify(SecurityUtils.getSubject().getSession()).setAttribute(eq("FL_SViewScopedSC_null"), any());
+        verify(SecurityUtils.getSubject().getSession()).getAttribute(ATTR_KEY);
+        verify(SecurityUtils.getSubject().getSession()).setAttribute(eq(ATTR_KEY), any());
         verify(SecurityUtils.getSubject(), never()).getSession(false);
     }
 
@@ -126,18 +131,25 @@ public class ShiroScopeContextTest {
                 .thenReturn(new ShiroScopeContext.ScopeInst<>(contextual,
                         bean, creationalContext));
         assertEquals(bean, ctx.get(contextual, creationalContext));
-        verify(SecurityUtils.getSubject().getSession()).getAttribute("FL_SViewScopedSC_null");
+        verify(SecurityUtils.getSubject().getSession()).getAttribute(ATTR_KEY);
         verify(SecurityUtils.getSubject(), never()).getSession(false);
         verify(contextual, never()).create(any());
     }
 
     @Test
+    @Tag("StressTest")
+    void nativeSessionSyncStress() {
+        fail("not completed");
+        // TODO +++ make sure that bean.create() gets called only required #times
+        // because if it's not thread safe it will be called more times then necessary
+    }
+
+    @Test
     void destroy() {
         Session session = SecurityUtils.getSubject().getSession();
-        when(session.getAttributeKeys()).thenReturn(List.of(new Object(), "", "FL_SViewScopedSC_null", "abcd"));
-        when(session.getAttribute("FL_SViewScopedSC_null"))
-                .thenReturn(new ShiroScopeContext.ScopeInst<>(contextual,
-                        bean, creationalContext));
+        when(session.getAttributeKeys()).thenReturn(List.of(new Object(), "", ATTR_KEY, "abcd"));
+        when(session.getAttribute(ATTR_KEY)).thenReturn(
+                new ShiroScopeContext.ScopeInst<>(contextual, bean, creationalContext));
         ctx.onDestroy(SecurityUtils.getSubject().getSession());
         verify(contextual).destroy(bean, creationalContext);
         verify(session, times(1)).getAttribute(any());

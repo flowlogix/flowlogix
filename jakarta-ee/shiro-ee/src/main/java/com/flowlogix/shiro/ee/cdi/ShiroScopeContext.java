@@ -68,8 +68,7 @@ public class ShiroScopeContext implements Context, Serializable
         {
             Session session = SecurityUtils.getSubject().getSession();
             Bean<T> bean = (Bean<T>)contextual;
-            // TODO +++ chage - see https://stackoverflow.com/questions/133988/synchronizing-on-string-objects-in-java
-            synchronized(session.getId().toString().intern())
+            synchronized(contextual)
             {
                 @SuppressWarnings("unchecked")
                 ScopeInst<T> scopeInst = (ScopeInst<T>)

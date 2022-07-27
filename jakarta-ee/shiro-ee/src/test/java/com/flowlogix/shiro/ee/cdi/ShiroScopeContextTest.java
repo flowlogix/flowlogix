@@ -32,9 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -134,14 +132,6 @@ public class ShiroScopeContextTest {
         verify(SecurityUtils.getSubject().getSession()).getAttribute(ATTR_KEY);
         verify(SecurityUtils.getSubject(), never()).getSession(false);
         verify(contextual, never()).create(any());
-    }
-
-    @Test
-    @Tag("StressTest")
-    void nativeSessionSyncStress() {
-        fail("not completed");
-        // TODO +++ make sure that bean.create() gets called only required #times
-        // because if it's not thread safe it will be called more times then necessary
     }
 
     @Test

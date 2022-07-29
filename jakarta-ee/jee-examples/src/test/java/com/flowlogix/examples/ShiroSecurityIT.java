@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.shiro.ee.cdi;
+package com.flowlogix.examples;
+
+import org.jboss.arquillian.junit5.ArquillianExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  *
  * @author lprimak
  */
+@ExtendWith(ArquillianExtension.class)
 public class ShiroSecurityIT {
-    // TODO +++
-    // ShiroScopeContext IT (both native and shiro sessions_
+    // +++ TODO test Shiro example app
+    // +++ TODO both Shiro native and web sessions
 }

@@ -94,13 +94,13 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     }
 
 
-    private static String getReferer(HttpServletRequest request)
+    static String getReferer(HttpServletRequest request)
     {
         String referer = request.getHeader("referer");
         if (referer != null)
         {
             // do not switch to https if custom port is specified
-            if(!referer.matches("^http:\\/\\/[A-z|.|[0-9]]+:[0-9]+\\/.*"))
+            if(!referer.matches("^http:\\/\\/[A-z|.|[0-9]]+:[0-9]+(\\/.*|$)"))
             {
                 referer = referer.replaceFirst("^http:", "https:");
             }

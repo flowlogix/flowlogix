@@ -29,15 +29,15 @@ import lombok.experimental.Delegate;
  * @author lprimak
  * @param <T> type of annotated class
  */
-public class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
+class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
 {
-    public AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
+    AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
     {
         this(wrapped, true, additionalAnnotations);
     }
 
 
-    public AnnotatedTypeWrapper(AnnotatedType<T> wrapped, boolean keepOriginalAnnotations,
+    AnnotatedTypeWrapper(AnnotatedType<T> wrapped, boolean keepOriginalAnnotations,
             Annotation... additionalAnnotations)
     {
         this.wrapped = wrapped;
@@ -58,6 +58,8 @@ public class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
     }
 
 
-    private final @Delegate(types = AnnotatedType.class) AnnotatedType<T> wrapped;
+    // the below is so the compiler doesn't complain about unchecked casts
+    private abstract class AT implements AnnotatedType<T> { }
+    private final @Delegate(types = AT.class) AnnotatedType<T> wrapped;
     private final @Getter Set<Annotation> annotations;
 }

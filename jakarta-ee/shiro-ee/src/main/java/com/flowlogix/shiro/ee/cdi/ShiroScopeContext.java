@@ -40,7 +40,6 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
  */
 public class ShiroScopeContext implements Context, Serializable
 {
-
     public ShiroScopeContext(Class<? extends Annotation> scopeType, Class<? extends Annotation> webScopeType)
     {
         this.scopeType = scopeType;
@@ -69,16 +68,16 @@ public class ShiroScopeContext implements Context, Serializable
         {
             Session session = SecurityUtils.getSubject().getSession();
             Bean<T> bean = (Bean<T>)contextual;
-            synchronized(session.getId().toString().intern())
+            synchronized(contextual)
             {
                 @SuppressWarnings("unchecked")
                 ScopeInst<T> scopeInst = (ScopeInst<T>)
-                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass());
+                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass().getName());
                 T rv;
                 if(scopeInst == null)
                 {
                     rv = bean.create(creationalContext);
-                    session.setAttribute(BEAN_PREFIX + bean.getBeanClass(),
+                    session.setAttribute(BEAN_PREFIX + bean.getBeanClass().getName(),
                             new ScopeInst<>(bean, rv, creationalContext));
                 }
                 else
@@ -108,7 +107,7 @@ public class ShiroScopeContext implements Context, Serializable
                 Bean<T> bean = (Bean<T>)contextual;
                 @SuppressWarnings("unchecked")
                 ScopeInst<T> scopeInst = (ScopeInst<T>)
-                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass());
+                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass().getName());
                 if(scopeInst != null)
                 {
                     rv = scopeInst.instance;
@@ -157,7 +156,7 @@ public class ShiroScopeContext implements Context, Serializable
 
 
     @RequiredArgsConstructor
-    private static class ScopeInst<T> implements Serializable
+    static class ScopeInst<T> implements Serializable
     {
         private final Bean<T> bean;
         private final T instance;

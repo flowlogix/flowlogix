@@ -44,17 +44,12 @@ public class ExceptionBean implements Serializable {
     }
 
     public void throwSqlBeforeResponse() {
-        Runnable before = () -> doThrowSQLException("sql");
+        Runnable before = () -> ExceptionUtils.rethrow(new SQLException("sql"));
         Faces.setRequestAttribute(RUN_BEFORE_RESPONSE, before);
     }
 
     public void throwExceptionFromMethod() {
-        doThrowSQLException("sql-from-method");
-    }
-
-    private void doThrowSQLException(String msg) {
-        log.info("*-*- Please ignore the next SEVERE message, it is expected");
-        ExceptionUtils.rethrow(new SQLException(msg));
+        ExceptionUtils.rethrow(new SQLException("sql-from-method"));
     }
 
     public void success() {

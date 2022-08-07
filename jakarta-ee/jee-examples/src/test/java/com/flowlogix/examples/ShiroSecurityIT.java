@@ -24,6 +24,4 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(ArquillianExtension.class)
 public class ShiroSecurityIT {
-    // +++ TODO test Shiro example app
-    // +++ TODO both Shiro native and web sessions
 }

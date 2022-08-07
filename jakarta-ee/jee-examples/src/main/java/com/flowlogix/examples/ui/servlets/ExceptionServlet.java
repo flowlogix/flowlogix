@@ -42,7 +42,7 @@ public class ExceptionServlet extends HttpServlet {
         LogRecord record = LogCapture.get().poll();
         while (record != null) {
             if (record.getThrown() != null) {
-                out.print(record.getThrown());
+                out.printf("%s: %s", record.getLevel(), record.getThrown());
                 out.print(System.lineSeparator());
             }
             record = LogCapture.get().poll();

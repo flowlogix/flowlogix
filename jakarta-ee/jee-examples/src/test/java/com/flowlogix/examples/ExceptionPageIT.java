@@ -74,6 +74,9 @@ public class ExceptionPageIT {
     @FindBy(id = "form:lateSqlThrow")
     private WebElement lateSqlThrow;
 
+    @FindBy(id = "form:methodSqlThrow")
+    private WebElement methodSqlThrow;
+
     @FindBy(id = "end-of-page")
     private WebElement endOfPage;
 
@@ -116,6 +119,18 @@ public class ExceptionPageIT {
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
+    }
+
+    @Test
+    @OperateOnDeployment("DevMode")
+    void sqlThrowFromFacesMethod() {
+        guardAjax(methodSqlThrow).click();
+        assertEquals("Exception happened", exceptionHeading.getText());
+        assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
+        webDriver.get(baseURL + "lastException");
+        waitGui(webDriver);
+        assertEquals("WARNING: javax.faces.FacesException: #{exceptionBean.throwExceptionFromMethod()}: "
+                + "java.sql.SQLException: sql-from-method", webDriver.findElement(By.tagName("body")).getText());
     }
 
     @Test

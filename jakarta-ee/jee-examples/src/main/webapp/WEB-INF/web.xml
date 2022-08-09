@@ -31,4 +31,32 @@
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
+    <context-param>
+        <param-name>org.omnifaces.FACES_VIEWS_SCAN_PATHS</param-name>
+        <param-value>/*.xhtml</param-value>
+    </context-param>
+
+    <!-- Apache Shiro Security -->
+    <listener>
+        <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+    </listener>
+    <filter>
+        <filter-name>ShiroFilter</filter-name>
+        <filter-class>com.flowlogix.shiro.ee.filters.ShiroFilter</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+    <context-param>
+        <param-name>shiroConfigLocations</param-name>
+        <param-value>classpath:META-INF/shiro.ini</param-value>
+    </context-param>
+
+    <!-- Security - Enforce Filter Ordering -->
+    <filter-mapping>
+        <filter-name>ShiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
 </web-app>

@@ -33,20 +33,24 @@ class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
 {
     AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
     {
-        this(wrapped, true, additionalAnnotations);
+        this(wrapped, true, Set.of(additionalAnnotations), Set.of());
     }
 
 
     AnnotatedTypeWrapper(AnnotatedType<T> wrapped, boolean keepOriginalAnnotations,
-            Annotation... additionalAnnotations)
+            Set<Annotation> additionalAnnotations, Set<Annotation> annotationsToRemove)
     {
         this.wrapped = wrapped;
         Stream.Builder<Annotation> builder = Stream.builder();
         if(keepOriginalAnnotations)
         {
-            wrapped.getAnnotations().forEach(builder::add);
+            var annotationTypesToExclude = annotationsToRemove.stream()
+                    .map(Annotation::annotationType).collect(Collectors.toSet());
+            wrapped.getAnnotations().stream().filter(ann ->
+                    !annotationTypesToExclude.contains(ann.annotationType()))
+                    .forEach(builder::add);
         }
-        Stream.of(additionalAnnotations).forEach(builder::add);
+        additionalAnnotations.forEach(builder::add);
         annotations = builder.build().collect(Collectors.toSet());
     }
 

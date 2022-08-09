@@ -17,6 +17,11 @@
         <property name="firefoxArguments">-headless</property>
         <property name="chromeBinary">${webdriver.chrome.binary}</property>
     </extension>
+    <container qualifier="payara-ssl" default="true">
+        <configuration>
+            <property name="ignoreCertificates">true</property>
+        </configuration>
+    </container>
     <container qualifier="payara-docker">
         <configuration>
             <property name="adminHttps">true</property>

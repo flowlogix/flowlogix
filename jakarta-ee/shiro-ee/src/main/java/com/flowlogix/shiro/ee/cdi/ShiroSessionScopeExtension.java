@@ -18,6 +18,7 @@ package com.flowlogix.shiro.ee.cdi;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.enterprise.context.SessionScoped;
@@ -41,6 +42,18 @@ import org.apache.shiro.session.SessionListenerAdapter;
  */
 public class ShiroSessionScopeExtension implements Extension, Serializable
 {
+    private static final List<ShiroScopeContext> contexts = Stream.of(
+            new ShiroScopeContext(ShiroSessionScoped.class, SessionScoped.class),
+            new ShiroScopeContext(ShiroViewScoped.class, ViewScoped.class))
+            .collect(Collectors.toList());
+
+    @SessionScoped
+    @SuppressWarnings("serial")
+    private static class SessionScopedAnnotated implements Serializable { }
+    @ViewScoped
+    @SuppressWarnings("serial")
+    private static class ViewScopedAnnotated implements Serializable { }
+
     public void addDestroyHandlers(Collection<SessionListener> sessionListeners) {
         addDestroyHandlers(sessionListeners, SecurityUtils.getSecurityManager());
     }
@@ -74,30 +87,28 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
     }
 
     <T> void addSessionScoped(@Observes @WithAnnotations(SessionScoped.class) ProcessAnnotatedType<T> pat) {
-        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroSessionScoped.class));
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
+                Set.of(SessionScopedAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of(() -> ShiroSessionScoped.class)));
     }
 
     <T> void addViewScoped(@Observes @WithAnnotations(ViewScoped.class) ProcessAnnotatedType<T> pat) {
-        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroViewScoped.class));
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
+                Set.of(ViewScopedAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of(() -> ShiroViewScoped.class)));
     }
 
-    void addScope(@Observes @WithAnnotations({
-        SessionScoped.class, ViewScoped.class} ) final BeforeBeanDiscovery event)
+    void addScope(@Observes final BeforeBeanDiscovery event)
     {
         contexts.forEach(ctx -> event.addScope(ctx.getScope(), true, true));
     }
 
 
-    void registerContext(@Observes @WithAnnotations({
-        SessionScoped.class, ViewScoped.class} ) final AfterBeanDiscovery event)
+    void registerContext(@Observes final AfterBeanDiscovery event)
     {
         contexts.forEach(event::addContext);
     }
 
 
-    private final List<ShiroScopeContext> contexts = Stream.of(
-            new ShiroScopeContext(ShiroSessionScoped.class, SessionScoped.class),
-            new ShiroScopeContext(ShiroViewScoped.class, ViewScoped.class))
-            .collect(Collectors.toList());
     private static final long serialVersionUID = 1L;
 }

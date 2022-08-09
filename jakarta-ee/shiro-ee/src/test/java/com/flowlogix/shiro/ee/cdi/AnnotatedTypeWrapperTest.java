@@ -27,6 +27,7 @@ import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,6 +99,14 @@ class AnnotatedTypeWrapperTest {
         assertEquals(3, wrapper.getAnnotations().size());
         assertFalse(wrapper.isAnnotationPresent(RequiresGuest.class));
         assertTrue(wrapper.isAnnotationPresent(SessionScoped.class));
+    }
+
+    @Test
+    void badLambdaArgument() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new AnnotatedTypeWrapper<>(annotatedType, true,
+                Set.of(() -> SessionScoped.class),
+                Set.of(() -> RequiresGuest.class)));
     }
 
     @Test

@@ -31,6 +31,12 @@ import lombok.experimental.Delegate;
  */
 class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
 {
+    // the below is so the compiler doesn't complain about unchecked casts
+    private abstract class AT implements AnnotatedType<T> { }
+    private final @Delegate(types = AT.class) AnnotatedType<T> wrapped;
+    private final @Getter Set<Annotation> annotations;
+
+
     AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
     {
         this(wrapped, true, Set.of(additionalAnnotations), Set.of());
@@ -50,10 +56,9 @@ class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
                     !annotationTypesToExclude.contains(ann.annotationType()))
                     .forEach(builder::add);
         }
-        additionalAnnotations.forEach(builder::add);
+        additionalAnnotations.forEach(annotation -> addToBuilder(builder, annotation));
         annotations = builder.build().collect(Collectors.toSet());
     }
-
 
     @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationType)
@@ -61,9 +66,11 @@ class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
         return annotations.stream().anyMatch(annotation -> annotationType.isInstance(annotation));
     }
 
-
-    // the below is so the compiler doesn't complain about unchecked casts
-    private abstract class AT implements AnnotatedType<T> { }
-    private final @Delegate(types = AT.class) AnnotatedType<T> wrapped;
-    private final @Getter Set<Annotation> annotations;
+    private void addToBuilder(Stream.Builder<Annotation> builder, Annotation ann) {
+        if (ann.annotationType().isInstance(ann)) {
+            builder.add(ann);
+        } else {
+            throw new IllegalArgumentException(ann.getClass().getName());
+        }
+    }
 }

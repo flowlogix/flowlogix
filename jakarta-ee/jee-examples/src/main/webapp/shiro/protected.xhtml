@@ -6,7 +6,12 @@
         <title>Protected Page</title>
     </h:head>
     <h:body>
-        Protected Page - User login required
+        Protected Page - User login required - Authorized!
+
+        <h:form>
+            <h:commandButton value="Logout..." action="#{loginBean.logout}"/>
+        </h:form>
+
     </h:body>
 </html>
 

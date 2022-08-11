@@ -20,6 +20,9 @@
             Password: <h:inputText id="pwd" title="Password: "
                                    value="#{loginBean.pwd}"/>
             <p/>
+            Remember Me: <h:selectBooleanCheckbox id="mrememberMe" title="Remember Me: "
+                                                  value="#{loginBean.rememberMe}"/>
+            <p/>
             <h:commandButton value="Login ..." action="#{loginBean.login}"/>
         </h:form>
         <h:messages/>

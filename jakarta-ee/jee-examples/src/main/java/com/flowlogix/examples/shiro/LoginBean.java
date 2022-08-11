@@ -37,9 +37,10 @@ public class LoginBean {
     private String uname;
     @NotBlank
     private String pwd;
+    private boolean rememberMe;
 
     public void login() {
-        SecurityUtils.getSubject().login(new UsernamePasswordToken(uname, pwd, false));
+        SecurityUtils.getSubject().login(new UsernamePasswordToken(uname, pwd, rememberMe));
         redirect();
     }
 

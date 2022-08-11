@@ -41,18 +41,26 @@ public class LoginBean {
 
     public void login() {
         SecurityUtils.getSubject().login(new UsernamePasswordToken(uname, pwd, rememberMe));
-        redirect();
+        redirectToSaved();
     }
 
     public void logout() {
         SecurityUtils.getSubject().logout();
-        redirect();
+        redirectToView();
     }
 
-    void redirect() {
+    void redirectToSaved() {
         String savedRequest = Faces.getRequestCookie(WebUtils.SAVED_REQUEST_KEY);
         if (savedRequest != null) {
             Faces.redirect(savedRequest);
+        } else {
+            redirectToView();
+        }
+    }
+
+    void redirectToView() {
+        if (Faces.getViewId().contains("shiro/auth/")) {
+            Faces.redirect(Faces.getRequestContextPath());
         } else {
             Faces.redirect(Faces.getRequestContextPath() + Faces.getViewId());
         }

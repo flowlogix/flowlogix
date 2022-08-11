@@ -62,7 +62,7 @@ public class LoginBean {
         if (Faces.getViewId().contains("shiro/auth/")) {
             Faces.redirect(Faces.getRequestContextPath());
         } else {
-            Faces.redirect(Faces.getRequestContextPath() + Faces.getViewId());
+            Faces.redirect(Faces.getRequestURLWithQueryString());
         }
     }
 }

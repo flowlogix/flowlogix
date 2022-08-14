@@ -106,7 +106,9 @@ public class LoginBean {
                 cookieManager.getCookieStore().add(new URI(savedRequest), cookie);
                 HttpClient client = HttpClient.newBuilder().cookieHandler(cookieManager)
                         .build();
-                if (!STATE_SAVING_METHOD_CLIENT.equals(Servlets.getContext().getInitParameter(STATE_SAVING_METHOD_PARAM_NAME))) {
+                if (!STATE_SAVING_METHOD_CLIENT.equals(Servlets.getContext()
+                        .getInitParameter(STATE_SAVING_METHOD_PARAM_NAME)) &&
+                        !isStatelessForm(savedFormData)) {
                     HttpRequest getRequest = HttpRequest.newBuilder()
                             .uri(URI.create(savedRequest))
                             .GET().build();
@@ -152,6 +154,12 @@ public class LoginBean {
         } else {
             redirectToView();
         }
+    }
+
+    static boolean isStatelessForm(String savedFormData) {
+        var matcher = VIEW_STATE_PATTERN.matcher(savedFormData);
+        return matcher.find() && matcher.groupCount() >= 1
+                && matcher.group(1).equalsIgnoreCase("stateless");
     }
 
     void redirectToView() {

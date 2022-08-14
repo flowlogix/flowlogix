@@ -31,9 +31,16 @@ import org.omnifaces.util.Faces;
 public class FormBean {
     private String firstName;
     private String lastName;
+    private String address;
+    private String city;
 
     public void submit() {
         log.info("Form Submitted - firstName: {}, lastName: {}", firstName, lastName);
+        Faces.redirect(Faces.getRequestContextPath() + "/shiro/protected");
+    }
+
+    public void submit2() {
+        log.info("2nd Form Submitted - Address: {}, City: {}", address, city);
         Faces.redirect(Faces.getRequestContextPath() + "/shiro/protected");
     }
 }

@@ -28,6 +28,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import javax.enterprise.inject.Model;
+import static javax.faces.application.StateManager.STATE_SAVING_METHOD_CLIENT;
+import static javax.faces.application.StateManager.STATE_SAVING_METHOD_PARAM_NAME;
 import javax.servlet.http.Cookie;
 import javax.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -104,23 +106,25 @@ public class LoginBean {
                 cookieManager.getCookieStore().add(new URI(savedRequest), cookie);
                 HttpClient client = HttpClient.newBuilder().cookieHandler(cookieManager)
                         .build();
-                HttpRequest getRequest = HttpRequest.newBuilder()
-                        .uri(URI.create(savedRequest))
-                        .GET().build();
-                HttpResponse<String> htmlResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
-                if (htmlResponse.statusCode() != 200) {
-                    Faces.redirect(savedRequest);
-                    return;
-                }
-                Elements elts = Jsoup.parse(htmlResponse.body()).select(String.format("input[name=%s]", FACES_VIEW_STATE));
-                if (!elts.isEmpty()) {
-                    String viewState = elts.first().attr("value");
+                if (!STATE_SAVING_METHOD_CLIENT.equals(Servlets.getContext().getInitParameter(STATE_SAVING_METHOD_PARAM_NAME))) {
+                    HttpRequest getRequest = HttpRequest.newBuilder()
+                            .uri(URI.create(savedRequest))
+                            .GET().build();
+                    HttpResponse<String> htmlResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+                    if (htmlResponse.statusCode() != 200) {
+                        Faces.redirect(savedRequest);
+                        return;
+                    }
+                    Elements elts = Jsoup.parse(htmlResponse.body()).select(String.format("input[name=%s]", FACES_VIEW_STATE));
+                    if (!elts.isEmpty()) {
+                        String viewState = elts.first().attr("value");
 
-                    var matcher = VIEW_STATE_PATTERN.matcher(savedFormData);
-                    if (matcher.find()) {
-                         savedFormData = matcher.replaceFirst(FACES_VIEW_STATE_EQUALS +
-                                URLEncoder.encode(viewState, StandardCharsets.UTF_8));
-                        log.debug("Encoded w/Replaced ViewState: {}", savedFormData);
+                        var matcher = VIEW_STATE_PATTERN.matcher(savedFormData);
+                        if (matcher.find()) {
+                            savedFormData = matcher.replaceFirst(FACES_VIEW_STATE_EQUALS
+                                    + URLEncoder.encode(viewState, StandardCharsets.UTF_8));
+                            log.debug("Encoded w/Replaced ViewState: {}", savedFormData);
+                        }
                     }
                 }
                 HttpRequest postRequest = HttpRequest.newBuilder()

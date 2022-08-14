@@ -8,8 +8,6 @@
         <title>Form Page</title>
     </h:head>
     <h:body>
-        <f:view transient="true">
-
         <h:form>
             First Name:
             <h:inputText title="First Name" p:autofocus="true" value="#{formBean.firstName}"/>
@@ -20,8 +18,5 @@
             <h:commandButton value="Submit ..." action="#{formBean.submit}"/>
             <h:commandButton value="Logout..." action="#{loginBean.logout}"/>
         </h:form>
-
-        </f:view>
     </h:body>
 </html>
-

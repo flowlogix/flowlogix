@@ -34,6 +34,6 @@ public class FormBean {
 
     public void submit() {
         log.info("Form Submitted - firstName: {}, lastName: {}", firstName, lastName);
-        Faces.refresh();
+        Faces.redirect(Faces.getRequestContextPath() + "/shiro/protected");
     }
 }

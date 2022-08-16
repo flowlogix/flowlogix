@@ -50,6 +50,14 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     }
 
 
+    /**
+     * in case the login link is clicked directly,
+     * redirect to referer
+     *
+     * @param request
+     * @param response
+     * @return
+     */
     @Override
     protected boolean isLoginRequest(ServletRequest request, ServletResponse response)
     {

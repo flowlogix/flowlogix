@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.extractJSFNewViewState;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFStatefulFormForm;
 import static com.flowlogix.shiro.ee.filters.Forms.getReferer;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -72,7 +73,7 @@ public class FormSupportTest {
     void viewStatePattern() {
         String statefulFormData
                 = "j_idt5%3Dj_idt5%26j_idt5%253Aj_idt7%3Dasdfs%26j_idt5%253Aj_idt9%3Dsdgg%26j_idt5%253A"
-                + "j_idt11%3DSubmit%2B...%26javax.faces.ViewState%3D1021528686131418418%253A8597242449099599476";
+                + "j_idt11%3DSubmit%2B...%26javax.faces.ViewState%3D1021528686131418418%3A8597242449099599476";
         assertTrue(isJSFStatefulFormForm(statefulFormData));
         String statelessFormData
                 = "j_idt5%3Dj_idt5%26j_idt5%253Aj_idt7%3Dasdfs%26j_idt5%253Aj_idt9%3Dsdgg%26j_idt5%253A"
@@ -84,5 +85,28 @@ public class FormSupportTest {
                 + "j_idt11%3DSubmit%2B...";
         assertFalse(isJSFStatefulFormForm("xxx"));
         assertFalse(isJSFStatefulFormForm(nonJSFFormData));
+    }
+
+    @Test
+    void extractViewState() {
+        assertThrows(NullPointerException.class, () -> extractJSFNewViewState(null, null));
+        assertEquals("hello", extractJSFNewViewState("", "hello"));
+        assertEquals("javax.faces.ViewState%3Dstateless%26hello%3Dbye",
+                extractJSFNewViewState("xxx", "javax.faces.ViewState%3Dstateless%26hello%3Dbye"));
+        assertEquals("javax.faces.ViewState%3Dstateless%26hello%3Dbye",
+                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>",
+                        "javax.faces.ViewState%3Dstateless%26hello%3Dbye"));
+        assertEquals("javax.faces.ViewState%3Dxxx:yyy%26hello%3Dbye",
+                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>",
+                        "javax.faces.ViewState%3Dxxx:yyy%26hello%3Dbye"));
+        assertEquals("javax.faces.ViewState%3D123%3A456%26hello%3Dbye",
+                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>",
+                        "javax.faces.ViewState%3D987%3A654%26hello%3Dbye"));
+        assertEquals("javax.faces.ViewState%3D-123%3A-456%26hello%3Dbye",
+                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
+                        "javax.faces.ViewState%3D987%3A654%26hello%3Dbye"));
+        assertEquals("javax.faces.ViewState%3D-123%3A-456%26hello%3Dbye",
+                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
+                        "javax.faces.ViewState%3D-987%3A-654%26hello%3Dbye"));
     }
 }

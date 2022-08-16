@@ -15,12 +15,12 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SHIRO_FORM_DATA;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.regex.Pattern;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
@@ -42,13 +42,6 @@ import org.omnifaces.util.Servlets;
  */
 @Slf4j
 public class Forms {
-    // encoded view state
-    static final Pattern VIEW_STATE_PATTERN = Pattern.compile("javax.faces.ViewState=([%\\d\\w:-]+)");
-    static final String FACES_VIEW_STATE = "javax.faces.ViewState";
-    static final String FACES_VIEW_STATE_EQUALS = FACES_VIEW_STATE + "=";
-    static final String SHIRO_FORM_DATA = "SHIRO_FORM_DATA";
-
-
     /**
      * redirect to saved request, possibly resubmitting an existing form
      * the saved request is via a cookie

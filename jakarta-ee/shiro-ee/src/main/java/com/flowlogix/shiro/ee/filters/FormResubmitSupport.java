@@ -15,22 +15,18 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import static com.flowlogix.shiro.ee.filters.Forms.FACES_VIEW_STATE;
-import static com.flowlogix.shiro.ee.filters.Forms.FACES_VIEW_STATE_EQUALS;
-import static com.flowlogix.shiro.ee.filters.Forms.SHIRO_FORM_DATA;
-import static com.flowlogix.shiro.ee.filters.Forms.VIEW_STATE_PATTERN;
 import static com.flowlogix.shiro.ee.filters.Forms.deleteCookie;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import static javax.faces.application.StateManager.STATE_SAVING_METHOD_CLIENT;
 import static javax.faces.application.StateManager.STATE_SAVING_METHOD_PARAM_NAME;
@@ -53,11 +49,23 @@ import org.omnifaces.util.Faces;
 import org.omnifaces.util.Servlets;
 
 /**
+ * supporting methods for {@link Forms}
  *
  * @author lprimak
  */
 @Slf4j
 public class FormResubmitSupport {
+    // encoded view state
+    private static final String FACES_VIEW_STATE = "javax.faces.ViewState";
+    private static final String FACES_VIEW_STATE_EQUALS = FACES_VIEW_STATE
+            + URLEncoder.encode("=", StandardCharsets.UTF_8);
+    private static final Pattern VIEW_STATE_PATTERN
+            = Pattern.compile("(.*)" + "(" + FACES_VIEW_STATE_EQUALS + "[-]?[\\d]+"
+                    + URLEncoder.encode(":", StandardCharsets.UTF_8)
+                    + "[-]?[\\d]+)(.*)");
+    static final String SHIRO_FORM_DATA = "SHIRO_FORM_DATA";
+
+
     @SneakyThrows(IOException.class)
     static void savePostDataForResubmit(ServletRequest request, ServletResponse response, String loginUrl) {
         if (HttpMethod.POST.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())) {
@@ -67,7 +75,6 @@ public class FormResubmitSupport {
                     WebUtils.toHttp(request).getContextPath(),
                     // cookie age = session timeout
                     Servlets.getContext().getSessionTimeout() * 60);
-
         }
         boolean isGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
         Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
@@ -76,7 +83,8 @@ public class FormResubmitSupport {
                 "sessionExpired");
     }
 
-    static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest) throws InterruptedException, URISyntaxException, IOException {
+    static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest)
+            throws InterruptedException, URISyntaxException, IOException {
         log.debug("saved form data: {}", savedFormData);
         deleteCookie(SHIRO_FORM_DATA);
         HttpClient client = buildHttpClient(savedRequest);
@@ -115,24 +123,25 @@ public class FormResubmitSupport {
         return HttpClient.newBuilder().cookieHandler(cookieManager).build();
     }
 
-    private static String getJSFNewViewState(String savedRequest, HttpClient client, String savedFormData) throws IOException, InterruptedException {
+    private static String getJSFNewViewState(String savedRequest, HttpClient client, String savedFormData)
+            throws IOException, InterruptedException {
         var getRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest)).GET().build();
         HttpResponse<String> htmlResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
         if (htmlResponse.statusCode() == Response.Status.OK.getStatusCode()) {
-            savedFormData = extractJSFNewViewStte(htmlResponse.body(), savedFormData);
+            savedFormData = extractJSFNewViewState(htmlResponse.body(), savedFormData);
         }
         return savedFormData;
     }
 
-    private static String extractJSFNewViewStte(@NonNull String responseBody, @NonNull String savedFormData) {
+    static String extractJSFNewViewState(@NonNull String responseBody, @NonNull String savedFormData) {
         Elements elts = Jsoup.parse(responseBody).select(String.format("input[name=%s]", FACES_VIEW_STATE));
         if (!elts.isEmpty()) {
             String viewState = elts.first().attr("value");
 
             var matcher = VIEW_STATE_PATTERN.matcher(savedFormData);
-            if (matcher.find()) {
-                savedFormData = matcher.replaceFirst(FACES_VIEW_STATE_EQUALS
-                        + URLEncoder.encode(viewState, StandardCharsets.UTF_8));
+            if (matcher.matches()) {
+                savedFormData = matcher.replaceFirst("$1" + FACES_VIEW_STATE_EQUALS
+                        + URLEncoder.encode(viewState, StandardCharsets.UTF_8) + "$3");
                 log.debug("Encoded w/Replaced ViewState: {}", savedFormData);
             }
         }
@@ -140,9 +149,9 @@ public class FormResubmitSupport {
     }
 
     static boolean isJSFStatefulFormForm(@NonNull String savedFormData) {
-        var matcher = VIEW_STATE_PATTERN.matcher(URLDecoder.decode(savedFormData, StandardCharsets.UTF_8));
-        return matcher.find() && matcher.groupCount() >= 1
-                && !matcher.group(1).equalsIgnoreCase("stateless");
+        var matcher = VIEW_STATE_PATTERN.matcher(savedFormData);
+        return matcher.find() && matcher.groupCount() >= 2
+                && !matcher.group(2).equalsIgnoreCase("stateless");
     }
 
     private static boolean isJSFNewViewStateNeeded(@NonNull String savedFormData) {

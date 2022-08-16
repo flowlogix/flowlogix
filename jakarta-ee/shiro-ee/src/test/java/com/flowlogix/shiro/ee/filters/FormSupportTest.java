@@ -18,7 +18,7 @@ package com.flowlogix.shiro.ee.filters;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.extractJSFNewViewState;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFStatefulFormForm;
 import static com.flowlogix.shiro.ee.filters.Forms.getReferer;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -74,17 +74,17 @@ public class FormSupportTest {
     @Test
     void viewStatePattern() {
         String statefulFormData
-                = "j_idt5%3Dj_idt5%26j_idt5%253Aj_idt7%3Dasdfs%26j_idt5%253Aj_idt9%3Dsdgg%26j_idt5%253A"
-                + "j_idt11%3DSubmit%2B...%26javax.faces.ViewState%3D1021528686131418418%3A8597242449099599476";
-        assertTrue(isJSFStatefulFormForm(statefulFormData));
+                = "j_idt5%3Dj_idt5%26j_idt5%3Aj_idt7%3Daaa%26j_idt5%3Aj_idt9%3Dbbb%26j_idt5%3A"
+                + "j_idt11%3DSubmit+...%26javax.faces.ViewState%3D-8335355445345003673%3A-6008443334776649058";
+        assertTrue(isJSFStatefulFormForm(decode(statefulFormData)));
         String statelessFormData
-                = "j_idt5%3Dj_idt5%26j_idt5%253Aj_idt7%3Dasdfs%26j_idt5%253Aj_idt9%3Dsdgg%26j_idt5%253A"
-                + "j_idt11%3DSubmit%2B...%26javax.faces.ViewState%3Dstateless";
+                = "j_idt5%3Dj_idt5%26j_idt5%3Aj_idt7%3Daaa%26j_idt5%3Aj_idt9%3Dbbb%26j_idt5%3A"
+                + "j_idt11%3DSubmit+...%26javax.faces.ViewState%3Dstateless";
         assertFalse(isJSFStatefulFormForm(statelessFormData));
         assertThrows(NullPointerException.class, () -> isJSFStatefulFormForm(null));
         String nonJSFFormData
-                = "j_idt5%3Dj_idt5%26j_idt5%253Aj_idt7%3Dasdfs%26j_idt5%253Aj_idt9%3Dsdgg%26j_idt5%253A"
-                + "j_idt11%3DSubmit%2B...";
+                = "j_idt5%3Dj_idt5%26j_idt5%3Aj_idt7%3Daaa%26j_idt5%3Aj_idt9%3Dbbb%26j_idt5%3A"
+                + "j_idt11%3DSubmit+...";
         assertFalse(isJSFStatefulFormForm("xxx"));
         assertFalse(isJSFStatefulFormForm(nonJSFFormData));
     }
@@ -93,32 +93,32 @@ public class FormSupportTest {
     void extractViewState() {
         assertThrows(NullPointerException.class, () -> extractJSFNewViewState(null, null));
         assertEquals("hello", extractJSFNewViewState("", "hello"));
-        assertEquals(encode("javax.faces.ViewState=stateless&hello=bye"),
-                extractJSFNewViewState("xxx", encode("javax.faces.ViewState=stateless&hello=bye")));
-        assertEquals(encode("javax.faces.ViewState=stateless&hello=bye"),
+        assertEquals("javax.faces.ViewState=stateless&hello=bye",
+                extractJSFNewViewState("xxx", "javax.faces.ViewState=stateless&hello=bye"));
+        assertEquals("javax.faces.ViewState=stateless&hello=bye",
                 extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>",
-                        encode("javax.faces.ViewState=stateless&hello=bye")));
-        assertEquals(encode("aaa=bbb&javax.faces.ViewState=xxx:yyy&hello=bye"),
+                        "javax.faces.ViewState=stateless&hello=bye"));
+        assertEquals("aaa=bbb&javax.faces.ViewState=xxx:yyy&hello=bye",
                 extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>",
-                        encode("aaa=bbb&javax.faces.ViewState=xxx:yyy&hello=bye")));
-        assertEquals(encode("javax.faces.ViewState=123:456&hello=bye"),
+                        "aaa=bbb&javax.faces.ViewState=xxx:yyy&hello=bye"));
+        assertEquals("javax.faces.ViewState=123:456&hello=bye",
                 extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>",
-                        encode("javax.faces.ViewState=987:654&hello=bye")));
-        assertEquals(encode("javax.faces.ViewState=-123:-456&hello=bye"),
+                        "javax.faces.ViewState=987:654&hello=bye"));
+        assertEquals("javax.faces.ViewState=-123:-456&hello=bye",
                 extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
-                        encode("javax.faces.ViewState=987:654&hello=bye")));
-        assertEquals(encode("javax.faces.ViewState=-123:-456&hello=bye"),
+                        "javax.faces.ViewState=987:654&hello=bye"));
+        assertEquals("javax.faces.ViewState=-123:-456&hello=bye",
                 extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
-                        encode("javax.faces.ViewState=-987:-654&hello=bye")));
-        assertEquals(encode("aaa=bbb&javax.faces.ViewState=-123:-456&hello=bye"),
+                        "javax.faces.ViewState=-987:-654&hello=bye"));
+        assertEquals("aaa=bbb&javax.faces.ViewState=-123:-456&hello=bye",
                 extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
-                        encode("aaa=bbb&javax.faces.ViewState=-987:-654&hello=bye")));
-        assertEquals(encode("aaa=bbb&javax.faces.ViewState=-123:-456"),
+                        "aaa=bbb&javax.faces.ViewState=-987:-654&hello=bye"));
+        assertEquals("aaa=bbb&javax.faces.ViewState=-123:-456",
                 extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
-                        encode("aaa=bbb&javax.faces.ViewState=-987:-654")));
+                        "aaa=bbb&javax.faces.ViewState=-987:-654"));
     }
 
-    private static String encode(String plain) {
-        return URLEncoder.encode(plain, StandardCharsets.UTF_8);
+    private static String decode(String plain) {
+        return URLDecoder.decode(plain, StandardCharsets.UTF_8);
     }
 }

@@ -21,7 +21,7 @@ import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -57,19 +57,17 @@ import org.omnifaces.util.Servlets;
 public class FormResubmitSupport {
     // encoded view state
     private static final String FACES_VIEW_STATE = "javax.faces.ViewState";
-    private static final String FACES_VIEW_STATE_EQUALS = FACES_VIEW_STATE
-            + URLEncoder.encode("=", StandardCharsets.UTF_8);
+    private static final String FACES_VIEW_STATE_EQUALS = FACES_VIEW_STATE + "=";
     private static final Pattern VIEW_STATE_PATTERN
-            = Pattern.compile("(.*)" + "(" + FACES_VIEW_STATE_EQUALS + "[-]?[\\d]+"
-                    + URLEncoder.encode(":", StandardCharsets.UTF_8)
-                    + "[-]?[\\d]+)(.*)");
+            = Pattern.compile(String.format("(.*)(%s[-]?[\\d]+:[-]?[\\d]+)(.*)", FACES_VIEW_STATE_EQUALS));
     static final String SHIRO_FORM_DATA = "SHIRO_FORM_DATA";
 
 
     @SneakyThrows(IOException.class)
     static void savePostDataForResubmit(ServletRequest request, ServletResponse response, String loginUrl) {
         if (HttpMethod.POST.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())) {
-            String postData = request.getReader().lines().collect(Collectors.joining());
+            String postData = URLDecoder.decode(request.getReader().lines()
+                    .collect(Collectors.joining()), StandardCharsets.UTF_8);
             Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
                     SHIRO_FORM_DATA, postData, null,
                     WebUtils.toHttp(request).getContextPath(),
@@ -140,8 +138,8 @@ public class FormResubmitSupport {
 
             var matcher = VIEW_STATE_PATTERN.matcher(savedFormData);
             if (matcher.matches()) {
-                savedFormData = matcher.replaceFirst("$1" + FACES_VIEW_STATE_EQUALS
-                        + URLEncoder.encode(viewState, StandardCharsets.UTF_8) + "$3");
+                savedFormData = matcher.replaceFirst(String.format("$1%s%s$3",
+                        FACES_VIEW_STATE_EQUALS, viewState));
                 log.debug("Encoded w/Replaced ViewState: {}", savedFormData);
             }
         }

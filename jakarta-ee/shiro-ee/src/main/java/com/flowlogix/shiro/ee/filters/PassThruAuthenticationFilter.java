@@ -15,17 +15,15 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.savePostDataForResubmit;
+import static com.flowlogix.shiro.ee.filters.FormSupport.saveRequestReferer;
 import java.io.IOException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.HttpMethod;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.util.WebUtils;
-import org.omnifaces.util.Servlets;
 
 /**
  * Implements JSF Ajax redirection via OmniFaces
@@ -35,6 +33,8 @@ import org.omnifaces.util.Servlets;
 @Slf4j
 public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter
 {
+    private @Getter @Setter boolean useRemembered = false;
+
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue)
     {
@@ -46,11 +46,7 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     @Override
     protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException
     {
-        boolean isGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
-        Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                Servlets.getRequestBaseURL(WebUtils.toHttp(request))
-                + getLoginUrl().replaceFirst("^/", "") + (isGetRequest? "" : "?%s=true"),
-                "sessionExpired");
+        savePostDataForResubmit(request, response, getLoginUrl());
     }
 
 
@@ -58,15 +54,7 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     protected boolean isLoginRequest(ServletRequest request, ServletResponse response)
     {
         boolean rv = super.isLoginRequest(request, response);
-        if(rv && HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod()))
-        {
-            if(Servlets.getRequestCookie(WebUtils.toHttp(request), WebUtils.SAVED_REQUEST_KEY) == null)
-            {
-                // only save refer when there is no saved request cookie already,
-                // and only as a last resort
-                saveRequest(request, response, true);
-            }
-        }
+        saveRequestReferer(rv, request, response);
         return rv;
     }
 
@@ -74,39 +62,8 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     @Override
     protected void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException
     {
-        saveRequest(request, response, false);
+        FormSupport.saveRequest(request, response, false);
         redirectToLogin(request, response);
-    }
-
-
-    private void saveRequest(ServletRequest request, ServletResponse response, boolean useReferer)
-    {
-        String path = useReferer? getReferer(WebUtils.toHttp(request))
-                : Servlets.getRequestURLWithQueryString(WebUtils.toHttp(request));
-        if(path == null)
-        {
-            return;
-        }
-
-        Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                WebUtils.SAVED_REQUEST_KEY, path, null,
-                WebUtils.toHttp(request).getContextPath(), -1);
-    }
-
-
-    static String getReferer(HttpServletRequest request)
-    {
-        String referer = request.getHeader("referer");
-        if (referer != null)
-        {
-            // do not switch to https if custom port is specified
-            if(!referer.matches("^http:\\/\\/[A-z|.|[0-9]]+:[0-9]+(\\/.*|$)"))
-            {
-                referer = referer.replaceFirst("^http:", "https:");
-            }
-        }
-
-        return referer;
     }
 
 
@@ -115,7 +72,4 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     {
         throw new UnsupportedOperationException("bad op");
     }
-
-
-    private @Getter @Setter boolean useRemembered = false;
 }

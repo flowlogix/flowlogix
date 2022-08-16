@@ -15,11 +15,15 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import static com.flowlogix.shiro.ee.filters.PassThruAuthenticationFilter.getReferer;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFStatefulFormForm;
+import static com.flowlogix.shiro.ee.filters.FormSupport.getReferer;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 import javax.servlet.http.HttpServletRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
@@ -30,7 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author lprimak
  */
 @ExtendWith(MockitoExtension.class)
-public class PassThruAuthenticationFilterTest {
+public class FormSupportTest {
     @Mock
     private HttpServletRequest request;
 
@@ -62,5 +66,23 @@ public class PassThruAuthenticationFilterTest {
     void dontSwitchToHttpsWhenCustomPortNoTrailingSlash() {
         when(request.getHeader("referer")).thenReturn("http://example.com:8080");
         assertEquals("http://example.com:8080", getReferer(request));
+    }
+
+    @Test
+    void viewStatePattern() {
+        String statefulFormData
+                = "j_idt5%3Dj_idt5%26j_idt5%253Aj_idt7%3Dasdfs%26j_idt5%253Aj_idt9%3Dsdgg%26j_idt5%253A"
+                + "j_idt11%3DSubmit%2B...%26javax.faces.ViewState%3D1021528686131418418%253A8597242449099599476";
+        assertTrue(isJSFStatefulFormForm(statefulFormData));
+        String statelessFormData
+                = "j_idt5%3Dj_idt5%26j_idt5%253Aj_idt7%3Dasdfs%26j_idt5%253Aj_idt9%3Dsdgg%26j_idt5%253A"
+                + "j_idt11%3DSubmit%2B...%26javax.faces.ViewState%3Dstateless";
+        assertFalse(isJSFStatefulFormForm(statelessFormData));
+        assertThrows(NullPointerException.class, () -> isJSFStatefulFormForm(null));
+        String nonJSFFormData
+                = "j_idt5%3Dj_idt5%26j_idt5%253Aj_idt7%3Dasdfs%26j_idt5%253Aj_idt9%3Dsdgg%26j_idt5%253A"
+                + "j_idt11%3DSubmit%2B...";
+        assertFalse(isJSFStatefulFormForm("xxx"));
+        assertFalse(isJSFStatefulFormForm(nonJSFFormData));
     }
 }

@@ -15,8 +15,8 @@
  */
 package com.flowlogix.examples.shiro;
 
-import static com.flowlogix.shiro.ee.filters.FormSupport.redirectToSaved;
-import static com.flowlogix.shiro.ee.filters.FormSupport.redirectToView;
+import static com.flowlogix.shiro.ee.filters.Forms.redirectToSaved;
+import static com.flowlogix.shiro.ee.filters.Forms.redirectToView;
 import javax.enterprise.inject.Model;
 import javax.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -45,10 +45,11 @@ public class LoginBean {
     public void login() {
         try {
             SecurityUtils.getSubject().login(new UsernamePasswordToken(uname, pwd, rememberMe));
+            // redirect to index page as a fallback
             redirectToSaved(() -> Faces.getViewId().contains("shiro/auth/"), Faces.getRequestContextPath());
         } catch (AuthenticationException e) {
             Messages.addFlashGlobalError("Incorrect Login");
-            Faces.redirect(Faces.getRequestURLWithQueryString());
+            redirectToView();
         }
     }
 

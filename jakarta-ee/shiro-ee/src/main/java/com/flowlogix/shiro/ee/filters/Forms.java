@@ -38,7 +38,7 @@ import org.omnifaces.util.Servlets;
  * @author lprimak
  */
 @Slf4j
-public class FormSupport {
+public class Forms {
     // encoded view state
     static final Pattern VIEW_STATE_PATTERN = Pattern.compile("javax.faces.ViewState=([%\\d\\w:-]+)");
     static final String FACES_VIEW_STATE = "javax.faces.ViewState";
@@ -98,7 +98,7 @@ public class FormSupport {
             {
                 // only save refer when there is no saved request cookie already,
                 // and only as a last resort
-                FormSupport.saveRequest(request, response, true);
+                Forms.saveRequest(request, response, true);
             }
         }
     }

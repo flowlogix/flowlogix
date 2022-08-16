@@ -16,7 +16,7 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFStatefulFormForm;
-import static com.flowlogix.shiro.ee.filters.FormSupport.getReferer;
+import static com.flowlogix.shiro.ee.filters.Forms.getReferer;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;

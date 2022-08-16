@@ -15,11 +15,11 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import static com.flowlogix.shiro.ee.filters.FormSupport.FACES_VIEW_STATE;
-import static com.flowlogix.shiro.ee.filters.FormSupport.FACES_VIEW_STATE_EQUALS;
-import static com.flowlogix.shiro.ee.filters.FormSupport.SHIRO_FORM_DATA;
-import static com.flowlogix.shiro.ee.filters.FormSupport.VIEW_STATE_PATTERN;
-import static com.flowlogix.shiro.ee.filters.FormSupport.deleteCookie;
+import static com.flowlogix.shiro.ee.filters.Forms.FACES_VIEW_STATE;
+import static com.flowlogix.shiro.ee.filters.Forms.FACES_VIEW_STATE_EQUALS;
+import static com.flowlogix.shiro.ee.filters.Forms.SHIRO_FORM_DATA;
+import static com.flowlogix.shiro.ee.filters.Forms.VIEW_STATE_PATTERN;
+import static com.flowlogix.shiro.ee.filters.Forms.deleteCookie;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.HttpCookie;

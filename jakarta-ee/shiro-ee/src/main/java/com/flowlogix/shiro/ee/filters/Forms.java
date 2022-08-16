@@ -34,6 +34,9 @@ import org.omnifaces.util.Faces;
 import org.omnifaces.util.Servlets;
 
 /**
+ * Methods to redirect to saved requests upon logout
+ * functionality includes saving a previous form state and resubmitting
+ * if the form times out
  *
  * @author lprimak
  */
@@ -46,6 +49,13 @@ public class Forms {
     static final String SHIRO_FORM_DATA = "SHIRO_FORM_DATA";
 
 
+    /**
+     * redirect to saved request, possibly resubmitting an existing form
+     * the saved request is via a cookie
+     *
+     * @param useFallbackPath
+     * @param fallbackPath
+     */
     public static void redirectToSaved(Callable<Boolean> useFallbackPath, String fallbackPath) {
         redirectToSaved(useFallbackPath, fallbackPath, true);
     }
@@ -79,23 +89,18 @@ public class Forms {
     {
         String path = useReferer? getReferer(WebUtils.toHttp(request))
                 : Servlets.getRequestURLWithQueryString(WebUtils.toHttp(request));
-        if(path == null)
-        {
-            return;
+        if (path != null) {
+            Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
+                    WebUtils.SAVED_REQUEST_KEY, path, null,
+                    WebUtils.toHttp(request).getContextPath(),
+                    // cookie age = session timeout
+                    Servlets.getContext().getSessionTimeout() * 60);
         }
-
-        Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                WebUtils.SAVED_REQUEST_KEY, path, null,
-                WebUtils.toHttp(request).getContextPath(),
-                // cookie age = session timeout
-                Servlets.getContext().getSessionTimeout() * 60);
     }
 
     static void saveRequestReferer(boolean rv, ServletRequest request, ServletResponse response) {
-        if(rv && HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod()))
-        {
-            if(Servlets.getRequestCookie(WebUtils.toHttp(request), WebUtils.SAVED_REQUEST_KEY) == null)
-            {
+        if(rv && HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())) {
+            if(Servlets.getRequestCookie(WebUtils.toHttp(request), WebUtils.SAVED_REQUEST_KEY) == null) {
                 // only save refer when there is no saved request cookie already,
                 // and only as a last resort
                 Forms.saveRequest(request, response, true);
@@ -152,5 +157,4 @@ public class Forms {
         cookieToDelete.setMaxAge(0);
         Faces.getResponse().addCookie(cookieToDelete);
     }
-
 }

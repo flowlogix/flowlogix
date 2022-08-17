@@ -80,6 +80,22 @@ public class Forms {
         redirectToView(() -> false, null);
     }
 
+    /**
+     * redirects to current view after a form submit,
+     * or the fallback path if predicate succeeds
+     *
+     * @param useFallbackPath
+     * @param fallbackPath
+     */
+    @SneakyThrows
+    public static void redirectToView(Callable<Boolean> useFallbackPath, String fallbackPath) {
+        if (useFallbackPath.call()) {
+            Faces.redirect(fallbackPath);
+        } else {
+            Faces.redirect(Faces.getRequestURLWithQueryString());
+        }
+    }
+
     public static boolean isSessionExpired() {
         return wasViewExpired() || Boolean.parseBoolean(Faces.getRequestParameter(SESSION_EXPIRED_PARAMETER));
     }
@@ -120,22 +136,6 @@ public class Forms {
         }
 
         return referer;
-    }
-
-    /**
-     * redirects to current view after a form submit,
-     * or the fallback path if predicate succeeds
-     *
-     * @param useFallbackPath
-     * @param fallbackPath
-     */
-    @SneakyThrows
-    static void redirectToView(Callable<Boolean> useFallbackPath, String fallbackPath) {
-        if (useFallbackPath.call()) {
-            Faces.redirect(fallbackPath);
-        } else {
-            Faces.redirect(Faces.getRequestURLWithQueryString());
-        }
     }
 
     private static void doRedirectToSaved(@NonNull String savedRequest, boolean resubmit) throws IOException, URISyntaxException, InterruptedException {

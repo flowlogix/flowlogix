@@ -18,6 +18,7 @@ package com.flowlogix.examples.shiro;
 import com.flowlogix.shiro.ee.filters.Forms;
 import static com.flowlogix.shiro.ee.filters.Forms.redirectToSaved;
 import static com.flowlogix.shiro.ee.filters.Forms.redirectToView;
+import java.util.concurrent.Callable;
 import javax.enterprise.inject.Model;
 import javax.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -37,6 +38,8 @@ import org.omnifaces.util.Messages;
 @Getter @Setter
 @Slf4j
 public class LoginBean {
+    private static final Callable<Boolean> PREDICATE = () -> Faces.getViewId().contains("shiro/auth/");
+
     @NotBlank
     private String uname;
     @NotBlank
@@ -47,7 +50,7 @@ public class LoginBean {
         try {
             SecurityUtils.getSubject().login(new UsernamePasswordToken(uname, pwd, rememberMe));
             // redirect to index page as a fallback
-            redirectToSaved(() -> Faces.getViewId().contains("shiro/auth/"), Faces.getRequestContextPath());
+            redirectToSaved(PREDICATE, Faces.getRequestContextPath());
         } catch (AuthenticationException e) {
             Messages.addFlashGlobalError("Incorrect Login");
             redirectToView();
@@ -56,7 +59,7 @@ public class LoginBean {
 
     public void logout() {
         SecurityUtils.getSubject().logout();
-        redirectToView();
+        redirectToView(PREDICATE, Faces.getRequestContextPath());
     }
 
     public boolean isSessionExpired() {

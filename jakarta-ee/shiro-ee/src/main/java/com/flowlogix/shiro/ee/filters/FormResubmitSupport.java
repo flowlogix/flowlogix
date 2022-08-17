@@ -61,6 +61,7 @@ public class FormResubmitSupport {
     private static final Pattern VIEW_STATE_PATTERN
             = Pattern.compile(String.format("(.*)(%s[-]?[\\d]+:[-]?[\\d]+)(.*)", FACES_VIEW_STATE_EQUALS));
     static final String SHIRO_FORM_DATA = "SHIRO_FORM_DATA";
+    static final String SESSION_EXPIRED_PARAMETER = "sessionExpired";
 
 
     @SneakyThrows(IOException.class)
@@ -78,7 +79,7 @@ public class FormResubmitSupport {
         Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
                 Servlets.getRequestBaseURL(WebUtils.toHttp(request))
                 + loginUrl.replaceFirst("^/", "") + (isGetRequest? "" : "?%s=true"),
-                "sessionExpired");
+                SESSION_EXPIRED_PARAMETER);
     }
 
     static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest)

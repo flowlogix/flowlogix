@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SESSION_EXPIRED_PARAMETER;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SHIRO_FORM_DATA;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.web.util.WebUtils;
+import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Servlets;
 
@@ -76,6 +78,10 @@ public class Forms {
      */
     public static void redirectToView() {
         redirectToView(() -> false, null);
+    }
+
+    public static boolean isSessionExpired() {
+        return wasViewExpired() || Boolean.parseBoolean(Faces.getRequestParameter(SESSION_EXPIRED_PARAMETER));
     }
 
     static void saveRequest(ServletRequest request, ServletResponse response, boolean useReferer)

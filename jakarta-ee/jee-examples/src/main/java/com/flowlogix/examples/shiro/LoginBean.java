@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples.shiro;
 
+import com.flowlogix.shiro.ee.filters.Forms;
 import static com.flowlogix.shiro.ee.filters.Forms.redirectToSaved;
 import static com.flowlogix.shiro.ee.filters.Forms.redirectToView;
 import javax.enterprise.inject.Model;
@@ -56,5 +57,9 @@ public class LoginBean {
     public void logout() {
         SecurityUtils.getSubject().logout();
         redirectToView();
+    }
+
+    public boolean isSessionExpired() {
+        return Forms.isSessionExpired();
     }
 }

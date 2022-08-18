@@ -17,9 +17,12 @@ package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.extractJSFNewViewState;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFStatefulFormForm;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.transformCookieHeader;
 import static com.flowlogix.shiro.ee.filters.Forms.getReferer;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -116,6 +119,13 @@ public class FormSupportTest {
         assertEquals("aaa=bbb&javax.faces.ViewState=-123:-456",
                 extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
                         "aaa=bbb&javax.faces.ViewState=-987:-654"));
+    }
+
+    @Test
+    void parseCookies() {
+        var map = Map.of("name1", "value1", "name2", "value2", "name3", "value3");
+        assertEquals(map, transformCookieHeader(List.of("name1=value1", "name2=value2; path=/my/path", "name3=value3")));
+        assertEquals(Map.of("name", ""), transformCookieHeader(List.of("name=")));
     }
 
     private static String decode(String plain) {

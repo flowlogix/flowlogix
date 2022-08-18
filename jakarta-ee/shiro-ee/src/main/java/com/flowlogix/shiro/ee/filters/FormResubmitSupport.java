@@ -26,6 +26,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import static java.util.function.Predicate.not;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import static javax.faces.application.StateManager.STATE_SAVING_METHOD_CLIENT;
@@ -35,6 +38,7 @@ import javax.servlet.ServletResponse;
 import javax.ws.rs.HttpMethod;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.HttpHeaders.LOCATION;
+import static javax.ws.rs.core.HttpHeaders.SET_COOKIE;
 import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import javax.ws.rs.core.Response;
 import lombok.NonNull;
@@ -102,6 +106,13 @@ public class FormResubmitSupport {
     private static String processResubmitResponse(HttpResponse<String> response, String savedRequest) throws IOException {
         switch (Response.Status.fromStatusCode(response.statusCode())) {
             case FOUND:
+                transformCookieHeader(response.headers().allValues(SET_COOKIE))
+                        .entrySet().stream().filter(not(entry -> entry.getKey().equals(getSessionCookieName())))
+                        .forEach(entry -> {
+                            Faces.addResponseCookie(entry.getKey(),
+                                    URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8),
+                                    Servlets.getContext().getContextPath(), -1);
+                                });
                 return response.headers().firstValue(LOCATION).orElseThrow();
             case OK:
                 Faces.getResponse().getWriter().append(response.body());
@@ -112,14 +123,23 @@ public class FormResubmitSupport {
         }
     }
 
+    static Map<String, String> transformCookieHeader(@NonNull List<String> cookies) {
+        return cookies.stream().map(s -> s.split("[=;]"))
+                .collect(Collectors.toMap(k -> k[0], v -> (v.length > 1) ? v[1] : ""));
+    }
+
     private static HttpClient buildHttpClient(String savedRequest) throws URISyntaxException {
         CookieManager cookieManager = new CookieManager();
-        HttpCookie cookie = new HttpCookie(Servlets.getContext().getSessionCookieConfig().getName() != null
-                ? Servlets.getContext().getSessionCookieConfig().getName() : DEFAULT_SESSION_ID_NAME,
+        HttpCookie cookie = new HttpCookie(getSessionCookieName(),
                 SecurityUtils.getSubject().getSession().getId().toString());
         cookie.setPath(Servlets.getContext().getContextPath());
         cookieManager.getCookieStore().add(new URI(savedRequest), cookie);
         return HttpClient.newBuilder().cookieHandler(cookieManager).build();
+    }
+
+    private static String getSessionCookieName() {
+        return Servlets.getContext().getSessionCookieConfig().getName() != null
+                ? Servlets.getContext().getSessionCookieConfig().getName() : DEFAULT_SESSION_ID_NAME     ;
     }
 
     private static String getJSFNewViewState(String savedRequest, HttpClient client, String savedFormData)

@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Messages;
 
 /**
  *
@@ -35,12 +36,11 @@ public class FormBean {
     private String city;
 
     public void submit() {
-        log.info("Form Submitted - firstName: {}, lastName: {}", firstName, lastName);
+        Messages.addFlashGlobalInfo("Form Submitted - firstName: {0}, lastName: {1}", firstName, lastName);
         Faces.redirect(Faces.getRequestContextPath() + "/shiro/protected");
     }
 
     public void submit2() {
-        log.info("2nd Form Submitted - Address: {}, City: {}", address, city);
-        Faces.redirect(Faces.getRequestContextPath() + "/shiro/protected");
+        Messages.addGlobalInfo("2nd Form Submitted - Address: {0}, City: {1}", address, city);
     }
 }

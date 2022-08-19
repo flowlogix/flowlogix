@@ -15,7 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import static com.flowlogix.shiro.ee.filters.Forms.FLASH_COOKIE_AGE_PARAM_NAME;
+import static com.flowlogix.shiro.ee.filters.Forms.addCookie;
 import static com.flowlogix.shiro.ee.filters.Forms.deleteCookie;
 import java.io.IOException;
 import java.net.CookieManager;
@@ -29,7 +29,6 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import static java.util.function.Predicate.not;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -109,18 +108,17 @@ public class FormResubmitSupport {
         return processResubmitResponse(response, savedRequest);
     }
 
+    @SuppressWarnings("fallthrough")
     private static String processResubmitResponse(HttpResponse<String> response, String savedRequest) throws IOException {
         switch (Response.Status.fromStatusCode(response.statusCode())) {
             case FOUND:
-                int flashCookeMaxAge = Optional.ofNullable(Servlets.getContext()
-                        .getInitParameter(FLASH_COOKIE_AGE_PARAM_NAME))
-                        .map(Integer::parseInt).orElse(5);
                 transformCookieHeader(response.headers().allValues(SET_COOKIE))
                         .entrySet().stream().filter(not(entry -> entry.getKey().equals(getSessionCookieName())))
-                        .forEach(entry -> Faces.addResponseCookie(entry.getKey(),
-                        URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8),
-                        null, Servlets.getContext().getContextPath(), flashCookeMaxAge));
-                return response.headers().firstValue(LOCATION).orElseThrow();
+                        .forEach(entry -> addCookie(entry.getKey(), entry.getValue()));
+                // do not duplicate the flash cookie
+                // can't use Faces.redirect() here
+                Faces.getResponse().setStatus(response.statusCode());
+                Faces.getResponse().setHeader(LOCATION, response.headers().firstValue(LOCATION).orElseThrow());
             case OK:
                 Faces.getResponse().getWriter().append(response.body());
                 Faces.responseComplete();

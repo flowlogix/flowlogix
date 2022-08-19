@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.Forms.FLASH_COOKIE_AGE_PARAM_NAME;
 import static com.flowlogix.shiro.ee.filters.Forms.deleteCookie;
 import java.io.IOException;
 import java.net.CookieManager;
@@ -28,6 +29,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import static java.util.function.Predicate.not;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -64,6 +66,9 @@ public class FormResubmitSupport {
     private static final String FACES_VIEW_STATE_EQUALS = FACES_VIEW_STATE + "=";
     private static final Pattern VIEW_STATE_PATTERN
             = Pattern.compile(String.format("(.*)(%s[-]?[\\d]+:[-]?[\\d]+)(.*)", FACES_VIEW_STATE_EQUALS));
+    private static final String PARTIAL_VIEW = "javax.faces.partial";
+    private static final Pattern PARTIAL_REQUEST_PATTERN
+            = Pattern.compile(String.format("[\\&]?%s.\\w+=[\\w\\s:]*", PARTIAL_VIEW));
     static final String SHIRO_FORM_DATA = "SHIRO_FORM_DATA";
     static final String SESSION_EXPIRED_PARAMETER = "sessionExpired";
 
@@ -94,6 +99,7 @@ public class FormResubmitSupport {
         if (isJSFNewViewStateNeeded(savedFormData)) {
             savedFormData = getJSFNewViewState(savedRequest, client, savedFormData);
         }
+        savedFormData = noJSFAjaxRequests(savedFormData);
         HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest))
                 .POST(HttpRequest.BodyPublishers.ofString(savedFormData))
                 .headers(CONTENT_TYPE, APPLICATION_FORM_URLENCODED)
@@ -106,13 +112,14 @@ public class FormResubmitSupport {
     private static String processResubmitResponse(HttpResponse<String> response, String savedRequest) throws IOException {
         switch (Response.Status.fromStatusCode(response.statusCode())) {
             case FOUND:
+                int flashCookeMaxAge = Optional.ofNullable(Servlets.getContext()
+                        .getInitParameter(FLASH_COOKIE_AGE_PARAM_NAME))
+                        .map(Integer::parseInt).orElse(5);
                 transformCookieHeader(response.headers().allValues(SET_COOKIE))
                         .entrySet().stream().filter(not(entry -> entry.getKey().equals(getSessionCookieName())))
-                        .forEach(entry -> {
-                            Faces.addResponseCookie(entry.getKey(),
-                                    URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8),
-                                    Servlets.getContext().getContextPath(), -1);
-                                });
+                        .forEach(entry -> Faces.addResponseCookie(entry.getKey(),
+                        URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8),
+                        null, Servlets.getContext().getContextPath(), flashCookeMaxAge));
                 return response.headers().firstValue(LOCATION).orElseThrow();
             case OK:
                 Faces.getResponse().getWriter().append(response.body());
@@ -167,7 +174,11 @@ public class FormResubmitSupport {
         return savedFormData;
     }
 
-    static boolean isJSFStatefulFormForm(@NonNull String savedFormData) {
+    static String noJSFAjaxRequests(String savedFormData) {
+        return PARTIAL_REQUEST_PATTERN.matcher(savedFormData).replaceAll("");
+    }
+
+    static boolean isJSFStatefulForm(@NonNull String savedFormData) {
         var matcher = VIEW_STATE_PATTERN.matcher(savedFormData);
         return matcher.find() && matcher.groupCount() >= 2
                 && !matcher.group(2).equalsIgnoreCase("stateless");
@@ -176,6 +187,6 @@ public class FormResubmitSupport {
     private static boolean isJSFNewViewStateNeeded(@NonNull String savedFormData) {
         return !STATE_SAVING_METHOD_CLIENT.equals(Servlets.getContext()
                 .getInitParameter(STATE_SAVING_METHOD_PARAM_NAME))
-                && isJSFStatefulFormForm(savedFormData);
+                && isJSFStatefulForm(savedFormData);
     }
 }

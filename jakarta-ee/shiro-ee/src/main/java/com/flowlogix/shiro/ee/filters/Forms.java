@@ -45,6 +45,11 @@ import org.omnifaces.util.Servlets;
 @Slf4j
 public class Forms {
     /**
+     * Number of seconds duplicate flash cookie lives on the system
+     * Defaults to one second
+     */
+    public static final String FLASH_COOKIE_AGE_PARAM_NAME = "com.flowlogix.shiro.ee.FLASH_COOKIE_AGE_PARAM_NAME";
+    /**
      * redirect to saved request, possibly resubmitting an existing form
      * the saved request is via a cookie
      *

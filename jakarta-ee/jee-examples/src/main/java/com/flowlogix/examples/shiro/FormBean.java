@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples.shiro;
 
+import com.flowlogix.shiro.ee.filters.Forms;
 import javax.enterprise.inject.Model;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +42,11 @@ public class FormBean {
     }
 
     public void submit2() {
-        Messages.addGlobalInfo("2nd Form Submitted - Address: {0}, City: {1}", address, city);
+        if (Faces.isAjaxRequest()) {
+            Messages.addGlobalInfo("2nd Form Submitted - Address: {0}, City: {1}", address, city);
+        } else {
+            Messages.addFlashGlobalInfo("2nd Form Submitted - Address: {0}, City: {1}", address, city);
+            Forms.redirectToView();
+        }
     }
 }

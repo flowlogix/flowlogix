@@ -7,10 +7,10 @@
     </h:head>
     <h:body>
         Protected Page - User login required - Authorized!
-        <h:form>
+        <h:form id="form">
             <h:link value="Go to form" outcome="form"/>
             <p/>
-            <h:commandButton value="Logout..." action="#{loginBean.logout}"/>
+            <h:commandButton id="logout" value="Logout..." action="#{loginBean.logout}"/>
         </h:form>
         <h:messages/>
     </h:body>

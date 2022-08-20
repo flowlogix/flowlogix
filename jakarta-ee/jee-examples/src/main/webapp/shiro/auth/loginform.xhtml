@@ -14,17 +14,17 @@
     <h:body>
         Please Log In
         <p/>
-        <h:form>
+        <h:form id="form">
             Username: <h:inputText id="uname" p:autofocus="true" title="Username: "
                                    value="#{loginBean.uname}"/>
             <p/>
             Password: <h:inputText id="pwd" title="Password: "
                                    value="#{loginBean.pwd}"/>
             <p/>
-            Remember Me: <h:selectBooleanCheckbox id="mrememberMe" title="Remember Me: "
+            Remember Me: <h:selectBooleanCheckbox id="rememberMe" title="Remember Me: "
                                                   value="#{loginBean.rememberMe}"/>
             <p/>
-            <h:commandButton value="Login ..." action="#{loginBean.login}"/>
+            <h:commandButton id="login" value="Login ..." action="#{loginBean.login}"/>
         </h:form>
         <p/>
         <div jsf:rendered="#{loginBean.sessionExpired}" style="color: red;" id="sessionExpiredMessage">

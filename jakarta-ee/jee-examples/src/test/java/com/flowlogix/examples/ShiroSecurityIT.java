@@ -105,6 +105,22 @@ public class ShiroSecurityIT {
         assertTrue(webDriver.getCurrentUrl().contains("shiro/auth"), "redirect to login");
     }
 
+    @Test
+    void unauthorized() {
+        webDriver.get(baseURL + "shiro/adminpage");
+        waitGui(webDriver);
+        login();
+        assertEquals("Unauthorized", webDriver.getTitle());
+        guardHttp(logout).click();
+        assertEquals(baseURL + "index", webDriver.getCurrentUrl());
+        webDriver.get(baseURL + "shiro/adminpage");
+        waitGui(webDriver);
+        username.sendKeys("admin");
+        password.sendKeys("adminpwd");
+        guardHttp(login).click();
+        assertEquals("Admin Page", webDriver.getTitle());
+    }
+
     private void login() {
         username.sendKeys("webuser");
         password.sendKeys("webpwd");

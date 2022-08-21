@@ -19,6 +19,7 @@ import java.net.URL;
 import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit5.ArquillianExtension;
@@ -63,6 +64,36 @@ public class ShiroSecurityIT {
 
     @FindBy(id = "form:logout")
     private WebElement logout;
+
+    @FindBy(id = "firstForm:firstName")
+    private WebElement firstName;
+
+    @FindBy(id = "firstForm:lastName")
+    private WebElement lastName;
+
+    @FindBy(id = "firstForm:submitFirst")
+    private WebElement submitFirst;
+
+    @FindBy(id = "secondForm:address")
+    private WebElement address;
+
+    @FindBy(id = "secondForm:city")
+    private WebElement city;
+
+    @FindBy(id = "secondForm:submitSecond")
+    private WebElement submitSecond;
+
+    @FindBy(id = "secondForm:messages")
+    private WebElement secondFormMessages;
+
+    @FindBy(id = "invalidate")
+    private WebElement invalidateSession;
+
+    @FindBy(id = "messages")
+    private WebElement messages;
+
+    @FindBy(id = "sessionExpiredMessage")
+    private WebElement sessionExpiredMessage;
 
     @BeforeEach
     void deleteAllCookies() {
@@ -119,6 +150,66 @@ public class ShiroSecurityIT {
         password.sendKeys("adminpwd");
         guardHttp(login).click();
         assertEquals("Admin Page", webDriver.getTitle());
+    }
+
+    @Test
+    void incorrectLoginOnce() {
+        webDriver.get(baseURL + "shiro/protected");
+        waitGui(webDriver);
+        username.sendKeys("webuser");
+        password.sendKeys("wrongpwd");
+        guardHttp(login).click();
+        assertEquals("Incorrect Login", messages.getText());
+        login();
+        assertEquals("Protected Page", webDriver.getTitle());
+    }
+
+    @Test
+    void nonAjaxSessionExpired() {
+        webDriver.get(baseURL + "shiro/form");
+        waitGui(webDriver);
+        login();
+        invalidateSession.click();
+        waitGui(webDriver);
+        webDriver.switchTo().alert().accept();
+        firstName.sendKeys("Jack");
+        lastName.sendKeys("Frost");
+        guardHttp(submitFirst).click();
+        assertEquals("Your Session Has Expired", sessionExpiredMessage.getText());
+    }
+
+    @Test
+    void nonAjaxResubmit() {
+        nonAjaxSessionExpired();
+        login();
+        assertEquals("Form Submitted - firstName: Jack, lastName: Frost", messages.getText());
+    }
+
+    @Test
+    void ajaxSessionExpired() {
+        webDriver.get(baseURL + "shiro/form");
+        waitGui(webDriver);
+        login();
+        invalidateSession.click();
+        waitGui(webDriver);
+        webDriver.switchTo().alert().accept();
+        address.sendKeys("1 Houston Street");
+        city.sendKeys("New York");
+        guardHttp(submitSecond).click();
+        assertEquals("Your Session Has Expired", sessionExpiredMessage.getText());
+    }
+
+    @Test
+    void ajaxResubmmit() {
+        ajaxSessionExpired();
+        login();
+        assertEquals("2nd Form Submitted - Address: 1 Houston Street, City: New York",
+                secondFormMessages.getText());
+        address.sendKeys("Workshop");
+        city.sendKeys("North Pole");
+        guardAjax(submitSecond).click();
+        assertEquals("2nd Form Submitted - Address: Workshop, City: North Pole",
+                secondFormMessages.getText());
     }
 
     private void login() {

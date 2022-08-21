@@ -8,23 +8,23 @@
         <title>Form Page</title>
     </h:head>
     <h:body>
-        <h:form>
+        <h:form id="firstForm">
             First Name:
-            <h:inputText title="First Name" p:autofocus="true" value="#{formBean.firstName}"/>
+            <h:inputText id="firstName" title="First Name" p:autofocus="true" value="#{formBean.firstName}"/>
             <p/>
             Last Name:
-            <h:inputText title="Last Name" value="#{formBean.lastName}"/>
+            <h:inputText id="lastName" title="Last Name" value="#{formBean.lastName}"/>
             <p/>
-            <h:commandButton value="Submit ..." action="#{formBean.submit}"/>
+            <h:commandButton id="submitFirst" value="Submit ..." action="#{formBean.submit}"/>
         </h:form>
-        <h:form>
+        <h:form id="secondForm">
             Address:
-            <h:inputText value="#{formBean.address}"/>
+            <h:inputText id="address" value="#{formBean.address}"/>
             <p/>
             City:
-            <h:inputText value="#{formBean.city}"/>
+            <h:inputText id="city" value="#{formBean.city}"/>
             <p/>
-            <h:commandButton value="Submit ..." action="#{formBean.submit2}">
+            <h:commandButton id="submitSecond" value="Submit ..." action="#{formBean.submit2}">
                 <f:ajax execute="@form" render="@form"/>
             </h:commandButton>
             <p>
@@ -32,7 +32,7 @@
                        onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
                 <h:commandButton value="Logout..." action="#{loginBean.logout}"/>
             </p>
-            <h:messages/>
+            <h:messages id="messages"/>
         </h:form>
     </h:body>
 </html>

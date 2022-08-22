@@ -23,6 +23,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import lombok.AccessLevel;
 import lombok.Getter;
 
@@ -50,13 +51,15 @@ public class StatisticsResource {
     @GET
     @Path("{which}")
     @Produces(MediaType.TEXT_PLAIN)
-    public int getStatistic(@PathParam("which") String which) {
-        return statistics.getOrDefault(which, new AtomicInteger(0)).get();
+    public Response getStatistic(@PathParam("which") String which) {
+        return Response.ok(statistics.getOrDefault(which, new AtomicInteger(0)).get()).build();
     }
 
     @GET
     @Path("clear")
-    public void clear() {
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response clear() {
         statistics.clear();
+        return Response.ok().build();
     }
 }

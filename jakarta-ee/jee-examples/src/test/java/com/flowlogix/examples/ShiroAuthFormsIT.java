@@ -43,7 +43,7 @@ import org.openqa.selenium.support.FindBy;
  */
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
-public class ShiroSecurityIT {
+public class ShiroAuthFormsIT {
     @Drone
     private WebDriver webDriver;
 
@@ -103,7 +103,6 @@ public class ShiroSecurityIT {
     @Test
     void protectedPageWithLogin() {
         webDriver.get(baseURL + "shiro/protected");
-        waitGui(webDriver);
         assertTrue(webDriver.getCurrentUrl().contains("shiro/auth"), "redirect to login");
         login();
         assertEquals("Protected Page", webDriver.getTitle());
@@ -112,7 +111,6 @@ public class ShiroSecurityIT {
     @Test
     void checkLogout() {
         webDriver.get(baseURL + "shiro/protected");
-        waitGui(webDriver);
         login();
         guardHttp(logout).click();
         assertTrue(webDriver.getCurrentUrl().contains("shiro/auth"), "redirect to login");
@@ -123,14 +121,12 @@ public class ShiroSecurityIT {
     @Test
     void rememberMe() {
         webDriver.get(baseURL + "shiro/protected");
-        waitGui(webDriver);
         if (!rememberMe.isSelected()) {
             rememberMe.click();
         }
         login();
         webDriver.manage().deleteCookieNamed(DEFAULT_SESSION_ID_NAME);
         webDriver.navigate().refresh();
-        waitGui(webDriver);
         assertEquals("Protected Page", webDriver.getTitle());
         guardHttp(logout).click();
         assertTrue(webDriver.getCurrentUrl().contains("shiro/auth"), "redirect to login");
@@ -139,13 +135,11 @@ public class ShiroSecurityIT {
     @Test
     void unauthorized() {
         webDriver.get(baseURL + "shiro/adminpage");
-        waitGui(webDriver);
         login();
         assertEquals("Unauthorized", webDriver.getTitle());
         guardHttp(logout).click();
         assertEquals(baseURL + "index", webDriver.getCurrentUrl());
         webDriver.get(baseURL + "shiro/adminpage");
-        waitGui(webDriver);
         username.sendKeys("admin");
         password.sendKeys("adminpwd");
         guardHttp(login).click();
@@ -155,7 +149,6 @@ public class ShiroSecurityIT {
     @Test
     void incorrectLoginOnce() {
         webDriver.get(baseURL + "shiro/protected");
-        waitGui(webDriver);
         username.sendKeys("webuser");
         password.sendKeys("wrongpwd");
         guardHttp(login).click();
@@ -167,7 +160,6 @@ public class ShiroSecurityIT {
     @Test
     void nonAjaxSessionExpired() {
         webDriver.get(baseURL + "shiro/form");
-        waitGui(webDriver);
         login();
         invalidateSession.click();
         waitGui(webDriver);
@@ -188,7 +180,6 @@ public class ShiroSecurityIT {
     @Test
     void ajaxSessionExpired() {
         webDriver.get(baseURL + "shiro/form");
-        waitGui(webDriver);
         login();
         invalidateSession.click();
         waitGui(webDriver);
@@ -220,7 +211,7 @@ public class ShiroSecurityIT {
 
     @Deployment(testable = false, name = "DevMode")
     public static WebArchive createDeployment() {
-        return ShrinkWrap.create(MavenImporter.class, "shiro-security.war")
+        return ShrinkWrap.create(MavenImporter.class, "shiro-auth-forms.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
     }

@@ -87,7 +87,6 @@ public class ExceptionPageIT {
     @BeforeEach
     void fetchExceptionPage() {
         webDriver.get(baseURL + "exception-pages.xhtml");
-        waitGui(webDriver);
     }
 
     @Test
@@ -97,7 +96,6 @@ public class ExceptionPageIT {
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
         webDriver.get(baseURL + "lastException");
-        waitGui(webDriver);
         assertEquals("", webDriver.findElement(By.tagName("body")).getText());
     }
 
@@ -128,7 +126,6 @@ public class ExceptionPageIT {
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
         webDriver.get(baseURL + "lastException");
-        waitGui(webDriver);
         assertEquals("WARNING: javax.faces.FacesException: #{exceptionBean.throwExceptionFromMethod()}: "
                 + "java.sql.SQLException: sql-from-method", webDriver.findElement(By.tagName("body")).getText());
     }

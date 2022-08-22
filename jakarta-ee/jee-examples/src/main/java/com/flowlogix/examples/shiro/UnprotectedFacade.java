@@ -17,14 +17,13 @@ package com.flowlogix.examples.shiro;
 
 import com.flowlogix.logcapture.LogCapture;
 import com.flowlogix.shiro.ee.filters.Forms;
-import java.util.List;
-import java.util.concurrent.Callable;
 import javax.ejb.EJBException;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.UnauthenticatedException;
 import static org.omnifaces.util.Exceptions.unwrap;
+import org.omnifaces.util.Messages;
 
 /**
  *
@@ -40,30 +39,49 @@ public class UnprotectedFacade {
     ProtectedOmniViewScopedBean omniViewScoped;
 
     @Inject
+    ProtectedSessionScopedBean sessionScoped;
+
+    @Inject
     ProtectedStatelessBean stateless;
 
-    public String hello() throws Exception {
-        StringBuilder sb = new StringBuilder();
-        if (!Forms.isLoggedIn()) {
-            log.info("*=*=*=*= The next WARNING is legit, it's expected");
+    public void callFacesViewScoped() {
+        try {
+            Messages.addGlobalInfo(viewScoped.hello());
+        } catch (UnauthenticatedException e) {
+            Messages.addGlobalInfo("view scope unauth: {0}", e.getMessage());
         }
-        for (var method : List.<Callable<String>>of(viewScoped::hello, omniViewScoped::hello,
-                stateless::hello)) {
-            try {
-                sb.append(method.call());
-            } catch (UnauthenticatedException e) {
-                sb.append(e.getMessage());
-            } catch (EJBException e) {
-                var real = unwrap(e, EJBException.class);
-                if (real instanceof UnauthenticatedException) {
-                    sb.append(real.getMessage());
-                    LogCapture.get().poll();
-                } else {
-                    throw e;
-                }
+    }
+
+    public void callOmniViewScoped() {
+        try {
+            Messages.addGlobalInfo(omniViewScoped.hello());
+        } catch (UnauthenticatedException e) {
+            Messages.addGlobalInfo("omni view scope unauth: {0}", e.getMessage());
+        }
+    }
+
+    public void callSessionScoped() {
+        try {
+            Messages.addGlobalInfo(sessionScoped.hello());
+        } catch (UnauthenticatedException e) {
+            Messages.addGlobalInfo("session scoped unauth: {0}", e.getMessage());
+        }
+    }
+
+    public void callStatelessBean() {
+        try {
+            if (!Forms.isLoggedIn()) {
+                log.info("*=*=*=*= The next WARNING is legit, it's expected");
             }
-            sb.append("<br>");
+            Messages.addGlobalInfo(stateless.hello());
+        } catch (EJBException e) {
+            var real = unwrap(e, EJBException.class);
+            if (real instanceof UnauthenticatedException) {
+                Messages.addGlobalInfo("stateless bean unauth: {0}", e.getMessage());
+                LogCapture.get().poll();
+            } else {
+                Messages.addGlobalError("Stateless - Unexpected Exception: {0}", e.getMessage());
+            }
         }
-        return sb.toString();
     }
 }

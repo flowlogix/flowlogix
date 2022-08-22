@@ -20,21 +20,20 @@ import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.faces.context.FacesContext;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresUser;
-import org.omnifaces.cdi.ViewScoped;
 
 /**
  *
  * @author lprimak
  */
-@ViewScoped
+@SessionScoped
 @Named
 @RequiresUser
 @Slf4j
-public class ProtectedOmniViewScopedBean implements Serializable {
+public class ProtectedSessionScopedBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final AtomicInteger instanceCount = new AtomicInteger();
@@ -42,16 +41,15 @@ public class ProtectedOmniViewScopedBean implements Serializable {
 
     @PostConstruct
     void postConstruct() {
-        increment("pc_ofv");
+        increment("pc_ss");
     }
 
     @PreDestroy
     void preDestroy() {
-        increment("pd_ofv");
+        increment("pd_ss");
     }
 
     public String hello() {
-        return String.format("Hello from OmniViewScoped %s - %s", count,
-        FacesContext.class.getPackage().getImplementationVersion());
+        return String.format("Hello from SessionScoped %s", count);
     }
 }

@@ -42,13 +42,11 @@ public class ProtectedFacesViewScopedBean implements Serializable {
 
     @PostConstruct
     void postConstruct() {
-        log.info("FacesViewScoped: postConstruct: {}", count);
         increment("pc_fv");
     }
 
     @PreDestroy
     void preDestroy() {
-        log.info("FacesViewScoped: preDestroy: {}", count);
         increment("pd_fv");
     }
 

@@ -29,7 +29,6 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
-import javax.faces.view.ViewScoped;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
@@ -44,22 +43,26 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
 {
     private static final List<ShiroScopeContext> contexts = Stream.of(
             new ShiroScopeContext(ShiroSessionScoped.class, SessionScoped.class),
-            new ShiroScopeContext(ShiroViewScoped.class, ViewScoped.class))
+            new ShiroScopeContext(ShiroFacesViewScoped.class, javax.faces.view.ViewScoped.class),
+            new ShiroScopeContext(ShiroOmniViewScoped.class, org.omnifaces.cdi.ViewScoped.class))
             .collect(Collectors.toList());
 
     @SessionScoped
     @SuppressWarnings("serial")
     private static class SessionScopedAnnotated implements Serializable { }
-    @ViewScoped
+    @javax.faces.view.ViewScoped
     @SuppressWarnings("serial")
-    private static class ViewScopedAnnotated implements Serializable { }
+    private static class FacesViewScopedAnnotated implements Serializable { }
 
     @ShiroSessionScoped
     @SuppressWarnings("serial")
     private static class ShiroSessionScopedAnnotated implements Serializable { }
-    @ShiroViewScoped
+    @ShiroFacesViewScoped
     @SuppressWarnings("serial")
-    private static class ShiroViewScopedAnnotated implements Serializable { }
+    private static class ShiroFacesViewScopedAnnotated implements Serializable { }
+    @ShiroOmniViewScoped
+    @SuppressWarnings("serial")
+    private static class ShiroOmniViewScopedAnnotated implements Serializable { }
 
 
     /**
@@ -88,11 +91,18 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
                 Set.of(SessionScopedAnnotated.class.getDeclaredAnnotations()[0])));
     }
 
-    <T> void addViewScoped(@Observes @WithAnnotations(ViewScoped.class) ProcessAnnotatedType<T> pat) {
+    <T> void addFacesViewScoped(@Observes @WithAnnotations(javax.faces.view.ViewScoped.class) ProcessAnnotatedType<T> pat) {
         pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
-                Set.of(ShiroViewScopedAnnotated.class.getDeclaredAnnotations()[0],
+                Set.of(ShiroFacesViewScopedAnnotated.class.getDeclaredAnnotations()[0],
                         ShiroSecureAnnotated.class.getDeclaredAnnotations()[0]),
-                Set.of(ViewScopedAnnotated.class.getDeclaredAnnotations()[0])));
+                Set.of(FacesViewScopedAnnotated.class.getDeclaredAnnotations()[0])));
+    }
+
+    <T> void addOmniViewScoped(@Observes @WithAnnotations(org.omnifaces.cdi.ViewScoped.class) ProcessAnnotatedType<T> pat) {
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
+                Set.of(ShiroOmniViewScopedAnnotated.class.getDeclaredAnnotations()[0],
+                        ShiroSecureAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of(ShiroOmniViewScopedAnnotated.class.getDeclaredAnnotations()[0])));
     }
 
     void addScope(@Observes final BeforeBeanDiscovery event)

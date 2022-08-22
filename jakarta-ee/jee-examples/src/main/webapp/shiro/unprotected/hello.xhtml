@@ -6,7 +6,7 @@
         <title>Hello Unprotected</title>
     </h:head>
     <h:body>
-        Hello from ViewScoped: #{protectedViewScopedBean.hello()}
+        Hello from ViewScoped: <h:outputText value ="#{unprotectedFacade.hello()}" escape="false"/>
         <p/>
         <h:form>
             <h:commandButton id="logout" value="Logout..." action="#{loginBean.logout}"/>

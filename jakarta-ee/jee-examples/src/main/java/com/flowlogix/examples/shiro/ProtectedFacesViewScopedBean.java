@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples.shiro;
 
+import static com.flowlogix.examples.shiro.StatisticsResource.increment;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
@@ -33,7 +34,7 @@ import org.apache.shiro.authz.annotation.RequiresUser;
 @Named
 @RequiresUser
 @Slf4j
-public class ProtectedViewScopedBean implements Serializable {
+public class ProtectedFacesViewScopedBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final AtomicInteger instanceCount = new AtomicInteger();
@@ -41,16 +42,18 @@ public class ProtectedViewScopedBean implements Serializable {
 
     @PostConstruct
     void postConstruct() {
-        log.info("ViewScoped: postConstruct: {}", count);
+        log.info("FacesViewScoped: postConstruct: {}", count);
+        increment("pc_fv");
     }
 
     @PreDestroy
     void preDestroy() {
-        log.info("ViewScoped: preDestroy: {}", count);
+        log.info("FacesViewScoped: preDestroy: {}", count);
+        increment("pd_fv");
     }
 
     public String hello() {
-        return String.format("Hello from ViewScoped %s - %s", count,
+        return String.format("Hello from FacesViewScoped %s - %s", count,
         FacesContext.class.getPackage().getImplementationVersion());
     }
 }

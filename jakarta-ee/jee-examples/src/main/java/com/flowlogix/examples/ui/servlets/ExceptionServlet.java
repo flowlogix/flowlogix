@@ -18,12 +18,14 @@ package com.flowlogix.examples.ui.servlets;
 import com.flowlogix.logcapture.LogCapture;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.LogRecord;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 /**
  *
@@ -36,8 +38,8 @@ public class ExceptionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter out = resp.getWriter();
-        resp.setContentType("text/plain");
-        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType(TEXT_PLAIN);
+        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         LogRecord record = LogCapture.get().poll();
         while (record != null) {

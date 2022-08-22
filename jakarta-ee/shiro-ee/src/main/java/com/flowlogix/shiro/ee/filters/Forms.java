@@ -30,6 +30,7 @@ import javax.ws.rs.HttpMethod;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.web.util.WebUtils;
 import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
 import org.omnifaces.util.Faces;
@@ -94,6 +95,11 @@ public class Forms {
         } else {
             Faces.redirect(Faces.getRequestURLWithQueryString());
         }
+    }
+
+    public static boolean isLoggedIn() {
+        var subject = SecurityUtils.getSubject();
+        return subject.isAuthenticated() || subject.isRemembered();
     }
 
     public static boolean isSessionExpired() {

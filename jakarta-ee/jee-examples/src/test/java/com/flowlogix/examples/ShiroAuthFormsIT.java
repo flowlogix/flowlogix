@@ -187,7 +187,8 @@ public class ShiroAuthFormsIT {
         webDriver.switchTo().alert().accept();
         address.sendKeys("1 Houston Street");
         city.sendKeys("New York");
-        waitForHttp(submitSecond).click();
+        submitSecond.click();
+        waitForHttp(webDriver);
         assertEquals("Your Session Has Expired", sessionExpiredMessage.getText());
     }
 

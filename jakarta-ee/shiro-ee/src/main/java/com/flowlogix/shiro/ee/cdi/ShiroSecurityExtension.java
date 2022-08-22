@@ -31,9 +31,13 @@ import org.apache.shiro.authz.annotation.RequiresUser;
  * @author lprimak
  */
 public class ShiroSecurityExtension implements Extension {
+    @ShiroSecureAnnotation
+    static class ShiroSecureAnnotated { };
+
     public <T> void addSecurity(@Observes @WithAnnotations({
         RequiresAuthentication.class, RequiresGuest.class, RequiresPermissions.class,
         RequiresRoles.class, RequiresUser.class}) ProcessAnnotatedType<T> pat) {
-        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroSecureAnnotation.class));
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(),
+                ShiroSecureAnnotated.class.getDeclaredAnnotations()[0]));
     }
 }

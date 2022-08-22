@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.cdi;
 
+import com.flowlogix.shiro.ee.cdi.ShiroSecurityExtension.ShiroSecureAnnotated;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -30,7 +31,6 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
 import javax.faces.view.ViewScoped;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.SessionListenerAdapter;
@@ -54,9 +54,14 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
     @SuppressWarnings("serial")
     private static class ViewScopedAnnotated implements Serializable { }
 
-    public void addDestroyHandlers(Collection<SessionListener> sessionListeners) {
-        addDestroyHandlers(sessionListeners, SecurityUtils.getSecurityManager());
-    }
+    @ShiroSessionScoped
+    @SuppressWarnings("serial")
+    private static class ShiroSessionScopedAnnotated implements Serializable { }
+    @ShiroViewScoped
+    @SuppressWarnings("serial")
+    private static class ShiroViewScopedAnnotated implements Serializable { }
+
+
     /**
      * intercept session destroy session listeners and destroy the beans
      *
@@ -88,14 +93,16 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
 
     <T> void addSessionScoped(@Observes @WithAnnotations(SessionScoped.class) ProcessAnnotatedType<T> pat) {
         pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
-                Set.of(SessionScopedAnnotated.class.getDeclaredAnnotations()[0]),
-                Set.of(() -> ShiroSessionScoped.class)));
+                Set.of(ShiroSessionScopedAnnotated.class.getDeclaredAnnotations()[0],
+                        ShiroSecureAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of(SessionScopedAnnotated.class.getDeclaredAnnotations()[0])));
     }
 
     <T> void addViewScoped(@Observes @WithAnnotations(ViewScoped.class) ProcessAnnotatedType<T> pat) {
         pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
-                Set.of(ViewScopedAnnotated.class.getDeclaredAnnotations()[0]),
-                Set.of(() -> ShiroViewScoped.class)));
+                Set.of(ShiroViewScopedAnnotated.class.getDeclaredAnnotations()[0],
+                        ShiroSecureAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of(ViewScopedAnnotated.class.getDeclaredAnnotations()[0])));
     }
 
     void addScope(@Observes final BeforeBeanDiscovery event)

@@ -51,6 +51,7 @@ class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
         if(keepOriginalAnnotations)
         {
             var annotationTypesToExclude = annotationsToRemove.stream()
+                    .map(AnnotatedTypeWrapper::checkIfAnnotation)
                     .map(Annotation::annotationType).collect(Collectors.toSet());
             wrapped.getAnnotations().stream().filter(ann ->
                     !annotationTypesToExclude.contains(ann.annotationType()))
@@ -67,10 +68,14 @@ class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
     }
 
     private void addToBuilder(Stream.Builder<Annotation> builder, Annotation ann) {
-        if (ann.annotationType().isInstance(ann)) {
-            builder.add(ann);
-        } else {
+        checkIfAnnotation(ann);
+        builder.add(ann);
+    }
+
+    private static Annotation checkIfAnnotation(Annotation ann) {
+        if (!ann.annotationType().isInstance(ann)) {
             throw new IllegalArgumentException(ann.getClass().getName());
         }
+        return ann;
     }
 }

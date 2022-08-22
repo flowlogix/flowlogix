@@ -125,7 +125,7 @@ public class ShiroScopeContext implements Context, Serializable
     }
 
 
-    public <T> void onDestroy(Session session)
+    <T> void onDestroy(Session session)
     {
         List<String> attrNames = session.getAttributeKeys().stream()
                 .filter(String.class::isInstance)

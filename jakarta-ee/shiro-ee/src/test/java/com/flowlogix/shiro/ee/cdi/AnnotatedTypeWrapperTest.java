@@ -95,7 +95,7 @@ class AnnotatedTypeWrapperTest {
         initializeStubs();
         var wrapper = new AnnotatedTypeWrapper<>(annotatedType, true,
                 Set.of(SessionScopedAnnotated.class.getDeclaredAnnotations()[0]),
-                Set.of(() -> RequiresGuest.class));
+                Set.of(Annotated.class.getDeclaredAnnotations()[1]));
         assertEquals(3, wrapper.getAnnotations().size());
         assertFalse(wrapper.isAnnotationPresent(RequiresGuest.class));
         assertTrue(wrapper.isAnnotationPresent(SessionScoped.class));
@@ -106,6 +106,14 @@ class AnnotatedTypeWrapperTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new AnnotatedTypeWrapper<>(annotatedType, true,
                 Set.of(() -> SessionScoped.class),
+                Set.of(() -> RequiresGuest.class)));
+        assertThrows(IllegalArgumentException.class,
+                () -> new AnnotatedTypeWrapper<>(annotatedType, true,
+                Set.of(() -> RequiresGuest.class),
+                Set.of()));
+        assertThrows(IllegalArgumentException.class,
+                () -> new AnnotatedTypeWrapper<>(annotatedType, true,
+                Set.of(),
                 Set.of(() -> RequiresGuest.class)));
     }
 

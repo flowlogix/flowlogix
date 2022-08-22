@@ -16,11 +16,14 @@
 package com.flowlogix.examples.shiro;
 
 import com.flowlogix.logcapture.LogCapture;
+import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.isWebContainerSessions;
 import com.flowlogix.shiro.ee.filters.Forms;
+import java.util.Map;
 import javax.ejb.EJBException;
 import javax.enterprise.inject.Model;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthenticatedException;
 import static org.omnifaces.util.Exceptions.unwrap;
 import org.omnifaces.util.Messages;
@@ -43,6 +46,9 @@ public class UnprotectedFacade {
 
     @Inject
     ProtectedStatelessBean stateless;
+
+    @Inject
+    ProtectedOneMethod protectedOneMethod;
 
     public void callFacesViewScoped() {
         try {
@@ -83,5 +89,29 @@ public class UnprotectedFacade {
                 Messages.addGlobalError("Stateless - Unexpected Exception: {0}", e.getMessage());
             }
         }
+    }
+
+    public void callUnprotectedMethod() {
+        try {
+            Messages.addGlobalInfo("unprotected method: {0}", protectedOneMethod.unprotectedMethod());
+        } catch (UnauthenticatedException e) {
+            Messages.addGlobalInfo("unprotected unauth: {0}", e.getMessage());
+        }
+    }
+
+    public void callProtectedMethod() {
+        try {
+            Messages.addGlobalInfo("protected method: {0}", protectedOneMethod.protectedMethod());
+        } catch (UnauthenticatedException e) {
+            Messages.addGlobalInfo("protected unauth: {0}", e.getMessage());
+        }
+    }
+
+    public Map<?, ?> getStatistics() {
+        return StatisticsResource.getStatistics();
+    }
+
+    public boolean isUsingWebSessions() {
+        return isWebContainerSessions(SecurityUtils.getSecurityManager());
     }
 }

@@ -23,6 +23,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
+import lombok.AccessLevel;
+import lombok.Getter;
 
 /**
  * REST Web Service
@@ -31,6 +33,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("statistics")
 public class StatisticsResource {
+    @Getter(AccessLevel.PACKAGE)
     private static final Map<String, AtomicInteger> statistics = new ConcurrentHashMap<>();
 
     public static void increment(String which) {
@@ -49,5 +52,11 @@ public class StatisticsResource {
     @Produces(MediaType.TEXT_PLAIN)
     public int getStatistic(@PathParam("which") String which) {
         return statistics.getOrDefault(which, new AtomicInteger(0)).get();
+    }
+
+    @GET
+    @Path("clear")
+    public void clear() {
+        statistics.clear();
     }
 }

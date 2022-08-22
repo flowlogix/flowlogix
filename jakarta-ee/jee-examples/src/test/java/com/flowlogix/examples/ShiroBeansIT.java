@@ -20,16 +20,19 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
+import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -59,6 +62,12 @@ public class ShiroBeansIT {
     @FindBy(id = "form:stateless")
     private WebElement stateless;
 
+    @FindBy(id = "form:unprotected")
+    private WebElement unprotectedMethod;
+
+    @FindBy(id = "form:protected")
+    private WebElement protectedMethod;
+
     @FindBy(id = "invalidate")
     private WebElement invalidateSession;
 
@@ -74,10 +83,13 @@ public class ShiroBeansIT {
     @FindBy(id = "form:login")
     private WebElement login;
 
+    @FindBy(id = "usingWebSessions")
+    private WebElement usingWebSessions;
 
     @BeforeEach
     void deleteAllCookies() {
         webDriver.manage().deleteAllCookies();
+        webDriver.get(baseURL + "api/statistics/clear");
     }
 
     @Test
@@ -95,6 +107,11 @@ public class ShiroBeansIT {
         guardAjax(stateless).click();
         assertTrue(messages.getText().startsWith("stateless bean unauth: Attempting to perform a user-only operation"),
                 "anonymous user should get an exception");
+        guardAjax(unprotectedMethod).click();
+        assertEquals("unprotected method: hello from unprotected", messages.getText());
+        guardAjax(protectedMethod).click();
+        assertTrue(messages.getText().startsWith("protected unauth: Attempting to perform a user-only operation"),
+                "anonymous user should get an exception");
     }
 
     @Test
@@ -111,6 +128,40 @@ public class ShiroBeansIT {
         assertTrue(messages.getText().startsWith("Hello from SessionScoped"));
         guardAjax(stateless).click();
         assertTrue(messages.getText().startsWith("Hello from ProtectedStatelessBean"));
+        guardAjax(protectedMethod).click();
+        assertEquals("protected method: hello from protected", messages.getText());
+    }
+
+    @Test
+    void beanDestroyCalled() {
+        exersizeViewAndSessionScoped(facesViewScoped, "api/statistics/pc_fv", "api/statistics/pd_fv", true);
+        webDriver.get(baseURL + "api/statistics/clear");
+        exersizeViewAndSessionScoped(omniViewScoped, "api/statistics/pc_ofv", "api/statistics/pd_ofv", false);
+    }
+
+    private void exersizeViewAndSessionScoped(WebElement elem, String createStatistic, String destroyStatistic,
+            boolean isBrokenDestructor) {
+        webDriver.get(baseURL + "shiro/auth/loginform");
+        login();
+
+        webDriver.get(baseURL + "shiro/unprotected/hello");
+        boolean webSessions = Boolean.parseBoolean(usingWebSessions.getText());
+        guardAjax(elem).click();
+        webDriver.navigate().refresh();
+        guardAjax(elem).click();
+        guardAjax(sessionScoped).click();
+
+        invalidateSession.click();
+        waitGui(webDriver);
+        webDriver.switchTo().alert().accept();
+        webDriver.get(baseURL + createStatistic);
+        assertEquals("2", webDriver.findElement(By.tagName("body")).getText());
+        webDriver.get(baseURL + destroyStatistic);
+        assertEquals(isBrokenDestructor && webSessions ? "1" : "2", webDriver.findElement(By.tagName("body")).getText());
+        webDriver.get(baseURL + "api/statistics/pc_ss");
+        assertEquals("1", webDriver.findElement(By.tagName("body")).getText());
+        webDriver.get(baseURL + "api/statistics/pd_ss");
+        assertEquals("1", webDriver.findElement(By.tagName("body")).getText());
     }
 
     private void login() {

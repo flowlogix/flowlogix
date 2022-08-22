@@ -95,7 +95,7 @@ public class ShiroScopeContextTest {
 
     @Test
     void nativeSessionsGet() {
-        assertFalse(isWebContainerSessions(SecurityUtils.getSecurityManager()));
+        assertFalse(isWebContainerSessions());
         when(SecurityUtils.getSubject().getSession(false).getAttribute(any()))
                 .thenReturn(new ShiroScopeContext.ScopeInst<>(contextual,
                         bean, null));

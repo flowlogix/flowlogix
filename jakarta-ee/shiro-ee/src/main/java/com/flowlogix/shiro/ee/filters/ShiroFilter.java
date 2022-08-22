@@ -43,8 +43,7 @@ import org.omnifaces.util.Lazy;
  *
  * @author lprimak
  */
-public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
-{
+public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     private static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
     private static final Pattern HTTP_TO_HTTPS = Pattern.compile("^\\s*http(.*)");
     private @Inject ShiroSessionScopeExtension ssse;
@@ -58,8 +57,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
         }
 
         @Override
-        public Principal getUserPrincipal()
-        {
+        public Principal getUserPrincipal() {
             return null;
         }
 
@@ -100,8 +98,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter
 
 
     @Override
-    protected ServletRequest wrapServletRequest(HttpServletRequest orig)
-    {
+    protected ServletRequest wrapServletRequest(HttpServletRequest orig) {
         return new WrappedRequest(orig, getServletContext(), isHttpSessions());
     }
 

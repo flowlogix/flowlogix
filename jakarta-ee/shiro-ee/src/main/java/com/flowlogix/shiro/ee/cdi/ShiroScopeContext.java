@@ -29,6 +29,7 @@ import javax.enterprise.inject.spi.CDI;
 import lombok.RequiredArgsConstructor;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 
@@ -60,8 +61,7 @@ public class ShiroScopeContext implements Context, Serializable {
 
     @Override
     public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext) {
-        if (isWebContainerSessions(SecurityUtils.getSecurityManager()))
-        {
+        if (isWebContainerSessions()) {
             Context ctx = CDI.current().getBeanManager().getContext(webScopeType);
             return ctx.get(contextual, creationalContext);
         } else {
@@ -87,7 +87,7 @@ public class ShiroScopeContext implements Context, Serializable {
 
     @Override
     public <T> T get(Contextual<T> contextual) {
-        if (isWebContainerSessions(SecurityUtils.getSecurityManager())) {
+        if (isWebContainerSessions()) {
             Context ctx = CDI.current().getBeanManager().getContext(webScopeType);
             return ctx.get(contextual);
         } else {
@@ -128,13 +128,20 @@ public class ShiroScopeContext implements Context, Serializable {
         }
     }
 
-
     public static boolean isWebContainerSessions(SecurityManager sm) {
         if (sm instanceof WebSecurityManager) {
             WebSecurityManager wsm = (WebSecurityManager) sm;
             return wsm.isHttpSessionMode();
         }
         return false;
+    }
+
+    static boolean isWebContainerSessions() {
+        try {
+            return isWebContainerSessions(SecurityUtils.getSecurityManager());
+        } catch (UnavailableSecurityManagerException unavailable) {
+            return true;
+        }
     }
 
 

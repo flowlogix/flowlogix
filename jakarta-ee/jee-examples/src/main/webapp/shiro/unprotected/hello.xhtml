@@ -11,7 +11,7 @@
         <h:form>
             <h:commandButton id="logout" value="Logout..." action="#{loginBean.logout}"/>
         </h:form>
-        <input type="button" id="invalidate" value="Invalidate session via Servlet"
-               onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
+        <input type="button" id="logoutservlet" value="Logout via Servlet"
+               onclick="fetch('#{request.contextPath}/logoutservlet', alert('Session invalidated!'))" />
     </h:body>
 </html>

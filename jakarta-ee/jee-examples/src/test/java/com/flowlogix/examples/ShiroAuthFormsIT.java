@@ -21,6 +21,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
+import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -186,7 +187,7 @@ public class ShiroAuthFormsIT {
         webDriver.switchTo().alert().accept();
         address.sendKeys("1 Houston Street");
         city.sendKeys("New York");
-        guardHttp(submitSecond).click();
+        waitForHttp(submitSecond).click();
         assertEquals("Your Session Has Expired", sessionExpiredMessage.getText());
     }
 

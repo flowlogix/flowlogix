@@ -53,6 +53,9 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
     @javax.faces.view.ViewScoped
     @SuppressWarnings("serial")
     private static class FacesViewScopedAnnotated implements Serializable { }
+    @org.omnifaces.cdi.ViewScoped
+    @SuppressWarnings("serial")
+    private static class OmniViewScopedAnnotated implements Serializable { }
 
     @ShiroSessionScoped
     @SuppressWarnings("serial")
@@ -102,7 +105,7 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
         pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
                 Set.of(ShiroOmniViewScopedAnnotated.class.getDeclaredAnnotations()[0],
                         ShiroSecureAnnotated.class.getDeclaredAnnotations()[0]),
-                Set.of(ShiroOmniViewScopedAnnotated.class.getDeclaredAnnotations()[0])));
+                Set.of(OmniViewScopedAnnotated.class.getDeclaredAnnotations()[0])));
     }
 
     void addScope(@Observes final BeforeBeanDiscovery event)

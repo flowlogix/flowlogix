@@ -16,6 +16,7 @@
 package com.flowlogix.examples.shiro;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.faces.context.FacesContext;
@@ -35,17 +36,21 @@ import org.apache.shiro.authz.annotation.RequiresUser;
 public class ProtectedViewScopedBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private static final AtomicInteger instanceCount = new AtomicInteger();
+    private final int count = instanceCount.incrementAndGet();
+
     @PostConstruct
     void postConstruct() {
-        log.info("ViewScoped: postConstruct");
+        log.info("ViewScoped: postConstruct: {}", count);
     }
 
     @PreDestroy
     void preDestroy() {
-        log.info("ViewScoped: preDestroy");
+        log.info("ViewScoped: preDestroy: {}", count);
     }
 
     public String hello() {
-        return "Hello from ViewScoped " + FacesContext.class.getPackage().getImplementationVersion();
+        return String.format("Hello from ViewScoped %s - %s", count,
+        FacesContext.class.getPackage().getImplementationVersion());
     }
 }

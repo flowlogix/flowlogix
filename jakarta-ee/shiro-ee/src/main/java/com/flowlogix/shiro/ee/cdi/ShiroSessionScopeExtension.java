@@ -64,28 +64,18 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
 
     /**
      * intercept session destroy session listeners and destroy the beans
-     *
-     * @param sessionListeners
-     */
-
-    /**
-     * intercept session destroy session listeners and destroy the beans
      * @param sessionListeners
      * @param sm
      */
-    public void addDestroyHandlers(Collection<SessionListener> sessionListeners, SecurityManager sm)
-    {
-        sessionListeners.add(new SessionListenerAdapter()
-        {
+    public void addDestroyHandlers(Collection<SessionListener> sessionListeners, SecurityManager sm) {
+        sessionListeners.add(new SessionListenerAdapter() {
             @Override
-            public void onStop(Session session)
-            {
+            public void onStop(Session session) {
                 contexts.forEach(ctx -> ctx.onDestroy(session));
             }
 
             @Override
-            public void onExpiration(Session session)
-            {
+            public void onExpiration(Session session) {
                 onStop(session);
             }
         });

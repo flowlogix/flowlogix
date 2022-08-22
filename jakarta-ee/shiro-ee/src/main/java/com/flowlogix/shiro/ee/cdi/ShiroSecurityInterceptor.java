@@ -33,23 +33,19 @@ import javax.interceptor.InvocationContext;
  * @author lprimak
  */
 @Interceptor @ShiroSecureAnnotation @Dependent @Priority(Interceptor.Priority.LIBRARY_BEFORE)
-public class ShiroSecurityInterceptor implements Serializable
-{
+public class ShiroSecurityInterceptor implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @AroundInvoke
-    public Object propagateShiroSecurity(final InvocationContext ctx) throws Exception
-    {
+    public Object propagateShiroSecurity(final InvocationContext ctx) throws Exception {
         checkPermissions(ctx);
         return ctx.proceed();
     }
 
 
-    private void checkPermissions(final InvocationContext ctx) throws Exception
-    {
+    private void checkPermissions(final InvocationContext ctx) throws Exception {
         List<SecurityInterceptor> siList = AopHelper.createSecurityInterceptors(ctx.getMethod(),
                 ctx.getMethod().getDeclaringClass());
         siList.forEach(SecurityInterceptor::intercept);
     }
-
-
-    private static final long serialVersionUID = 1L;
 }

@@ -192,7 +192,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
-    void ajaxResubmmit() {
+    void ajaxResubmit() {
         ajaxSessionExpired();
         login();
         assertEquals("2nd Form Submitted - Address: 1 Houston Street, City: New York",

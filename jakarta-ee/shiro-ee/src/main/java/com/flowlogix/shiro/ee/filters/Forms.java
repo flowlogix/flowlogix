@@ -26,6 +26,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -145,8 +146,8 @@ public class Forms {
 
     private static void doRedirectToSaved(@NonNull String savedRequest, boolean resubmit) throws IOException, URISyntaxException, InterruptedException {
         deleteCookie(WebUtils.SAVED_REQUEST_KEY);
-
-        String savedFormData = Faces.getRequestCookie(SHIRO_FORM_DATA);
+        Cookie formDataCookie = (Cookie)Faces.getExternalContext().getRequestCookieMap().get(SHIRO_FORM_DATA);
+        String savedFormData = formDataCookie == null ? null : formDataCookie.getValue();
         if (savedFormData != null && resubmit) {
             Optional.ofNullable(resubmitSavedForm(savedFormData, savedRequest))
                     .ifPresent(Faces::redirect);
@@ -155,11 +156,12 @@ public class Forms {
         }
     }
 
-    static void addCookie(@NonNull String cokieName, @NonNull String cookieValue) {
+    static void addCookie(@NonNull HttpServletResponse response,
+            @NonNull String cokieName, @NonNull String cookieValue, int maxAge) {
         var cookie = new Cookie(cokieName, cookieValue);
         cookie.setPath(Servlets.getContext().getContextPath());
-        cookie.setMaxAge(-1);
-        Faces.getResponse().addCookie(cookie);
+        cookie.setMaxAge(maxAge);
+        response.addCookie(cookie);
     }
 
     static void deleteCookie(@NonNull String cokieName) {

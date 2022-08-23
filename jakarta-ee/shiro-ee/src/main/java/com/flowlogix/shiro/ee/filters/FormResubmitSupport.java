@@ -67,7 +67,7 @@ public class FormResubmitSupport {
             = Pattern.compile(String.format("(.*)(%s[-]?[\\d]+:[-]?[\\d]+)(.*)", FACES_VIEW_STATE_EQUALS));
     private static final String PARTIAL_VIEW = "javax.faces.partial";
     private static final Pattern PARTIAL_REQUEST_PATTERN
-            = Pattern.compile(String.format("[\\&]?%s.\\w+=[\\w\\s:]*", PARTIAL_VIEW));
+            = Pattern.compile(String.format("[\\&]?%s.\\w+=[\\w\\s:%%\\d]*", PARTIAL_VIEW));
     static final String SHIRO_FORM_DATA = "SHIRO_FORM_DATA";
     static final String SESSION_EXPIRED_PARAMETER = "sessionExpired";
 
@@ -75,13 +75,9 @@ public class FormResubmitSupport {
     @SneakyThrows(IOException.class)
     static void savePostDataForResubmit(ServletRequest request, ServletResponse response, String loginUrl) {
         if (HttpMethod.POST.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())) {
-            String postData = URLDecoder.decode(request.getReader().lines()
-                    .collect(Collectors.joining()), StandardCharsets.UTF_8);
-            Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                    SHIRO_FORM_DATA, postData, null,
-                    WebUtils.toHttp(request).getContextPath(),
-                    // cookie age = session timeout
-                    Servlets.getContext().getSessionTimeout() * 60);
+            String postData = request.getReader().lines().collect(Collectors.joining());
+            addCookie(WebUtils.toHttp(response), SHIRO_FORM_DATA,
+                    postData, Servlets.getContext().getSessionTimeout() * 60);
         }
         boolean isGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
         Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
@@ -95,17 +91,24 @@ public class FormResubmitSupport {
         log.debug("saved form data: {}", savedFormData);
         deleteCookie(SHIRO_FORM_DATA);
         HttpClient client = buildHttpClient(savedRequest);
-        if (isJSFNewViewStateNeeded(savedFormData)) {
-            savedFormData = getJSFNewViewState(savedRequest, client, savedFormData);
-        }
-        savedFormData = noJSFAjaxRequests(savedFormData);
+        String decodedFormData = parseFormData(savedFormData, savedRequest, client);
         HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest))
-                .POST(HttpRequest.BodyPublishers.ofString(savedFormData))
+                .POST(HttpRequest.BodyPublishers.ofString(decodedFormData))
                 .headers(CONTENT_TYPE, APPLICATION_FORM_URLENCODED)
                 .build();
         HttpResponse<String> response = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
         log.debug("requeust: {}, response: {}", postRequest, response);
         return processResubmitResponse(response, savedRequest);
+    }
+
+    private static String parseFormData(String savedFormData, String savedRequest, HttpClient client) throws IOException, InterruptedException {
+        if (!isJSFClientStateSavingMethod()) {
+            String decodedFormData = URLDecoder.decode(savedFormData, StandardCharsets.UTF_8);
+            if (isJSFStatefulForm(decodedFormData)) {
+                savedFormData = getJSFNewViewState(savedRequest, client, decodedFormData);
+            }
+        }
+        return noJSFAjaxRequests(savedFormData);
     }
 
     @SuppressWarnings("fallthrough")
@@ -114,7 +117,7 @@ public class FormResubmitSupport {
             case FOUND:
                 transformCookieHeader(response.headers().allValues(SET_COOKIE))
                         .entrySet().stream().filter(not(entry -> entry.getKey().equals(getSessionCookieName())))
-                        .forEach(entry -> addCookie(entry.getKey(), entry.getValue()));
+                        .forEach(entry -> addCookie(Faces.getResponse(), entry.getKey(), entry.getValue(), -1));
                 // do not duplicate the flash cookie
                 // can't use Faces.redirect() here
                 Faces.getResponse().setStatus(response.statusCode());
@@ -182,9 +185,8 @@ public class FormResubmitSupport {
                 && !matcher.group(2).equalsIgnoreCase("stateless");
     }
 
-    private static boolean isJSFNewViewStateNeeded(@NonNull String savedFormData) {
-        return !STATE_SAVING_METHOD_CLIENT.equals(Servlets.getContext()
-                .getInitParameter(STATE_SAVING_METHOD_PARAM_NAME))
-                && isJSFStatefulForm(savedFormData);
+    private static boolean isJSFClientStateSavingMethod() {
+        return STATE_SAVING_METHOD_CLIENT.equals(
+                Servlets.getContext().getInitParameter(STATE_SAVING_METHOD_PARAM_NAME));
     }
 }

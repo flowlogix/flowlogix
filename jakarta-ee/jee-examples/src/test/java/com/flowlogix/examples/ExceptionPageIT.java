@@ -83,6 +83,8 @@ public class ExceptionPageIT {
     @FindBy(id = "mode")
     private WebElement modeField;
 
+    @FindBy(id = "stateSaving")
+    private WebElement stateSaving;
 
     @BeforeEach
     void fetchExceptionPage() {
@@ -105,8 +107,10 @@ public class ExceptionPageIT {
         invalidateSession.click();
         waitGui(webDriver);
         webDriver.switchTo().alert().accept();
-        waitForHttp(noAction).click();
-        assertEquals("Logged Out", isExpired.getText());
+        if (!Boolean.parseBoolean(stateSaving.getText())) {
+            waitForHttp(noAction).click();
+            assertEquals("Logged Out", isExpired.getText());
+        }
         guardAjax(noAction).click();
         assertEquals("Logged In", isExpired.getText());
     }

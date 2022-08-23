@@ -46,9 +46,16 @@
             Security Status: <span id="isExpired"> #{exceptionBean.expired()} </span>
         </h:form>
         <p/>
-        <div id="mode">
+        ProjectStage:
+        <span id="mode">
             #{facesContext.application.projectStage}
-        </div>
+        </span>
+        <p/>
+        isClientStateSaving:
+        <span id="stateSaving">
+            #{facesContext.application.stateManager.isSavingStateInClient(facesContext)}
+        </span>
+        <p/>
         <span id="end-of-page">
             <h:outputScript name="test-resource.js"/>
         </span>

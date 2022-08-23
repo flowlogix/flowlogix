@@ -15,6 +15,8 @@
  */
 package com.flowlogix.examples;
 
+import com.flowlogix.util.ShrinkWrapManipulator;
+import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
 import java.net.URL;
 import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -213,8 +215,10 @@ public class ShiroAuthFormsIT {
 
     @Deployment(testable = false, name = "DevMode")
     public static WebArchive createDeployment() {
-        return ShrinkWrap.create(MavenImporter.class, "shiro-auth-forms.war")
+        WebArchive archive = ShrinkWrap.create(MavenImporter.class, "shiro-auth-forms.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
+        new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
+        return archive;
     }
 }

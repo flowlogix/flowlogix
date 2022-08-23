@@ -15,8 +15,12 @@
  */
 package com.flowlogix.examples;
 
+import com.flowlogix.util.ShrinkWrapManipulator;
+import com.flowlogix.util.ShrinkWrapManipulator.Action;
+import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
 import java.net.URL;
 import java.util.List;
+import java.util.stream.Stream;
 import org.codehaus.plexus.util.StringUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -117,6 +121,20 @@ public class ExceptionPageIT {
 
     @Test
     @OperateOnDeployment("DevMode")
+    void checkStateSavingDev() {
+        boolean clientStateSaving = "clientStateSaving".equals(System.getProperty("integration.test.mode"));
+        assertEquals(Boolean.parseBoolean(stateSaving.getText()), clientStateSaving);
+    }
+
+    @Test
+    @OperateOnDeployment("ProdMode")
+    void checkStateSavingProd() {
+        boolean clientStateSaving = "clientStateSaving".equals(System.getProperty("integration.test.mode"));
+        assertEquals(Boolean.parseBoolean(stateSaving.getText()), clientStateSaving);
+    }
+
+    @Test
+    @OperateOnDeployment("DevMode")
     void lateSqlThrow() {
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
@@ -185,7 +203,10 @@ public class ExceptionPageIT {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest-prod.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
-        archive.setWebXML(archive.get("WEB-INF/web-production.xml").getAsset());
+        var productionList = List.of(new Action("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value",
+                node -> node.setTextContent("Production")));
+        new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
+                getStandardActions().stream()).toList());
         return archive;
     }
 }

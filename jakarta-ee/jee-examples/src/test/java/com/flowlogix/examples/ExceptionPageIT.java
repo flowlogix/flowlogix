@@ -45,6 +45,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  *
@@ -111,7 +112,7 @@ public class ExceptionPageIT {
     @OperateOnDeployment("DevMode")
     void invalidSession() {
         invalidateSession.click();
-        waitGui(webDriver);
+        waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
         webDriver.switchTo().alert().accept();
         if (!Boolean.parseBoolean(stateSaving.getText())) {
             waitForHttp(noAction).click();

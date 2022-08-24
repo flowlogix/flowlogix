@@ -13,7 +13,7 @@
         <h:form id="form">
             <p>
                 <input type="button" id="invalidate" value="Invalidate session via Servlet"
-                       onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
+                       onclick="invalidateSession('#{request.contextPath}/invalidatesession')" />
             </p>
             <p/>
             <h:commandButton id="closeByIntr" value="Throw ClosedByInterruptException" action="#{exceptionBean.throwClosedByInterruptException(true)}">
@@ -60,4 +60,11 @@
             <h:outputScript name="test-resource.js"/>
         </span>
     </body>
+    <script type="text/javascript">
+        const invalidateSession = async (path) => {
+            const response = await fetch(path);
+            const strresp = await response.text();
+            alert('Session invalidated!');
+        };
+    </script>
 </html>

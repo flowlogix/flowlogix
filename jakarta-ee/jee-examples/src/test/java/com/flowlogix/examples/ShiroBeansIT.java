@@ -38,6 +38,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  *
@@ -154,7 +155,7 @@ public class ShiroBeansIT {
         guardAjax(sessionScoped).click();
 
         invalidateSession.click();
-        waitGui(webDriver);
+        waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
         webDriver.switchTo().alert().accept();
         webDriver.get(baseURL + createStatistic);
         assertEquals("2", webDriver.findElement(By.tagName("body")).getText());

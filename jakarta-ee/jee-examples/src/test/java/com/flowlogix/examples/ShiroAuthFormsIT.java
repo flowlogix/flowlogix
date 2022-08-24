@@ -32,15 +32,14 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  *
@@ -167,7 +166,7 @@ public class ShiroAuthFormsIT {
         webDriver.get(baseURL + "shiro/form");
         login();
         invalidateSession.click();
-        waitGui(webDriver);
+        waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
         webDriver.switchTo().alert().accept();
         firstName.sendKeys("Jack");
         lastName.sendKeys("Frost");
@@ -187,17 +186,12 @@ public class ShiroAuthFormsIT {
         webDriver.get(baseURL + "shiro/form");
         login();
         invalidateSession.click();
-        waitGui(webDriver);
+        waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
         webDriver.switchTo().alert().accept();
         address.sendKeys("1 Houston Street");
         city.sendKeys("New York");
-        submitSecond.click();
-        waitForHttp(webDriver);
-        try {
-            assertEquals("Your Session Has Expired", sessionExpiredMessage.getText());
-        } catch(NoSuchElementException e) {
-            fail(webDriver.getPageSource());
-        }
+        waitForHttp(submitSecond).click();
+        assertEquals("Your Session Has Expired", sessionExpiredMessage.getText());
     }
 
     @Test

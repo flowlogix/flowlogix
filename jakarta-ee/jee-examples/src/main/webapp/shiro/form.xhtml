@@ -28,10 +28,17 @@
             </h:commandButton>
             <p>
                 <input type="button" id="invalidate" value="Invalidate session via Servlet"
-                       onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
+                       onclick="invalidateSession('#{request.contextPath}/invalidatesession')" />
                 <h:commandButton value="Logout..." action="#{loginBean.logout}"/>
             </p>
             <h:messages id="messages"/>
         </h:form>
     </h:body>
+    <script type="text/javascript">
+        const invalidateSession = async (path) => {
+            const response = await fetch(path);
+            const strresp = await response.text();
+            alert('Session invalidated!');
+        };
+    </script>
 </html>

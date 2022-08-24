@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SESSION_EXPIRED_PARAMETER;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SHIRO_FORM_DATA;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
@@ -74,7 +75,6 @@ public class Forms {
         }
     }
 
-
     /**
      * redirects to current view after a form submit, or a logout, for example
      */
@@ -95,6 +95,19 @@ public class Forms {
             Faces.redirect(fallbackPath);
         } else {
             Faces.redirect(Faces.getRequestURLWithQueryString());
+        }
+    }
+
+    /**
+     * makes sure that there is no double-logout
+     *
+     * @param useFallback
+     * @param fallbackPath
+     */
+    public static void logout(Callable<Boolean> useFallback, String fallbackPath) {
+        if (!Boolean.TRUE.toString().equals(Faces.getRequestHeader(FORM_IS_RESUBMITTED))) {
+            SecurityUtils.getSubject().logout();
+            redirectToView(useFallback, Faces.getRequestContextPath());
         }
     }
 

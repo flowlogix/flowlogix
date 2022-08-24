@@ -58,8 +58,7 @@ public class LoginBean {
     }
 
     public void logout() {
-        SecurityUtils.getSubject().logout();
-        redirectToView(PREDICATE, Faces.getRequestContextPath());
+        Forms.logout(PREDICATE, Faces.getRequestContextPath());
     }
 
     public boolean isSessionExpired() {

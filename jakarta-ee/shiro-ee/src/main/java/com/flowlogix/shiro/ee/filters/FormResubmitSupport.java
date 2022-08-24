@@ -69,7 +69,8 @@ public class FormResubmitSupport {
     private static final Pattern PARTIAL_REQUEST_PATTERN
             = Pattern.compile(String.format("[\\&]?%s.\\w+=[\\w\\s:%%\\d]*", PARTIAL_VIEW));
     static final String SHIRO_FORM_DATA = "SHIRO_FORM_DATA";
-    static final String SESSION_EXPIRED_PARAMETER = "sessionExpired";
+    static final String SESSION_EXPIRED_PARAMETER = "com.flowlogix.sessionExpired";
+    static final String FORM_IS_RESUBMITTED = "com.flowlogix.form-is-resubmitted";
 
 
     @SneakyThrows(IOException.class)
@@ -94,7 +95,8 @@ public class FormResubmitSupport {
         String decodedFormData = parseFormData(savedFormData, savedRequest, client);
         HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest))
                 .POST(HttpRequest.BodyPublishers.ofString(decodedFormData))
-                .headers(CONTENT_TYPE, APPLICATION_FORM_URLENCODED)
+                .headers(CONTENT_TYPE, APPLICATION_FORM_URLENCODED,
+                        FORM_IS_RESUBMITTED, Boolean.TRUE.toString())
                 .build();
         HttpResponse<String> response = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
         log.debug("requeust: {}, response: {}", postRequest, response);

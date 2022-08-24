@@ -42,16 +42,19 @@ import org.w3c.dom.Node;
  * @author lprimak
  */
 public class ShrinkWrapManipulator {
-    private final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
-    private final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
-
-    private static final @Getter List<Action> standardActions = initializeStandardActions();
+    public static final String CLIENT_STATE_SAVING = "clientStateSaving";
+    public static final String INTEGRATION_TEST_MODE_PROPERTY = "integration.test.mode";
 
     @RequiredArgsConstructor
     public static class Action {
         private final String path;
         private final Consumer<Node> func;
     }
+
+    private final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
+    private final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
+
+    private static final @Getter List<Action> standardActions = initializeStandardActions();
 
     /**
      * modified web.xml according to xpath and method
@@ -77,11 +80,15 @@ public class ShrinkWrapManipulator {
         archive.setWebXML(new StringAsset(newXmlText));
     }
 
+    public static boolean isClientStateSavingIntegrationTest() {
+        return CLIENT_STATE_SAVING.equals(System.getProperty(INTEGRATION_TEST_MODE_PROPERTY));
+    }
+
     private static List<Action> initializeStandardActions() {
-        switch (System.getProperty("integration.test.mode")) {
-            case "clientStateSaving":
+        switch (System.getProperty(INTEGRATION_TEST_MODE_PROPERTY)) {
+            case CLIENT_STATE_SAVING:
                 return List.of(new Action("//web-app/context-param[param-name = 'javax.faces.STATE_SAVING_METHOD']/param-value",
-                node -> node.setTextContent("client")));
+                        node -> node.setTextContent("client")));
             default:
                 return List.of();
         }

@@ -18,8 +18,10 @@ package com.flowlogix.examples;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
+import static com.flowlogix.util.ShrinkWrapManipulator.isClientStateSavingIntegrationTest;
 import java.net.URL;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.codehaus.plexus.util.StringUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -122,15 +124,13 @@ public class ExceptionPageIT {
     @Test
     @OperateOnDeployment("DevMode")
     void checkStateSavingDev() {
-        boolean clientStateSaving = "clientStateSaving".equals(System.getProperty("integration.test.mode"));
-        assertEquals(Boolean.parseBoolean(stateSaving.getText()), clientStateSaving);
+        assertEquals(Boolean.parseBoolean(stateSaving.getText()), isClientStateSavingIntegrationTest());
     }
 
     @Test
     @OperateOnDeployment("ProdMode")
     void checkStateSavingProd() {
-        boolean clientStateSaving = "clientStateSaving".equals(System.getProperty("integration.test.mode"));
-        assertEquals(Boolean.parseBoolean(stateSaving.getText()), clientStateSaving);
+        assertEquals(Boolean.parseBoolean(stateSaving.getText()), isClientStateSavingIntegrationTest());
     }
 
     @Test
@@ -193,9 +193,11 @@ public class ExceptionPageIT {
 
     @Deployment(testable = false, name = "DevMode")
     public static WebArchive createDeployment() {
-        return ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest.war")
+        WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
+        new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
+        return archive;
     }
 
     @Deployment(testable = false, name = "ProdMode")
@@ -206,7 +208,7 @@ public class ExceptionPageIT {
         var productionList = List.of(new Action("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value",
                 node -> node.setTextContent("Production")));
         new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
-                getStandardActions().stream()).toList());
+                getStandardActions().stream()).collect(Collectors.toList()));
         return archive;
     }
 }

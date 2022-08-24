@@ -32,10 +32,12 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -191,7 +193,11 @@ public class ShiroAuthFormsIT {
         city.sendKeys("New York");
         submitSecond.click();
         waitForHttp(webDriver);
-        assertEquals("Your Session Has Expired", sessionExpiredMessage.getText());
+        try {
+            assertEquals("Your Session Has Expired", sessionExpiredMessage.getText());
+        } catch(NoSuchElementException e) {
+            fail(webDriver.getPageSource());
+        }
     }
 
     @Test

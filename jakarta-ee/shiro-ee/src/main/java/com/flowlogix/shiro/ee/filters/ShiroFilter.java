@@ -19,9 +19,12 @@ import com.flowlogix.shiro.ee.cdi.ShiroScopeContext;
 import com.flowlogix.shiro.ee.cdi.ShiroSessionScopeExtension;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getPostData;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFClientStateSavingMethod;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isPostRequest;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
@@ -31,6 +34,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -125,7 +129,8 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
             var session = wsm.getSession(new WebSessionKey(webContext.getSessionId(), webContext.getServletRequest(),
                     webContext.getServletResponse()));
             var newSubject = wrapped.createSubject(context);
-            if (newSubject.isRemembered() && session == null) {
+            if (newSubject.isRemembered() && session == null
+                    && !isJSFClientStateSavingMethod(webContext.getServletRequest().getServletContext())) {
                 log.warn("Remembered Subject with new session {}", newSubject.getPrincipal());
                 webContext.getServletRequest().setAttribute(FORM_IS_RESUBMITTED, Boolean.TRUE);
             }
@@ -155,13 +160,25 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     }
 
     @Override
+    @SneakyThrows
     protected void executeChain(ServletRequest request, ServletResponse response, FilterChain origChain) throws IOException, ServletException {
         if (Boolean.TRUE.equals(request.getAttribute(FORM_IS_RESUBMITTED)) && isPostRequest(request)) {
+            request.removeAttribute(FORM_IS_RESUBMITTED);
             String postData = getPostData(request);
             log.info("Resubmitting Post Data: {}", postData);
-            WebUtils.toHttp(response).sendRedirect(Servlets.getRequestURIWithQueryString(WebUtils.toHttp(request)));
+            var httpRequest = WebUtils.toHttp(request);
+            boolean rememberedAjaxResubmit = "partial/ajax".equals(httpRequest.getHeader("Faces-Request"));
+            Optional.ofNullable(resubmitSavedForm(postData,
+                    Servlets.getRequestURLWithQueryString(httpRequest),
+                    WebUtils.toHttp(response), request.getServletContext(), rememberedAjaxResubmit))
+                    .ifPresent(url -> sendRedirect(response, url));
         } else {
             super.executeChain(request, response, origChain);
         }
+    }
+
+    @SneakyThrows(IOException.class)
+    private static void sendRedirect(ServletResponse response, String url) {
+        WebUtils.toHttp(response).sendRedirect(url);
     }
 }

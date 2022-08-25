@@ -43,6 +43,7 @@ public class FormBean {
     }
 
     public void submit2() {
+        log.info("2nd Form Triggered!");
         if (Faces.isAjaxRequest()) {
             Messages.addGlobalInfo("2nd Form Submitted - Address: {0}, City: {1}", address, city);
         } else {

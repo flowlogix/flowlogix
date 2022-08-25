@@ -158,11 +158,12 @@ public class Forms {
     }
 
     private static void doRedirectToSaved(@NonNull String savedRequest, boolean resubmit) throws IOException, URISyntaxException, InterruptedException {
-        deleteCookie(WebUtils.SAVED_REQUEST_KEY);
+        deleteCookie(Faces.getResponse(), WebUtils.SAVED_REQUEST_KEY);
         Cookie formDataCookie = (Cookie)Faces.getExternalContext().getRequestCookieMap().get(SHIRO_FORM_DATA);
         String savedFormData = formDataCookie == null ? null : formDataCookie.getValue();
         if (savedFormData != null && resubmit) {
-            Optional.ofNullable(resubmitSavedForm(savedFormData, savedRequest))
+            Optional.ofNullable(resubmitSavedForm(savedFormData, savedRequest,
+                    Faces.getResponse(), Faces.getServletContext(), false))
                     .ifPresent(Faces::redirect);
         } else {
             Faces.redirect(savedRequest);
@@ -177,10 +178,11 @@ public class Forms {
         response.addCookie(cookie);
     }
 
-    static void deleteCookie(@NonNull String cokieName) {
+    static void deleteCookie(@NonNull HttpServletResponse response,
+            @NonNull String cokieName) {
         var cookieToDelete = new Cookie(cokieName, "tbd");
         cookieToDelete.setPath(Servlets.getContext().getContextPath());
         cookieToDelete.setMaxAge(0);
-        Faces.getResponse().addCookie(cookieToDelete);
+        response.addCookie(cookieToDelete);
     }
 }

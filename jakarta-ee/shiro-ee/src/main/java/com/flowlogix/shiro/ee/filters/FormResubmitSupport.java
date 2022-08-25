@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -34,8 +35,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import static javax.faces.application.StateManager.STATE_SAVING_METHOD_CLIENT;
 import static javax.faces.application.StateManager.STATE_SAVING_METHOD_PARAM_NAME;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.HttpHeaders.LOCATION;
@@ -95,24 +98,36 @@ public class FormResubmitSupport {
         return request.getReader().lines().collect(Collectors.joining());
     }
 
-    static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest)
+    static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest,
+            HttpServletResponse originalResponse, ServletContext servletContext, boolean rememberedAjaxResubmit)
             throws InterruptedException, URISyntaxException, IOException {
         log.debug("saved form data: {}", savedFormData);
-        deleteCookie(SHIRO_FORM_DATA);
-        HttpClient client = buildHttpClient(savedRequest);
-        String decodedFormData = parseFormData(savedFormData, savedRequest, client);
+        deleteCookie(originalResponse, SHIRO_FORM_DATA);
+        HttpClient client = buildHttpClient(savedRequest, servletContext);
+        String decodedFormData = parseFormData(savedFormData, savedRequest, client, servletContext);
         HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest))
                 .POST(HttpRequest.BodyPublishers.ofString(decodedFormData))
                 .headers(CONTENT_TYPE, APPLICATION_FORM_URLENCODED,
                         FORM_IS_RESUBMITTED, Boolean.TRUE.toString())
                 .build();
         HttpResponse<String> response = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
-        log.debug("requeust: {}, response: {}", postRequest, response);
-        return processResubmitResponse(response, savedRequest);
+        if (rememberedAjaxResubmit) {
+            HttpRequest redirectRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest))
+                    .POST(HttpRequest.BodyPublishers.ofString(savedFormData))
+                    .headers(CONTENT_TYPE, APPLICATION_FORM_URLENCODED)
+                    .build();
+            var redirectResponse = client.send(redirectRequest, HttpResponse.BodyHandlers.ofString());
+            log.debug("requeust: {}, response: {}", postRequest, response);
+            return processResubmitResponse(redirectResponse, originalResponse, response.headers(), savedRequest, servletContext);
+        } else {
+            log.debug("requeust: {}, response: {}", postRequest, response);
+            return processResubmitResponse(response, originalResponse, response.headers(), savedRequest, servletContext);
+        }
     }
 
-    private static String parseFormData(String savedFormData, String savedRequest, HttpClient client) throws IOException, InterruptedException {
-        if (!isJSFClientStateSavingMethod()) {
+    private static String parseFormData(String savedFormData, String savedRequest,
+            HttpClient client, ServletContext servletContext) throws IOException, InterruptedException {
+        if (!isJSFClientStateSavingMethod(servletContext)) {
             String decodedFormData = URLDecoder.decode(savedFormData, StandardCharsets.UTF_8);
             if (isJSFStatefulForm(decodedFormData)) {
                 savedFormData = getJSFNewViewState(savedRequest, client, decodedFormData);
@@ -122,19 +137,25 @@ public class FormResubmitSupport {
     }
 
     @SuppressWarnings("fallthrough")
-    private static String processResubmitResponse(HttpResponse<String> response, String savedRequest) throws IOException {
+    private static String processResubmitResponse(HttpResponse<String> response, HttpServletResponse originalResponse,
+            HttpHeaders headers, String savedRequest, ServletContext servletContext) throws IOException {
         switch (Response.Status.fromStatusCode(response.statusCode())) {
             case FOUND:
-                transformCookieHeader(response.headers().allValues(SET_COOKIE))
-                        .entrySet().stream().filter(not(entry -> entry.getKey().equals(getSessionCookieName())))
-                        .forEach(entry -> addCookie(Faces.getResponse(), entry.getKey(), entry.getValue(), -1));
-                // do not duplicate the flash cookie
                 // can't use Faces.redirect() here
-                Faces.getResponse().setStatus(response.statusCode());
-                Faces.getResponse().setHeader(LOCATION, response.headers().firstValue(LOCATION).orElseThrow());
+                originalResponse.setStatus(response.statusCode());
+                originalResponse.setHeader(LOCATION, response.headers().firstValue(LOCATION).orElseThrow());
             case OK:
-                Faces.getResponse().getWriter().append(response.body());
-                Faces.responseComplete();
+                // do not duplicate the session cookie
+                transformCookieHeader(headers.allValues(SET_COOKIE))
+                        .entrySet().stream().filter(not(entry -> entry.getKey().equals(getSessionCookieName(servletContext))))
+                        .forEach(entry -> addCookie(originalResponse, entry.getKey(), entry.getValue(), -1));
+                originalResponse.getWriter().append(response.body());
+                if (Faces.hasContext()) {
+                    Faces.responseComplete();
+                } else {
+                    originalResponse.getWriter().flush();
+                    originalResponse.getWriter().close();
+                }
                 return null;
             default:
                 return savedRequest;
@@ -146,18 +167,18 @@ public class FormResubmitSupport {
                 .collect(Collectors.toMap(k -> k[0], v -> (v.length > 1) ? v[1] : ""));
     }
 
-    private static HttpClient buildHttpClient(String savedRequest) throws URISyntaxException {
+    private static HttpClient buildHttpClient(String savedRequest, ServletContext servletContext) throws URISyntaxException {
         CookieManager cookieManager = new CookieManager();
-        HttpCookie cookie = new HttpCookie(getSessionCookieName(),
+        HttpCookie cookie = new HttpCookie(getSessionCookieName(servletContext),
                 SecurityUtils.getSubject().getSession().getId().toString());
         cookie.setPath(Servlets.getContext().getContextPath());
         cookieManager.getCookieStore().add(new URI(savedRequest), cookie);
         return HttpClient.newBuilder().cookieHandler(cookieManager).build();
     }
 
-    private static String getSessionCookieName() {
-        return Servlets.getContext().getSessionCookieConfig().getName() != null
-                ? Servlets.getContext().getSessionCookieConfig().getName() : DEFAULT_SESSION_ID_NAME     ;
+    private static String getSessionCookieName(ServletContext context) {
+        return context.getSessionCookieConfig().getName() != null
+                ? context.getSessionCookieConfig().getName() : DEFAULT_SESSION_ID_NAME     ;
     }
 
     private static String getJSFNewViewState(String savedRequest, HttpClient client, String savedFormData)
@@ -195,8 +216,8 @@ public class FormResubmitSupport {
                 && !matcher.group(2).equalsIgnoreCase("stateless");
     }
 
-    private static boolean isJSFClientStateSavingMethod() {
+    static boolean isJSFClientStateSavingMethod(ServletContext servletContext) {
         return STATE_SAVING_METHOD_CLIENT.equals(
-                Servlets.getContext().getInitParameter(STATE_SAVING_METHOD_PARAM_NAME));
+                servletContext.getInitParameter(STATE_SAVING_METHOD_PARAM_NAME));
     }
 }

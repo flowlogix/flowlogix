@@ -124,17 +124,21 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
         @Override
         public Subject createSubject(SubjectContext context) {
-            WebSubjectContext webContext = (WebSubjectContext) context;
-            DefaultWebSecurityManager wsm = (DefaultWebSecurityManager)wrapped;
-            var session = wsm.getSession(new WebSessionKey(webContext.getSessionId(), webContext.getServletRequest(),
-                    webContext.getServletResponse()));
-            var newSubject = wrapped.createSubject(context);
-            if (newSubject.isRemembered() && session == null
-                    && !isJSFClientStateSavingMethod(webContext.getServletRequest().getServletContext())) {
-                log.warn("Remembered Subject with new session {}", newSubject.getPrincipal());
-                webContext.getServletRequest().setAttribute(FORM_IS_RESUBMITTED, Boolean.TRUE);
+            if (context instanceof WebSubjectContext && wrapped instanceof DefaultSecurityManager) {
+                WebSubjectContext webContext = (WebSubjectContext) context;
+                DefaultWebSecurityManager wsm = (DefaultWebSecurityManager) wrapped;
+                var session = wsm.getSession(new WebSessionKey(webContext.getSessionId(), webContext.getServletRequest(),
+                        webContext.getServletResponse()));
+                var newSubject = wrapped.createSubject(context);
+                if (newSubject.isRemembered() && session == null
+                        && !isJSFClientStateSavingMethod(webContext.getServletRequest().getServletContext())) {
+                    log.debug("Remembered Subject with new session {}", newSubject.getPrincipal());
+                    webContext.getServletRequest().setAttribute(FORM_IS_RESUBMITTED, Boolean.TRUE);
+                }
+                return newSubject;
+            } else {
+                return wrapped.createSubject(context);
             }
-            return newSubject;
         }
     }
 
@@ -147,10 +151,13 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     @Override
     public void init() throws Exception {
         super.init();
-        if(!ShiroScopeContext.isWebContainerSessions(super.getSecurityManager())) {
+        if(!ShiroScopeContext.isWebContainerSessions(super.getSecurityManager())
+                && super.getSecurityManager() instanceof DefaultSecurityManager) {
             DefaultSecurityManager dsm = (DefaultSecurityManager)super.getSecurityManager();
-            DefaultSessionManager sm = (DefaultSessionManager)dsm.getSessionManager();
-            ssse.addDestroyHandlers(sm.getSessionListeners(), dsm);
+            if (dsm.getSessionManager() instanceof DefaultSessionManager) {
+                DefaultSessionManager sm = (DefaultSessionManager) dsm.getSessionManager();
+                ssse.addDestroyHandlers(sm.getSessionListeners(), dsm);
+            }
         }
     }
 
@@ -165,7 +172,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
         if (Boolean.TRUE.equals(request.getAttribute(FORM_IS_RESUBMITTED)) && isPostRequest(request)) {
             request.removeAttribute(FORM_IS_RESUBMITTED);
             String postData = getPostData(request);
-            log.info("Resubmitting Post Data: {}", postData);
+            log.debug("Resubmitting Post Data: {}", postData);
             var httpRequest = WebUtils.toHttp(request);
             boolean rememberedAjaxResubmit = "partial/ajax".equals(httpRequest.getHeader("Faces-Request"));
             Optional.ofNullable(resubmitSavedForm(postData,

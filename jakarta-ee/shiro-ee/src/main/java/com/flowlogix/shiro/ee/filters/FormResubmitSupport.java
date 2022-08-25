@@ -102,7 +102,6 @@ public class FormResubmitSupport {
             HttpServletResponse originalResponse, ServletContext servletContext, boolean rememberedAjaxResubmit)
             throws InterruptedException, URISyntaxException, IOException {
         log.debug("saved form data: {}", savedFormData);
-        deleteCookie(originalResponse, SHIRO_FORM_DATA);
         HttpClient client = buildHttpClient(savedRequest, servletContext);
         String decodedFormData = parseFormData(savedFormData, savedRequest, client, servletContext);
         HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest))
@@ -111,16 +110,17 @@ public class FormResubmitSupport {
                         FORM_IS_RESUBMITTED, Boolean.TRUE.toString())
                 .build();
         HttpResponse<String> response = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
+        log.debug("Resubmit request: {}, response: {}", postRequest, response);
         if (rememberedAjaxResubmit) {
             HttpRequest redirectRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest))
                     .POST(HttpRequest.BodyPublishers.ofString(savedFormData))
                     .headers(CONTENT_TYPE, APPLICATION_FORM_URLENCODED)
                     .build();
             var redirectResponse = client.send(redirectRequest, HttpResponse.BodyHandlers.ofString());
-            log.debug("requeust: {}, response: {}", postRequest, response);
+            log.debug("Redirect request: {}, response: {}", redirectRequest, redirectResponse);
             return processResubmitResponse(redirectResponse, originalResponse, response.headers(), savedRequest, servletContext);
         } else {
-            log.debug("requeust: {}, response: {}", postRequest, response);
+            deleteCookie(originalResponse, SHIRO_FORM_DATA);
             return processResubmitResponse(response, originalResponse, response.headers(), savedRequest, servletContext);
         }
     }
@@ -152,9 +152,6 @@ public class FormResubmitSupport {
                 originalResponse.getWriter().append(response.body());
                 if (Faces.hasContext()) {
                     Faces.responseComplete();
-                } else {
-                    originalResponse.getWriter().flush();
-                    originalResponse.getWriter().close();
                 }
                 return null;
             default:

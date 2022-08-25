@@ -182,6 +182,20 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    void nonAjaxRememberedResubmit() {
+        webDriver.get(baseURL + "shiro/form");
+        rememberMe.click();
+        login();
+        invalidateSession.click();
+        waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
+        webDriver.switchTo().alert().accept();
+        firstName.sendKeys("Jack");
+        lastName.sendKeys("Frost");
+        guardHttp(submitFirst).click();
+        assertEquals("Form Submitted - firstName: Jack, lastName: Frost", messages.getText());
+    }
+
+    @Test
     void ajaxSessionExpired() {
         webDriver.get(baseURL + "shiro/form");
         login();
@@ -204,6 +218,34 @@ public class ShiroAuthFormsIT {
         city.sendKeys("North Pole");
         guardAjax(submitSecond).click();
         assertEquals("2nd Form Submitted - Address: Workshop, City: North Pole",
+                secondFormMessages.getText());
+    }
+
+    @Test
+    void ajaxRememberedResubmit() {
+        webDriver.get(baseURL + "shiro/form");
+        rememberMe.click();
+        login();
+        address.sendKeys("1 Houston Street");
+        city.sendKeys("New York");
+        invalidateSession.click();
+        waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
+        webDriver.switchTo().alert().accept();
+        waitForHttp(submitSecond).click();
+        assertEquals("2nd Form Submitted - Address: 1 Houston Street, City: New York",
+                secondFormMessages.getText());
+        address.sendKeys("Workshop");
+        city.sendKeys("North Pole");
+        invalidateSession.click();
+        waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
+        webDriver.switchTo().alert().accept();
+        waitForHttp(submitSecond).click();
+        assertEquals("2nd Form Submitted - Address: Workshop, City: North Pole",
+                secondFormMessages.getText());
+        address.sendKeys("LAX Airport");
+        city.sendKeys("Los Angeles");
+        guardAjax(submitSecond).click();
+        assertEquals("2nd Form Submitted - Address: LAX Airport, City: Los Angeles",
                 secondFormMessages.getText());
     }
 

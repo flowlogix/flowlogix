@@ -17,6 +17,7 @@ package com.flowlogix.examples;
 
 import com.flowlogix.util.ShrinkWrapManipulator;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
+import static com.flowlogix.util.ShrinkWrapManipulator.isClientStateSavingIntegrationTest;
 import java.net.URL;
 import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -231,7 +232,11 @@ public class ShiroAuthFormsIT {
         invalidateSession.click();
         waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
         webDriver.switchTo().alert().accept();
-        waitForHttp(submitSecond).click();
+        if (isClientStateSavingIntegrationTest()) {
+            guardAjax(submitSecond).click();
+        } else {
+            waitForHttp(submitSecond).click();
+        }
         assertEquals("2nd Form Submitted - Address: 1 Houston Street, City: New York",
                 secondFormMessages.getText());
         address.sendKeys("Workshop");
@@ -239,7 +244,11 @@ public class ShiroAuthFormsIT {
         invalidateSession.click();
         waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
         webDriver.switchTo().alert().accept();
-        waitForHttp(submitSecond).click();
+        if (isClientStateSavingIntegrationTest()) {
+            guardAjax(submitSecond).click();
+        } else {
+            waitForHttp(submitSecond).click();
+        }
         assertEquals("2nd Form Submitted - Address: Workshop, City: North Pole",
                 secondFormMessages.getText());
         address.sendKeys("LAX Airport");

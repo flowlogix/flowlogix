@@ -18,12 +18,16 @@ package com.flowlogix.shiro.ee.filters;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.savePostDataForResubmit;
 import static com.flowlogix.shiro.ee.filters.Forms.saveRequestReferer;
 import java.io.IOException;
+import javax.faces.application.ViewExpiredException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.subject.Subject;
+import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.FLASH_ATTRIBUTE_VIEW_EXPIRED;
 
 /**
  * Implements JSF Ajax redirection via OmniFaces
@@ -42,6 +46,13 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
         return subject.isAuthenticated() || (useRemembered && subject.isRemembered());
     }
 
+    @Override
+    protected void postHandle(ServletRequest request, ServletResponse response) throws Exception {
+        if (Boolean.TRUE.equals(request.getAttribute(FLASH_ATTRIBUTE_VIEW_EXPIRED))) {
+            Subject subject = getSubject(request, response);
+            log.error("resubmit the form, session = {}", subject.getSession(false));
+        }
+    }
 
     @Override
     protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException
@@ -49,6 +60,15 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
         savePostDataForResubmit(request, response, getLoginUrl());
     }
 
+    @Override
+    public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
+        try {
+            super.doFilterInternal(request, response, chain);
+        } catch (ViewExpiredException e) {
+            Subject subject = getSubject(request, response);
+            log.error("resubmit the form, session = {}", subject.getSession(false));
+        }
+    }
 
     /**
      * in case the login link is clicked directly,

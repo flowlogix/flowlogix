@@ -37,6 +37,7 @@ public class FormBean {
     private String city;
 
     public void submit() {
+        log.info("Form Triggered!");
         Messages.addFlashGlobalInfo("Form Submitted - firstName: {0}, lastName: {1}", firstName, lastName);
         Faces.redirect(Faces.getRequestContextPath() + "/shiro/protected");
     }

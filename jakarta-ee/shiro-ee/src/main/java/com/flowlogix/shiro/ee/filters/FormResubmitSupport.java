@@ -73,10 +73,9 @@ public class FormResubmitSupport {
     static final String FORM_IS_RESUBMITTED = "com.flowlogix.form-is-resubmitted";
 
 
-    @SneakyThrows(IOException.class)
     static void savePostDataForResubmit(ServletRequest request, ServletResponse response, String loginUrl) {
-        if (HttpMethod.POST.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())) {
-            String postData = request.getReader().lines().collect(Collectors.joining());
+        if (isPostRequest(request)) {
+            String postData = getPostData(request);
             addCookie(WebUtils.toHttp(response), SHIRO_FORM_DATA,
                     postData, Servlets.getContext().getSessionTimeout() * 60);
         }
@@ -85,6 +84,15 @@ public class FormResubmitSupport {
                 Servlets.getRequestBaseURL(WebUtils.toHttp(request))
                 + loginUrl.replaceFirst("^/", "") + (isGetRequest? "" : "?%s=true"),
                 SESSION_EXPIRED_PARAMETER);
+    }
+
+    static boolean isPostRequest(ServletRequest request) {
+        return HttpMethod.POST.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
+    }
+
+    @SneakyThrows(IOException.class)
+    static String getPostData(ServletRequest request) {
+        return request.getReader().lines().collect(Collectors.joining());
     }
 
     static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest)

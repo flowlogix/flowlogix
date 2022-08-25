@@ -234,6 +234,8 @@ public class ShiroAuthFormsIT {
         webDriver.switchTo().alert().accept();
         if (isClientStateSavingIntegrationTest()) {
             guardAjax(submitSecond).click();
+            address.clear();
+            city.clear();
         } else {
             waitForHttp(submitSecond).click();
         }
@@ -246,6 +248,8 @@ public class ShiroAuthFormsIT {
         webDriver.switchTo().alert().accept();
         if (isClientStateSavingIntegrationTest()) {
             guardAjax(submitSecond).click();
+            address.clear();
+            city.clear();
         } else {
             waitForHttp(submitSecond).click();
         }

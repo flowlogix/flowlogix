@@ -49,6 +49,7 @@ public class ExceptionBean implements Serializable {
     }
 
     public void throwExceptionFromMethod() {
+        log.info("*=*=*=*= The next WARNING is legit, it's expected");
         ExceptionUtils.rethrow(new SQLException("sql-from-method"));
     }
 

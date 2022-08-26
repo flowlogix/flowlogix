@@ -17,6 +17,7 @@ package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.Forms.addCookie;
 import static com.flowlogix.shiro.ee.filters.Forms.deleteCookie;
+import com.flowlogix.shiro.ee.filters.ShiroFilter.WrappedSecurityManager;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.HttpCookie;
@@ -30,6 +31,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import static java.util.function.Predicate.not;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -49,6 +51,8 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.SecurityManager;
 import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
 import org.apache.shiro.web.util.WebUtils;
 import org.jsoup.Jsoup;
@@ -71,16 +75,21 @@ public class FormResubmitSupport {
     private static final String PARTIAL_VIEW = "javax.faces.partial";
     private static final Pattern PARTIAL_REQUEST_PATTERN
             = Pattern.compile(String.format("[\\&]?%s.\\w+=[\\w\\s:%%\\d]*", PARTIAL_VIEW));
-    static final String SHIRO_FORM_DATA = "SHIRO_FORM_DATA";
+    private static final String FORM_DATA_CACHE = "com.flowlogix.form-data-cache";
+    static final String SHIRO_FORM_DATA_KEY = "com.flowlogix.form-data-key";
     static final String SESSION_EXPIRED_PARAMETER = "com.flowlogix.sessionExpired";
     static final String FORM_IS_RESUBMITTED = "com.flowlogix.form-is-resubmitted";
 
 
     static void savePostDataForResubmit(ServletRequest request, ServletResponse response, String loginUrl) {
-        if (isPostRequest(request)) {
+        if (isPostRequest(request) && unwrapSecurityManager(SecurityUtils.getSecurityManager())
+                instanceof DefaultSecurityManager) {
             String postData = getPostData(request);
-            addCookie(WebUtils.toHttp(response), SHIRO_FORM_DATA,
-                    postData, Servlets.getContext().getSessionTimeout() * 60);
+            var cacheKey = UUID.randomUUID();
+            var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
+            dsm.getCacheManager().getCache(FORM_DATA_CACHE).put(cacheKey, postData);
+            addCookie(WebUtils.toHttp(response), SHIRO_FORM_DATA_KEY,
+                    cacheKey.toString(), Servlets.getContext().getSessionTimeout() * 60);
         }
         boolean isGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
         Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
@@ -98,9 +107,21 @@ public class FormResubmitSupport {
         return request.getReader().lines().collect(Collectors.joining());
     }
 
-    static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest,
+    static String getSavedFormDataFromKey(@NonNull String savedFormDataKey) {
+        String savedFormData = null;
+        if (unwrapSecurityManager(SecurityUtils.getSecurityManager()) instanceof DefaultSecurityManager) {
+            var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
+            savedFormData = (String)dsm.getCacheManager().getCache(FORM_DATA_CACHE).get(UUID.fromString(savedFormDataKey));
+        }
+        return savedFormData;
+    }
+
+    static String resubmitSavedForm(String savedFormData, @NonNull String savedRequest,
             HttpServletResponse originalResponse, ServletContext servletContext, boolean rememberedAjaxResubmit)
             throws InterruptedException, URISyntaxException, IOException {
+        if (savedFormData == null) {
+            return savedRequest;
+        }
         log.debug("saved form data: {}", savedFormData);
         HttpClient client = buildHttpClient(savedRequest, servletContext);
         String decodedFormData = parseFormData(savedFormData, savedRequest, client, servletContext);
@@ -120,7 +141,7 @@ public class FormResubmitSupport {
             log.debug("Redirect request: {}, response: {}", redirectRequest, redirectResponse);
             return processResubmitResponse(redirectResponse, originalResponse, response.headers(), savedRequest, servletContext);
         } else {
-            deleteCookie(originalResponse, SHIRO_FORM_DATA);
+            deleteCookie(originalResponse, SHIRO_FORM_DATA_KEY);
             return processResubmitResponse(response, originalResponse, response.headers(), savedRequest, servletContext);
         }
     }
@@ -176,6 +197,15 @@ public class FormResubmitSupport {
     private static String getSessionCookieName(ServletContext context) {
         return context.getSessionCookieConfig().getName() != null
                 ? context.getSessionCookieConfig().getName() : DEFAULT_SESSION_ID_NAME     ;
+    }
+
+    private static org.apache.shiro.mgt.SecurityManager unwrapSecurityManager(SecurityManager securityManager) {
+        if (securityManager instanceof WrappedSecurityManager) {
+            WrappedSecurityManager wsm = (WrappedSecurityManager)securityManager;
+            return wsm.wrapped;
+        } else {
+            return securityManager;
+        }
     }
 
     private static String getJSFNewViewState(String savedRequest, HttpClient client, String savedFormData)

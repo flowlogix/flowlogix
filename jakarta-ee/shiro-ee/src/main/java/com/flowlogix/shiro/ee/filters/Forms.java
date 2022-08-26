@@ -17,7 +17,6 @@ package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SESSION_EXPIRED_PARAMETER;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SHIRO_FORM_DATA;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -37,6 +36,8 @@ import org.apache.shiro.web.util.WebUtils;
 import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Servlets;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SHIRO_FORM_DATA_KEY;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getSavedFormDataFromKey;
 
 /**
  * Methods to redirect to saved requests upon logout
@@ -159,10 +160,10 @@ public class Forms {
 
     private static void doRedirectToSaved(@NonNull String savedRequest, boolean resubmit) throws IOException, URISyntaxException, InterruptedException {
         deleteCookie(Faces.getResponse(), WebUtils.SAVED_REQUEST_KEY);
-        Cookie formDataCookie = (Cookie)Faces.getExternalContext().getRequestCookieMap().get(SHIRO_FORM_DATA);
-        String savedFormData = formDataCookie == null ? null : formDataCookie.getValue();
-        if (savedFormData != null && resubmit) {
-            Optional.ofNullable(resubmitSavedForm(savedFormData, savedRequest,
+        Cookie formDataCookie = (Cookie)Faces.getExternalContext().getRequestCookieMap().get(SHIRO_FORM_DATA_KEY);
+        String savedFormDataKey = formDataCookie == null ? null : formDataCookie.getValue();
+        if (savedFormDataKey != null && resubmit) {
+            Optional.ofNullable(resubmitSavedForm(getSavedFormDataFromKey(savedFormDataKey), savedRequest,
                     Faces.getResponse(), Faces.getServletContext(), false))
                     .ifPresent(Faces::redirect);
         } else {

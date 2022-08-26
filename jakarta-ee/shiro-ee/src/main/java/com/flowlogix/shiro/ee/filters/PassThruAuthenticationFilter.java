@@ -31,24 +31,19 @@ import org.apache.shiro.subject.Subject;
  * @author lprimak
  */
 @Slf4j
-public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter
-{
+public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter {
     private @Getter @Setter boolean useRemembered = false;
 
     @Override
-    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue)
-    {
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         Subject subject = getSubject(request, response);
         return subject.isAuthenticated() || (useRemembered && subject.isRemembered());
     }
 
-
     @Override
-    protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException
-    {
+    protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
         savePostDataForResubmit(request, response, getLoginUrl());
     }
-
 
     /**
      * in case the login link is clicked directly,
@@ -59,25 +54,20 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
      * @return
      */
     @Override
-    protected boolean isLoginRequest(ServletRequest request, ServletResponse response)
-    {
+    protected boolean isLoginRequest(ServletRequest request, ServletResponse response) {
         boolean rv = super.isLoginRequest(request, response);
         saveRequestReferer(rv, request, response);
         return rv;
     }
 
-
     @Override
-    protected void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException
-    {
+    protected void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
         Forms.saveRequest(request, response, false);
         redirectToLogin(request, response);
     }
 
-
     @Override
-    protected void saveRequest(ServletRequest request)
-    {
+    protected void saveRequest(ServletRequest request) {
         throw new UnsupportedOperationException("bad op");
     }
 }

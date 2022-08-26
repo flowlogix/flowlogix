@@ -119,8 +119,8 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     }
 
     @RequiredArgsConstructor
-    private static class WrappedSecurityManager implements WebSecurityManager {
-        private final @Delegate WebSecurityManager wrapped;
+    static class WrappedSecurityManager implements WebSecurityManager {
+        final @Delegate WebSecurityManager wrapped;
 
         @Override
         public Subject createSubject(SubjectContext context) {

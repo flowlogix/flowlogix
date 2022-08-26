@@ -17,6 +17,7 @@ package com.flowlogix.util;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.xml.parsers.DocumentBuilder;
@@ -82,6 +83,15 @@ public class ShrinkWrapManipulator {
 
     public static boolean isClientStateSavingIntegrationTest() {
         return CLIENT_STATE_SAVING.equals(System.getProperty(INTEGRATION_TEST_MODE_PROPERTY));
+    }
+
+    @SneakyThrows
+    public static URL toHttpsURL(URL httpUrl) {
+        if (httpUrl.getProtocol().endsWith("//")) {
+            return httpUrl;
+        }
+        int sslPort = Integer.getInteger("sslPort", 8181);
+        return new URL(httpUrl.getProtocol() + "s", httpUrl.getHost(), sslPort, httpUrl.getFile());
     }
 
     private static List<Action> initializeStandardActions() {

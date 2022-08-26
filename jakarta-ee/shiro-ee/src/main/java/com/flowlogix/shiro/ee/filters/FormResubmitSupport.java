@@ -111,17 +111,17 @@ public class FormResubmitSupport {
         String savedFormData = null;
         if (unwrapSecurityManager(SecurityUtils.getSecurityManager()) instanceof DefaultSecurityManager) {
             var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
-            savedFormData = (String)dsm.getCacheManager().getCache(FORM_DATA_CACHE).get(UUID.fromString(savedFormDataKey));
+            var cache = dsm.getCacheManager().getCache(FORM_DATA_CACHE);
+            var cacheKey = UUID.fromString(savedFormDataKey);
+            savedFormData = (String)cache.get(cacheKey);
+            cache.remove(cacheKey);
         }
         return savedFormData;
     }
 
-    static String resubmitSavedForm(String savedFormData, @NonNull String savedRequest,
+    static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest,
             HttpServletResponse originalResponse, ServletContext servletContext, boolean rememberedAjaxResubmit)
             throws InterruptedException, URISyntaxException, IOException {
-        if (savedFormData == null) {
-            return savedRequest;
-        }
         log.debug("saved form data: {}", savedFormData);
         HttpClient client = buildHttpClient(savedRequest, servletContext);
         String decodedFormData = parseFormData(savedFormData, savedRequest, client, servletContext);

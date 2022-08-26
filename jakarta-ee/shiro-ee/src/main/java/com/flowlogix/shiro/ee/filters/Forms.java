@@ -162,11 +162,19 @@ public class Forms {
         deleteCookie(Faces.getResponse(), WebUtils.SAVED_REQUEST_KEY);
         Cookie formDataCookie = (Cookie)Faces.getExternalContext().getRequestCookieMap().get(SHIRO_FORM_DATA_KEY);
         String savedFormDataKey = formDataCookie == null ? null : formDataCookie.getValue();
+        boolean doRedirectAtEnd = true;
         if (savedFormDataKey != null && resubmit) {
-            Optional.ofNullable(resubmitSavedForm(getSavedFormDataFromKey(savedFormDataKey), savedRequest,
-                    Faces.getResponse(), Faces.getServletContext(), false))
-                    .ifPresent(Faces::redirect);
-        } else {
+            String formData = getSavedFormDataFromKey(savedFormDataKey);
+            if (formData != null) {
+                Optional.ofNullable(resubmitSavedForm(formData, savedRequest,
+                        Faces.getResponse(), Faces.getServletContext(), false))
+                        .ifPresent(Faces::redirect);
+                doRedirectAtEnd = false;
+            } else {
+                deleteCookie(Faces.getResponse(), SHIRO_FORM_DATA_KEY);
+            }
+        }
+        if (doRedirectAtEnd) {
             Faces.redirect(savedRequest);
         }
     }

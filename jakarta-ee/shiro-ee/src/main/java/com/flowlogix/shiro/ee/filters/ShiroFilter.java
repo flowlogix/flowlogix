@@ -17,6 +17,7 @@ package com.flowlogix.shiro.ee.filters;
 
 import com.flowlogix.shiro.ee.cdi.ShiroScopeContext;
 import com.flowlogix.shiro.ee.cdi.ShiroSessionScopeExtension;
+import static com.flowlogix.shiro.ee.filters.EnvironmentLoaderListener.SHIRO_EE_DISABLED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getPostData;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFClientStateSavingMethod;
@@ -27,11 +28,13 @@ import java.security.Principal;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
+import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -65,6 +68,10 @@ import org.omnifaces.util.Servlets;
  * @author lprimak
  */
 @Slf4j
+@WebFilter(filterName = "ShiroFilter", urlPatterns = "/*",
+        dispatcherTypes = { DispatcherType.ERROR, DispatcherType.FORWARD,
+            DispatcherType.INCLUDE, DispatcherType.REQUEST,
+            DispatcherType.ASYNC }, asyncSupported = true)
 public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     private static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
     private static final Pattern HTTP_TO_HTTPS = Pattern.compile("^\\s*http(.*)");
@@ -150,6 +157,9 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
     @Override
     public void init() throws Exception {
+        if (SHIRO_EE_DISABLED) {
+            return;
+        }
         super.init();
         if(!ShiroScopeContext.isWebContainerSessions(super.getSecurityManager())
                 && super.getSecurityManager() instanceof DefaultSecurityManager) {
@@ -169,7 +179,9 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     @Override
     @SneakyThrows
     protected void executeChain(ServletRequest request, ServletResponse response, FilterChain origChain) throws IOException, ServletException {
-        if (Boolean.TRUE.equals(request.getAttribute(FORM_IS_RESUBMITTED)) && isPostRequest(request)) {
+        if (SHIRO_EE_DISABLED) {
+            origChain.doFilter(request, response);
+        } else if (Boolean.TRUE.equals(request.getAttribute(FORM_IS_RESUBMITTED)) && isPostRequest(request)) {
             request.removeAttribute(FORM_IS_RESUBMITTED);
             String postData = getPostData(request);
             log.debug("Resubmitting Post Data: {}", postData);

@@ -17,12 +17,12 @@ package com.flowlogix.shiro.ee.filters;
 
 import com.flowlogix.shiro.ee.cdi.ShiroScopeContext;
 import com.flowlogix.shiro.ee.cdi.ShiroSessionScopeExtension;
-import static com.flowlogix.shiro.ee.filters.EnvironmentLoaderListener.SHIRO_EE_DISABLED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getPostData;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFClientStateSavingMethod;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isPostRequest;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
+import static com.flowlogix.shiro.ee.listeners.EnvironmentLoaderListener.isShiroEEDisabled;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
@@ -157,7 +157,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
     @Override
     public void init() throws Exception {
-        if (SHIRO_EE_DISABLED) {
+        if (isShiroEEDisabled()) {
             return;
         }
         super.init();
@@ -179,7 +179,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     @Override
     @SneakyThrows
     protected void executeChain(ServletRequest request, ServletResponse response, FilterChain origChain) throws IOException, ServletException {
-        if (SHIRO_EE_DISABLED) {
+        if (isShiroEEDisabled()) {
             origChain.doFilter(request, response);
         } else if (Boolean.TRUE.equals(request.getAttribute(FORM_IS_RESUBMITTED)) && isPostRequest(request)) {
             request.removeAttribute(FORM_IS_RESUBMITTED);

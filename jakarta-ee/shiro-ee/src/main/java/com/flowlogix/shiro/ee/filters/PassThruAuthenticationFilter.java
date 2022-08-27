@@ -16,7 +16,7 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.savePostDataForResubmit;
-import static com.flowlogix.shiro.ee.filters.Forms.saveRequestReferer;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.saveRequestReferer;
 import java.io.IOException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -62,7 +62,7 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
 
     @Override
     protected void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
-        Forms.saveRequest(request, response, false);
+        FormResubmitSupport.saveRequest(request, response, false);
         redirectToLogin(request, response);
     }
 

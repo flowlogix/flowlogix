@@ -13,31 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.shiro.ee.filters;
+package com.flowlogix.shiro.ee.listeners;
 
 import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import org.apache.shiro.web.env.EnvironmentLoader;
+import org.apache.shiro.web.env.WebEnvironment;
 
 /**
- *
+ * Automatic, adds ability to disable via system property
+ * Adds ability to have two shiro.ini configuration files that are merged
  * @author lprimak
  */
 @WebListener
-public class EnvironmentLoaderListener extends org.apache.shiro.web.env.EnvironmentLoaderListener {
+public class EnvironmentLoaderListener extends EnvironmentLoader implements ServletContextListener {
     public static final String SHIRO_EE_DISABLED_PROP = "com.flowlogix.shiro.ee.disabled";
     static final boolean SHIRO_EE_DISABLED = Boolean.getBoolean(SHIRO_EE_DISABLED_PROP);
+
+    public static boolean isShiroEEDisabled() {
+        return SHIRO_EE_DISABLED;
+    }
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         if (!SHIRO_EE_DISABLED) {
-            super.contextInitialized(sce);
+            initEnvironment(sce.getServletContext());
         }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         if (!SHIRO_EE_DISABLED) {
-            super.contextDestroyed(sce);
+            destroyEnvironment(sce.getServletContext());
         }
+    }
+
+    @Override
+    protected Class<? extends WebEnvironment> getDefaultWebEnvironmentClass() {
+        return IniEnvironment.class;
     }
 }

@@ -17,27 +17,16 @@ package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SESSION_EXPIRED_PARAMETER;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.doRedirectToSaved;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Optional;
 import java.util.concurrent.Callable;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.HttpMethod;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.web.util.WebUtils;
 import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.Servlets;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SHIRO_FORM_DATA_KEY;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getSavedFormDataFromKey;
 
 /**
  * Methods to redirect to saved requests upon logout
@@ -119,79 +108,5 @@ public class Forms {
 
     public static boolean isSessionExpired() {
         return wasViewExpired() || Boolean.parseBoolean(Faces.getRequestParameter(SESSION_EXPIRED_PARAMETER));
-    }
-
-    static void saveRequest(ServletRequest request, ServletResponse response, boolean useReferer) {
-        String path = useReferer? getReferer(WebUtils.toHttp(request))
-                : Servlets.getRequestURLWithQueryString(WebUtils.toHttp(request));
-        if (path != null) {
-            Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                    WebUtils.SAVED_REQUEST_KEY, path, null,
-                    WebUtils.toHttp(request).getContextPath(),
-                    // cookie age = session timeout
-                    Servlets.getContext().getSessionTimeout() * 60);
-        }
-    }
-
-    static void saveRequestReferer(boolean rv, ServletRequest request, ServletResponse response) {
-        if(rv && HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())) {
-            if(Servlets.getRequestCookie(WebUtils.toHttp(request), WebUtils.SAVED_REQUEST_KEY) == null) {
-                // only save refer when there is no saved request cookie already,
-                // and only as a last resort
-                Forms.saveRequest(request, response, true);
-            }
-        }
-    }
-
-    static String getReferer(HttpServletRequest request)
-    {
-        String referer = request.getHeader("referer");
-        if (referer != null)
-        {
-            // do not switch to https if custom port is specified
-            if(!referer.matches("^http:\\/\\/[A-z|.|[0-9]]+:[0-9]+(\\/.*|$)"))
-            {
-                referer = referer.replaceFirst("^http:", "https:");
-            }
-        }
-
-        return referer;
-    }
-
-    private static void doRedirectToSaved(@NonNull String savedRequest, boolean resubmit) throws IOException, URISyntaxException, InterruptedException {
-        deleteCookie(Faces.getResponse(), WebUtils.SAVED_REQUEST_KEY);
-        Cookie formDataCookie = (Cookie)Faces.getExternalContext().getRequestCookieMap().get(SHIRO_FORM_DATA_KEY);
-        String savedFormDataKey = formDataCookie == null ? null : formDataCookie.getValue();
-        boolean doRedirectAtEnd = true;
-        if (savedFormDataKey != null && resubmit) {
-            String formData = getSavedFormDataFromKey(savedFormDataKey);
-            if (formData != null) {
-                Optional.ofNullable(resubmitSavedForm(formData, savedRequest,
-                        Faces.getResponse(), Faces.getServletContext(), false))
-                        .ifPresent(Faces::redirect);
-                doRedirectAtEnd = false;
-            } else {
-                deleteCookie(Faces.getResponse(), SHIRO_FORM_DATA_KEY);
-            }
-        }
-        if (doRedirectAtEnd) {
-            Faces.redirect(savedRequest);
-        }
-    }
-
-    static void addCookie(@NonNull HttpServletResponse response,
-            @NonNull String cokieName, @NonNull String cookieValue, int maxAge) {
-        var cookie = new Cookie(cokieName, cookieValue);
-        cookie.setPath(Servlets.getContext().getContextPath());
-        cookie.setMaxAge(maxAge);
-        response.addCookie(cookie);
-    }
-
-    static void deleteCookie(@NonNull HttpServletResponse response,
-            @NonNull String cokieName) {
-        var cookieToDelete = new Cookie(cokieName, "tbd");
-        cookieToDelete.setPath(Servlets.getContext().getContextPath());
-        cookieToDelete.setMaxAge(0);
-        response.addCookie(cookieToDelete);
     }
 }

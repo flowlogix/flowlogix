@@ -43,8 +43,9 @@ import org.w3c.dom.Node;
  * @author lprimak
  */
 public class ShrinkWrapManipulator {
-    public static final String CLIENT_STATE_SAVING = "clientStateSaving";
     public static final String INTEGRATION_TEST_MODE_PROPERTY = "integration.test.mode";
+    public static final String CLIENT_STATE_SAVING = "clientStateSaving";
+    public static final String SHIRO_NATIVE_SESSIONS = "shiroNativeSessions";
 
     @RequiredArgsConstructor
     public static class Action {
@@ -85,6 +86,10 @@ public class ShrinkWrapManipulator {
         return CLIENT_STATE_SAVING.equals(System.getProperty(INTEGRATION_TEST_MODE_PROPERTY));
     }
 
+    public static boolean isShiroNativeSessionsIntegrationTest() {
+        return SHIRO_NATIVE_SESSIONS.equals(System.getProperty(INTEGRATION_TEST_MODE_PROPERTY));
+    }
+
     @SneakyThrows
     public static URL toHttpsURL(URL httpUrl) {
         if (httpUrl.getProtocol().endsWith("//")) {
@@ -97,11 +102,19 @@ public class ShrinkWrapManipulator {
     private static List<Action> initializeStandardActions() {
         switch (System.getProperty(INTEGRATION_TEST_MODE_PROPERTY)) {
             case CLIENT_STATE_SAVING:
-                return List.of(new Action("//web-app/context-param[param-name = 'javax.faces.STATE_SAVING_METHOD']/param-value",
+                return List.of(new Action(getParamValue("javax.faces.STATE_SAVING_METHOD"),
                         node -> node.setTextContent("client")));
+            case SHIRO_NATIVE_SESSIONS:
+                return List.of(new Action(getParamValue("shiroConfigLocations"),
+                        node -> node.setTextContent(node.getTextContent()
+                                + ",classpath:META-INF/shiro-native-sessions.ini")));
             default:
                 return List.of();
         }
+    }
+
+    private static String getParamValue(String paramName) {
+        return String.format("//web-app/context-param[param-name = '%s']/param-value", paramName);
     }
 
     @SneakyThrows

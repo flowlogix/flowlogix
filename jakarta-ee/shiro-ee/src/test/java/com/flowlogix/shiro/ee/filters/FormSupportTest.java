@@ -16,8 +16,8 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.extractJSFNewViewState;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getReferer;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.transformCookieHeader;
-import static com.flowlogix.shiro.ee.filters.Forms.getReferer;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;

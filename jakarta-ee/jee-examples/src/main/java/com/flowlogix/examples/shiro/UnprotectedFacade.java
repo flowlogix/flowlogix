@@ -85,6 +85,7 @@ public class UnprotectedFacade {
             if (real instanceof UnauthenticatedException) {
                 Messages.addGlobalInfo("stateless bean unauth: {0}", e.getMessage());
                 LogCapture.get().poll();
+                LogCapture.get().poll();
             } else {
                 Messages.addGlobalError("Stateless - Unexpected Exception: {0}", e.getMessage());
             }

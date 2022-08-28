@@ -18,6 +18,7 @@ package com.flowlogix.shiro.ee.filters;
 import com.flowlogix.shiro.ee.cdi.ShiroScopeContext;
 import com.flowlogix.shiro.ee.cdi.ShiroSessionScopeExtension;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getNativeSessionManager;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getPostData;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFClientStateSavingMethod;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isPostRequest;
@@ -43,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.SubjectContext;
 import static org.apache.shiro.web.filter.authz.SslFilter.HTTPS_SCHEME;
@@ -168,13 +168,10 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
             return;
         }
         super.init();
-        if(!ShiroScopeContext.isWebContainerSessions(super.getSecurityManager())
-                && super.getSecurityManager() instanceof DefaultSecurityManager) {
-            DefaultSecurityManager dsm = (DefaultSecurityManager)super.getSecurityManager();
-            if (dsm.getSessionManager() instanceof DefaultSessionManager) {
-                DefaultSessionManager sm = (DefaultSessionManager) dsm.getSessionManager();
-                ssse.addDestroyHandlers(sm.getSessionListeners(), dsm);
-            }
+        WebSecurityManager wsm = super.getSecurityManager();
+        if(!ShiroScopeContext.isWebContainerSessions(wsm)) {
+            var dsm = getNativeSessionManager(wsm);
+            ssse.addDestroyHandlers(dsm.getSessionListeners(), wsm);
         }
     }
 

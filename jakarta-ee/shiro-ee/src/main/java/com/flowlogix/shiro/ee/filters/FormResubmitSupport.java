@@ -245,7 +245,8 @@ public class FormResubmitSupport {
             case OK:
                 // do not duplicate the session cookie
                 transformCookieHeader(headers.allValues(SET_COOKIE))
-                        .entrySet().stream().filter(not(entry -> entry.getKey().equals(getSessionCookieName(servletContext))))
+                        .entrySet().stream().filter(not(entry -> entry.getKey()
+                        .equals(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()))))
                         .forEach(entry -> addCookie(originalResponse, entry.getKey(), entry.getValue(), -1));
                 originalResponse.getWriter().append(response.body());
                 if (Faces.hasContext()) {
@@ -264,27 +265,27 @@ public class FormResubmitSupport {
 
     private static HttpClient buildHttpClient(String savedRequest, ServletContext servletContext) throws URISyntaxException {
         CookieManager cookieManager = new CookieManager();
-        HttpCookie cookie = new HttpCookie(getSessionCookieName(servletContext),
+        HttpCookie cookie = new HttpCookie(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()),
                 SecurityUtils.getSubject().getSession().getId().toString());
         cookie.setPath(Servlets.getContext().getContextPath());
         cookieManager.getCookieStore().add(new URI(savedRequest), cookie);
         return HttpClient.newBuilder().cookieHandler(cookieManager).build();
     }
 
-    private static String getSessionCookieName(ServletContext context) {
-        if (!isWebContainerSessions(SecurityUtils.getSecurityManager()) && getNativeSessionManager() != null) {
-            return getNativeSessionManager().getSessionIdCookie().getName();
+    private static String getSessionCookieName(ServletContext context, SecurityManager securityManager) {
+        if (!isWebContainerSessions(securityManager) && getNativeSessionManager(securityManager) != null) {
+            return getNativeSessionManager(securityManager).getSessionIdCookie().getName();
         } else {
             return context.getSessionCookieConfig().getName() != null
                     ? context.getSessionCookieConfig().getName() : DEFAULT_SESSION_ID_NAME;
         }
     }
 
-    private static DefaultWebSessionManager getNativeSessionManager() {
+    static DefaultWebSessionManager getNativeSessionManager(SecurityManager securityManager) {
         DefaultWebSessionManager rv = null;
-        SecurityManager securityManager = unwrapSecurityManager(SecurityUtils.getSecurityManager());
-        if (securityManager instanceof SessionsSecurityManager) {
-            var ssm = (SessionsSecurityManager) securityManager;
+        SecurityManager unwrapped = unwrapSecurityManager(securityManager);
+        if (unwrapped instanceof SessionsSecurityManager) {
+            var ssm = (SessionsSecurityManager) unwrapped;
             var sm = ssm.getSessionManager();
             if (sm instanceof DefaultWebSessionManager) {
                 rv = (DefaultWebSessionManager) sm;

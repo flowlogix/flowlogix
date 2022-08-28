@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples;
 
+import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_PROD_MODE;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
 import static com.flowlogix.util.ShrinkWrapManipulator.toHttpsURL;
@@ -52,19 +53,19 @@ public class ShiroSSLFilterIT {
     protected URL baseURL;
 
     @Test
-    @OperateOnDeployment("ProdMode")
+    @OperateOnDeployment(DEPLOYMENT_PROD_MODE)
     void checkNonSSL() {
         assertThrows(WebDriverException.class, () -> webDriver.get(baseURL + "shiro/unprotected/hello"));
     }
 
     @Test
-    @OperateOnDeployment("ProdMode")
+    @OperateOnDeployment(DEPLOYMENT_PROD_MODE)
     void checkSSL() {
         webDriver.get(toHttpsURL(baseURL) + "shiro/unprotected/hello");
         assertEquals("Hello Unprotected", webDriver.getTitle());
     }
 
-    @Deployment(testable = false, name = "ProdMode")
+    @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
     public static WebArchive createDeploymentProdMode() {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ShiroSSLFilterTest-prod.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()

@@ -55,6 +55,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
 public class ExceptionPageIT {
+    static final String DEPLOYMENT_DEV_MODE = "DevMode";
+    static final String DEPLOYMENT_PROD_MODE = "ProdMode";
+
     @Drone
     private WebDriver webDriver;
 
@@ -100,7 +103,7 @@ public class ExceptionPageIT {
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void closedByInterrupted() {
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
@@ -110,7 +113,7 @@ public class ExceptionPageIT {
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void invalidSession() {
         invalidateSession.click();
         waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
@@ -124,19 +127,19 @@ public class ExceptionPageIT {
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkStateSavingDev() {
         assertEquals(Boolean.parseBoolean(stateSaving.getText()), isClientStateSavingIntegrationTest());
     }
 
     @Test
-    @OperateOnDeployment("ProdMode")
+    @OperateOnDeployment(DEPLOYMENT_PROD_MODE)
     void checkStateSavingProd() {
         assertEquals(Boolean.parseBoolean(stateSaving.getText()), isClientStateSavingIntegrationTest());
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void lateSqlThrow() {
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
@@ -155,13 +158,13 @@ public class ExceptionPageIT {
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void versionsOnDev() {
         versions("end of page");
     }
 
     @Test
-    @OperateOnDeployment("ProdMode")
+    @OperateOnDeployment(DEPLOYMENT_PROD_MODE)
     void versionsOnProd() {
         versions("end of page - minimized");
     }
@@ -193,7 +196,7 @@ public class ExceptionPageIT {
         assertEquals(1, count);
     }
 
-    @Deployment(testable = false, name = "DevMode")
+    @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()
@@ -202,7 +205,7 @@ public class ExceptionPageIT {
         return archive;
     }
 
-    @Deployment(testable = false, name = "ProdMode")
+    @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
     public static WebArchive createDeploymentProdMode() {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest-prod.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()

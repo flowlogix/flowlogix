@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples;
 
+import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
 import static com.flowlogix.util.ShrinkWrapManipulator.isClientStateSavingIntegrationTest;
@@ -22,6 +23,7 @@ import static com.flowlogix.util.ShrinkWrapManipulator.isShiroNativeSessionsInte
 import java.net.URL;
 import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
@@ -107,6 +109,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void protectedPageWithLogin() {
         webDriver.get(baseURL + "shiro/protected");
         assertTrue(webDriver.getCurrentUrl().contains("shiro/auth"), "redirect to login");
@@ -115,6 +118,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkLogout() {
         webDriver.get(baseURL + "shiro/protected");
         login();
@@ -125,6 +129,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void rememberMe() {
         webDriver.get(baseURL + "shiro/protected");
         if (!rememberMe.isSelected()) {
@@ -140,6 +145,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void unauthorized() {
         webDriver.get(baseURL + "shiro/adminpage");
         login();
@@ -154,6 +160,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void incorrectLoginOnce() {
         webDriver.get(baseURL + "shiro/protected");
         username.sendKeys("webuser");
@@ -165,6 +172,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void nonAjaxSessionExpired() {
         webDriver.get(baseURL + "shiro/form");
         login();
@@ -178,6 +186,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void nonAjaxResubmit() {
         nonAjaxSessionExpired();
         login();
@@ -185,6 +194,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void nonAjaxResubmitAfterFailedLogin() {
         nonAjaxSessionExpired();
         username.sendKeys("xxx");
@@ -195,6 +205,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void nonAjaxRememberedResubmit() {
         webDriver.get(baseURL + "shiro/form");
         rememberMe.click();
@@ -209,6 +220,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void ajaxSessionExpired() {
         webDriver.get(baseURL + "shiro/form");
         login();
@@ -222,6 +234,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void ajaxResubmit() {
         ajaxSessionExpired();
         login();
@@ -235,6 +248,7 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void ajaxRememberedResubmit() {
         webDriver.get(baseURL + "shiro/form");
         rememberMe.click();
@@ -280,7 +294,7 @@ public class ShiroAuthFormsIT {
         guardHttp(login).click();
     }
 
-    @Deployment(testable = false, name = "DevMode")
+    @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, "shiro-auth-forms.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()

@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 import javax.naming.NamingException;
 import lombok.Lombok;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(ArquillianExtension.class)
 public class LookupIT {
+    static final String DEPLOYMENT_NAME = "LookupIT";
     private JndiExample example;
 
 
@@ -49,12 +51,14 @@ public class LookupIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_NAME)
     public void happyPath() {
         assertEquals(5, example.getNumber());
         assertNotNull(example.getLocator().getObject(AnotherEJB.class), "should not be null");
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_NAME)
     public void unhappyPath() throws NamingException {
         assertNull(example.getLocator().getObject("hello"));
     }
@@ -62,6 +66,7 @@ public class LookupIT {
     @Test
     @Timeout(10)
     @Tag("StressTest")
+    @OperateOnDeployment(DEPLOYMENT_NAME)
     public void stressTest() throws InterruptedException {
         ExecutorService exec = Executors.newFixedThreadPool(50 *
                 Runtime.getRuntime().availableProcessors());
@@ -84,7 +89,7 @@ public class LookupIT {
         assertFalse(failed.get(), "stress test failed");
     }
 
-    @Deployment
+    @Deployment(name = DEPLOYMENT_NAME)
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class, "LookupTest.war")
                 .addPackages(true, "org.omnifaces")

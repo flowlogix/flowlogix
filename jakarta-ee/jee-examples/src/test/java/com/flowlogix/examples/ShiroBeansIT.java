@@ -15,10 +15,12 @@
  */
 package com.flowlogix.examples;
 
+import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
 import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
@@ -96,6 +98,7 @@ public class ShiroBeansIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkDontCallWhenNotAuth() {
         webDriver.get(baseURL + "shiro/unprotected/hello");
         guardAjax(facesViewScoped).click();
@@ -118,6 +121,7 @@ public class ShiroBeansIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkCallWhenAuth() {
         webDriver.get(baseURL + "shiro/auth/loginform");
         login();
@@ -136,6 +140,7 @@ public class ShiroBeansIT {
     }
 
     @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void beanDestroyCalled() {
         exersizeViewAndSessionScoped(facesViewScoped, "api/statistics/pc_fv", "api/statistics/pd_fv", true);
         webDriver.get(baseURL + "api/statistics/clear");
@@ -173,7 +178,7 @@ public class ShiroBeansIT {
         guardHttp(login).click();
     }
 
-    @Deployment(testable = false, name = "DevMode")
+    @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, "shiro-auth-forms.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()

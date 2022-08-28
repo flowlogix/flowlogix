@@ -41,6 +41,8 @@ import lombok.SneakyThrows;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.SubjectContext;
@@ -134,8 +136,13 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
             if (context instanceof WebSubjectContext && wrapped instanceof DefaultSecurityManager) {
                 WebSubjectContext webContext = (WebSubjectContext) context;
                 DefaultWebSecurityManager wsm = (DefaultWebSecurityManager) wrapped;
-                var session = wsm.getSession(new WebSessionKey(webContext.getSessionId(), webContext.getServletRequest(),
-                        webContext.getServletResponse()));
+                Session session = null;
+                try {
+                    session = wsm.getSession(new WebSessionKey(webContext.getSessionId(), webContext.getServletRequest(),
+                            webContext.getServletResponse()));
+                } catch (SessionException e) {
+                    log.debug("Create Session Failed", e);
+                }
                 var newSubject = wrapped.createSubject(context);
                 if (newSubject.isRemembered() && session == null
                         && !isJSFClientStateSavingMethod(webContext.getServletRequest().getServletContext())) {

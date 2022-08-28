@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.isWebContainerSessions;
 import com.flowlogix.shiro.ee.filters.ShiroFilter.WrappedSecurityManager;
 import java.io.IOException;
 import java.net.CookieManager;
@@ -54,7 +55,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.mgt.SessionsSecurityManager;
 import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.util.WebUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
@@ -269,8 +272,25 @@ public class FormResubmitSupport {
     }
 
     private static String getSessionCookieName(ServletContext context) {
-        return context.getSessionCookieConfig().getName() != null
-                ? context.getSessionCookieConfig().getName() : DEFAULT_SESSION_ID_NAME     ;
+        if (!isWebContainerSessions(SecurityUtils.getSecurityManager()) && getNativeSessionManager() != null) {
+            return getNativeSessionManager().getSessionIdCookie().getName();
+        } else {
+            return context.getSessionCookieConfig().getName() != null
+                    ? context.getSessionCookieConfig().getName() : DEFAULT_SESSION_ID_NAME;
+        }
+    }
+
+    private static DefaultWebSessionManager getNativeSessionManager() {
+        DefaultWebSessionManager rv = null;
+        SecurityManager securityManager = unwrapSecurityManager(SecurityUtils.getSecurityManager());
+        if (securityManager instanceof SessionsSecurityManager) {
+            var ssm = (SessionsSecurityManager) securityManager;
+            var sm = ssm.getSessionManager();
+            if (sm instanceof DefaultWebSessionManager) {
+                rv = (DefaultWebSessionManager) sm;
+            }
+        }
+        return rv;
     }
 
     private static org.apache.shiro.mgt.SecurityManager unwrapSecurityManager(SecurityManager securityManager) {

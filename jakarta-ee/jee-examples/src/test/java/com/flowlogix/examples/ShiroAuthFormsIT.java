@@ -18,6 +18,7 @@ package com.flowlogix.examples;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
 import static com.flowlogix.util.ShrinkWrapManipulator.isClientStateSavingIntegrationTest;
+import static com.flowlogix.util.ShrinkWrapManipulator.isShiroNativeSessionsIntegrationTest;
 import java.net.URL;
 import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -130,7 +131,8 @@ public class ShiroAuthFormsIT {
             rememberMe.click();
         }
         login();
-        webDriver.manage().deleteCookieNamed(DEFAULT_SESSION_ID_NAME);
+        webDriver.manage().deleteCookieNamed(isShiroNativeSessionsIntegrationTest() ?
+                "native_session_cookie" : DEFAULT_SESSION_ID_NAME);
         webDriver.navigate().refresh();
         assertEquals("Protected Page", webDriver.getTitle());
         guardHttp(logout).click();

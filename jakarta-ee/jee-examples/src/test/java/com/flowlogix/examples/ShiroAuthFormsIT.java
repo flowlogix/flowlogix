@@ -185,6 +185,16 @@ public class ShiroAuthFormsIT {
     }
 
     @Test
+    void nonAjaxResubmitAfterFailedLogin() {
+        nonAjaxSessionExpired();
+        username.sendKeys("xxx");
+        password.sendKeys("yyy");
+        guardHttp(login).click();
+        login();
+        assertEquals("Form Submitted - firstName: Jack, lastName: Frost", messages.getText());
+    }
+
+    @Test
     void nonAjaxRememberedResubmit() {
         webDriver.get(baseURL + "shiro/form");
         rememberMe.click();

@@ -83,6 +83,7 @@ public class FormResubmitSupport {
     static final String SHIRO_FORM_DATA_KEY = "com.flowlogix.form-data-key";
     static final String SESSION_EXPIRED_PARAMETER = "com.flowlogix.sessionExpired";
     static final String FORM_IS_RESUBMITTED = "com.flowlogix.form-is-resubmitted";
+    static final String DONT_ADD_ANY_MORE_COOKIES = "com.flowlogix.no-more-cookies";
 
 
     static void savePostDataForResubmit(ServletRequest request, ServletResponse response, String loginUrl) {
@@ -147,15 +148,12 @@ public class FormResubmitSupport {
 
     static String getReferer(HttpServletRequest request) {
         String referer = request.getHeader("referer");
-        if (referer != null)
-        {
+        if (referer != null) {
             // do not switch to https if custom port is specified
-            if(!referer.matches("^http:\\/\\/[A-z|.|[0-9]]+:[0-9]+(\\/.*|$)"))
-            {
+            if(!referer.matches("^http:\\/\\/[A-z|.|[0-9]]+:[0-9]+(\\/.*|$)")) {
                 referer = referer.replaceFirst("^http:", "https:");
             }
         }
-
         return referer;
     }
 
@@ -168,7 +166,8 @@ public class FormResubmitSupport {
             String formData = getSavedFormDataFromKey(savedFormDataKey);
             if (formData != null) {
                 Optional.ofNullable(resubmitSavedForm(formData, savedRequest,
-                        Faces.getResponse(), Faces.getServletContext(), false))
+                        Faces.getRequest(), Faces.getResponse(),
+                        Faces.getServletContext(), false))
                         .ifPresent(Faces::redirect);
                 doRedirectAtEnd = false;
             } else {
@@ -197,7 +196,8 @@ public class FormResubmitSupport {
     }
 
     static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest,
-            HttpServletResponse originalResponse, ServletContext servletContext, boolean rememberedAjaxResubmit)
+            HttpServletRequest originalRequest, HttpServletResponse originalResponse,
+            ServletContext servletContext, boolean rememberedAjaxResubmit)
             throws InterruptedException, URISyntaxException, IOException {
         log.debug("saved form data: {}", savedFormData);
         HttpClient client = buildHttpClient(savedRequest, servletContext);
@@ -216,10 +216,12 @@ public class FormResubmitSupport {
                     .build();
             var redirectResponse = client.send(redirectRequest, HttpResponse.BodyHandlers.ofString());
             log.debug("Redirect request: {}, response: {}", redirectRequest, redirectResponse);
-            return processResubmitResponse(redirectResponse, originalResponse, response.headers(), savedRequest, servletContext);
+            return processResubmitResponse(redirectResponse, originalRequest, originalResponse,
+                    response.headers(), savedRequest, servletContext);
         } else {
             deleteCookie(originalResponse, SHIRO_FORM_DATA_KEY);
-            return processResubmitResponse(response, originalResponse, response.headers(), savedRequest, servletContext);
+            return processResubmitResponse(response, originalRequest, originalResponse,
+                    response.headers(), savedRequest, servletContext);
         }
     }
 
@@ -235,7 +237,8 @@ public class FormResubmitSupport {
     }
 
     @SuppressWarnings("fallthrough")
-    private static String processResubmitResponse(HttpResponse<String> response, HttpServletResponse originalResponse,
+    private static String processResubmitResponse(HttpResponse<String> response,
+            HttpServletRequest originalRequest, HttpServletResponse originalResponse,
             HttpHeaders headers, String savedRequest, ServletContext servletContext) throws IOException {
         switch (Response.Status.fromStatusCode(response.statusCode())) {
             case FOUND:
@@ -249,6 +252,7 @@ public class FormResubmitSupport {
                         .equals(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()))))
                         .forEach(entry -> addCookie(originalResponse, entry.getKey(), entry.getValue(), -1));
                 originalResponse.getWriter().append(response.body());
+                originalRequest.setAttribute(DONT_ADD_ANY_MORE_COOKIES, Boolean.TRUE);
                 if (Faces.hasContext()) {
                     Faces.responseComplete();
                 }

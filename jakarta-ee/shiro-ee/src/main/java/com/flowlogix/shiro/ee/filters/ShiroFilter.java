@@ -17,6 +17,7 @@ package com.flowlogix.shiro.ee.filters;
 
 import com.flowlogix.shiro.ee.cdi.ShiroScopeContext;
 import com.flowlogix.shiro.ee.cdi.ShiroSessionScopeExtension;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.DONT_ADD_ANY_MORE_COOKIES;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getNativeSessionManager;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getPostData;
@@ -36,7 +37,10 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Delegate;
@@ -79,7 +83,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     private static final Pattern HTTP_TO_HTTPS = Pattern.compile("^\\s*http(.*)");
     private @Inject ShiroSessionScopeExtension ssse;
 
-    private class WrappedRequest extends ShiroHttpServletRequest {
+    private static class WrappedRequest extends ShiroHttpServletRequest {
         private final Lazy<Boolean> httpsNeeded = new Lazy<>(this::isHttpButNeedHttps);
         private final Lazy<StringBuffer> requestURL = new Lazy<>(this::rewriteHttpToHttps);
 
@@ -127,6 +131,22 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
         }
     }
 
+    private static class WrappedResponse extends HttpServletResponseWrapper {
+        private final HttpServletRequest request;
+
+        public WrappedResponse(HttpServletResponse response, HttpServletRequest request) {
+            super(response);
+            this.request = request;
+        }
+
+        @Override
+        public void addCookie(Cookie cookie) {
+            if (request.getAttribute(DONT_ADD_ANY_MORE_COOKIES) != Boolean.TRUE) {
+                super.addCookie(cookie);
+            }
+        }
+    }
+
     @RequiredArgsConstructor
     static class WrappedSecurityManager implements WebSecurityManager {
         final @Delegate WebSecurityManager wrapped;
@@ -156,7 +176,6 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
         }
     }
 
-
     @Override
     protected ServletRequest wrapServletRequest(HttpServletRequest orig) {
         return new WrappedRequest(orig, getServletContext(), isHttpSessions());
@@ -182,9 +201,11 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
     @Override
     @SneakyThrows
-    protected void executeChain(ServletRequest request, ServletResponse response, FilterChain origChain) throws IOException, ServletException {
+    protected void executeChain(ServletRequest request, ServletResponse origResponse,
+            FilterChain origChain) throws IOException, ServletException {
+        var response = new WrappedResponse(WebUtils.toHttp(origResponse), WebUtils.toHttp(request));
         if (isShiroEEDisabled()) {
-            origChain.doFilter(request, response);
+            origChain.doFilter(request, origResponse);
         } else if (Boolean.TRUE.equals(request.getAttribute(FORM_IS_RESUBMITTED)) && isPostRequest(request)) {
             request.removeAttribute(FORM_IS_RESUBMITTED);
             String postData = getPostData(request);
@@ -193,7 +214,8 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
             boolean rememberedAjaxResubmit = "partial/ajax".equals(httpRequest.getHeader("Faces-Request"));
             Optional.ofNullable(resubmitSavedForm(postData,
                     Servlets.getRequestURLWithQueryString(httpRequest),
-                    WebUtils.toHttp(response), request.getServletContext(), rememberedAjaxResubmit))
+                    WebUtils.toHttp(request), WebUtils.toHttp(response),
+                    request.getServletContext(), rememberedAjaxResubmit))
                     .ifPresent(url -> sendRedirect(response, url));
         } else {
             super.executeChain(request, response, origChain);

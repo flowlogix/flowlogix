@@ -32,7 +32,6 @@ import javax.enterprise.inject.spi.WithAnnotations;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
-import org.apache.shiro.session.SessionListenerAdapter;
 
 /**
  * Entry point for Shiro Session scope CDI extension
@@ -73,8 +72,13 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
      * @param sessionListeners
      * @param sm
      */
-    public void addDestroyHandlers(Collection<SessionListener> sessionListeners, SecurityManager sm) {
-        sessionListeners.add(new SessionListenerAdapter() {
+    public void addSessionListeners(Collection<SessionListener> sessionListeners, SecurityManager sm) {
+        sessionListeners.add(new SessionListener() {
+            @Override
+            public void onStart(Session session) {
+                contexts.forEach(ctx -> ctx.onCreate(session));
+            }
+
             @Override
             public void onStop(Session session) {
                 contexts.forEach(ctx -> ctx.onDestroy(session));

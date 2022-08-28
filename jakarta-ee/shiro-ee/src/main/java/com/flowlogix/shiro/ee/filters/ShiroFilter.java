@@ -171,7 +171,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
         WebSecurityManager wsm = super.getSecurityManager();
         if(!ShiroScopeContext.isWebContainerSessions(wsm)) {
             var dsm = getNativeSessionManager(wsm);
-            ssse.addDestroyHandlers(dsm.getSessionListeners(), wsm);
+            ssse.addSessionListeners(dsm.getSessionListeners(), wsm);
         }
     }
 

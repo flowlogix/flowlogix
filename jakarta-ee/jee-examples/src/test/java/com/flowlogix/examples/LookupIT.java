@@ -93,6 +93,9 @@ public class LookupIT {
                 .deletePackages(true, "com.flowlogix.examples.entities")
                 .deletePackages(true, "com.flowlogix.examples.ui")
                 .deletePackages(true, "com.flowlogix.logcapture")
+                .deletePackages(true, "com.flowlogix.shiro")
+                .deletePackages(true, "com.flowlogix.examples.shiro")
+                .deletePackages(true, "com.flowlogix.jeedao")
                 .deletePackages(true, "org.omnifaces.persistence")
                 .deleteClass(ExceptionPageIT.class);
     }

@@ -9,7 +9,7 @@
         <title>Exception Pages Example</title>
         <h:outputScript name="components.js" library="primefaces"/>
     </h:head>
-    <body>
+    <h:body>
         <h:form id="form">
             <p>
                 <input type="button" id="invalidate" value="Invalidate session via Servlet"
@@ -59,7 +59,7 @@
         <span id="end-of-page">
             <h:outputScript name="test-resource.js"/>
         </span>
-    </body>
+    </h:body>
     <script type="text/javascript">
         const invalidateSession = async (path) => {
             const response = await fetch(path);

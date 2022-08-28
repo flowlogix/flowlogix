@@ -27,11 +27,14 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.CDI;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.util.Beans;
 
 /**
  * If web environment, delegate to SessionScoped,
@@ -39,11 +42,13 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
  *
  * @author lprimak
  */
+@Slf4j
 public class ShiroScopeContext implements Context, Serializable {
     private final Class<? extends Annotation> scopeType;
     private final Class<? extends Annotation> webScopeType;
     private final String BEAN_PREFIX;
     private final Pattern bpPattern;
+    private final boolean isViewScoped;
     private static final long serialVersionUID = 1L;
 
     public ShiroScopeContext(Class<? extends Annotation> scopeType, Class<? extends Annotation> webScopeType) {
@@ -51,6 +56,7 @@ public class ShiroScopeContext implements Context, Serializable {
         this.webScopeType = webScopeType;
         BEAN_PREFIX = String.format("FL_S%sSC_", scopeType.getSimpleName());
         bpPattern = Pattern.compile(String.format("^%s.*", BEAN_PREFIX));
+        isViewScoped = webScopeType.getName().endsWith("ViewScoped");
     }
 
     @Override
@@ -58,24 +64,22 @@ public class ShiroScopeContext implements Context, Serializable {
         return scopeType;
     }
 
-
     @Override
     public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext) {
         if (isWebContainerSessions()) {
             Context ctx = CDI.current().getBeanManager().getContext(webScopeType);
             return ctx.get(contextual, creationalContext);
+        } else if (isViewScoped) {
+            return Beans.getReference(ViewScopeManager.class).createBean(contextual, creationalContext);
         } else {
             Session session = SecurityUtils.getSubject().getSession();
             Bean<T> bean = (Bean<T>)contextual;
             synchronized (contextual) {
-                @SuppressWarnings("unchecked")
-                ScopeInst<T> scopeInst = (ScopeInst<T>)
-                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass().getName());
+                var scopeInst = getScopedInst(session, bean);
                 T rv;
                 if (scopeInst == null) {
                     rv = bean.create(creationalContext);
-                    session.setAttribute(BEAN_PREFIX + bean.getBeanClass().getName(),
-                            new ScopeInst<>(bean, rv, creationalContext));
+                    setScopedInst(session, bean, new ScopeInst<>(bean, rv, creationalContext));
                 } else {
                     rv = scopeInst.instance;
                 }
@@ -84,20 +88,18 @@ public class ShiroScopeContext implements Context, Serializable {
         }
     }
 
-
     @Override
     public <T> T get(Contextual<T> contextual) {
         if (isWebContainerSessions()) {
             Context ctx = CDI.current().getBeanManager().getContext(webScopeType);
             return ctx.get(contextual);
+        } else if (isViewScoped) {
+            return Beans.getReference(ViewScopeManager.class).getBean(contextual);
         } else {
             Session session = SecurityUtils.getSubject().getSession(false);
             T rv = null;
             if (session != null) {
-                Bean<T> bean = (Bean<T>)contextual;
-                @SuppressWarnings("unchecked")
-                ScopeInst<T> scopeInst = (ScopeInst<T>)
-                        session.getAttribute(BEAN_PREFIX + bean.getBeanClass().getName());
+                var scopeInst = getScopedInst(session, (Bean<T>)contextual);
                 if (scopeInst != null)
                 {
                     rv = scopeInst.instance;
@@ -111,7 +113,6 @@ public class ShiroScopeContext implements Context, Serializable {
     public boolean isActive() {
         return true;
     }
-
 
     <T> void onDestroy(Session session) {
         List<String> attrNames = session.getAttributeKeys().stream()
@@ -144,6 +145,16 @@ public class ShiroScopeContext implements Context, Serializable {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private <T> ScopeInst<T> getScopedInst(Session session, Bean<T> bean) {
+        String attribute = BEAN_PREFIX + bean.getBeanClass().getName();
+        return (ScopeInst<T>) session.getAttribute(attribute);
+    }
+
+    private <T> void setScopedInst(Session session, Bean<T> bean, ScopeInst<T> scoped) {
+        String attribute = BEAN_PREFIX + bean.getBeanClass().getName();
+        session.setAttribute(attribute, scoped);
+    }
 
     @RequiredArgsConstructor
     static class ScopeInst<T> implements Serializable {

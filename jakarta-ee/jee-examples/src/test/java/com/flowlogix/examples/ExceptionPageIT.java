@@ -147,7 +147,7 @@ public class ExceptionPageIT {
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void sqlThrowFromFacesMethod() {
         guardAjax(methodSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());

@@ -15,7 +15,6 @@
  */
 package com.flowlogix.examples.shiro;
 
-import com.flowlogix.logcapture.LogCapture;
 import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.isWebContainerSessions;
 import com.flowlogix.shiro.ee.filters.Forms;
 import java.util.Map;
@@ -84,8 +83,6 @@ public class UnprotectedFacade {
             var real = unwrap(e, EJBException.class);
             if (real instanceof UnauthenticatedException) {
                 Messages.addGlobalInfo("stateless bean unauth: {0}", e.getMessage());
-                LogCapture.get().poll();
-                LogCapture.get().poll();
             } else {
                 Messages.addGlobalError("Stateless - Unexpected Exception: {0}", e.getMessage());
             }

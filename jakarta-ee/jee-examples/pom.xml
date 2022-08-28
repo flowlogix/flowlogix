@@ -33,6 +33,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>shiro-ee</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>flowlogix-datamodel</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -69,6 +74,20 @@
             <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
 
+        <!-- Apache Shiro Dependencies -->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+
         <!-- test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -103,7 +122,6 @@
             <artifactId>slf4j-jdk14</artifactId>
         </dependency>
 
-
         <!-- Arquillian test dependencies -->
         <dependency>
             <groupId>org.jboss.arquillian.junit5</groupId>
@@ -121,6 +139,12 @@
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-depchain</artifactId>
             <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eu.ingwar.tools</groupId>
+            <artifactId>arquillian-suite-extension</artifactId>
+            <version>1.2.2</version>
             <scope>test</scope>
         </dependency>
 

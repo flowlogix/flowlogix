@@ -15,14 +15,19 @@
  */
 package com.flowlogix.shiro.ee.cdi;
 
+import java.io.Serializable;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.ejb.Stateless;
+import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.spi.AnnotatedType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +53,10 @@ class AnnotatedTypeWrapperTest {
 
     @Stateless
     private class StatelessAnnotated { }
+
+    @SessionScoped
+    @SuppressWarnings("serial")
+    private static class SessionScopedAnnotated implements Serializable { }
 
     @Test
     void noAnnotations() {
@@ -82,13 +91,41 @@ class AnnotatedTypeWrapperTest {
     }
 
     @Test
+    void removeAnnotations() {
+        initializeStubs();
+        var wrapper = new AnnotatedTypeWrapper<>(annotatedType, true,
+                Set.of(SessionScopedAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of(Annotated.class.getDeclaredAnnotations()[1]));
+        assertEquals(3, wrapper.getAnnotations().size());
+        assertFalse(wrapper.isAnnotationPresent(RequiresGuest.class));
+        assertTrue(wrapper.isAnnotationPresent(SessionScoped.class));
+    }
+
+    @Test
+    void badLambdaArgument() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new AnnotatedTypeWrapper<>(annotatedType, true,
+                Set.of(() -> SessionScoped.class),
+                Set.of(() -> RequiresGuest.class)));
+        assertThrows(IllegalArgumentException.class,
+                () -> new AnnotatedTypeWrapper<>(annotatedType, true,
+                Set.of(() -> RequiresGuest.class),
+                Set.of()));
+        assertThrows(IllegalArgumentException.class,
+                () -> new AnnotatedTypeWrapper<>(annotatedType, true,
+                Set.of(),
+                Set.of(() -> RequiresGuest.class)));
+    }
+
+    @Test
     void overriddenAnnotation() {
         initializeStubs();
         when(annotatedType.getJavaClass()).thenReturn(Void.class);
         assertEquals(3, annotatedType.getAnnotations().size());
         var wrapper = new AnnotatedTypeWrapper<>(annotatedType, false,
-                ShiroSecureAnnotated.class.getDeclaredAnnotations()[0],
-                StatelessAnnotated.class.getDeclaredAnnotations()[0]);
+                Set.of(ShiroSecureAnnotated.class.getDeclaredAnnotations()[0],
+                        StatelessAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of());
         assertEquals(2, wrapper.getAnnotations().size());
         assertTrue(wrapper.isAnnotationPresent(ShiroSecureAnnotated.class
                 .getDeclaredAnnotations()[0].annotationType()));
@@ -101,7 +138,7 @@ class AnnotatedTypeWrapperTest {
     void decreaseAnnotationsToZero() {
         initializeStubs();
         assertEquals(3, annotatedType.getAnnotations().size());
-        var wrapper = new AnnotatedTypeWrapper<>(annotatedType, false);
+        var wrapper = new AnnotatedTypeWrapper<>(annotatedType, false, Set.of(), Set.of());
         assertEquals(0, wrapper.getAnnotations().size());
     }
 

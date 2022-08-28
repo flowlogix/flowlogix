@@ -9,11 +9,11 @@
         <title>Exception Pages Example</title>
         <h:outputScript name="components.js" library="primefaces"/>
     </h:head>
-    <body>
+    <h:body>
         <h:form id="form">
             <p>
                 <input type="button" id="invalidate" value="Invalidate session via Servlet"
-                       onclick="fetch('#{request.contextPath}/invalidatesession', alert('Session invalidated!'))" />
+                       onclick="invalidateSession('#{request.contextPath}/invalidatesession')" />
             </p>
             <p/>
             <h:commandButton id="closeByIntr" value="Throw ClosedByInterruptException" action="#{exceptionBean.throwClosedByInterruptException(true)}">
@@ -46,11 +46,25 @@
             Security Status: <span id="isExpired"> #{exceptionBean.expired()} </span>
         </h:form>
         <p/>
-        <div id="mode">
+        ProjectStage:
+        <span id="mode">
             #{facesContext.application.projectStage}
-        </div>
+        </span>
+        <p/>
+        isClientStateSaving:
+        <span id="stateSaving">
+            #{facesContext.application.stateManager.isSavingStateInClient(facesContext)}
+        </span>
+        <p/>
         <span id="end-of-page">
             <h:outputScript name="test-resource.js"/>
         </span>
-    </body>
+    </h:body>
+    <script type="text/javascript">
+        const invalidateSession = async (path) => {
+            const response = await fetch(path);
+            const strresp = await response.text();
+            alert('Session invalidated!');
+        };
+    </script>
 </html>

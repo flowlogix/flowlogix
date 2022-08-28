@@ -15,8 +15,15 @@
  */
 package com.flowlogix.examples;
 
+import com.flowlogix.util.ShrinkWrapManipulator;
+import com.flowlogix.util.ShrinkWrapManipulator.Action;
+import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
+import static com.flowlogix.util.ShrinkWrapManipulator.isClientStateSavingIntegrationTest;
+import static com.flowlogix.util.ShrinkWrapManipulator.isShiroNativeSessionsIntegrationTest;
 import java.net.URL;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.codehaus.plexus.util.StringUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -39,6 +46,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  *
@@ -47,6 +55,9 @@ import org.openqa.selenium.support.FindBy;
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
 public class ExceptionPageIT {
+    static final String DEPLOYMENT_DEV_MODE = "DevMode";
+    static final String DEPLOYMENT_PROD_MODE = "ProdMode";
+
     @Drone
     private WebDriver webDriver;
 
@@ -83,38 +94,52 @@ public class ExceptionPageIT {
     @FindBy(id = "mode")
     private WebElement modeField;
 
+    @FindBy(id = "stateSaving")
+    private WebElement stateSaving;
 
     @BeforeEach
     void fetchExceptionPage() {
         webDriver.get(baseURL + "exception-pages.xhtml");
-        waitGui(webDriver);
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void closedByInterrupted() {
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
         webDriver.get(baseURL + "lastException");
-        waitGui(webDriver);
         assertEquals("", webDriver.findElement(By.tagName("body")).getText());
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void invalidSession() {
         invalidateSession.click();
-        waitGui(webDriver);
+        waitGui(webDriver).until(ExpectedConditions.alertIsPresent());
         webDriver.switchTo().alert().accept();
-        waitForHttp(noAction).click();
-        assertEquals("Logged Out", isExpired.getText());
+        if (!Boolean.parseBoolean(stateSaving.getText())) {
+            waitForHttp(noAction).click();
+            assertEquals("Logged Out", isExpired.getText());
+        }
         guardAjax(noAction).click();
         assertEquals("Logged In", isExpired.getText());
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void checkStateSavingDev() {
+        assertEquals(Boolean.parseBoolean(stateSaving.getText()), isClientStateSavingIntegrationTest());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_PROD_MODE)
+    void checkStateSavingProd() {
+        assertEquals(Boolean.parseBoolean(stateSaving.getText()), isClientStateSavingIntegrationTest());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void lateSqlThrow() {
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
@@ -122,25 +147,24 @@ public class ExceptionPageIT {
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void sqlThrowFromFacesMethod() {
         guardAjax(methodSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
         webDriver.get(baseURL + "lastException");
-        waitGui(webDriver);
         assertEquals("WARNING: javax.faces.FacesException: #{exceptionBean.throwExceptionFromMethod()}: "
                 + "java.sql.SQLException: sql-from-method", webDriver.findElement(By.tagName("body")).getText());
     }
 
     @Test
-    @OperateOnDeployment("DevMode")
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void versionsOnDev() {
         versions("end of page");
     }
 
     @Test
-    @OperateOnDeployment("ProdMode")
+    @OperateOnDeployment(DEPLOYMENT_PROD_MODE)
     void versionsOnProd() {
         versions("end of page - minimized");
     }
@@ -157,7 +181,7 @@ public class ExceptionPageIT {
             assertTrue(href.contains("v="), "not versioned");
             ++count;
         }
-        assertEquals(3, count);
+        assertEquals(isShiroNativeSessionsIntegrationTest() ? 4 : 3, count);
 
         count = 0;
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));
@@ -172,19 +196,24 @@ public class ExceptionPageIT {
         assertEquals(1, count);
     }
 
-    @Deployment(testable = false, name = "DevMode")
+    @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
-        return ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest.war")
+        WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
+        new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
+        return archive;
     }
 
-    @Deployment(testable = false, name = "ProdMode")
+    @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
     public static WebArchive createDeploymentProdMode() {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest-prod.war")
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
-        archive.setWebXML(archive.get("WEB-INF/web-production.xml").getAsset());
+        var productionList = List.of(new Action("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value",
+                node -> node.setTextContent("Production")));
+        new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
+                getStandardActions().stream()).collect(Collectors.toList()));
         return archive;
     }
 }

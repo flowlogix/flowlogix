@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 lprimak.
+ * Copyright 2022 lprimak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.shiro.ee.cdi;
+package com.flowlogix.examples.shiro;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import javax.inject.Scope;
+import javax.ejb.Stateless;
+import org.apache.shiro.authz.annotation.RequiresUser;
 
 /**
- * {@code @ViewScoped} interface that works with Shiro sessions
- * Primarily for plugging into Shiro destruction pipeline
  *
  * @author lprimak
  */
-@Scope
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
-@interface ShiroViewScoped {}
+@RequiresUser
+@Stateless
+public class ProtectedStatelessBean {
+    public String hello() {
+        return "Hello from ProtectedStatelessBean";
+    }
+}

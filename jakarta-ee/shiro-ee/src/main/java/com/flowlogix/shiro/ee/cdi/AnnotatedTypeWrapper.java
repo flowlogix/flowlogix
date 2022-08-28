@@ -31,25 +31,35 @@ import lombok.experimental.Delegate;
  */
 class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
 {
+    // the below is so the compiler doesn't complain about unchecked casts
+    private abstract class AT implements AnnotatedType<T> { }
+    private final @Delegate(types = AT.class) AnnotatedType<T> wrapped;
+    private final @Getter Set<Annotation> annotations;
+
+
     AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
     {
-        this(wrapped, true, additionalAnnotations);
+        this(wrapped, true, Set.of(additionalAnnotations), Set.of());
     }
 
 
     AnnotatedTypeWrapper(AnnotatedType<T> wrapped, boolean keepOriginalAnnotations,
-            Annotation... additionalAnnotations)
+            Set<Annotation> additionalAnnotations, Set<Annotation> annotationsToRemove)
     {
         this.wrapped = wrapped;
         Stream.Builder<Annotation> builder = Stream.builder();
         if(keepOriginalAnnotations)
         {
-            wrapped.getAnnotations().forEach(builder::add);
+            var annotationTypesToExclude = annotationsToRemove.stream()
+                    .map(AnnotatedTypeWrapper::checkIfAnnotation)
+                    .map(Annotation::annotationType).collect(Collectors.toSet());
+            wrapped.getAnnotations().stream().filter(ann ->
+                    !annotationTypesToExclude.contains(ann.annotationType()))
+                    .forEach(builder::add);
         }
-        Stream.of(additionalAnnotations).forEach(builder::add);
+        additionalAnnotations.forEach(annotation -> addToBuilder(builder, annotation));
         annotations = builder.build().collect(Collectors.toSet());
     }
-
 
     @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationType)
@@ -57,9 +67,15 @@ class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
         return annotations.stream().anyMatch(annotation -> annotationType.isInstance(annotation));
     }
 
+    private void addToBuilder(Stream.Builder<Annotation> builder, Annotation ann) {
+        checkIfAnnotation(ann);
+        builder.add(ann);
+    }
 
-    // the below is so the compiler doesn't complain about unchecked casts
-    private abstract class AT implements AnnotatedType<T> { }
-    private final @Delegate(types = AT.class) AnnotatedType<T> wrapped;
-    private final @Getter Set<Annotation> annotations;
+    private static Annotation checkIfAnnotation(Annotation ann) {
+        if (!ann.annotationType().isInstance(ann)) {
+            throw new IllegalArgumentException(ann.getClass().getName());
+        }
+        return ann;
+    }
 }

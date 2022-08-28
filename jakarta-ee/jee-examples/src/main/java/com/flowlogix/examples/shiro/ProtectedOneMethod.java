@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.examples;
+package com.flowlogix.examples.shiro;
 
-import org.jboss.arquillian.junit5.ArquillianExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
+import javax.enterprise.context.RequestScoped;
+import org.apache.shiro.authz.annotation.RequiresUser;
 
 /**
  *
  * @author lprimak
  */
-@ExtendWith(ArquillianExtension.class)
-public class ShiroSecurityIT {
+@RequestScoped
+public class ProtectedOneMethod {
+    public String unprotectedMethod() {
+        return "hello from unprotected";
+    }
+
+    @RequiresUser
+    public String protectedMethod() {
+        return "hello from protected";
+    }
 }

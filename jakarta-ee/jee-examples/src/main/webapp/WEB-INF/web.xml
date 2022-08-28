@@ -3,6 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
+    <distributable/>
     <welcome-file-list>
         <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
@@ -28,7 +29,26 @@
         <param-value>#{environmentInfo.version}</param-value>
     </context-param>
     <context-param>
+        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>server</param-value>
+    </context-param>
+    <context-param>
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
+    <context-param>
+        <param-name>org.omnifaces.FACES_VIEWS_SCAN_PATHS</param-name>
+        <param-value>/*.xhtml</param-value>
+    </context-param>
+
+    <!-- Apache Shiro Security -->
+    <context-param>
+        <param-name>shiroConfigLocations</param-name>
+        <param-value>classpath:META-INF/shiro.ini</param-value>
+    </context-param>
+    <!-- Enforce Filter Ordering (Optional) -->
+    <filter-mapping>
+        <filter-name>ShiroFilter</filter-name>
+        <url-pattern/>
+    </filter-mapping>
 </web-app>

@@ -15,9 +15,11 @@
  */
 package com.flowlogix.shiro.ee.cdi;
 
+import com.flowlogix.shiro.ee.cdi.ShiroSecurityExtension.ShiroSecureAnnotated;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.enterprise.context.SessionScoped;
@@ -27,12 +29,9 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
-import javax.faces.view.ViewScoped;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
-import org.apache.shiro.session.SessionListenerAdapter;
 
 /**
  * Entry point for Shiro Session scope CDI extension
@@ -41,63 +40,89 @@ import org.apache.shiro.session.SessionListenerAdapter;
  */
 public class ShiroSessionScopeExtension implements Extension, Serializable
 {
-    public void addDestroyHandlers(Collection<SessionListener> sessionListeners) {
-        addDestroyHandlers(sessionListeners, SecurityUtils.getSecurityManager());
-    }
-    /**
-     * intercept session destroy session listeners and destroy the beans
-     *
-     * @param sessionListeners
-     */
+    private static final List<ShiroScopeContext> contexts = Stream.of(
+            new ShiroScopeContext(ShiroSessionScoped.class, SessionScoped.class),
+            new ShiroScopeContext(ShiroFacesViewScoped.class, javax.faces.view.ViewScoped.class),
+            new ShiroScopeContext(ShiroOmniViewScoped.class, org.omnifaces.cdi.ViewScoped.class))
+            .collect(Collectors.toList());
+
+    @SessionScoped
+    @SuppressWarnings("serial")
+    private static class SessionScopedAnnotated implements Serializable { }
+    @javax.faces.view.ViewScoped
+    @SuppressWarnings("serial")
+    private static class FacesViewScopedAnnotated implements Serializable { }
+    @org.omnifaces.cdi.ViewScoped
+    @SuppressWarnings("serial")
+    private static class OmniViewScopedAnnotated implements Serializable { }
+
+    @ShiroSessionScoped
+    @SuppressWarnings("serial")
+    private static class ShiroSessionScopedAnnotated implements Serializable { }
+    @ShiroFacesViewScoped
+    @SuppressWarnings("serial")
+    private static class ShiroFacesViewScopedAnnotated implements Serializable { }
+    @ShiroOmniViewScoped
+    @SuppressWarnings("serial")
+    private static class ShiroOmniViewScopedAnnotated implements Serializable { }
+
 
     /**
      * intercept session destroy session listeners and destroy the beans
      * @param sessionListeners
      * @param sm
      */
-    public void addDestroyHandlers(Collection<SessionListener> sessionListeners, SecurityManager sm)
-    {
-        sessionListeners.add(new SessionListenerAdapter()
-        {
+    public void addSessionListeners(Collection<SessionListener> sessionListeners, SecurityManager sm) {
+        sessionListeners.add(new SessionListener() {
             @Override
-            public void onStop(Session session)
-            {
+            public void onStart(Session session) {
+                contexts.forEach(ctx -> ctx.onCreate(session));
+            }
+
+            @Override
+            public void onStop(Session session) {
                 contexts.forEach(ctx -> ctx.onDestroy(session));
             }
 
             @Override
-            public void onExpiration(Session session)
-            {
+            public void onExpiration(Session session) {
                 onStop(session);
             }
         });
     }
 
     <T> void addSessionScoped(@Observes @WithAnnotations(SessionScoped.class) ProcessAnnotatedType<T> pat) {
-        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroSessionScoped.class));
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
+                Set.of(ShiroSessionScopedAnnotated.class.getDeclaredAnnotations()[0],
+                        ShiroSecureAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of(SessionScopedAnnotated.class.getDeclaredAnnotations()[0])));
     }
 
-    <T> void addViewScoped(@Observes @WithAnnotations(ViewScoped.class) ProcessAnnotatedType<T> pat) {
-        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), () -> ShiroViewScoped.class));
+    <T> void addFacesViewScoped(@Observes @WithAnnotations(javax.faces.view.ViewScoped.class) ProcessAnnotatedType<T> pat) {
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
+                Set.of(ShiroFacesViewScopedAnnotated.class.getDeclaredAnnotations()[0],
+                        ShiroSecureAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of(FacesViewScopedAnnotated.class.getDeclaredAnnotations()[0])));
     }
 
-    void addScope(@Observes @WithAnnotations({
-        SessionScoped.class, ViewScoped.class} ) final BeforeBeanDiscovery event)
+    <T> void addOmniViewScoped(@Observes @WithAnnotations(org.omnifaces.cdi.ViewScoped.class) ProcessAnnotatedType<T> pat) {
+        pat.setAnnotatedType(new AnnotatedTypeWrapper<>(pat.getAnnotatedType(), true,
+                Set.of(ShiroOmniViewScopedAnnotated.class.getDeclaredAnnotations()[0],
+                        ShiroSecureAnnotated.class.getDeclaredAnnotations()[0]),
+                Set.of(OmniViewScopedAnnotated.class.getDeclaredAnnotations()[0])));
+    }
+
+    void addScope(@Observes final BeforeBeanDiscovery event)
     {
         contexts.forEach(ctx -> event.addScope(ctx.getScope(), true, true));
     }
 
 
-    void registerContext(@Observes @WithAnnotations({
-        SessionScoped.class, ViewScoped.class} ) final AfterBeanDiscovery event)
+    void registerContext(@Observes final AfterBeanDiscovery event)
     {
         contexts.forEach(event::addContext);
     }
 
 
-    private final List<ShiroScopeContext> contexts = Stream.of(
-            new ShiroScopeContext(ShiroSessionScoped.class, SessionScoped.class),
-            new ShiroScopeContext(ShiroViewScoped.class, ViewScoped.class))
-            .collect(Collectors.toList());
     private static final long serialVersionUID = 1L;
 }

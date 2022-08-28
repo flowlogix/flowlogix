@@ -18,18 +18,15 @@ package com.flowlogix.shiro.ee.cdi;
 import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.isWebContainerSessions;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.util.List;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.CDI;
 import javax.faces.view.ViewScoped;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,15 +34,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -91,58 +85,6 @@ public class ShiroScopeContextTest {
     void basics() {
         assertTrue(ctx.isActive());
         assertEquals(ViewScoped.class, ctx.getScope());
-    }
-
-    @Test
-    void nativeSessionsGet() {
-        assertFalse(isWebContainerSessions(SecurityUtils.getSecurityManager()));
-        when(SecurityUtils.getSubject().getSession(false).getAttribute(any()))
-                .thenReturn(new ShiroScopeContext.ScopeInst<>(contextual,
-                        bean, null));
-        assertEquals(bean, ctx.get(contextual));
-        verify(SecurityUtils.getSubject().getSession(false)).getAttribute(ATTR_KEY);
-        verify(SecurityUtils.getSubject(), never()).getSession();
-        verify(SecurityUtils.getSubject(), never()).getSession(true);
-    }
-
-    @Test
-    void nativeSessionsGetWhenNotExist() {
-        assertFalse(isWebContainerSessions(SecurityUtils.getSecurityManager()));
-        assertNull(ctx.get(contextual));
-        verify(SecurityUtils.getSubject().getSession(false)).getAttribute(ATTR_KEY);
-        verify(SecurityUtils.getSubject(), never()).getSession();
-        verify(SecurityUtils.getSubject(), never()).getSession(true);
-    }
-
-    @Test
-    void nativeSessionsCreate() {
-        when(contextual.create(creationalContext)).thenReturn(bean);
-        assertEquals(bean, ctx.get(contextual, creationalContext));
-        verify(SecurityUtils.getSubject().getSession()).getAttribute(ATTR_KEY);
-        verify(SecurityUtils.getSubject().getSession()).setAttribute(eq(ATTR_KEY), any());
-        verify(SecurityUtils.getSubject(), never()).getSession(false);
-    }
-
-    @Test
-    void nativeSessionsCreateWhenAlreadyExists() {
-        when(SecurityUtils.getSubject().getSession().getAttribute(any()))
-                .thenReturn(new ShiroScopeContext.ScopeInst<>(contextual,
-                        bean, creationalContext));
-        assertEquals(bean, ctx.get(contextual, creationalContext));
-        verify(SecurityUtils.getSubject().getSession()).getAttribute(ATTR_KEY);
-        verify(SecurityUtils.getSubject(), never()).getSession(false);
-        verify(contextual, never()).create(any());
-    }
-
-    @Test
-    void destroy() {
-        Session session = SecurityUtils.getSubject().getSession();
-        when(session.getAttributeKeys()).thenReturn(List.of(new Object(), "", ATTR_KEY, "abcd"));
-        when(session.getAttribute(ATTR_KEY)).thenReturn(
-                new ShiroScopeContext.ScopeInst<>(contextual, bean, creationalContext));
-        ctx.onDestroy(SecurityUtils.getSubject().getSession());
-        verify(contextual).destroy(bean, creationalContext);
-        verify(session, times(1)).getAttribute(any());
     }
 
     @Test

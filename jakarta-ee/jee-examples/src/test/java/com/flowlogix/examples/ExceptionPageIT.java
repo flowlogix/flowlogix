@@ -19,6 +19,7 @@ import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
 import static com.flowlogix.util.ShrinkWrapManipulator.isClientStateSavingIntegrationTest;
+import static com.flowlogix.util.ShrinkWrapManipulator.isShiroNativeSessionsIntegrationTest;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -177,7 +178,7 @@ public class ExceptionPageIT {
             assertTrue(href.contains("v="), "not versioned");
             ++count;
         }
-        assertEquals(4, count);
+        assertEquals(isShiroNativeSessionsIntegrationTest() ? 4 : 3, count);
 
         count = 0;
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));

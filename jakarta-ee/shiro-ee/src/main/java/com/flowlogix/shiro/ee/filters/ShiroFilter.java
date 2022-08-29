@@ -37,6 +37,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,6 @@ import static org.apache.shiro.web.filter.authz.SslFilter.HTTPS_SCHEME;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
-import org.apache.shiro.web.servlet.ShiroHttpServletResponse;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.apache.shiro.web.subject.WebSubjectContext;
 import org.apache.shiro.web.util.WebUtils;
@@ -130,14 +130,17 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
         }
     }
 
-    private static class WrappedResponse extends ShiroHttpServletResponse {
-        public WrappedResponse(HttpServletResponse response, ShiroHttpServletRequest request) {
-            super(response, request.getServletContext(), request);
+    private static class WrappedResponse extends HttpServletResponseWrapper {
+        private final ServletRequest request;
+
+        public WrappedResponse(HttpServletResponse response, ServletRequest request) {
+            super(response);
+            this.request = request;
         }
 
         @Override
         public void addCookie(Cookie cookie) {
-            if (getRequest().getAttribute(DONT_ADD_ANY_MORE_COOKIES) != Boolean.TRUE) {
+            if (request.getAttribute(DONT_ADD_ANY_MORE_COOKIES) != Boolean.TRUE) {
                 super.addCookie(cookie);
             }
         }
@@ -182,11 +185,12 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     }
 
     @Override
-    protected ServletResponse wrapServletResponse(HttpServletResponse response, ShiroHttpServletRequest request) {
-        if (isShiroEEDisabled(request.getServletContext())) {
-            return super.wrapServletResponse(response, request);
+    // wrapServletResponse() only gets called in certain configurations, we need to wrap them all
+    protected ServletResponse prepareServletResponse(ServletRequest request, ServletResponse response, FilterChain chain) {
+        if (isShiroEEDisabled(request.getServletContext()) || !(request instanceof HttpServletRequest)) {
+            return super.prepareServletResponse(request, response, chain);
         } else {
-            return new WrappedResponse(response, request);
+            return new WrappedResponse(WebUtils.toHttp(response), request);
         }
     }
 

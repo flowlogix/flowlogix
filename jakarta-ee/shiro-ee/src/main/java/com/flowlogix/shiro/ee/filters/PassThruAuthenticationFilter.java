@@ -20,6 +20,7 @@ import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.saveRequestRefe
 import java.io.IOException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,9 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
 
     @Override
     protected void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
-        savePostDataForResubmit(request, response, getLoginUrl());
+        if (request instanceof HttpServletRequest) {
+            savePostDataForResubmit(request, response, getLoginUrl());
+        }
     }
 
     /**
@@ -56,13 +59,17 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     @Override
     protected boolean isLoginRequest(ServletRequest request, ServletResponse response) {
         boolean rv = super.isLoginRequest(request, response);
-        saveRequestReferer(rv, request, response);
+        if (request instanceof HttpServletRequest) {
+            saveRequestReferer(rv, request, response);
+        }
         return rv;
     }
 
     @Override
     protected void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
-        FormResubmitSupport.saveRequest(request, response, false);
+        if (request instanceof HttpServletRequest) {
+            FormResubmitSupport.saveRequest(request, response, false);
+        }
         redirectToLogin(request, response);
     }
 

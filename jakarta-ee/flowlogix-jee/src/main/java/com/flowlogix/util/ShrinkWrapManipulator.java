@@ -46,6 +46,7 @@ public class ShrinkWrapManipulator {
     public static final String INTEGRATION_TEST_MODE_PROPERTY = "integration.test.mode";
     public static final String CLIENT_STATE_SAVING = "clientStateSaving";
     public static final String SHIRO_NATIVE_SESSIONS = "shiroNativeSessions";
+    public static final String SHIRO_EE_DISABLED = "disableShiroEE";
 
     @RequiredArgsConstructor
     public static class Action {
@@ -108,6 +109,9 @@ public class ShrinkWrapManipulator {
                 return List.of(new Action(getParamValue("shiroConfigLocations"),
                         node -> node.setTextContent(node.getTextContent()
                                 + ",classpath:META-INF/shiro-native-sessions.ini")));
+            case SHIRO_EE_DISABLED:
+                return List.of(new Action(getParamValue("com.flowlogix.shiro.ee.disabled"),
+                        node -> node.setTextContent("true")));
             default:
                 return List.of();
         }

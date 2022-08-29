@@ -183,7 +183,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
     @Override
     public void init() throws Exception {
-        if (isShiroEEDisabled()) {
+        if (isShiroEEDisabled(getServletContext())) {
             return;
         }
         super.init();
@@ -204,7 +204,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     protected void executeChain(ServletRequest request, ServletResponse origResponse,
             FilterChain origChain) throws IOException, ServletException {
         var response = new WrappedResponse(WebUtils.toHttp(origResponse), WebUtils.toHttp(request));
-        if (isShiroEEDisabled()) {
+        if (isShiroEEDisabled(getServletContext())) {
             origChain.doFilter(request, origResponse);
         } else if (Boolean.TRUE.equals(request.getAttribute(FORM_IS_RESUBMITTED)) && isPostRequest(request)) {
             request.removeAttribute(FORM_IS_RESUBMITTED);

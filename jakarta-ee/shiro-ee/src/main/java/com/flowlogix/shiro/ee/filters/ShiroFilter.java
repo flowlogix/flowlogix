@@ -15,11 +15,9 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import com.flowlogix.shiro.ee.cdi.ShiroScopeContext;
-import com.flowlogix.shiro.ee.cdi.ShiroSessionScopeExtension;
+import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.addScopeSessionListeners;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.DONT_ADD_ANY_MORE_COOKIES;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getNativeSessionManager;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getPostData;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFClientStateSavingMethod;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isPostRequest;
@@ -29,7 +27,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
@@ -40,7 +37,8 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Delegate;
@@ -54,10 +52,10 @@ import static org.apache.shiro.web.filter.authz.SslFilter.HTTPS_SCHEME;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
+import org.apache.shiro.web.servlet.ShiroHttpServletResponse;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.apache.shiro.web.subject.WebSubjectContext;
 import org.apache.shiro.web.util.WebUtils;
-import org.omnifaces.util.Lazy;
 import org.omnifaces.util.Servlets;
 
 /**
@@ -81,11 +79,12 @@ import org.omnifaces.util.Servlets;
 public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     private static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
     private static final Pattern HTTP_TO_HTTPS = Pattern.compile("^\\s*http(.*)");
-    private @Inject ShiroSessionScopeExtension ssse;
 
     private static class WrappedRequest extends ShiroHttpServletRequest {
-        private final Lazy<Boolean> httpsNeeded = new Lazy<>(this::isHttpButNeedHttps);
-        private final Lazy<StringBuffer> requestURL = new Lazy<>(this::rewriteHttpToHttps);
+        @Getter(value = AccessLevel.PRIVATE, lazy = true)
+        private final boolean httpsNeeded = createHttpButNeedHttps();
+        @Getter(value = AccessLevel.PRIVATE, lazy = true)
+        private final StringBuffer secureRequestURL = rewriteHttpToHttps();
 
         public WrappedRequest(HttpServletRequest wrapped, ServletContext servletContext, boolean httpSessions) {
             super(wrapped, servletContext, httpSessions);
@@ -98,7 +97,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
         @Override
         public String getScheme() {
-            if (httpsNeeded.get()) {
+            if (isHttpsNeeded()) {
                 return HTTPS_SCHEME;
             } else {
                 return super.getScheme();
@@ -107,8 +106,8 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
         @Override
         public StringBuffer getRequestURL() {
-            if (httpsNeeded.get()) {
-                return requestURL.get();
+            if (isHttpsNeeded()) {
+                return getSecureRequestURL();
             } else {
                 return super.getRequestURL();
             }
@@ -116,10 +115,10 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
         @Override
         public boolean isSecure() {
-            return super.isSecure() || httpsNeeded.get();
+            return super.isSecure() || isHttpsNeeded();
         }
 
-        private boolean isHttpButNeedHttps() {
+        private boolean createHttpButNeedHttps() {
             return !HTTPS_SCHEME.equalsIgnoreCase(super.getScheme())
                     && HTTPS_SCHEME.equalsIgnoreCase(WebUtils.toHttp(getRequest())
                             .getHeader(X_FORWARDED_PROTO));
@@ -131,17 +130,14 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
         }
     }
 
-    private static class WrappedResponse extends HttpServletResponseWrapper {
-        private final HttpServletRequest request;
-
-        public WrappedResponse(HttpServletResponse response, HttpServletRequest request) {
-            super(response);
-            this.request = request;
+    private static class WrappedResponse extends ShiroHttpServletResponse {
+        public WrappedResponse(HttpServletResponse response, ShiroHttpServletRequest request) {
+            super(response, request.getServletContext(), request);
         }
 
         @Override
         public void addCookie(Cookie cookie) {
-            if (request.getAttribute(DONT_ADD_ANY_MORE_COOKIES) != Boolean.TRUE) {
+            if (getRequest().getAttribute(DONT_ADD_ANY_MORE_COOKIES) != Boolean.TRUE) {
                 super.addCookie(cookie);
             }
         }
@@ -177,8 +173,21 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     }
 
     @Override
-    protected ServletRequest wrapServletRequest(HttpServletRequest orig) {
-        return new WrappedRequest(orig, getServletContext(), isHttpSessions());
+    protected ServletRequest wrapServletRequest(HttpServletRequest request) {
+        if (isShiroEEDisabled(request.getServletContext())) {
+            return super.wrapServletRequest(request);
+        } else {
+            return new WrappedRequest(request, getServletContext(), isHttpSessions());
+        }
+    }
+
+    @Override
+    protected ServletResponse wrapServletResponse(HttpServletResponse response, ShiroHttpServletRequest request) {
+        if (isShiroEEDisabled(request.getServletContext())) {
+            return super.wrapServletResponse(response, request);
+        } else {
+            return new WrappedResponse(response, request);
+        }
     }
 
     @Override
@@ -187,10 +196,10 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
             return;
         }
         super.init();
-        WebSecurityManager wsm = super.getSecurityManager();
-        if(!ShiroScopeContext.isWebContainerSessions(wsm)) {
-            var dsm = getNativeSessionManager(wsm);
-            ssse.addSessionListeners(dsm.getSessionListeners(), wsm);
+        try {
+            addScopeSessionListeners(super.getSecurityManager());
+        } catch (Throwable e) {
+            log.warn("Unable to add scope session listeners", e);
         }
     }
 
@@ -201,11 +210,10 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
     @Override
     @SneakyThrows
-    protected void executeChain(ServletRequest request, ServletResponse origResponse,
+    protected void executeChain(ServletRequest request, ServletResponse response,
             FilterChain origChain) throws IOException, ServletException {
-        var response = new WrappedResponse(WebUtils.toHttp(origResponse), WebUtils.toHttp(request));
         if (isShiroEEDisabled(getServletContext())) {
-            origChain.doFilter(request, origResponse);
+            origChain.doFilter(request, response);
         } else if (Boolean.TRUE.equals(request.getAttribute(FORM_IS_RESUBMITTED)) && isPostRequest(request)) {
             request.removeAttribute(FORM_IS_RESUBMITTED);
             String postData = getPostData(request);

@@ -285,7 +285,7 @@ public class FormResubmitSupport {
         }
     }
 
-    static DefaultWebSessionManager getNativeSessionManager(SecurityManager securityManager) {
+    public static DefaultWebSessionManager getNativeSessionManager(SecurityManager securityManager) {
         DefaultWebSessionManager rv = null;
         SecurityManager unwrapped = unwrapSecurityManager(securityManager);
         if (unwrapped instanceof SessionsSecurityManager) {

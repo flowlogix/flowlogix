@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.listeners;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -28,23 +29,25 @@ import org.apache.shiro.web.env.WebEnvironment;
  */
 @WebListener
 public class EnvironmentLoaderListener extends EnvironmentLoader implements ServletContextListener {
-    public static final String SHIRO_EE_DISABLED_PROP = "com.flowlogix.shiro.ee.disabled";
-    static final boolean SHIRO_EE_DISABLED = Boolean.getBoolean(SHIRO_EE_DISABLED_PROP);
+    private static final String SHIRO_EE_DISABLED_PARAM = "com.flowlogix.shiro.ee.disabled";
 
-    public static boolean isShiroEEDisabled() {
-        return SHIRO_EE_DISABLED;
+    public static boolean isShiroEEDisabled(ServletContext ctx) {
+        return Boolean.TRUE.equals(ctx.getAttribute(SHIRO_EE_DISABLED_PARAM));
     }
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        if (!SHIRO_EE_DISABLED) {
+        if (Boolean.parseBoolean(sce.getServletContext().getInitParameter(SHIRO_EE_DISABLED_PARAM))) {
+            sce.getServletContext().setAttribute(SHIRO_EE_DISABLED_PARAM, Boolean.TRUE);
+        }
+        if (!isShiroEEDisabled(sce.getServletContext())) {
             initEnvironment(sce.getServletContext());
         }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        if (!SHIRO_EE_DISABLED) {
+        if (!isShiroEEDisabled(sce.getServletContext())) {
             destroyEnvironment(sce.getServletContext());
         }
     }

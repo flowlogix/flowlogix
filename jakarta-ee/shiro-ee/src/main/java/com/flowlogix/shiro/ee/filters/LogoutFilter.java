@@ -15,11 +15,12 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.FallbackPredicate;
 import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.NO_PREDICATE;
-import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.createPredicate;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import lombok.Getter;
+import lombok.Setter;
 import org.omnifaces.util.Faces;
 
 /**
@@ -29,15 +30,10 @@ import org.omnifaces.util.Faces;
  */
 public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter {
     public @Getter Class<? extends FormAuthenticationFilter.FallbackPredicate> predicateType = NO_PREDICATE.getClass();
-    private FormAuthenticationFilter.FallbackPredicate predicate = NO_PREDICATE;
+    private @Getter @Setter FallbackPredicate fallbackType = NO_PREDICATE;
 
     @Override
     protected void issueRedirect(ServletRequest request, ServletResponse response, String redirectUrl) throws Exception {
-        Forms.logout(predicate::useFallback, Faces.getRequestContextPath());
-    }
-
-    public void setPredicateType(Class<? extends FormAuthenticationFilter.FallbackPredicate> predicateType) {
-        this.predicateType = predicateType;
-        predicate = createPredicate(predicateType);
+        Forms.logout(fallbackType::useFallback, Faces.getRequestContextPath());
     }
 }

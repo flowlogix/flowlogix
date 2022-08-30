@@ -19,7 +19,7 @@ import com.flowlogix.shiro.ee.filters.AuthenticationFilterDelegate.MethodsFromFi
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import lombok.Getter;
-import lombok.SneakyThrows;
+import lombok.Setter;
 import lombok.experimental.Delegate;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -35,8 +35,7 @@ import org.omnifaces.util.Faces;
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {
     private final @Delegate AuthenticationFilterDelegate delegate;
     static final FallbackPredicate NO_PREDICATE = () -> false;
-    public @Getter Class<? extends FallbackPredicate> predicateType = NO_PREDICATE.getClass();
-    private FallbackPredicate predicate = NO_PREDICATE;
+    private @Getter @Setter FallbackPredicate fallbackType = NO_PREDICATE;
 
     @FunctionalInterface
     public interface FallbackPredicate {
@@ -64,14 +63,9 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
         delegate = new AuthenticationFilterDelegate(new Methods());
     }
 
-    public void setPredicateType(Class<? extends FallbackPredicate> predicateType) {
-        this.predicateType = predicateType;
-        predicate = createPredicate(predicateType);
-    }
-
     @Override
     protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
-        Forms.redirectToSaved(predicate::useFallback, request.getServletContext().getContextPath());
+        Forms.redirectToSaved(fallbackType::useFallback, request.getServletContext().getContextPath());
         return false;
     }
 
@@ -80,10 +74,5 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
         Faces.setFlashAttribute(getFailureKeyAttribute(), e);
         Forms.redirectToView();
         return false;
-    }
-
-    @SneakyThrows
-    static FallbackPredicate createPredicate(Class<? extends FallbackPredicate> predicateType) {
-        return predicateType.getConstructor().newInstance();
     }
 }

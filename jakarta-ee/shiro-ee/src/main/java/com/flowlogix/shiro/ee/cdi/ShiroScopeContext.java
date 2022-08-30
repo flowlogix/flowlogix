@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.cdi;
 
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getNativeSessionManager;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import javax.enterprise.context.spi.Context;
@@ -105,6 +106,14 @@ public class ShiroScopeContext implements Context, Serializable {
             return wsm.isHttpSessionMode();
         }
         return false;
+    }
+
+    public static void addScopeSessionListeners(WebSecurityManager wsm) {
+        if (!isWebContainerSessions(wsm)) {
+            var dsm = getNativeSessionManager(wsm);
+            Beans.getReference(ShiroSessionScopeExtension.class)
+                    .addSessionListeners(dsm.getSessionListeners(), wsm);
+        }
     }
 
     static boolean isWebContainerSessions() {

@@ -94,7 +94,7 @@ public class FormResubmitSupport {
             var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
             dsm.getCacheManager().getCache(FORM_DATA_CACHE).put(cacheKey, postData);
             addCookie(WebUtils.toHttp(response), SHIRO_FORM_DATA_KEY,
-                    cacheKey.toString(), Servlets.getContext().getSessionTimeout() * 60);
+                    cacheKey.toString(), getCookieAge(request, dsm));
         }
         boolean isGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
         Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
@@ -132,7 +132,7 @@ public class FormResubmitSupport {
                     WebUtils.SAVED_REQUEST_KEY, path, null,
                     WebUtils.toHttp(request).getContextPath(),
                     // cookie age = session timeout
-                    Servlets.getContext().getSessionTimeout() * 60);
+                    getCookieAge(request, SecurityUtils.getSecurityManager()));
         }
     }
 
@@ -193,6 +193,15 @@ public class FormResubmitSupport {
         cookieToDelete.setPath(Servlets.getContext().getContextPath());
         cookieToDelete.setMaxAge(0);
         response.addCookie(cookieToDelete);
+    }
+
+    static int getCookieAge(ServletRequest request, SecurityManager securityManager) {
+        var nativeSessionManager = getNativeSessionManager(securityManager);
+        if (nativeSessionManager != null) {
+            return ((int)nativeSessionManager.getGlobalSessionTimeout() / 1000);
+        } else {
+            return request.getServletContext().getSessionTimeout() * 60;
+        }
     }
 
     static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest,
@@ -285,7 +294,7 @@ public class FormResubmitSupport {
         }
     }
 
-    static DefaultWebSessionManager getNativeSessionManager(SecurityManager securityManager) {
+    public static DefaultWebSessionManager getNativeSessionManager(SecurityManager securityManager) {
         DefaultWebSessionManager rv = null;
         SecurityManager unwrapped = unwrapSecurityManager(securityManager);
         if (unwrapped instanceof SessionsSecurityManager) {

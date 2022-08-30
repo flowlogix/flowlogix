@@ -16,12 +16,12 @@
 package com.flowlogix.shiro.ee.filters;
 
 import com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.FallbackPredicate;
-import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.NO_PREDICATE;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
-import org.omnifaces.util.Faces;
+import org.apache.shiro.web.util.WebUtils;
 
 /**
  * JSF Ajax support
@@ -29,11 +29,16 @@ import org.omnifaces.util.Faces;
  * @author lprimak
  */
 public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter {
-    public @Getter Class<? extends FormAuthenticationFilter.FallbackPredicate> predicateType = NO_PREDICATE.getClass();
-    private @Getter @Setter FallbackPredicate fallbackType = NO_PREDICATE;
+    private static final FallbackPredicate YES_PREDICATE = () -> true;
+    private @Getter @Setter FallbackPredicate fallbackType = YES_PREDICATE;
 
     @Override
     protected void issueRedirect(ServletRequest request, ServletResponse response, String redirectUrl) throws Exception {
-        Forms.logout(fallbackType::useFallback, Faces.getRequestContextPath());
+        if (request instanceof HttpServletRequest) {
+            Forms.logout(WebUtils.toHttp(request), WebUtils.toHttp(response),
+                    fallbackType::useFallback, redirectUrl);
+        } else {
+            super.issueRedirect(request, response, redirectUrl);
+        }
     }
 }

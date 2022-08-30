@@ -17,14 +17,11 @@ package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SESSION_EXPIRED_PARAMETER;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.doRedirectToSaved;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
-import lombok.SneakyThrows;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.web.util.WebUtils;
 import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
 import org.omnifaces.util.Faces;
 
@@ -38,6 +35,7 @@ import org.omnifaces.util.Faces;
 @Slf4j
 public class Forms {
     /**
+     * Jakarta Faces variant
      * redirect to saved request, possibly resubmitting an existing form
      * the saved request is via a cookie
      *
@@ -45,59 +43,39 @@ public class Forms {
      * @param fallbackPath
      */
     public static void redirectToSaved(Callable<Boolean> useFallbackPath, String fallbackPath) {
-        redirectToSaved(useFallbackPath, fallbackPath, true);
+        FormResubmitSupport.redirectToSaved(Faces.getRequest(), Faces.getResponse(), useFallbackPath, fallbackPath, true);
     }
 
     /**
-     * Redirects the user to saved request after login, if available
-     * Resumbits the form that caused the logout upon successfull login.Form resumnission supports JSF and Ajax forms
-     * @param useFallbackPath predicate whether to use fall back path
-     * @param fallbackPath
-     * @param resubmit if true, attempt to resubmit the form that was unsubmitted prior to logout
-     */
-    @SneakyThrows({IOException.class, URISyntaxException.class, InterruptedException.class})
-    public static void redirectToSaved(Callable<Boolean> useFallbackPath, String fallbackPath, boolean resubmit) {
-        String savedRequest = Faces.getRequestCookie(WebUtils.SAVED_REQUEST_KEY);
-        if (savedRequest != null) {
-            doRedirectToSaved(savedRequest, resubmit);
-        } else {
-            redirectToView(useFallbackPath, fallbackPath);
-        }
-    }
-
-    /**
+     * Jakarta Faces variant
      * redirects to current view after a form submit, or a logout, for example
      */
     public static void redirectToView() {
-        redirectToView(() -> false, null);
+        FormResubmitSupport.redirectToView(Faces.getRequest(), Faces.getResponse());
     }
 
     /**
-     * redirects to current view after a form submit,
-     * or the fallback path if predicate succeeds
-     *
-     * @param useFallbackPath
+     * Faces variant
+     * @param useFallback
      * @param fallbackPath
      */
-    @SneakyThrows
-    public static void redirectToView(Callable<Boolean> useFallbackPath, String fallbackPath) {
-        if (useFallbackPath.call()) {
-            Faces.redirect(fallbackPath);
-        } else {
-            Faces.redirect(Faces.getRequestURLWithQueryString());
-        }
+    public static void logout(Callable<Boolean> useFallback, String fallbackPath) {
+        logout(Faces.getRequest(), Faces.getResponse(), useFallback, fallbackPath);
     }
 
     /**
      * makes sure that there is no double-logout
      *
+     * @param request
+     * @param response
      * @param useFallback
      * @param fallbackPath
      */
-    public static void logout(Callable<Boolean> useFallback, String fallbackPath) {
-        if (!Boolean.TRUE.toString().equals(Faces.getRequestHeader(FORM_IS_RESUBMITTED))) {
+    public static void logout(HttpServletRequest request, HttpServletResponse response,
+            Callable<Boolean> useFallback, String fallbackPath) {
+        if (!Boolean.TRUE.toString().equals(request.getHeader(FORM_IS_RESUBMITTED))) {
             SecurityUtils.getSubject().logout();
-            redirectToView(useFallback, Faces.getRequestContextPath());
+            FormResubmitSupport.redirectToView(request, response, useFallback, fallbackPath);
         }
     }
 

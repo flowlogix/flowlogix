@@ -94,7 +94,7 @@ public class FormResubmitSupport {
             var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
             dsm.getCacheManager().getCache(FORM_DATA_CACHE).put(cacheKey, postData);
             addCookie(WebUtils.toHttp(response), SHIRO_FORM_DATA_KEY,
-                    cacheKey.toString(), Servlets.getContext().getSessionTimeout() * 60);
+                    cacheKey.toString(), ((int)getNativeSessionManager(dsm).getGlobalSessionTimeout() / 1000) * 60);
         }
         boolean isGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
         Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
@@ -132,7 +132,8 @@ public class FormResubmitSupport {
                     WebUtils.SAVED_REQUEST_KEY, path, null,
                     WebUtils.toHttp(request).getContextPath(),
                     // cookie age = session timeout
-                    Servlets.getContext().getSessionTimeout() * 60);
+                    ((int)getNativeSessionManager(SecurityUtils.getSecurityManager())
+                            .getGlobalSessionTimeout() / 1000) * 60);
         }
     }
 

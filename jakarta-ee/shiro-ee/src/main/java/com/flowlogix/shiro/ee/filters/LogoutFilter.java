@@ -29,7 +29,7 @@ import org.omnifaces.util.Faces;
  */
 public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter {
     public @Getter Class<? extends FormAuthenticationFilter.FallbackPredicate> predicateType = NO_PREDICATE.getClass();
-    private FormAuthenticationFilter.FallbackPredicate predicate = createPredicate(predicateType);
+    private FormAuthenticationFilter.FallbackPredicate predicate = NO_PREDICATE;
 
     @Override
     protected void issueRedirect(ServletRequest request, ServletResponse response, String redirectUrl) throws Exception {

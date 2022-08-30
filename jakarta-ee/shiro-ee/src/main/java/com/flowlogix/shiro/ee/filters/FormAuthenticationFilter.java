@@ -36,7 +36,7 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
     private final @Delegate AuthenticationFilterDelegate delegate;
     static final FallbackPredicate NO_PREDICATE = () -> false;
     public @Getter Class<? extends FallbackPredicate> predicateType = NO_PREDICATE.getClass();
-    private FallbackPredicate predicate = createPredicate(predicateType);
+    private FallbackPredicate predicate = NO_PREDICATE;
 
     @FunctionalInterface
     public interface FallbackPredicate {

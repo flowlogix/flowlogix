@@ -198,7 +198,7 @@ public class FormResubmitSupport {
     static int getCookieAge(ServletRequest request, SecurityManager securityManager) {
         var nativeSessionManager = getNativeSessionManager(securityManager);
         if (nativeSessionManager != null) {
-            return ((int)nativeSessionManager.getGlobalSessionTimeout() / 1000) * 60;
+            return ((int)nativeSessionManager.getGlobalSessionTimeout() / 1000);
         } else {
             return request.getServletContext().getSessionTimeout() * 60;
         }

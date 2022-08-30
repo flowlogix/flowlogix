@@ -15,9 +15,11 @@
  */
 package com.flowlogix.shiro.ee.listeners;
 
+import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import static javax.servlet.SessionTrackingMode.COOKIE;
 import javax.servlet.annotation.WebListener;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
@@ -41,6 +43,7 @@ public class EnvironmentLoaderListener extends EnvironmentLoader implements Serv
             sce.getServletContext().setAttribute(SHIRO_EE_DISABLED_PARAM, Boolean.TRUE);
         }
         if (!isShiroEEDisabled(sce.getServletContext())) {
+            sce.getServletContext().setSessionTrackingModes(Set.of(COOKIE));
             initEnvironment(sce.getServletContext());
         }
     }

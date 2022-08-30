@@ -103,7 +103,7 @@ public class FormResubmitSupport {
         }
         boolean isFacesGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())
                 && Faces.hasContext();
-        Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
+        doFacesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
                 WebUtils.toHttp(request).getContextPath() + loginUrl + (isFacesGetRequest? "" : "?%s=true"),
                 SESSION_EXPIRED_PARAMETER);
     }
@@ -208,14 +208,14 @@ public class FormResubmitSupport {
             if (formData != null) {
                 Optional.ofNullable(resubmitSavedForm(formData, savedRequest,
                         request, response, request.getServletContext(), false))
-                        .ifPresent(path -> Servlets.facesRedirect(request, response, path));
+                        .ifPresent(path -> doFacesRedirect(request, response, path));
                 doRedirectAtEnd = false;
             } else {
                 deleteCookie(response, SHIRO_FORM_DATA_KEY);
             }
         }
         if (doRedirectAtEnd) {
-            Servlets.facesRedirect(request, response, savedRequest);
+            doFacesRedirect(request, response, savedRequest);
         }
     }
 
@@ -240,9 +240,17 @@ public class FormResubmitSupport {
     static void redirectToView(HttpServletRequest request, HttpServletResponse response,
             Callable<Boolean> useFallbackPath, String fallbackPath) {
         if (useFallbackPath.call()) {
-            Servlets.facesRedirect(request, response, fallbackPath);
+            doFacesRedirect(request, response, fallbackPath);
         } else {
-            Servlets.facesRedirect(request, response, Servlets.getRequestURLWithQueryString(request));
+            doFacesRedirect(request, response, Servlets.getRequestURLWithQueryString(request));
+        }
+    }
+
+    private static void doFacesRedirect(HttpServletRequest request, HttpServletResponse response, String path, Object... paramValues) {
+        if (Faces.hasContext()) {
+            Faces.redirect(path, paramValues);
+        } else {
+            Servlets.facesRedirect(request, response, path, paramValues);
         }
     }
 

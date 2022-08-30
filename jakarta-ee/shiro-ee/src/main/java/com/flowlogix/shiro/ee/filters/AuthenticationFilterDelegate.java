@@ -50,7 +50,7 @@ class AuthenticationFilterDelegate {
      * @param mappedValue
      * @return access allowed
      */
-    boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
+    public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         Subject subject = methods.getSubject(request, response);
         boolean isAuthenticated = subject.isAuthenticated() && subject.getPrincipal() != null;
         return isAuthenticated || (useRemembered && subject.isRemembered());
@@ -63,7 +63,7 @@ class AuthenticationFilterDelegate {
      * @param response
      * @throws IOException
      */
-    void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
+    public void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
         if (request instanceof HttpServletRequest) {
             savePostDataForResubmit(request, response, methods.getLoginUrl());
         }
@@ -77,7 +77,7 @@ class AuthenticationFilterDelegate {
      * @param response
      * @return
      */
-    boolean isLoginRequest(ServletRequest request, ServletResponse response) {
+    public boolean isLoginRequest(ServletRequest request, ServletResponse response) {
         boolean rv = methods.isLoginRequest(request, response);
         if (request instanceof HttpServletRequest) {
             saveRequestReferer(rv, request, response);
@@ -91,14 +91,14 @@ class AuthenticationFilterDelegate {
      * @param response
      * @throws IOException
      */
-    void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
+    public void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
         if (request instanceof HttpServletRequest) {
             FormResubmitSupport.saveRequest(request, response, false);
         }
         redirectToLogin(request, response);
     }
 
-    void saveRequest(ServletRequest request) {
+    public void saveRequest(ServletRequest request) {
         throw new UnsupportedOperationException("bad op");
     }
 }

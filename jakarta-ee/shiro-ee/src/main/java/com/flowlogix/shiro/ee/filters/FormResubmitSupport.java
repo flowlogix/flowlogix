@@ -222,7 +222,7 @@ public class FormResubmitSupport {
      * @param response
      */
     static void redirectToView(HttpServletRequest request, HttpServletResponse response) {
-        redirectToView(request, response, path -> false, null);
+        redirectToView(request, response, (path, req) -> false, null);
     }
 
     /**
@@ -237,11 +237,11 @@ public class FormResubmitSupport {
     @SneakyThrows
     static void redirectToView(HttpServletRequest request, HttpServletResponse response,
             FallbackPredicate useFallbackPath, String fallbackPath) {
-        boolean useFallback = useFallbackPath.useFallback(request.getRequestURI());
+        boolean useFallback = useFallbackPath.useFallback(request.getRequestURI(), request);
         String referer = getReferer(request);
         String redirectPath = Servlets.getRequestURLWithQueryString(request);
         if (useFallback && referer != null) {
-            useFallback = useFallbackPath.useFallback(referer);
+            useFallback = useFallbackPath.useFallback(referer, request);
             redirectPath = referer;
         }
         if (useFallback) {
@@ -253,7 +253,7 @@ public class FormResubmitSupport {
 
     /**
      * flash cookie is preserved here
-     * 
+     *
      * @param request
      * @param response
      * @param path

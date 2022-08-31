@@ -16,6 +16,7 @@
 package com.flowlogix.examples.shiro;
 
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -23,7 +24,7 @@ import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
  */
 public class UseFallback implements FallbackPredicate {
     @Override
-    public boolean useFallback(String path) {
+    public boolean useFallback(String path, HttpServletRequest request) {
         return path.contains("shiro/auth/");
     }
 }

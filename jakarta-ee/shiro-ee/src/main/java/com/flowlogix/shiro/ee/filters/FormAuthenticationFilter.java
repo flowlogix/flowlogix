@@ -36,7 +36,7 @@ import org.apache.shiro.web.util.WebUtils;
  */
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {
     private final @Delegate AuthenticationFilterDelegate delegate;
-    private static final FallbackPredicate NO_PREDICATE = path -> false;
+    private static final FallbackPredicate NO_PREDICATE = (path, request) -> false;
     private @Getter @Setter FallbackPredicate fallbackType = NO_PREDICATE;
 
     private class Methods implements MethodsFromFilter {

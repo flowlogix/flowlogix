@@ -66,7 +66,7 @@ public class Forms {
 
     @FunctionalInterface
     public interface FallbackPredicate {
-        boolean useFallback(String path);
+        boolean useFallback(String path, HttpServletRequest request);
     }
 
     /**

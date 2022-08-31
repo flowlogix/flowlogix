@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getReferer;
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -29,7 +30,7 @@ import org.apache.shiro.web.util.WebUtils;
  * @author lprimak
  */
 public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter {
-    private static final FallbackPredicate YES_PREDICATE = path -> true;
+    private final FallbackPredicate YES_PREDICATE = createPredicate();
     static final String LOGOUT_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.logout-predicate";
     private @Getter @Setter FallbackPredicate fallbackType = YES_PREDICATE;
 
@@ -47,5 +48,12 @@ public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter
         } else {
             super.issueRedirect(request, response, redirectUrl);
         }
+    }
+
+    private FallbackPredicate createPredicate() {
+        return (String path, HttpServletRequest request) -> {
+            String referer = getReferer(request);
+            return !path.equals(referer);
+        };
     }
 }

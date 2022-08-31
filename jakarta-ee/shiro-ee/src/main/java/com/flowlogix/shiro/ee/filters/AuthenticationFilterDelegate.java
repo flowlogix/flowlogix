@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.util.WebUtils;
 
 /**
  * common functionality for both Form and PassThru authentication filters
@@ -65,7 +66,8 @@ class AuthenticationFilterDelegate {
      */
     public void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
         if (request instanceof HttpServletRequest) {
-            savePostDataForResubmit(request, response, methods.getLoginUrl());
+            savePostDataForResubmit(WebUtils.toHttp(request), WebUtils.toHttp(response),
+                    methods.getLoginUrl());
         }
     }
 
@@ -80,7 +82,7 @@ class AuthenticationFilterDelegate {
     public boolean isLoginRequest(ServletRequest request, ServletResponse response) {
         boolean rv = methods.isLoginRequest(request, response);
         if (request instanceof HttpServletRequest) {
-            saveRequestReferer(rv, request, response);
+            saveRequestReferer(rv, WebUtils.toHttp(request), WebUtils.toHttp(response));
         }
         return rv;
     }
@@ -93,7 +95,7 @@ class AuthenticationFilterDelegate {
      */
     public void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
         if (request instanceof HttpServletRequest) {
-            FormResubmitSupport.saveRequest(request, response, false);
+            FormResubmitSupport.saveRequest(WebUtils.toHttp(request), WebUtils.toHttp(response), false);
         }
         redirectToLogin(request, response);
     }

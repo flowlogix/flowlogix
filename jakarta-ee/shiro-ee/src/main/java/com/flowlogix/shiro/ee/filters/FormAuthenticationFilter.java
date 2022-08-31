@@ -17,17 +17,16 @@ package com.flowlogix.shiro.ee.filters;
 
 import com.flowlogix.shiro.ee.filters.AuthenticationFilterDelegate.MethodsFromFilter;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.redirectToSaved;
+import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
-import org.omnifaces.util.Faces;
 
 /**
  * Implements JSF Ajax redirection via OmniFaces
@@ -37,13 +36,8 @@ import org.omnifaces.util.Faces;
  */
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {
     private final @Delegate AuthenticationFilterDelegate delegate;
-    private static final FallbackPredicate NO_PREDICATE = () -> false;
+    private static final FallbackPredicate NO_PREDICATE = path -> false;
     private @Getter @Setter FallbackPredicate fallbackType = NO_PREDICATE;
-
-    @FunctionalInterface
-    public interface FallbackPredicate {
-        boolean useFallback();
-    }
 
     private class Methods implements MethodsFromFilter {
         @Override
@@ -73,16 +67,5 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
                     request.getServletContext().getContextPath());
         }
         return false;
-    }
-
-    @Override
-    protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
-        if (Faces.hasContext()) {
-            Faces.setFlashAttribute(getFailureKeyAttribute(), e);
-            FormResubmitSupport.redirectToView(Faces.getRequest(), Faces.getResponse());
-            return false;
-        } else {
-            return true;
-        }
     }
 }

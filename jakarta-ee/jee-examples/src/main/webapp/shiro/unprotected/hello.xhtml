@@ -30,10 +30,10 @@
                 <f:ajax execute="@form" render="@form"/>
             </h:commandButton>
             <p/>
-            <h:commandButton id="logout" value="Logout..." action="#{loginBean.logout}"/>
+            <h:commandButton id="logout" value="Logout..." action="#{logoutBean.logout}"/>
             <h:messages id="messages"/>
             <h:outputText escape="false" value="#{unprotectedFacade.statistics}"/>
-            <div jsf:rendered="#{loginBean.sessionExpired}" style="color: red;" id="sessionExpiredMessage">
+            <div jsf:rendered="#{forms.sessionExpired}" style="color: red;" id="sessionExpiredMessage">
                 Your Session Has Expired
             </div>
         </h:form>

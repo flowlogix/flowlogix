@@ -15,8 +15,7 @@
  */
 package com.flowlogix.examples.shiro;
 
-import com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.FallbackPredicate;
-import org.omnifaces.util.Faces;
+import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 
 /**
  *
@@ -24,7 +23,7 @@ import org.omnifaces.util.Faces;
  */
 public class UseFallback implements FallbackPredicate {
     @Override
-    public boolean useFallback() {
-        return Faces.getViewId().contains("shiro/auth/");
+    public boolean useFallback(String path) {
+        return path.contains("shiro/auth/");
     }
 }

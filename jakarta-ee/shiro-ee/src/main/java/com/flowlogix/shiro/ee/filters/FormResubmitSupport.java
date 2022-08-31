@@ -16,6 +16,7 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.isWebContainerSessions;
+import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import com.flowlogix.shiro.ee.filters.ShiroFilter.WrappedSecurityManager;
 import java.io.IOException;
 import java.net.CookieManager;
@@ -32,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import static java.util.function.Predicate.not;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -40,7 +40,6 @@ import static javax.faces.application.StateManager.STATE_SAVING_METHOD_CLIENT;
 import static javax.faces.application.StateManager.STATE_SAVING_METHOD_PARAM_NAME;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,7 +86,7 @@ public class FormResubmitSupport {
     static final String DONT_ADD_ANY_MORE_COOKIES = "com.flowlogix.no-more-cookies";
 
 
-    static void savePostDataForResubmit(ServletRequest request, ServletResponse response, String loginUrl) {
+    static void savePostDataForResubmit(HttpServletRequest request, HttpServletResponse response, String loginUrl) {
         if (isPostRequest(request) && unwrapSecurityManager(SecurityUtils.getSecurityManager())
                 instanceof DefaultSecurityManager) {
             String postData = getPostData(request);
@@ -95,21 +94,22 @@ public class FormResubmitSupport {
             var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
             if (dsm.getCacheManager() != null) {
                 dsm.getCacheManager().getCache(FORM_DATA_CACHE).put(cacheKey, postData);
-                addCookie(WebUtils.toHttp(response), SHIRO_FORM_DATA_KEY,
-                        cacheKey.toString(), getCookieAge(request, dsm));
+                addCookie(response, SHIRO_FORM_DATA_KEY, cacheKey.toString(), getCookieAge(request, dsm));
             } else {
                 log.warn("Shiro Cache manager is not configured, cannot store form data");
             }
         }
-        boolean isFacesGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())
-                && Faces.hasContext();
-        doFacesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                WebUtils.toHttp(request).getContextPath() + loginUrl + (isFacesGetRequest? "" : "?%s=true"),
-                SESSION_EXPIRED_PARAMETER);
+        boolean isFacesGetRequest = HttpMethod.GET.equalsIgnoreCase(request.getMethod());
+        doFacesRedirect(request, response, request.getContextPath() + loginUrl
+                + (isFacesGetRequest? "" : "?%s=true"), SESSION_EXPIRED_PARAMETER);
     }
 
     static boolean isPostRequest(ServletRequest request) {
-        return HttpMethod.POST.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
+        if (request instanceof HttpServletRequest) {
+            return HttpMethod.POST.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
+        } else {
+            return false;
+        }
     }
 
     @SneakyThrows(IOException.class)
@@ -129,21 +129,20 @@ public class FormResubmitSupport {
         return savedFormData;
     }
 
-    static void saveRequest(ServletRequest request, ServletResponse response, boolean useReferer) {
-        String path = useReferer? getReferer(WebUtils.toHttp(request))
-                : Servlets.getRequestURLWithQueryString(WebUtils.toHttp(request));
+    static void saveRequest(HttpServletRequest request, HttpServletResponse response, boolean useReferer) {
+        String path = useReferer? getReferer(request)
+                : Servlets.getRequestURLWithQueryString(request);
         if (path != null) {
-            Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                    WebUtils.SAVED_REQUEST_KEY, path, null,
-                    WebUtils.toHttp(request).getContextPath(),
+            Servlets.addResponseCookie(request, response, WebUtils.SAVED_REQUEST_KEY,
+                    path, null, request.getContextPath(),
                     // cookie age = session timeout
                     getCookieAge(request, SecurityUtils.getSecurityManager()));
         }
     }
 
-    static void saveRequestReferer(boolean rv, ServletRequest request, ServletResponse response) {
-        if(rv && HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())) {
-            if(Servlets.getRequestCookie(WebUtils.toHttp(request), WebUtils.SAVED_REQUEST_KEY) == null) {
+    static void saveRequestReferer(boolean rv, HttpServletRequest request, HttpServletResponse response) {
+        if(rv && HttpMethod.GET.equalsIgnoreCase(request.getMethod())) {
+            if(Servlets.getRequestCookie(request, WebUtils.SAVED_REQUEST_KEY) == null) {
                 // only save refer when there is no saved request cookie already,
                 // and only as a last resort
                 saveRequest(request, response, true);
@@ -173,8 +172,7 @@ public class FormResubmitSupport {
      */
     @SneakyThrows({IOException.class, URISyntaxException.class, InterruptedException.class})
     static void redirectToSaved(HttpServletRequest request, HttpServletResponse response,
-            Callable<Boolean> useFallbackPath,
-            String fallbackPath, boolean resubmit) {
+            FallbackPredicate useFallbackPath, String fallbackPath, boolean resubmit) {
         String savedRequest = Servlets.getRequestCookie(request, WebUtils.SAVED_REQUEST_KEY);
         if (savedRequest != null) {
             doRedirectToSaved(request, response, savedRequest, resubmit);
@@ -193,7 +191,7 @@ public class FormResubmitSupport {
      * @param fallbackPath
      */
     static void redirectToSaved(HttpServletRequest request, HttpServletResponse response,
-            Callable<Boolean> useFallbackPath, String fallbackPath) {
+            FallbackPredicate useFallbackPath, String fallbackPath) {
         redirectToSaved(request, response, useFallbackPath, fallbackPath, true);
     }
 
@@ -224,7 +222,7 @@ public class FormResubmitSupport {
      * @param response
      */
     static void redirectToView(HttpServletRequest request, HttpServletResponse response) {
-        redirectToView(request, response, () -> false, null);
+        redirectToView(request, response, path -> false, null);
     }
 
     /**
@@ -238,14 +236,29 @@ public class FormResubmitSupport {
      */
     @SneakyThrows
     static void redirectToView(HttpServletRequest request, HttpServletResponse response,
-            Callable<Boolean> useFallbackPath, String fallbackPath) {
-        if (useFallbackPath.call()) {
-            doFacesRedirect(request, response, fallbackPath);
+            FallbackPredicate useFallbackPath, String fallbackPath) {
+        boolean useFallback = useFallbackPath.useFallback(request.getRequestURI());
+        String referer = getReferer(request);
+        String redirectPath = Servlets.getRequestURLWithQueryString(request);
+        if (useFallback && referer != null) {
+            useFallback = useFallbackPath.useFallback(referer);
+            redirectPath = referer;
+        }
+        if (useFallback) {
+            doFacesRedirect(request, response, request.getContextPath() + fallbackPath);
         } else {
-            doFacesRedirect(request, response, Servlets.getRequestURLWithQueryString(request));
+            doFacesRedirect(request, response, redirectPath);
         }
     }
 
+    /**
+     * flash cookie is preserved here
+     * 
+     * @param request
+     * @param response
+     * @param path
+     * @param paramValues
+     */
     private static void doFacesRedirect(HttpServletRequest request, HttpServletResponse response, String path, Object... paramValues) {
         if (Faces.hasContext()) {
             Faces.redirect(path, paramValues);

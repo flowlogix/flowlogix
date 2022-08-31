@@ -17,11 +17,14 @@ package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SESSION_EXPIRED_PARAMETER;
-import java.util.concurrent.Callable;
+import static com.flowlogix.shiro.ee.filters.LogoutFilter.LOGOUT_PREDICATE_ATTR_NAME;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import static org.apache.shiro.web.filter.authc.FormAuthenticationFilter.DEFAULT_ERROR_KEY_ATTRIBUTE_NAME;
 import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
 import org.omnifaces.util.Faces;
 
@@ -35,6 +38,38 @@ import org.omnifaces.util.Faces;
 @Slf4j
 public class Forms {
     /**
+     * JSF access points
+     */
+    @Named("authc")
+    @ApplicationScoped
+    public static class AuthenticationMethods {
+        public void login() {
+            Forms.loginFailed();
+        }
+
+        public void logout() {
+            Forms.logout();
+        }
+
+        public boolean isLoggedIn() {
+            return Forms.isLoggedIn();
+        }
+
+        public boolean isSessionExpired() {
+            return Forms.isSessionExpired();
+        }
+
+        public boolean isLoginFailure() {
+            return Faces.getFlashAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null;
+        }
+    }
+
+    @FunctionalInterface
+    public interface FallbackPredicate {
+        boolean useFallback(String path);
+    }
+
+    /**
      * Jakarta Faces variant
      * redirect to saved request, possibly resubmitting an existing form
      * the saved request is via a cookie
@@ -42,7 +77,7 @@ public class Forms {
      * @param useFallbackPath
      * @param fallbackPath
      */
-    public static void redirectToSaved(Callable<Boolean> useFallbackPath, String fallbackPath) {
+    public static void redirectToSaved(FallbackPredicate useFallbackPath, String fallbackPath) {
         FormResubmitSupport.redirectToSaved(Faces.getRequest(), Faces.getResponse(), useFallbackPath, fallbackPath, true);
     }
 
@@ -55,11 +90,24 @@ public class Forms {
     }
 
     /**
+     * JSF login failure method
+     */
+    public static void loginFailed() {
+        Faces.setFlashAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME, Faces.getRequestAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME));
+        Faces.removeRequestAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME);
+        redirectToView();
+    }
+
+    public static void logout() {
+        Forms.logout(Faces.getRequestAttribute(LOGOUT_PREDICATE_ATTR_NAME), Faces.getRequestContextPath());
+    }
+
+    /**
      * Faces variant
      * @param useFallback
      * @param fallbackPath
      */
-    public static void logout(Callable<Boolean> useFallback, String fallbackPath) {
+    public static void logout(FallbackPredicate useFallback, String fallbackPath) {
         logout(Faces.getRequest(), Faces.getResponse(), useFallback, fallbackPath);
     }
 
@@ -72,7 +120,7 @@ public class Forms {
      * @param fallbackPath
      */
     public static void logout(HttpServletRequest request, HttpServletResponse response,
-            Callable<Boolean> useFallback, String fallbackPath) {
+            FallbackPredicate useFallback, String fallbackPath) {
         if (!Boolean.TRUE.toString().equals(request.getHeader(FORM_IS_RESUBMITTED))) {
             SecurityUtils.getSubject().logout();
             FormResubmitSupport.redirectToView(request, response, useFallback, fallbackPath);

@@ -15,7 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.FallbackPredicate;
+import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -29,8 +29,15 @@ import org.apache.shiro.web.util.WebUtils;
  * @author lprimak
  */
 public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter {
-    private static final FallbackPredicate YES_PREDICATE = () -> true;
+    private static final FallbackPredicate YES_PREDICATE = path -> true;
+    static final String LOGOUT_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.logout-predicate";
     private @Getter @Setter FallbackPredicate fallbackType = YES_PREDICATE;
+
+    @Override
+    protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+        request.setAttribute(LOGOUT_PREDICATE_ATTR_NAME, fallbackType);
+        return super.preHandle(request, response);
+    }
 
     @Override
     protected void issueRedirect(ServletRequest request, ServletResponse response, String redirectUrl) throws Exception {

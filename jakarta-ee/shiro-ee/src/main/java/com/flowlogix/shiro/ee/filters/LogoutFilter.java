@@ -15,13 +15,14 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import com.flowlogix.shiro.ee.filters.AuthenticationFilterDelegate.MethodsFromFilter;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getReferer;
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.experimental.Delegate;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 
 /**
@@ -30,27 +31,48 @@ import org.apache.shiro.web.util.WebUtils;
  * @author lprimak
  */
 public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter {
-    private final FallbackPredicate YES_PREDICATE = createPredicate();
+    static final FallbackPredicate YES_PREDICATE = createPredicate();
     static final String LOGOUT_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.logout-predicate";
-    private @Getter @Setter FallbackPredicate fallbackType = YES_PREDICATE;
+    private final @Delegate AuthenticationFilterDelegate delegate;
 
-    @Override
-    protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
-        request.setAttribute(LOGOUT_PREDICATE_ATTR_NAME, fallbackType);
-        return super.preHandle(request, response);
+    private class Methods implements MethodsFromFilter {
+        @Override
+        public Subject getSubject(ServletRequest request, ServletResponse response) {
+            return LogoutFilter.super.getSubject(request, response);
+        }
+
+        @Override
+        public boolean isLoginRequest(ServletRequest request, ServletResponse response) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String getLoginUrl() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+            return LogoutFilter.super.preHandle(request, response);
+        }
+    }
+
+    public LogoutFilter() {
+        delegate = new AuthenticationFilterDelegate(new Methods());
     }
 
     @Override
     protected void issueRedirect(ServletRequest request, ServletResponse response, String redirectUrl) throws Exception {
         if (request instanceof HttpServletRequest) {
+            FallbackPredicate logoutFallbackType = (FallbackPredicate) request.getAttribute(LOGOUT_PREDICATE_ATTR_NAME);
             Forms.logout(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                    fallbackType::useFallback, redirectUrl);
+                    logoutFallbackType::useFallback, redirectUrl);
         } else {
             super.issueRedirect(request, response, redirectUrl);
         }
     }
 
-    private FallbackPredicate createPredicate() {
+    static FallbackPredicate createPredicate() {
         return (String path, HttpServletRequest request) -> {
             String referer = getReferer(request);
             return !path.equals(referer);

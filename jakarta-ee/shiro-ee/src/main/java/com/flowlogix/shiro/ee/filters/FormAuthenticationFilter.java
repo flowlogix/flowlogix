@@ -21,12 +21,11 @@ import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Delegate;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 
 /**
  * Implements JSF Ajax redirection via OmniFaces
@@ -35,9 +34,9 @@ import org.apache.shiro.web.util.WebUtils;
  * @author lprimak
  */
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {
+    static final String LOGIN_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.login-predicate";
     private final @Delegate AuthenticationFilterDelegate delegate;
-    private static final FallbackPredicate NO_PREDICATE = (path, request) -> false;
-    private @Getter @Setter FallbackPredicate fallbackType = NO_PREDICATE;
+    static final FallbackPredicate NO_PREDICATE = (path, request) -> false;
 
     private class Methods implements MethodsFromFilter {
         @Override
@@ -54,6 +53,11 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
         public String getLoginUrl() {
             return FormAuthenticationFilter.super.getLoginUrl();
         }
+
+        @Override
+        public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+            return FormAuthenticationFilter.super.preHandle(request, response);
+        }
     };
 
     public FormAuthenticationFilter() {
@@ -63,9 +67,19 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
     @Override
     protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
         if (request instanceof HttpServletRequest) {
-            redirectToSaved(WebUtils.toHttp(request), WebUtils.toHttp(response), fallbackType::useFallback,
-                    request.getServletContext().getContextPath());
+            FallbackPredicate loginFallbackType = (FallbackPredicate) request.getAttribute(LOGIN_PREDICATE_ATTR_NAME);
+            redirectToSaved(WebUtils.toHttp(request), WebUtils.toHttp(response), loginFallbackType::useFallback, "");
         }
         return false;
+    }
+
+    @Override
+    protected String getPathWithinApplication(ServletRequest request) {
+        String origPath = (String)request.getAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
+        if (origPath != null) {
+            return origPath;
+        } else {
+            return super.getPathWithinApplication(request);
+        }
     }
 }

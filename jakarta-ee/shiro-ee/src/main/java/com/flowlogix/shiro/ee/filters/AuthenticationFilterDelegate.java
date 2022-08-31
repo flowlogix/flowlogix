@@ -15,8 +15,13 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_PREDICATE_ATTR_NAME;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.NO_PREDICATE;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.savePostDataForResubmit;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.saveRequestReferer;
+import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
+import static com.flowlogix.shiro.ee.filters.LogoutFilter.LOGOUT_PREDICATE_ATTR_NAME;
+import static com.flowlogix.shiro.ee.filters.LogoutFilter.YES_PREDICATE;
 import java.io.IOException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -38,10 +43,19 @@ class AuthenticationFilterDelegate {
         Subject getSubject(ServletRequest request, ServletResponse response);
         boolean isLoginRequest(ServletRequest request, ServletResponse response);
         String getLoginUrl();
+        boolean preHandle(ServletRequest request, ServletResponse response) throws Exception;
     }
 
     private final MethodsFromFilter methods;
     private @Getter @Setter boolean useRemembered = false;
+    private @Getter @Setter FallbackPredicate loginFallbackType = NO_PREDICATE;
+    private @Getter @Setter FallbackPredicate logoutFallbackType = YES_PREDICATE;
+
+    public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+        request.setAttribute(LOGIN_PREDICATE_ATTR_NAME, loginFallbackType);
+        request.setAttribute(LOGOUT_PREDICATE_ATTR_NAME, logoutFallbackType);
+        return methods.preHandle(request, response);
+    }
 
     /**
      * added remembered functionality

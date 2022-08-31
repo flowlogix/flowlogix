@@ -15,8 +15,13 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_PREDICATE_ATTR_NAME;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.NO_PREDICATE;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.savePostDataForResubmit;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.saveRequestReferer;
+import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
+import static com.flowlogix.shiro.ee.filters.LogoutFilter.LOGOUT_PREDICATE_ATTR_NAME;
+import static com.flowlogix.shiro.ee.filters.LogoutFilter.YES_PREDICATE;
 import java.io.IOException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -25,6 +30,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.util.WebUtils;
 
 /**
  * common functionality for both Form and PassThru authentication filters
@@ -37,10 +43,19 @@ class AuthenticationFilterDelegate {
         Subject getSubject(ServletRequest request, ServletResponse response);
         boolean isLoginRequest(ServletRequest request, ServletResponse response);
         String getLoginUrl();
+        boolean preHandle(ServletRequest request, ServletResponse response) throws Exception;
     }
 
     private final MethodsFromFilter methods;
     private @Getter @Setter boolean useRemembered = false;
+    private @Getter @Setter FallbackPredicate loginFallbackType = NO_PREDICATE;
+    private @Getter @Setter FallbackPredicate logoutFallbackType = YES_PREDICATE;
+
+    public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+        request.setAttribute(LOGIN_PREDICATE_ATTR_NAME, loginFallbackType);
+        request.setAttribute(LOGOUT_PREDICATE_ATTR_NAME, logoutFallbackType);
+        return methods.preHandle(request, response);
+    }
 
     /**
      * added remembered functionality
@@ -65,7 +80,8 @@ class AuthenticationFilterDelegate {
      */
     public void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
         if (request instanceof HttpServletRequest) {
-            savePostDataForResubmit(request, response, methods.getLoginUrl());
+            savePostDataForResubmit(WebUtils.toHttp(request), WebUtils.toHttp(response),
+                    methods.getLoginUrl());
         }
     }
 
@@ -80,7 +96,7 @@ class AuthenticationFilterDelegate {
     public boolean isLoginRequest(ServletRequest request, ServletResponse response) {
         boolean rv = methods.isLoginRequest(request, response);
         if (request instanceof HttpServletRequest) {
-            saveRequestReferer(rv, request, response);
+            saveRequestReferer(rv, WebUtils.toHttp(request), WebUtils.toHttp(response));
         }
         return rv;
     }
@@ -93,7 +109,7 @@ class AuthenticationFilterDelegate {
      */
     public void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
         if (request instanceof HttpServletRequest) {
-            FormResubmitSupport.saveRequest(request, response, false);
+            FormResubmitSupport.saveRequest(WebUtils.toHttp(request), WebUtils.toHttp(response), false);
         }
         redirectToLogin(request, response);
     }

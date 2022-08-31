@@ -14,21 +14,22 @@
     <h:body>
         Please Log In
         <p/>
-        <h:form id="form">
-            Username: <h:inputText id="uname" p:autofocus="true" title="Username: "
-                                   value="#{loginBean.uname}"/>
+        <h:form prependId="false" id="form">
+            Username: <h:inputText id="username" p:autofocus="true" title="Username: " required="true" />
             <p/>
-            Password: <h:inputText id="pwd" title="Password: "
-                                   value="#{loginBean.pwd}"/>
+            Password: <h:inputText id="password" title="Password: " required="true"/>
             <p/>
-            Remember Me: <h:selectBooleanCheckbox id="rememberMe" title="Remember Me: "
-                                                  value="#{loginBean.rememberMe}"/>
+            Remember Me: <h:selectBooleanCheckbox id="rememberMe" title="Remember Me: "/>
             <p/>
-            <h:commandButton id="login" value="Login ..." action="#{loginBean.login}"/>
+            <h:commandButton id="login" value="Login ..." action="#{authc.login}"/>
+            <h:commandButton id="login2" value="Login (non-JSF) ..."/>
         </h:form>
         <p/>
-        <div jsf:rendered="#{loginBean.sessionExpired}" style="color: red;" id="sessionExpiredMessage">
+        <div jsf:rendered="#{authc.sessionExpired}" style="color: red;" id="sessionExpiredMessage">
             Your Session Has Expired
+        </div>
+        <div jsf:rendered="#{authc.loginFailure}" id="loginFailureMessage">
+            Login Failed
         </div>
         <h:messages id="messages"/>
     </h:body>

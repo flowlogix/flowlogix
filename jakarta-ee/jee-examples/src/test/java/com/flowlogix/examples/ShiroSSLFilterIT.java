@@ -55,14 +55,14 @@ public class ShiroSSLFilterIT {
     @Test
     @OperateOnDeployment(DEPLOYMENT_PROD_MODE)
     void checkNonSSL() {
-        assertThrows(WebDriverException.class, () -> webDriver.get(baseURL + "shiro/unprotected/hello"));
+        assertThrows(WebDriverException.class, () -> webDriver.get(baseURL + "shiro/unprotected/manybeans"));
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_PROD_MODE)
     void checkSSL() {
-        webDriver.get(toHttpsURL(baseURL) + "shiro/unprotected/hello");
-        assertEquals("Hello Unprotected", webDriver.getTitle());
+        webDriver.get(toHttpsURL(baseURL) + "shiro/unprotected/manybeans");
+        assertEquals("Many Beans Unprotected", webDriver.getTitle());
     }
 
     @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)

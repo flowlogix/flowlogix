@@ -29,10 +29,11 @@
             <p>
                 <input type="button" id="invalidate" value="Invalidate session via Servlet"
                        onclick="invalidateSession('#{request.contextPath}/invalidatesession')" />
-                <h:commandButton value="Logout..." action="#{loginBean.logout}"/>
+                <h:commandButton value="Logout..." action="#{authc.logout}"/>
             </p>
             <h:messages id="messages"/>
         </h:form>
+        <h:outputLink id="logoutFiaFilter" value="#{request.contextPath}/shiro/auth/logout">Logout (via filter)</h:outputLink>
     </h:body>
     <script type="text/javascript">
         const invalidateSession = async (path) => {

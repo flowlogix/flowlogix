@@ -5,7 +5,7 @@
       xmlns:jsf="http://xmlns.jcp.org/jsf"
       xmlns:h="http://xmlns.jcp.org/jsf/html">
     <h:head>
-        <title>Hello Unprotected</title>
+        <title>Many Beans Unprotected</title>
     </h:head>
     <h:body>
         Using Web Sessions: <h:outputText id='usingWebSessions' value="#{unprotectedFacade.usingWebSessions}"/>
@@ -30,10 +30,10 @@
                 <f:ajax execute="@form" render="@form"/>
             </h:commandButton>
             <p/>
-            <h:commandButton id="logout" value="Logout..." action="#{loginBean.logout}"/>
+            <h:commandButton id="logout" value="Logout..." action="#{logoutBean.logout}"/>
             <h:messages id="messages"/>
             <h:outputText escape="false" value="#{unprotectedFacade.statistics}"/>
-            <div jsf:rendered="#{loginBean.sessionExpired}" style="color: red;" id="sessionExpiredMessage">
+            <div jsf:rendered="#{forms.sessionExpired}" style="color: red;" id="sessionExpiredMessage">
                 Your Session Has Expired
             </div>
         </h:form>

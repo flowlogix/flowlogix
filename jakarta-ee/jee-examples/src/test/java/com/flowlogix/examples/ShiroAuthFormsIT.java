@@ -58,20 +58,26 @@ public class ShiroAuthFormsIT {
     @ArquillianResource
     protected URL baseURL;
 
-    @FindBy(id = "form:uname")
+    @FindBy(id = "username")
     private WebElement username;
 
-    @FindBy(id = "form:pwd")
+    @FindBy(id = "password")
     private WebElement password;
 
-    @FindBy(id = "form:login")
+    @FindBy(id = "login")
     private WebElement login;
 
-    @FindBy(id = "form:rememberMe")
+    @FindBy(id = "login2")
+    private WebElement nonJSFLogin;
+
+    @FindBy(id = "rememberMe")
     private WebElement rememberMe;
 
     @FindBy(id = "form:logout")
     private WebElement logout;
+
+    @FindBy(id = "logoutFiaFilter")
+    private WebElement logoutViaFilter;
 
     @FindBy(id = "firstForm:firstName")
     private WebElement firstName;
@@ -103,6 +109,9 @@ public class ShiroAuthFormsIT {
     @FindBy(id = "sessionExpiredMessage")
     private WebElement sessionExpiredMessage;
 
+    @FindBy(id = "loginFailureMessage")
+    private WebElement loginFailureMessage;
+
     @BeforeEach
     void deleteAllCookies() {
         webDriver.manage().deleteAllCookies();
@@ -126,6 +135,34 @@ public class ShiroAuthFormsIT {
         assertTrue(webDriver.getCurrentUrl().contains("shiro/auth"), "redirect to login");
         login();
         assertEquals("Protected Page", webDriver.getTitle());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void nonJSFLogin() {
+        webDriver.get(baseURL + "shiro/protected");
+        username.sendKeys("webuser");
+        password.sendKeys("webpwd");
+        guardHttp(nonJSFLogin).click();
+        assertEquals("Protected Page", webDriver.getTitle());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void logoutViaFilterThenLoginAndForm() {
+        webDriver.get(baseURL + "shiro/form");
+        username.sendKeys("webuser");
+        password.sendKeys("webpwd");
+        guardHttp(nonJSFLogin).click();
+        guardHttp(logoutViaFilter).click();
+        assertTrue(webDriver.getCurrentUrl().contains("shiro/auth"), "redirect to login");
+        username.sendKeys("webuser");
+        password.sendKeys("webpwd");
+        guardHttp(nonJSFLogin).click();
+        firstName.sendKeys("Jack");
+        lastName.sendKeys("Frost");
+        guardHttp(submitFirst).click();
+        assertEquals("Form Submitted - firstName: Jack, lastName: Frost", messages.getText());
     }
 
     @Test
@@ -166,7 +203,7 @@ public class ShiroAuthFormsIT {
         username.sendKeys("webuser");
         password.sendKeys("wrongpwd");
         guardHttp(login).click();
-        assertEquals("Incorrect Login", messages.getText());
+        assertEquals("Login Failed", loginFailureMessage.getText());
         login();
         assertEquals("Protected Page", webDriver.getTitle());
     }

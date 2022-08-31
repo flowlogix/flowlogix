@@ -47,6 +47,11 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
         public String getLoginUrl() {
             return PassThruAuthenticationFilter.super.getLoginUrl();
         }
+
+        @Override
+        public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+            return PassThruAuthenticationFilter.super.preHandle(request, response);
+        }
     };
 
     public PassThruAuthenticationFilter() {

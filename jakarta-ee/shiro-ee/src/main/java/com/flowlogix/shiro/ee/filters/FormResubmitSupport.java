@@ -16,6 +16,7 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.isWebContainerSessions;
+import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import com.flowlogix.shiro.ee.filters.ShiroFilter.WrappedSecurityManager;
 import java.io.IOException;
 import java.net.CookieManager;
@@ -39,7 +40,6 @@ import static javax.faces.application.StateManager.STATE_SAVING_METHOD_CLIENT;
 import static javax.faces.application.StateManager.STATE_SAVING_METHOD_PARAM_NAME;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -86,25 +86,30 @@ public class FormResubmitSupport {
     static final String DONT_ADD_ANY_MORE_COOKIES = "com.flowlogix.no-more-cookies";
 
 
-    static void savePostDataForResubmit(ServletRequest request, ServletResponse response, String loginUrl) {
+    static void savePostDataForResubmit(HttpServletRequest request, HttpServletResponse response, String loginUrl) {
         if (isPostRequest(request) && unwrapSecurityManager(SecurityUtils.getSecurityManager())
                 instanceof DefaultSecurityManager) {
             String postData = getPostData(request);
             var cacheKey = UUID.randomUUID();
             var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
-            dsm.getCacheManager().getCache(FORM_DATA_CACHE).put(cacheKey, postData);
-            addCookie(WebUtils.toHttp(response), SHIRO_FORM_DATA_KEY,
-                    cacheKey.toString(), getCookieAge(request, dsm));
+            if (dsm.getCacheManager() != null) {
+                dsm.getCacheManager().getCache(FORM_DATA_CACHE).put(cacheKey, postData);
+                addCookie(response, SHIRO_FORM_DATA_KEY, cacheKey.toString(), getCookieAge(request, dsm));
+            } else {
+                log.warn("Shiro Cache manager is not configured, cannot store form data");
+            }
         }
-        boolean isGetRequest = HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
-        Servlets.facesRedirect(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                Servlets.getRequestBaseURL(WebUtils.toHttp(request))
-                + loginUrl.replaceFirst("^/", "") + (isGetRequest? "" : "?%s=true"),
-                SESSION_EXPIRED_PARAMETER);
+        boolean isFacesGetRequest = HttpMethod.GET.equalsIgnoreCase(request.getMethod());
+        doFacesRedirect(request, response, request.getContextPath() + loginUrl
+                + (isFacesGetRequest? "" : "?%s=true"), SESSION_EXPIRED_PARAMETER);
     }
 
     static boolean isPostRequest(ServletRequest request) {
-        return HttpMethod.POST.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
+        if (request instanceof HttpServletRequest) {
+            return HttpMethod.POST.equalsIgnoreCase(WebUtils.toHttp(request).getMethod());
+        } else {
+            return false;
+        }
     }
 
     @SneakyThrows(IOException.class)
@@ -124,21 +129,20 @@ public class FormResubmitSupport {
         return savedFormData;
     }
 
-    static void saveRequest(ServletRequest request, ServletResponse response, boolean useReferer) {
-        String path = useReferer? getReferer(WebUtils.toHttp(request))
-                : Servlets.getRequestURLWithQueryString(WebUtils.toHttp(request));
+    static void saveRequest(HttpServletRequest request, HttpServletResponse response, boolean useReferer) {
+        String path = useReferer? getReferer(request)
+                : Servlets.getRequestURLWithQueryString(request);
         if (path != null) {
-            Servlets.addResponseCookie(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                    WebUtils.SAVED_REQUEST_KEY, path, null,
-                    WebUtils.toHttp(request).getContextPath(),
+            Servlets.addResponseCookie(request, response, WebUtils.SAVED_REQUEST_KEY,
+                    path, null, request.getContextPath(),
                     // cookie age = session timeout
                     getCookieAge(request, SecurityUtils.getSecurityManager()));
         }
     }
 
-    static void saveRequestReferer(boolean rv, ServletRequest request, ServletResponse response) {
-        if(rv && HttpMethod.GET.equalsIgnoreCase(WebUtils.toHttp(request).getMethod())) {
-            if(Servlets.getRequestCookie(WebUtils.toHttp(request), WebUtils.SAVED_REQUEST_KEY) == null) {
+    static void saveRequestReferer(boolean rv, HttpServletRequest request, HttpServletResponse response) {
+        if(rv && HttpMethod.GET.equalsIgnoreCase(request.getMethod())) {
+            if(Servlets.getRequestCookie(request, WebUtils.SAVED_REQUEST_KEY) == null) {
                 // only save refer when there is no saved request cookie already,
                 // and only as a last resort
                 saveRequest(request, response, true);
@@ -157,25 +161,109 @@ public class FormResubmitSupport {
         return referer;
     }
 
-    static void doRedirectToSaved(@NonNull String savedRequest, boolean resubmit) throws IOException, URISyntaxException, InterruptedException {
-        deleteCookie(Faces.getResponse(), WebUtils.SAVED_REQUEST_KEY);
-        Cookie formDataCookie = (Cookie)Faces.getExternalContext().getRequestCookieMap().get(SHIRO_FORM_DATA_KEY);
-        String savedFormDataKey = formDataCookie == null ? null : formDataCookie.getValue();
+    /**
+     * Redirects the user to saved request after login, if available
+     * Resumbits the form that caused the logout upon successfull login.Form resumnission supports JSF and Ajax forms
+     * @param request
+     * @param response
+     * @param useFallbackPath predicate whether to use fall back path
+     * @param fallbackPath
+     * @param resubmit if true, attempt to resubmit the form that was unsubmitted prior to logout
+     */
+    @SneakyThrows({IOException.class, URISyntaxException.class, InterruptedException.class})
+    static void redirectToSaved(HttpServletRequest request, HttpServletResponse response,
+            FallbackPredicate useFallbackPath, String fallbackPath, boolean resubmit) {
+        String savedRequest = Servlets.getRequestCookie(request, WebUtils.SAVED_REQUEST_KEY);
+        if (savedRequest != null) {
+            doRedirectToSaved(request, response, savedRequest, resubmit);
+        } else {
+            redirectToView(request, response, useFallbackPath, fallbackPath);
+        }
+    }
+
+    /**
+     * redirect to saved request, possibly resubmitting an existing form
+     * the saved request is via a cookie
+     *
+     * @param request
+     * @param response
+     * @param useFallbackPath
+     * @param fallbackPath
+     */
+    static void redirectToSaved(HttpServletRequest request, HttpServletResponse response,
+            FallbackPredicate useFallbackPath, String fallbackPath) {
+        redirectToSaved(request, response, useFallbackPath, fallbackPath, true);
+    }
+
+
+    private static void doRedirectToSaved(HttpServletRequest request, HttpServletResponse response,
+            @NonNull String savedRequest, boolean resubmit) throws IOException, URISyntaxException, InterruptedException {
+        deleteCookie(response, WebUtils.SAVED_REQUEST_KEY);
+        String savedFormDataKey = Servlets.getRequestCookie(request, SHIRO_FORM_DATA_KEY);
         boolean doRedirectAtEnd = true;
         if (savedFormDataKey != null && resubmit) {
             String formData = getSavedFormDataFromKey(savedFormDataKey);
             if (formData != null) {
                 Optional.ofNullable(resubmitSavedForm(formData, savedRequest,
-                        Faces.getRequest(), Faces.getResponse(),
-                        Faces.getServletContext(), false))
-                        .ifPresent(Faces::redirect);
+                        request, response, request.getServletContext(), false))
+                        .ifPresent(path -> doFacesRedirect(request, response, path));
                 doRedirectAtEnd = false;
             } else {
-                deleteCookie(Faces.getResponse(), SHIRO_FORM_DATA_KEY);
+                deleteCookie(response, SHIRO_FORM_DATA_KEY);
             }
         }
         if (doRedirectAtEnd) {
-            Faces.redirect(savedRequest);
+            doFacesRedirect(request, response, savedRequest);
+        }
+    }
+
+    /**
+     * @param request
+     * @param response
+     */
+    static void redirectToView(HttpServletRequest request, HttpServletResponse response) {
+        redirectToView(request, response, (path, req) -> false, null);
+    }
+
+    /**
+     * redirects to current view after a form submit,
+     * or the fallback path if predicate succeeds
+     *
+     * @param request
+     * @param response
+     * @param useFallbackPath
+     * @param fallbackPath
+     */
+    @SneakyThrows
+    static void redirectToView(HttpServletRequest request, HttpServletResponse response,
+            FallbackPredicate useFallbackPath, String fallbackPath) {
+        boolean useFallback = useFallbackPath.useFallback(request.getRequestURI(), request);
+        String referer = getReferer(request);
+        String redirectPath = Servlets.getRequestURLWithQueryString(request);
+        if (useFallback && referer != null) {
+            useFallback = useFallbackPath.useFallback(referer, request);
+            redirectPath = referer;
+        }
+        if (useFallback) {
+            doFacesRedirect(request, response, request.getContextPath() + fallbackPath);
+        } else {
+            doFacesRedirect(request, response, redirectPath);
+        }
+    }
+
+    /**
+     * flash cookie is preserved here
+     *
+     * @param request
+     * @param response
+     * @param path
+     * @param paramValues
+     */
+    private static void doFacesRedirect(HttpServletRequest request, HttpServletResponse response, String path, Object... paramValues) {
+        if (Faces.hasContext()) {
+            Faces.redirect(path, paramValues);
+        } else {
+            Servlets.facesRedirect(request, response, path, paramValues);
         }
     }
 

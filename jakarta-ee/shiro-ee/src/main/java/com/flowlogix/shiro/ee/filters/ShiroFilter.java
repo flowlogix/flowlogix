@@ -24,6 +24,7 @@ import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isPostRequest;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
 import static com.flowlogix.shiro.ee.listeners.EnvironmentLoaderListener.isShiroEEDisabled;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -219,6 +220,8 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
         if (isShiroEEDisabled(getServletContext())) {
             origChain.doFilter(request, response);
         } else if (Boolean.TRUE.equals(request.getAttribute(FORM_IS_RESUBMITTED)) && isPostRequest(request)) {
+            // See https://stackoverflow.com/questions/7643484/how-to-get-rid-of-warning-pwc4011-unable-to-set-request-character-encoding-to
+            request.setCharacterEncoding(StandardCharsets.UTF_8.name());
             request.removeAttribute(FORM_IS_RESUBMITTED);
             String postData = getPostData(request);
             log.debug("Resubmitting Post Data: {}", postData);
@@ -230,6 +233,8 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
                     request.getServletContext(), rememberedAjaxResubmit))
                     .ifPresent(url -> sendRedirect(response, url));
         } else {
+            // See https://stackoverflow.com/questions/7643484/how-to-get-rid-of-warning-pwc4011-unable-to-set-request-character-encoding-to
+            request.setCharacterEncoding(StandardCharsets.UTF_8.name());
             super.executeChain(request, response, origChain);
         }
     }

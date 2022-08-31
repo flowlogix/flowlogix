@@ -33,7 +33,7 @@
             </p>
             <h:messages id="messages"/>
         </h:form>
-        <h:outputLink value="#{request.contextPath}/shiro/auth/logout">Logout (via filter)</h:outputLink>
+        <h:outputLink id="logoutFiaFilter" value="#{request.contextPath}/shiro/auth/logout">Logout (via filter)</h:outputLink>
     </h:body>
     <script type="text/javascript">
         const invalidateSession = async (path) => {

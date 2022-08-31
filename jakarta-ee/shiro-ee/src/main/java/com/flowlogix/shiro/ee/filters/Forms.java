@@ -99,7 +99,7 @@ public class Forms {
     }
 
     public static void logout() {
-        Forms.logout(Faces.getRequestAttribute(LOGOUT_PREDICATE_ATTR_NAME), Faces.getRequestContextPath());
+        Forms.logout(Faces.getRequestAttribute(LOGOUT_PREDICATE_ATTR_NAME), "");
     }
 
     /**

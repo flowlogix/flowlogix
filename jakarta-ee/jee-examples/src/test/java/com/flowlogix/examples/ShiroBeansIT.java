@@ -79,13 +79,13 @@ public class ShiroBeansIT {
     @FindBy(id = "form:messages")
     private WebElement messages;
 
-    @FindBy(id = "form:uname")
+    @FindBy(id = "username")
     private WebElement username;
 
-    @FindBy(id = "form:pwd")
+    @FindBy(id = "password")
     private WebElement password;
 
-    @FindBy(id = "form:login")
+    @FindBy(id = "login")
     private WebElement login;
 
     @FindBy(id = "usingWebSessions")
@@ -100,7 +100,7 @@ public class ShiroBeansIT {
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkDontCallWhenNotAuth() {
-        webDriver.get(baseURL + "shiro/unprotected/hello");
+        webDriver.get(baseURL + "shiro/unprotected/manybeans");
         guardAjax(facesViewScoped).click();
         assertTrue(messages.getText().startsWith("view scope unauth: Attempting to perform a user-only operation"),
                 "anonymous user should get an exception");
@@ -130,7 +130,7 @@ public class ShiroBeansIT {
         webDriver.get(baseURL + "shiro/auth/loginform");
         login();
 
-        webDriver.get(baseURL + "shiro/unprotected/hello");
+        webDriver.get(baseURL + "shiro/unprotected/manybeans");
         guardAjax(facesViewScoped).click();
         assertTrue(messages.getText().startsWith("Hello from FacesViewScoped"));
         guardAjax(omniViewScoped).click();
@@ -156,7 +156,7 @@ public class ShiroBeansIT {
         webDriver.get(baseURL + "shiro/auth/loginform");
         login();
 
-        webDriver.get(baseURL + "shiro/unprotected/hello");
+        webDriver.get(baseURL + "shiro/unprotected/manybeans");
         boolean webSessions = Boolean.parseBoolean(usingWebSessions.getText());
         guardAjax(elem).click();
         webDriver.navigate().refresh();

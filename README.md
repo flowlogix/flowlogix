@@ -12,7 +12,7 @@ Releases are available on [Maven Central](https://search.maven.org/search?q=g:co
 [Maven Snapshots](https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/) are automatically released by Jenkins for the current head
 
 ## News ##
-- 7/16/2022: Moving on to 5.x with Java 17 being the minimum default
+- 7/16/2022: Moving on to 5.x with Java 11 being the minimum default
 - 7/16/2022: Version 4.0.9 has been released.
 - 3/15/2022: Version 4.0.7 has been released. Java 8 through 18 compatible.
 - 1/3/2022: Version 4.0.6 has been released

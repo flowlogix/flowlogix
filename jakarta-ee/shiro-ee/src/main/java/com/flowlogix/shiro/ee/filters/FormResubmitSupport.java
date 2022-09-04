@@ -121,10 +121,12 @@ public class FormResubmitSupport {
         String savedFormData = null;
         if (unwrapSecurityManager(SecurityUtils.getSecurityManager()) instanceof DefaultSecurityManager) {
             var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
-            var cache = dsm.getCacheManager().getCache(FORM_DATA_CACHE);
-            var cacheKey = UUID.fromString(savedFormDataKey);
-            savedFormData = (String)cache.get(cacheKey);
-            cache.remove(cacheKey);
+            if (dsm.getCacheManager() != null) {
+                var cache = dsm.getCacheManager().getCache(FORM_DATA_CACHE);
+                var cacheKey = UUID.fromString(savedFormDataKey);
+                savedFormData = (String)cache.get(cacheKey);
+                cache.remove(cacheKey);
+            }
         }
         return savedFormData;
     }

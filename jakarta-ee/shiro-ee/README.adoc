@@ -13,4 +13,4 @@ mode
 throws it)
 - Works with JSF Client state saving and Server state saving
 - Basically, it’s Shiro on steroids when used with Jakarta EE stack as
-opposed to changing the way Shiro works by integrating CD
+opposed to changing the way Shiro works by integrating CDI

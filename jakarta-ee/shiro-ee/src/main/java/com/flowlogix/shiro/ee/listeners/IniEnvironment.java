@@ -15,8 +15,15 @@
  */
 package com.flowlogix.shiro.ee.listeners;
 
+import com.flowlogix.shiro.ee.filters.FormAuthenticationFilter;
+import com.flowlogix.shiro.ee.filters.LogoutFilter;
+import com.flowlogix.shiro.ee.filters.SslFilter;
+import java.util.Map;
+import javax.servlet.Filter;
 import org.apache.shiro.config.Ini;
+import org.apache.shiro.web.config.WebIniSecurityManagerFactory;
 import org.apache.shiro.web.env.IniWebEnvironment;
+import org.apache.shiro.web.filter.mgt.DefaultFilter;
 
 /**
  * Ability to merge two configuration files, exactly two
@@ -25,6 +32,23 @@ import org.apache.shiro.web.env.IniWebEnvironment;
  */
 public class IniEnvironment extends IniWebEnvironment {
     private String otherConfigLocation;
+
+    @SuppressWarnings("deprecation")
+    private static class SecurityManagerFactory extends WebIniSecurityManagerFactory {
+        @Override
+        protected Map<String, ?> createDefaults(Ini ini, Ini.Section mainSection) {
+            @SuppressWarnings("unchecked")
+            Map<String, Filter> defaults = (Map<String, Filter>) super.createDefaults(ini, mainSection);
+            defaults.replace(DefaultFilter.authc.name(), new FormAuthenticationFilter());
+            defaults.replace(DefaultFilter.ssl.name(), new SslFilter());
+            defaults.replace(DefaultFilter.logout.name(), new LogoutFilter());
+            return defaults;
+        }
+    }
+
+    public IniEnvironment() {
+        setSecurityManagerFactory(new SecurityManagerFactory());
+    }
 
     @Override
     public void setConfigLocations(String[] configLocations) {

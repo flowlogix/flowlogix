@@ -94,7 +94,8 @@ public class FormResubmitSupport {
             var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
             if (dsm.getCacheManager() != null) {
                 dsm.getCacheManager().getCache(FORM_DATA_CACHE).put(cacheKey, postData);
-                addCookie(response, SHIRO_FORM_DATA_KEY, cacheKey.toString(), getCookieAge(request, dsm));
+                addCookie(response, request.getServletContext(), SHIRO_FORM_DATA_KEY,
+                        cacheKey.toString(), getCookieAge(request, dsm));
             } else {
                 log.warn("Shiro Cache manager is not configured, cannot store form data");
             }
@@ -200,7 +201,7 @@ public class FormResubmitSupport {
 
     private static void doRedirectToSaved(HttpServletRequest request, HttpServletResponse response,
             @NonNull String savedRequest, boolean resubmit) throws IOException, URISyntaxException, InterruptedException {
-        deleteCookie(response, WebUtils.SAVED_REQUEST_KEY);
+        deleteCookie(response, request.getServletContext(), WebUtils.SAVED_REQUEST_KEY);
         String savedFormDataKey = Servlets.getRequestCookie(request, SHIRO_FORM_DATA_KEY);
         boolean doRedirectAtEnd = true;
         if (savedFormDataKey != null && resubmit) {
@@ -211,7 +212,7 @@ public class FormResubmitSupport {
                         .ifPresent(path -> doFacesRedirect(request, response, path));
                 doRedirectAtEnd = false;
             } else {
-                deleteCookie(response, SHIRO_FORM_DATA_KEY);
+                deleteCookie(response, request.getServletContext(), SHIRO_FORM_DATA_KEY);
             }
         }
         if (doRedirectAtEnd) {
@@ -262,25 +263,33 @@ public class FormResubmitSupport {
      * @param paramValues
      */
     private static void doFacesRedirect(HttpServletRequest request, HttpServletResponse response, String path, Object... paramValues) {
-        if (Faces.hasContext()) {
+        if (hasFacesContext()) {
             Faces.redirect(path, paramValues);
         } else {
             Servlets.facesRedirect(request, response, path, paramValues);
         }
     }
 
-    static void addCookie(@NonNull HttpServletResponse response,
+    private static boolean hasFacesContext() {
+        try {
+            return Faces.hasContext();
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
+    static void addCookie(@NonNull HttpServletResponse response, ServletContext servletContext,
             @NonNull String cokieName, @NonNull String cookieValue, int maxAge) {
         var cookie = new Cookie(cokieName, cookieValue);
-        cookie.setPath(Servlets.getContext().getContextPath());
+        cookie.setPath(servletContext.getContextPath());
         cookie.setMaxAge(maxAge);
         response.addCookie(cookie);
     }
 
-    static void deleteCookie(@NonNull HttpServletResponse response,
+    static void deleteCookie(@NonNull HttpServletResponse response, ServletContext servletContext,
             @NonNull String cokieName) {
         var cookieToDelete = new Cookie(cokieName, "tbd");
-        cookieToDelete.setPath(Servlets.getContext().getContextPath());
+        cookieToDelete.setPath(servletContext.getContextPath());
         cookieToDelete.setMaxAge(0);
         response.addCookie(cookieToDelete);
     }
@@ -290,7 +299,12 @@ public class FormResubmitSupport {
         if (nativeSessionManager != null) {
             return ((int)nativeSessionManager.getGlobalSessionTimeout() / 1000);
         } else {
-            return request.getServletContext().getSessionTimeout() * 60;
+            try {
+                return request.getServletContext().getSessionTimeout() * 60;
+            } catch (Throwable e) {
+                // default 60 minutes
+                return 60 * 60;
+            }
         }
     }
 
@@ -318,7 +332,7 @@ public class FormResubmitSupport {
             return processResubmitResponse(redirectResponse, originalRequest, originalResponse,
                     response.headers(), savedRequest, servletContext);
         } else {
-            deleteCookie(originalResponse, SHIRO_FORM_DATA_KEY);
+            deleteCookie(originalResponse, servletContext, SHIRO_FORM_DATA_KEY);
             return processResubmitResponse(response, originalRequest, originalResponse,
                     response.headers(), savedRequest, servletContext);
         }
@@ -349,10 +363,11 @@ public class FormResubmitSupport {
                 transformCookieHeader(headers.allValues(SET_COOKIE))
                         .entrySet().stream().filter(not(entry -> entry.getKey()
                         .equals(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()))))
-                        .forEach(entry -> addCookie(originalResponse, entry.getKey(), entry.getValue(), -1));
+                        .forEach(entry -> addCookie(originalResponse, servletContext,
+                                entry.getKey(), entry.getValue(), -1));
                 originalResponse.getWriter().append(response.body());
                 originalRequest.setAttribute(DONT_ADD_ANY_MORE_COOKIES, Boolean.TRUE);
-                if (Faces.hasContext()) {
+                if (hasFacesContext()) {
                     Faces.responseComplete();
                 }
                 return null;
@@ -370,7 +385,7 @@ public class FormResubmitSupport {
         CookieManager cookieManager = new CookieManager();
         HttpCookie cookie = new HttpCookie(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()),
                 SecurityUtils.getSubject().getSession().getId().toString());
-        cookie.setPath(Servlets.getContext().getContextPath());
+        cookie.setPath(servletContext.getContextPath());
         cookieManager.getCookieStore().add(new URI(savedRequest), cookie);
         return HttpClient.newBuilder().cookieHandler(cookieManager).build();
     }

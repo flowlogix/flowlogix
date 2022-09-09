@@ -30,10 +30,8 @@ import org.primefaces.model.SortMeta;
  * @author lprimak
  */
 @Getter @Setter
-public class SortData
-{
-    public SortData(Map<String, SortMeta> sm)
-    {
+public class SortData {
+    public SortData(Map<String, SortMeta> sm) {
         sortMeta = new HashMap<>(sm);
     }
 

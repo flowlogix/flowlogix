@@ -76,8 +76,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                 .build());
     }
 
-    public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta)
-    {
+    public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
         return super.findRange(first, first + pageSize,
                 Parameters.<TT>builder()
                         .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
@@ -91,22 +90,16 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         qc.getRoot().alias(JPALazyDataModel.RESULT);
     }
 
-    private Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root)
-    {
+    private Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
         Map<String, FilterData> predicates = new HashMap<>();
-        filters.forEach((key, value) ->
-        {
+        filters.forEach((key, value) -> {
             Predicate cond = null;
-            try
-            {
+            try {
                 Class<?> fieldType = root.get(key).getJavaType();
-                if (fieldType == String.class)
-                {
+                if (fieldType == String.class) {
                     cond = cb.like(root.get(key), String.format("%%%s%%", value));
-                } else
-                {
-                    if (TypeConverter.checkType(value.toString(), fieldType))
-                    {
+                } else {
+                    if (TypeConverter.checkType(value.toString(), fieldType)) {
                         cond = cb.equal(root.get(key), value);
                     }
                 }
@@ -119,35 +112,26 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
 
-
-    private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root)
-    {
+    private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
         SortData sortData = new SortData(sortCriteria);
         sorter.sort(sortData, cb, root);
 
         List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);
         List<Order> rv = new ArrayList<>();
-        if(sortData.isAppendSortOrder())
-        {
+        if(sortData.isAppendSortOrder()) {
             rv.addAll(sortMetaOrdering);
             rv.addAll(sortData.getSortOrder());
-        }
-        else
-        {
+        } else {
             rv.addAll(sortData.getSortOrder());
             rv.addAll(sortMetaOrdering);
         }
         return rv;
     }
 
-
-    private List<Order> processSortMeta(Map<String, SortMeta> sortMeta, CriteriaBuilder cb, Root<TT> root)
-    {
+    private List<Order> processSortMeta(Map<String, SortMeta> sortMeta, CriteriaBuilder cb, Root<TT> root) {
         List<Order> sortMetaOrdering = new ArrayList<>();
-        sortMeta.forEach((field, order) ->
-        {
-            switch(order.getOrder())
-            {
+        sortMeta.forEach((field, order) -> {
+            switch(order.getOrder()) {
                 case ASCENDING:
                     sortMetaOrdering.add(cb.asc(root.get(order.getField())));
                     break;

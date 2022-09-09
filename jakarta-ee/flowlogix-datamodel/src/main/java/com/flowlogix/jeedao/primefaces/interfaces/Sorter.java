@@ -24,8 +24,7 @@ import javax.persistence.criteria.Root;
  * @param <TT> Entity Type
  */
 @FunctionalInterface
-public interface Sorter<TT>
-{
+public interface Sorter<TT> {
     /**
      * Hook for sort criteria application
      * can remove elements from the SortMeta lists and do your own action

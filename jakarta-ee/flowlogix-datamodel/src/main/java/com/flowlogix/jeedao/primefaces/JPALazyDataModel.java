@@ -74,8 +74,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param builder
      * @return newly-created data model
      */
-    public static<TT, KK> JPALazyDataModel<TT, KK> create(ModelBuilder<TT, KK> builder)
-    {
+    public static<TT, KK> JPALazyDataModel<TT, KK> create(ModelBuilder<TT, KK> builder) {
         @SuppressWarnings("unchecked")
         JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
         model.builder = builder;
@@ -91,11 +90,9 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param fp lambda to get the new Filter predicate
      */
     public static void replaceFilter(Map<String, FilterData> filters, String element,
-            BiFunction<Predicate, Object, Predicate> fp)
-    {
+            BiFunction<Predicate, Object, Predicate> fp) {
         FilterData elt = filters.get(element);
-        if (elt != null && StringUtils.isNotBlank(elt.getFieldValue()))
-        {
+        if (elt != null && StringUtils.isNotBlank(elt.getFieldValue())) {
             filters.replace(element, new FilterData(elt.getFieldValue(),
                     fp.apply(elt.getPredicate(), elt.getFieldValue())));
         }
@@ -107,30 +104,25 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param val
      * @return JPA field suitable for hints
      */
-    public static String getResultField(String val)
-    {
+    public static String getResultField(String val) {
         return String.format("%s.%s", RESULT, val);
     }
 
     @Override
     @Transactional
-    public TT getRowData(String rowKey)
-    {
+    public TT getRowData(String rowKey) {
         return impl.getEntityManager().find(impl.getEntityClass(), impl.getConverter().apply(rowKey));
     }
 
-
     @Override
     @Transactional
-    public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy)
-    {
+    public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
         setRowCount(impl.count(filterBy));
         return impl.findRows(first, pageSize, filterBy, sortBy);
     }
 
     @Override
-    public int count(Map<String, FilterMeta> map)
-    {
+    public int count(Map<String, FilterMeta> map) {
         return impl.count(map);
     }
 

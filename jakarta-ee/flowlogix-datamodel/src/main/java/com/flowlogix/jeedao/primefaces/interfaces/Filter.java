@@ -26,8 +26,7 @@ import javax.persistence.criteria.Root;
  * @param <TT> Entity Type
  */
 @FunctionalInterface
-public interface Filter<TT>
-{
+public interface Filter<TT> {
     /**
      * hook to supply custom filter
      *

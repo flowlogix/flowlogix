@@ -25,6 +25,8 @@ import java.io.Serializable;
  * portable over-the-wire
  *
  * @author lprimak
+ * @param <TT>
+ * @param <KK>
  */
 @FunctionalInterface
 public interface ModelBuilder<TT, KK> extends Serializable {

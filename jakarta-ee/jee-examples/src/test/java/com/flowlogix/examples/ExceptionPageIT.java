@@ -193,7 +193,7 @@ public class ExceptionPageIT {
             assertTrue(href.contains("v="), "not versioned");
             ++count;
         }
-        assertEquals(1, count);
+        assertEquals(2, count);
     }
 
     @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)

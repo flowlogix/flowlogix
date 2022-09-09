@@ -117,7 +117,6 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     @Override
     @Transactional
     public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
-        setRowCount(impl.count(filterBy));
         return impl.findRows(first, pageSize, filterBy, sortBy);
     }
 

@@ -80,7 +80,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         return super.findRange(first, first + pageSize,
                 Parameters.<TT>builder()
                         .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
-                        .hints(tq -> optimizer.apply(tq))
+                        .hints(optimizer::apply)
                         .build());
     }
 

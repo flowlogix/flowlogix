@@ -146,13 +146,13 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         List<Order> sortMetaOrdering = new ArrayList<>();
         sortMeta.forEach((field, order) ->
         {
-            switch(order.getSortOrder())
+            switch(order.getOrder())
             {
                 case ASCENDING:
-                    sortMetaOrdering.add(cb.asc(root.get(order.getSortField())));
+                    sortMetaOrdering.add(cb.asc(root.get(order.getField())));
                     break;
                 case DESCENDING:
-                    sortMetaOrdering.add(cb.desc(root.get(order.getSortField())));
+                    sortMetaOrdering.add(cb.desc(root.get(order.getField())));
                     break;
             }
         });

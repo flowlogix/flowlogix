@@ -112,16 +112,6 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         return String.format("%s.%s", RESULT, val);
     }
 
-
-    @Override
-    @SuppressWarnings("unchecked")
-    @Transactional
-    public KK getRowKey(TT entity)
-    {
-        return (KK)impl.getEntityManager().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
-    }
-
-
     @Override
     @Transactional
     public TT getRowData(String rowKey)
@@ -138,6 +128,11 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         return impl.findRows(first, pageSize, filterBy, sortBy);
     }
 
+    @Override
+    public int count(Map<String, FilterMeta> map)
+    {
+        return impl.count(map);
+    }
 
     void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
          stream.defaultReadObject();

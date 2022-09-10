@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
@@ -47,7 +49,38 @@ import org.primefaces.model.SortMeta;
  * @param <KK>
  */
 @SuperBuilder
-class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
+public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
+    /**
+     * prevent from direct construction
+     */
+    JPAModelImpl() {
+        super(null, null);
+        this.converter = null;
+        this.filter = null;
+        this.sorter = null;
+        this.optimizer = null;
+        this.caseSensitiveQuery = false;
+    }
+
+    /**
+     * prevent direct construction
+     * @param converter
+     * @param filter
+     * @param sorter
+     * @param optimizer
+     * @param caseSensitiveQuery
+     * @param entityManagerSupplier
+     * @param entityClass
+     */
+    JPAModelImpl(Function<String, KK> converter, Filter<TT> filter, Sorter<TT> sorter, Function<TypedQuery<TT>, TypedQuery<TT>> optimizer, boolean caseSensitiveQuery, Supplier<EntityManager> entityManagerSupplier, Class<TT> entityClass) {
+        super(entityManagerSupplier, entityClass);
+        this.converter = converter;
+        this.filter = filter;
+        this.sorter = sorter;
+        this.optimizer = optimizer;
+        this.caseSensitiveQuery = caseSensitiveQuery;
+    }
+
     /**
      * convert String key into {@link KK} object
      */

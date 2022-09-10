@@ -16,8 +16,6 @@
 package com.flowlogix.examples;
 
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
-import com.flowlogix.util.ShrinkWrapManipulator;
-import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
 import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -27,9 +25,7 @@ import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
@@ -184,10 +180,6 @@ public class ShiroBeansIT {
 
     @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
-        WebArchive archive = ShrinkWrap.create(MavenImporter.class, "shiro-auth-forms.war")
-                .loadPomFromFile("pom.xml").importBuildOutput()
-                .as(WebArchive.class);
-        new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
-        return archive;
+        return ExceptionPageIT.createDeploymentDev("shiro-beans-test.war");
     }
 }

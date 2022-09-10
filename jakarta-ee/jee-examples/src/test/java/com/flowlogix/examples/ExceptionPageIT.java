@@ -197,8 +197,12 @@ public class ExceptionPageIT {
     }
 
     @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
-    public static WebArchive createDeployment() {
-        WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest.war")
+    public static WebArchive createDeploymentDev() {
+        return createDeploymentDev("ExceptionPageTest.war");
+    }
+
+    static WebArchive createDeploymentDev(String archiveName) {
+        WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
         new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
@@ -206,8 +210,12 @@ public class ExceptionPageIT {
     }
 
     @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
-    public static WebArchive createDeploymentProdMode() {
-        WebArchive archive = ShrinkWrap.create(MavenImporter.class, "ExceptionPageTest-prod.war")
+    public static WebArchive createDeploymentProd() {
+        return createDeploymentProd("ExceptionPageTest-prod.war");
+    }
+
+    static WebArchive createDeploymentProd(String archiveName) {
+        WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
         var productionList = List.of(new Action("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value",

@@ -23,6 +23,10 @@
                           filterMatchMode="contains">
                     <h:outputText value="#{user.fullName}" />
                 </p:column>
+                <p:column headerText="Zip" sortBy="#{user.zipCode}" filterBy="#{user.zipCode}"
+                          filterMatchMode="exact">
+                    <h:outputText value="#{user.zipCode}" />
+                </p:column>
             </p:dataTable>
             <p/>
             Data Table Omni Data Model

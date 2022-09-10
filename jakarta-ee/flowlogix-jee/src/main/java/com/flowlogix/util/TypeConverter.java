@@ -22,8 +22,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
 import lombok.Lombok;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -109,21 +111,49 @@ public class TypeConverter {
     }
 
     /**
+     * used by {@link TypeConverter#checkAndConvert(java.lang.String, java.lang.Class)}
+     * @param <TT> type of value
+     */
+    @RequiredArgsConstructor
+    public static class CheckedValue<TT> {
+        /**
+         * valid is true if conversion succeeded
+         */
+        private final @Getter boolean valid;
+        /**
+         * value of the converted object
+         */
+        private final @Getter TT value;
+    }
+
+    /**
      * Check if conversion will succeed
      *
+     * @param <TT> type of class
      * @param value
      * @param type
      * @return true if conversion is good
      */
-    public static boolean checkType(@NonNull String value, @NonNull Class<?> type) {
+    public static <TT> boolean checkType(@NonNull String value, @NonNull Class<TT> type) {
+        return checkAndConvert(value, type).valid;
+    }
+
+    /**
+     *
+     * @param <TT> type of class
+     * @param value
+     * @param type
+     * @return checked type
+     */
+    public static <TT> CheckedValue<TT> checkAndConvert(@NonNull String value, @NonNull Class<TT> type) {
         try {
-            Object cv = TypeConverter.valueOf(value, type);
+            TT cv = TypeConverter.valueOf(value, type);
             if (value.equals(cv.toString())) {
-                return true;
+                return new CheckedValue<>(true, cv);
             }
         } catch (IllegalArgumentException e) {
         }
-        return false;
+        return new CheckedValue<>(false, null);
     }
 
     /**

@@ -108,11 +108,12 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                 if (fieldType == String.class) {
                     cond = predicateFromFilter(cb, root.get(key), filterMeta, value.toString());
                 } else {
-                    if (TypeConverter.checkType(value.toString(), fieldType)) {
-                        cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
+                    var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
+                    if (convertedValue.isValid()) {
+                        cond = predicateFromFilter(cb, root.get(key), filterMeta, convertedValue.getValue());
                         if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
                             @SuppressWarnings({"unchecked", "rawtypes"})
-                            Comparable<? super Comparable> cv = (Comparable)value;
+                            Comparable<? super Comparable> cv = (Comparable)convertedValue.getValue();
                             cond = predicateFromFilterComparable(cb, root.get(key), filterMeta, cv);
                         }
                     }

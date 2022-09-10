@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -38,6 +39,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import static lombok.Builder.Default;
+import org.omnifaces.util.Lazy;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 
@@ -69,6 +71,12 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     @Default
     private final @Getter @NonNull Function<TypedQuery<TT>, TypedQuery<TT>> optimizer = (a) -> a;
 
+    /**
+     * whether string queries are case-sensitive
+     */
+    @Default
+    private final @Getter boolean caseSensitiveQuery = true;
+
 
     public int count(Map<String, FilterMeta> filters) {
         return super.count(Parameters.<TT>builder()
@@ -92,15 +100,21 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
 
     private Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
         Map<String, FilterData> predicates = new HashMap<>();
-        filters.forEach((key, value) -> {
+        filters.forEach((key, filterMeta) -> {
             Predicate cond = null;
+            Object value = filterMeta.getFilterValue();
             try {
                 Class<?> fieldType = root.get(key).getJavaType();
                 if (fieldType == String.class) {
-                    cond = cb.like(root.get(key), String.format("%%%s%%", value));
+                    cond = predicateFromFilter(cb, root.get(key), filterMeta, value.toString());
                 } else {
                     if (TypeConverter.checkType(value.toString(), fieldType)) {
-                        cond = cb.equal(root.get(key), value);
+                        cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
+                        if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
+                            @SuppressWarnings({"unchecked", "rawtypes"})
+                            Comparable<? super Comparable> cv = (Comparable)value;
+                            cond = predicateFromFilterComparable(cb, root.get(key), filterMeta, cv);
+                        }
                     }
                 }
             }
@@ -110,6 +124,73 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         filter.filter(predicates, cb, root);
         return cb.and(predicates.values().stream().map(FilterData::getPredicate)
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
+    }
+
+    private class ExpressionEvaluator {
+        private final Expression<String> expression;
+        private final String value;
+
+        public ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
+            if (caseSensitiveQuery) {
+                this.expression = expression.as(String.class);
+                this.value = value.toString();
+            } else {
+                this.expression = cb.lower(expression.as(String.class));
+                this.value = value.toString().toLowerCase();
+            }
+        }
+    }
+
+    private Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
+            FilterMeta filter, Object filterValue) {
+        var stringExpression = new Lazy<>(() -> new ExpressionEvaluator(cb, expression, filterValue));
+        switch (filter.getMatchMode()) {
+            case STARTS_WITH:
+                return cb.like(stringExpression.get().expression, stringExpression.get().value + "%");
+            case NOT_STARTS_WITH:
+                return cb.notLike(stringExpression.get().expression, stringExpression.get().value + "%");
+            case ENDS_WITH:
+                return cb.like(stringExpression.get().expression, "%" + stringExpression.get().value);
+            case NOT_ENDS_WITH:
+                return cb.notLike(stringExpression.get().expression, "%" + stringExpression.get().value);
+            case CONTAINS:
+                return cb.like(stringExpression.get().expression, "%" + stringExpression.get().value + "%");
+            case NOT_CONTAINS:
+                return cb.notLike(stringExpression.get().expression, "%" + stringExpression.get().value + "%");
+            case EXACT:
+            case EQUALS:
+                return cb.equal(expression, filterValue);
+            case NOT_EXACT:
+            case NOT_EQUALS:
+                return cb.notEqual(expression, filterValue);
+            case IN:
+                throw new UnsupportedOperationException("MatchMode.IN currently not supported!");
+            case NOT_IN:
+                throw new UnsupportedOperationException("MatchMode.NOT_IN currently not supported!");
+            case BETWEEN:
+                throw new UnsupportedOperationException("MatchMode.BETWEEN currently not supported!");
+            case NOT_BETWEEN:
+                throw new UnsupportedOperationException("MatchMode.NOT_BETWEEN currently not supported!");
+            case GLOBAL:
+                throw new UnsupportedOperationException("MatchMode.GLOBAL currently not supported!");
+        }
+        return null;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb, Expression objectExpression,
+            FilterMeta filter, TC filterValue) {
+        switch (filter.getMatchMode()) {
+            case LESS_THAN:
+                return cb.lessThan(objectExpression, filterValue);
+            case LESS_THAN_EQUALS:
+                return cb.lessThanOrEqualTo(objectExpression, filterValue);
+            case GREATER_THAN:
+                return cb.greaterThan(objectExpression, filterValue);
+            case GREATER_THAN_EQUALS:
+                return cb.greaterThanOrEqualTo(objectExpression, filterValue);
+        }
+        return null;
     }
 
     private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {

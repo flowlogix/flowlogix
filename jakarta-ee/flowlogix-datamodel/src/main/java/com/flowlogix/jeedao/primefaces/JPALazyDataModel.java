@@ -15,19 +15,22 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.interfaces.ModelBuilder;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
 import com.flowlogix.jeedao.primefaces.support.FilterData;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.view.ViewScoped;
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.omnifaces.util.Beans;
 import org.primefaces.model.FilterMeta;
@@ -59,11 +62,13 @@ import org.primefaces.model.SortMeta;
  * </pre>
  */
 @Dependent
+@Slf4j
 public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     public static final String RESULT = "result";
     private static final long serialVersionUID = 2L;
     private transient JPAModelImpl<TT, KK> impl;
-    private ModelBuilder<TT, KK> builder;
+    @SuppressWarnings("serial")
+    private Function<JPAModelImplBuilder<TT, KK, ?, ?>, JPAModelImpl<TT, KK>> builder;
 
     /**
      * Set up this particular instance of the data model
@@ -71,14 +76,16 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      *
      * @param <TT> Value Type
      * @param <KK> Key Type
+     * @param <FF> serializable lambda for creation
      * @param builder
      * @return newly-created data model
      */
-    public static<TT, KK> JPALazyDataModel<TT, KK> create(ModelBuilder<TT, KK> builder) {
+    public static<TT, KK, FF extends Function<JPAModelImplBuilder<TT, KK, ?, ?>,
+        JPAModelImpl<TT, KK>> & Serializable> JPALazyDataModel<TT, KK> create(FF builder) {
         @SuppressWarnings("unchecked")
         JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
         model.builder = builder;
-        model.impl = builder.build(JPAModelImpl.builder());
+        model.impl = builder.apply(JPAModelImpl.builder());
         return model;
     }
 
@@ -125,8 +132,9 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         return impl.count(map);
     }
 
+    @SuppressWarnings("serial")
     void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
          stream.defaultReadObject();
-         impl = builder.build(JPAModelImpl.builder());
+         impl = builder.apply(JPAModelImpl.builder());
     }
 }

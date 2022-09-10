@@ -12,16 +12,16 @@
         <p/>
         Data Table FlowLogix Data Model
         <o/>
-        <h:form>
-            <p:dataTable lazy="true" scrollRows="2" rows="3" scrollable="true" virtualScroll="true"
-                         scrollHeight="100" value="#{userViewer.lazyModel}" var="user">
+        <h:form prependId="false">
+            <p:dataTable id="model1" lazy="true" scrollRows="2" rows="3" scrollable="true" virtualScroll="true"
+                         scrollHeight="100" value="#{userViewer.lazyModel}" var="user" filterEvent="enter">
                 <p:column headerText="User ID" sortBy="#{user.userId}" filterBy="#{user.userId}"
                           filterMatchMode="contains">
                     <h:outputText value="#{user.userId}" />
                 </p:column>
                 <p:column headerText="Full Name" sortBy="#{user.fullName}" filterBy="#{user.fullName}"
-                          filterMatchMode="contains">
-                    <h:outputText value="#{user.fullName}" />
+                          filterMatchMode="contains" id="fullNameFilter">
+                    <h:outputText id="fullName" value="#{user.fullName}" />
                 </p:column>
                 <p:column headerText="Zip" sortBy="#{user.zipCode}" filterBy="#{user.zipCode}"
                           filterMatchMode="exact">

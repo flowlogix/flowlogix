@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.internal;
+package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
-import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import com.flowlogix.jeedao.primefaces.interfaces.Filter;
-import com.flowlogix.jeedao.primefaces.interfaces.Sorter;
-import com.flowlogix.jeedao.primefaces.support.FilterData;
-import com.flowlogix.jeedao.primefaces.support.SortData;
+import com.flowlogix.jeedao.primefaces.hooks.Filter;
+import com.flowlogix.jeedao.primefaces.hooks.Sorter;
 import com.flowlogix.util.TypeConverter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +47,7 @@ import org.primefaces.model.SortMeta;
  * @param <KK>
  */
 @SuperBuilder
-public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
+class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     /**
      * convert String key into {@link KK} object
      */
@@ -78,13 +75,13 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     private final @Getter boolean caseSensitiveQuery = true;
 
 
-    public int count(Map<String, FilterMeta> filters) {
+    int count(Map<String, FilterMeta> filters) {
         return super.count(Parameters.<TT>builder()
                 .countQueryCriteria(cqc -> cqc.getQuery().where(getFilters(filters, cqc.getBuilder(), cqc.getRoot())))
                 .build());
     }
 
-    public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
+    List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
         return super.findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
                 Parameters.<TT>builder()
                         .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))

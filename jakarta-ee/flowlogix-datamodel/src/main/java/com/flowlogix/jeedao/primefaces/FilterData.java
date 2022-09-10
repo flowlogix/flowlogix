@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.support;
+package com.flowlogix.jeedao.primefaces;
 
 import javax.persistence.criteria.Predicate;
 import lombok.Getter;

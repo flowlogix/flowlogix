@@ -13,26 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.interfaces;
+package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.support.FilterData;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Order;
+import lombok.Getter;
+import org.primefaces.model.SortMeta;
 
 /**
- * Filter Hook
+ * return type for the sorter hook
  *
- * @param <TT> Entity Type
+ * @author lprimak
  */
-@FunctionalInterface
-public interface Filter<TT> {
+@Getter
+public class SortData {
+    public SortData(Map<String, SortMeta> sm) {
+        sortMeta = new HashMap<>(sm);
+    }
+
     /**
-     * hook to supply custom filter
-     *
-     * @param filters user input
-     * @param cb
-     * @param root
+     * Sort based on fields
      */
-    void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<TT> root);
+    private final Map<String, SortMeta> sortMeta;
+    /**
+     * global sort order added by the client
+     */
+    private final List<Order> sortOrder = new ArrayList<>();
 }

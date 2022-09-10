@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.interfaces;
+package com.flowlogix.jeedao.primefaces.hooks;
 
-import com.flowlogix.jeedao.primefaces.support.SortData;
+import com.flowlogix.jeedao.primefaces.SortData;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
 

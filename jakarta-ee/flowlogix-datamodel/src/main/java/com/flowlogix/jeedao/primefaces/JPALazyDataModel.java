@@ -17,7 +17,6 @@ package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
-import com.flowlogix.jeedao.primefaces.support.FilterData;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;

@@ -64,7 +64,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
      * adds {@link Sorter} object
      */
     @Default
-    private final @Getter @NonNull Sorter<TT> sorter = (a, b, c) -> { };
+    private final @Getter @NonNull Sorter<TT> sorter = (a, b, c) -> true;
     /**
      * add optimizer hints here
      */
@@ -195,12 +195,12 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     }
 
     private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
-        SortData sortData = new SortData(sortCriteria);
-        sorter.sort(sortData, cb, root);
+        var sortData = new SortData(sortCriteria);
+        boolean appendSortOder = sorter.sort(sortData, cb, root);
 
         List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);
         List<Order> rv = new ArrayList<>();
-        if(sortData.isAppendSortOrder()) {
+        if(appendSortOder) {
             rv.addAll(sortMetaOrdering);
             rv.addAll(sortData.getSortOrder());
         } else {

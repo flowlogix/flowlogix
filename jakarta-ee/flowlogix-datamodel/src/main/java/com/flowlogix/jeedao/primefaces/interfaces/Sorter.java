@@ -33,6 +33,7 @@ public interface Sorter<TT> {
      * @param sortData
      * @param cb
      * @param root
+     * @return true if sort by the UI (default) or application-based sort (false)
      */
-    void sort(SortData sortData, CriteriaBuilder cb, Root<TT> root);
+    boolean sort(SortData sortData, CriteriaBuilder cb, Root<TT> root);
 }

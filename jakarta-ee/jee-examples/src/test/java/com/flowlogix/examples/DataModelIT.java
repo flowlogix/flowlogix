@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -50,19 +51,31 @@ public class DataModelIT {
     @FindBy(id = "model1")
     private WebElement first_table;
 
-    @FindBy(id = "model1:fullNameFilter:filter")
+    @FindBy(id = "model1:fullNameHeader:filter")
     private WebElement fullNameFilterInput;
 
-    @FindBy(id = "model1:0:fullName")
+    @FindBy(id = "model1:0:fullNameRow")
     private WebElement firstRowFullName;
+
+    @FindBy(id = "model1:0:userIdRow")
+    private WebElement firstRowUserId;
+
+    @FindBy(id = "model1:userIdHeader")
+    private WebElement userIdHeader;
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkPage() {
         webDriver.get(baseURL + "view-users");
         assertEquals("View Users", webDriver.getTitle());
+        // sort
+        guardAjax(userIdHeader.findElement(By.className("ui-column-title"))).click();
+        assertEquals("anya", firstRowUserId.getText());
+        WebElement scrollable = first_table.findElement(By.className("ui-datatable-scrollable-body"));
         ((JavascriptExecutor) webDriver)
-                .executeScript("arguments[0].scroll(0, 100);", first_table);
+                .executeScript("arguments[0].scroll(0, 500);", scrollable);
+        ((JavascriptExecutor) webDriver)
+                .executeScript("arguments[0].scroll(0, 0);", scrollable);
         fullNameFilterInput.sendKeys("ly l");
         guardAjax(fullNameFilterInput).sendKeys(Keys.RETURN);
         assertEquals("Lovely Lady", firstRowFullName.getText());

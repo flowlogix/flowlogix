@@ -11,6 +11,14 @@
         <extension>ttf</extension>
         <mime-type>application/octet-stream</mime-type>
     </mime-mapping>
+    <mime-mapping>
+        <extension>woff</extension>
+        <mime-type>application/octet-stream</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>eot</extension>
+        <mime-type>application/octet-stream</mime-type>
+    </mime-mapping>
     <error-page>
         <exception-type>javax.faces.application.ViewExpiredException</exception-type>
         <location>/WEB-INF/errorpages/invalidErrorPage.xhtml</location>

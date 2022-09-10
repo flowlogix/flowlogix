@@ -51,7 +51,7 @@ import org.primefaces.model.SortMeta;
  * <pre>
  * {@code
  *     private @Getter final JPALazyDataModel<UserEntity, Long> lazyModel =
- *           JPALazyDataModel.createModel(builder -> builder
+ *           JPALazyDataModel.create(builder -> builder
  *                   .entityManagerSupplier(() -> em)
  *                   .entityClass(UserEntity.class)
  *                   .converter(Long::parseLong)

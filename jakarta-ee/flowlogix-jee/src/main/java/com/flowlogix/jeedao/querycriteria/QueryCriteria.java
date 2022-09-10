@@ -27,8 +27,7 @@ import lombok.RequiredArgsConstructor;
  * @param <TT> Type of Query
 */
 @Data @RequiredArgsConstructor
-public class QueryCriteria<TT>
-{
+public class QueryCriteria<TT> {
     private final CriteriaBuilder builder;
     private final Root<TT> root;
     private final CriteriaQuery<TT> query;

@@ -47,5 +47,6 @@ public class UserViewer implements Serializable {
                     .entityManagerSupplier(() -> em)
                     .entityClass(UserEntity.class)
                     .converter(Long::parseLong)
+                    .caseSensitiveQuery(false)
                     .build());
 }

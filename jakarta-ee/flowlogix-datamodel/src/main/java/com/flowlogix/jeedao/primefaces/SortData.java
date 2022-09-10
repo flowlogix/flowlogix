@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.support;
+package com.flowlogix.jeedao.primefaces;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.criteria.Order;
 import lombok.Getter;
-import lombok.Setter;
 import org.primefaces.model.SortMeta;
 
 /**
@@ -29,11 +28,9 @@ import org.primefaces.model.SortMeta;
  *
  * @author lprimak
  */
-@Getter @Setter
-public class SortData
-{
-    public SortData(Map<String, SortMeta> sm)
-    {
+@Getter
+public class SortData {
+    public SortData(Map<String, SortMeta> sm) {
         sortMeta = new HashMap<>(sm);
     }
 
@@ -45,8 +42,4 @@ public class SortData
      * global sort order added by the client
      */
     private final List<Order> sortOrder = new ArrayList<>();
-    /**
-     * which sort gets priority - sort by the UI (default) or application-based sort
-     */
-    private boolean appendSortOrder = true;
 }

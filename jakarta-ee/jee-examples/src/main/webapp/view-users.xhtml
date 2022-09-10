@@ -12,20 +12,31 @@
         <p/>
         Data Table FlowLogix Data Model
         <o/>
-        <p:dataTable lazy="true" scrollRows="2" rows="3" scrollable="true" virtualScroll="true"
-                     scrollHeight="100" value="#{userViewer.lazyModel}" var="user">
-            <p:column headerText="Full Name" sortBy="#{user.fullName}" filterBy="#{user.fullName}">
-                <h:outputText value="#{user.fullName}" />
-            </p:column>
-        </p:dataTable>
-        <p/>
-        Data Table Omni Data Model
-        <o/>
-        <p:dataTable lazy="true" scrollRows="2" rows="3" scrollable="true" virtualScroll="true"
-                     scrollHeight="100" value="#{userViewerOmni.lazyModel}" var="user">
-            <p:column headerText="Full Name" sortBy="#{user.fullName}" filterBy="#{user.fullName}">
-                <h:outputText value="#{user.fullName}" />
-            </p:column>
-        </p:dataTable>
+        <h:form prependId="false">
+            <p:dataTable id="model1" lazy="true" scrollRows="2" rows="3" scrollable="true" virtualScroll="true"
+                         scrollHeight="100" value="#{userViewer.lazyModel}" var="user" filterEvent="enter">
+                <p:column headerText="User ID" sortBy="#{user.userId}" filterBy="#{user.userId}"
+                          filterMatchMode="contains" id="userIdHeader">
+                    <h:outputText id="userIdRow" value="#{user.userId}" />
+                </p:column>
+                <p:column headerText="Full Name" sortBy="#{user.fullName}" filterBy="#{user.fullName}"
+                          filterMatchMode="contains" id="fullNameHeader">
+                    <h:outputText id="fullNameRow" value="#{user.fullName}" />
+                </p:column>
+                <p:column headerText="Zip" sortBy="#{user.zipCode}" filterBy="#{user.zipCode}"
+                          filterMatchMode="exact">
+                    <h:outputText value="#{user.zipCode}" />
+                </p:column>
+            </p:dataTable>
+            <p/>
+            Data Table Omni Data Model
+            <o/>
+            <p:dataTable lazy="true" scrollRows="2" rows="3" scrollable="true" virtualScroll="true"
+                         scrollHeight="100" value="#{userViewerOmni.lazyModel}" var="user">
+                <p:column headerText="Full Name" sortBy="#{user.fullName}" filterBy="#{user.fullName}">
+                    <h:outputText value="#{user.fullName}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
     </h:body>
 </html>

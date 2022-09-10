@@ -52,4 +52,9 @@ public class TypeConverterTest {
         assertEquals(Float.POSITIVE_INFINITY, TypeConverter.valueOf("inf", float.class));
         assertEquals(Float.NEGATIVE_INFINITY, TypeConverter.valueOf("-inf", float.class));
     }
+
+    @Test
+    void invalidArgument() {
+        assertThrows(IllegalArgumentException.class, () -> TypeConverter.valueOf("abc", Integer.class));
+    }
 }

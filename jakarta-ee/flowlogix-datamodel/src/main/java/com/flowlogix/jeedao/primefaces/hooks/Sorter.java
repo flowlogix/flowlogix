@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.interfaces;
+package com.flowlogix.jeedao.primefaces.hooks;
 
-import com.flowlogix.jeedao.primefaces.support.FilterData;
-import java.util.Map;
+import com.flowlogix.jeedao.primefaces.SortData;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
 
 /**
- * Filter Hook
- *
+ * Sorter Hook
  * @param <TT> Entity Type
  */
 @FunctionalInterface
-public interface Filter<TT>
-{
+public interface Sorter<TT> {
     /**
-     * hook to supply custom filter
+     * Hook for sort criteria application
+     * can remove elements from the SortMeta lists and do your own action
+     * any elements left in SortMeta will be done via the default mechanism
      *
-     * @param filters user input
+     * @param sortData
      * @param cb
      * @param root
+     * @return true if sort by the UI (default) or application-based sort (false)
      */
-    void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<TT> root);
+    boolean sort(SortData sortData, CriteriaBuilder cb, Root<TT> root);
 }

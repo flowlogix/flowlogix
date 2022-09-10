@@ -33,7 +33,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-
 /**
  * Lightweight wrapper around common JPA methods
  * This is the primary class in the {@link com.flowlogix.jeedao} package
@@ -53,8 +52,7 @@ import lombok.experimental.SuperBuilder;
  */
 @SuperBuilder
 @RequiredArgsConstructor
-public class DaoHelper<TT, KT>
-{
+public class DaoHelper<TT, KT> {
     /**
      * Return entity manager to operate on
      */
@@ -93,8 +91,7 @@ public class DaoHelper<TT, KT>
      * @param parms
      * @return
      */
-    public List<TT> findAll(Parameters<TT> parms)
-    {
+    public List<TT> findAll(Parameters<TT> parms) {
         CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
         Root<TT> root = cq.from(entityClass);
         cq.select(root);
@@ -116,8 +113,7 @@ public class DaoHelper<TT, KT>
      * @param parms
      * @return
      */
-    public List<TT> findRange(int min, int max, Parameters<TT> parms)
-    {
+    public List<TT> findRange(int min, int max, Parameters<TT> parms) {
         CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
         Root<TT> root = cq.from(entityClass);
         cq.select(root);
@@ -133,8 +129,7 @@ public class DaoHelper<TT, KT>
         return count(Parameters.<TT>builder().build());
     }
 
-    public int count(Parameters<TT> parms)
-    {
+    public int count(Parameters<TT> parms) {
         CriteriaQuery<Long> cq = getEntityManager().getCriteriaBuilder().createQuery(Long.class);
         Root<TT> rt = cq.from(entityClass);
         cq.select(getEntityManager().getCriteriaBuilder().count(rt));
@@ -150,30 +145,22 @@ public class DaoHelper<TT, KT>
         return entityManagerSupplier.get();
     }
 
-
-    public QueryCriteria<TT> buildQueryCriteria()
-    {
+    public QueryCriteria<TT> buildQueryCriteria() {
         return buildQueryCriteria(entityClass);
     }
 
-
-    public<RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls)
-    {
+    public<RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls) {
         CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
         CriteriaQuery<RR> cq = cb.createQuery(cls);
         return new QueryCriteria<>(cb, cq.from(cls), cq);
     }
 
-
-    public TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass)
-    {
+    public TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass) {
         Query q = getEntityManager().createNativeQuery(sql, resultClass);
         return new TypedNativeQuery(q);
     }
 
-
-    protected TypedNativeQuery createNativeQuery(String sql, String resultMapping)
-    {
+    protected TypedNativeQuery createNativeQuery(String sql, String resultMapping) {
         Query q = getEntityManager().createNativeQuery(sql, resultMapping);
         return new TypedNativeQuery(q);
     }

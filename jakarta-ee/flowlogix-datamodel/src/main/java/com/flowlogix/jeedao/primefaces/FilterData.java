@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.interfaces;
+package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.support.SortData;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Predicate;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
- * Sorter Hook
- * @param <TT> Entity Type
+ * filter data
+ * this is what you replace with your own filter
  */
-@FunctionalInterface
-public interface Sorter<TT>
-{
+@RequiredArgsConstructor
+@Getter
+public class FilterData {
     /**
-     * Hook for sort criteria application
-     * can remove elements from the SortMeta lists and do your own action
-     * any elements left in SortMeta will be done via the default mechanism
-     *
-     * @param sortData
-     * @param cb
-     * @param root
+     * filter field value
      */
-    void sort(SortData sortData, CriteriaBuilder cb, Root<TT> root);
+    private final String fieldValue;
+    /**
+     * Existing or null predicate, can replace with custom
+     */
+    private final Predicate predicate;
 }

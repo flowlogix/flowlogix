@@ -15,19 +15,20 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.interfaces.ModelBuilder;
-import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
-import com.flowlogix.jeedao.primefaces.support.FilterData;
+import com.flowlogix.jeedao.primefaces.JPAModelImpl.JPAModelImplBuilder;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.view.ViewScoped;
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.omnifaces.util.Beans;
 import org.primefaces.model.FilterMeta;
@@ -59,11 +60,13 @@ import org.primefaces.model.SortMeta;
  * </pre>
  */
 @Dependent
+@Slf4j
 public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     public static final String RESULT = "result";
     private static final long serialVersionUID = 2L;
     private transient JPAModelImpl<TT, KK> impl;
-    private ModelBuilder<TT, KK> builder;
+    @SuppressWarnings("serial")
+    private Function<JPAModelImplBuilder<TT, KK, ?, ?>, JPAModelImpl<TT, KK>> builder;
 
     /**
      * Set up this particular instance of the data model
@@ -71,15 +74,16 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      *
      * @param <TT> Value Type
      * @param <KK> Key Type
+     * @param <FF> serializable lambda for creation
      * @param builder
      * @return newly-created data model
      */
-    public static<TT, KK> JPALazyDataModel<TT, KK> create(ModelBuilder<TT, KK> builder)
-    {
+    public static<TT, KK, FF extends Function<JPAModelImplBuilder<TT, KK, ?, ?>,
+        JPAModelImpl<TT, KK>> & Serializable> JPALazyDataModel<TT, KK> create(FF builder) {
         @SuppressWarnings("unchecked")
         JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
         model.builder = builder;
-        model.impl = builder.build(JPAModelImpl.builder());
+        model.impl = builder.apply(JPAModelImpl.builder());
         return model;
     }
 
@@ -91,11 +95,9 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param fp lambda to get the new Filter predicate
      */
     public static void replaceFilter(Map<String, FilterData> filters, String element,
-            BiFunction<Predicate, Object, Predicate> fp)
-    {
+            BiFunction<Predicate, Object, Predicate> fp) {
         FilterData elt = filters.get(element);
-        if (elt != null && StringUtils.isNotBlank(elt.getFieldValue()))
-        {
+        if (elt != null && StringUtils.isNotBlank(elt.getFieldValue())) {
             filters.replace(element, new FilterData(elt.getFieldValue(),
                     fp.apply(elt.getPredicate(), elt.getFieldValue())));
         }
@@ -107,40 +109,30 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param val
      * @return JPA field suitable for hints
      */
-    public static String getResultField(String val)
-    {
+    public static String getResultField(String val) {
         return String.format("%s.%s", RESULT, val);
     }
 
-
-    @Override
-    @SuppressWarnings("unchecked")
-    @Transactional
-    public KK getRowKey(TT entity)
-    {
-        return (KK)impl.getEntityManager().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
-    }
-
-
     @Override
     @Transactional
-    public TT getRowData(String rowKey)
-    {
+    public TT getRowData(String rowKey) {
         return impl.getEntityManager().find(impl.getEntityClass(), impl.getConverter().apply(rowKey));
     }
 
-
     @Override
     @Transactional
-    public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy)
-    {
-        setRowCount(impl.count(filterBy));
+    public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
         return impl.findRows(first, pageSize, filterBy, sortBy);
     }
 
+    @Override
+    public int count(Map<String, FilterMeta> map) {
+        return impl.count(map);
+    }
 
+    @SuppressWarnings("serial")
     void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
          stream.defaultReadObject();
-         impl = builder.build(JPAModelImpl.builder());
+         impl = builder.apply(JPAModelImpl.builder());
     }
 }

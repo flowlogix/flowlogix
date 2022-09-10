@@ -29,12 +29,12 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class Deployments {
     @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
-        return ExceptionPageIT.createDeployment();
+        return ExceptionPageIT.createDeploymentDev("FlowLogixTest.war");
     }
 
     @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
     public static WebArchive createDeploymentProd() {
-        return ExceptionPageIT.createDeploymentProdMode();
+        return ExceptionPageIT.createDeploymentProd();
     }
 
     @Deployment(name = LookupIT.DEPLOYMENT_NAME)

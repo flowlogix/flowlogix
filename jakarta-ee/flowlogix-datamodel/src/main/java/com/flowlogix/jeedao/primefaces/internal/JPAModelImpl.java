@@ -85,7 +85,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     }
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        return super.findRange(first, first + pageSize,
+        return super.findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
                 Parameters.<TT>builder()
                         .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
                         .hints(optimizer::apply)

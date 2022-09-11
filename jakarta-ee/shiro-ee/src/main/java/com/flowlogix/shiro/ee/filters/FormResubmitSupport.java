@@ -29,6 +29,7 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -297,13 +298,13 @@ public class FormResubmitSupport {
     static int getCookieAge(ServletRequest request, SecurityManager securityManager) {
         var nativeSessionManager = getNativeSessionManager(securityManager);
         if (nativeSessionManager != null) {
-            return ((int)nativeSessionManager.getGlobalSessionTimeout() / 1000);
+            return (int)Duration.ofMillis(nativeSessionManager.getGlobalSessionTimeout()).toSeconds();
         } else {
             try {
-                return request.getServletContext().getSessionTimeout() * 60;
+                return (int)Duration.ofMinutes(request.getServletContext().getSessionTimeout()).toSeconds();
             } catch (Throwable e) {
-                // default 60 minutes
-                return 60 * 60;
+                // default one hour
+                return (int)Duration.ofHours(1).toSeconds();
             }
         }
     }

@@ -16,13 +16,21 @@
 package com.flowlogix.examples.data;
 
 import com.flowlogix.examples.entities.UserEntity;
+import com.flowlogix.examples.entities.UserEntity_;
+import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.replaceFilter;
+import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import lombok.Getter;
 
 /**
@@ -48,5 +56,17 @@ public class UserViewer implements Serializable {
                     .entityClass(UserEntity.class)
                     .converter(Long::parseLong)
                     .caseSensitiveQuery(false)
+//                    .sorter(UserViewer::sorter)
+//                    .filter(UserViewer::filter)
                     .build());
+
+    private static boolean sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
+        sortData.getSortOrder().add(cb.asc(root.get(UserEntity_.address)));
+        return false;
+    }
+
+    private static void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<UserEntity> root) {
+        replaceFilter(filters, UserEntity_.ZIP_CODE,
+                (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value));
+    }
 }

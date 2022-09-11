@@ -55,9 +55,9 @@
             <artifactId>primefaces</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-            <version>4.0.0-RC2</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>5.6.10.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

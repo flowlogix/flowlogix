@@ -15,7 +15,10 @@
  */
 package com.flowlogix.util;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Time;
+import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
@@ -34,6 +37,8 @@ public class TypeConverterTest {
         assertEquals(20.0f, TypeConverter.valueOf("20.0", float.class));
         assertEquals(20.0d, TypeConverter.valueOf("20.0", double.class));
         assertEquals(20.0d, TypeConverter.valueOf("20.0", Double.class));
+        assertEquals((short)20, TypeConverter.valueOf("20", Short.class));
+        assertEquals((short)20, TypeConverter.valueOf("20", short.class));
     }
 
     @Test
@@ -51,6 +56,33 @@ public class TypeConverterTest {
         assertEquals(Float.NaN, TypeConverter.valueOf("nan", float.class));
         assertEquals(Float.POSITIVE_INFINITY, TypeConverter.valueOf("inf", float.class));
         assertEquals(Float.NEGATIVE_INFINITY, TypeConverter.valueOf("-inf", float.class));
+    }
+
+    @Test
+    void nonNumbers() {
+        assertEquals(true, TypeConverter.valueOf("true", boolean.class));
+        assertEquals(true, TypeConverter.valueOf("true", Boolean.class));
+    }
+
+    @Test
+    void bigNumbers() {
+        assertEquals(BigInteger.ONE, TypeConverter.valueOf(BigInteger.ONE.toString(), BigInteger.class));
+        assertEquals(BigDecimal.ONE, TypeConverter.valueOf(BigDecimal.ONE.toPlainString(), BigDecimal.class));
+    }
+
+    private enum MyEnum {
+        ONE, TWO;
+    }
+
+    @Test
+    void enums() {
+        assertEquals(MyEnum.ONE, TypeConverter.valueOf(MyEnum.ONE.name(), MyEnum.class));
+    }
+
+    @Test
+    void dates() {
+        LocalDate today = LocalDate.now();
+        assertEquals(today, TypeConverter.valueOf(today.toString(), LocalDate.class));
     }
 
     @Test

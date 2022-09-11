@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import javax.faces.component.UIComponent;
+import javax.faces.convert.Converter;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
@@ -36,6 +38,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import static lombok.Builder.Default;
+import lombok.extern.slf4j.Slf4j;
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Lazy;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
@@ -47,6 +51,7 @@ import org.primefaces.model.SortMeta;
  * @param <KK>
  */
 @SuperBuilder
+@Slf4j
 public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     /**
      * prevent from direct construction
@@ -119,8 +124,22 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                     cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
                 } else {
                     var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
-                    if (convertedValue.isValid()) {
+                    boolean valid = convertedValue.isValid();
+                    if (valid) {
                         value = convertedValue.getValue();
+                    } else {
+                        try {
+                            Converter<?> valueConverter = Faces.getApplication().createConverter(fieldType);
+                            if (valueConverter != null) {
+                                value = valueConverter.getAsObject(Faces.getContext(),
+                                        UIComponent.getCurrentComponent(Faces.getContext()), value.toString());
+                                valid = true;
+                            }
+                        } catch (Throwable e) {
+                            log.debug("unable to convert via JSF", e);
+                        }
+                    }
+                    if (valid) {
                         cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
                         if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
                             @SuppressWarnings({"unchecked", "rawtypes"})

@@ -20,8 +20,15 @@ import java.io.StringWriter;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Map;
+import static java.util.Map.entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.Lombok;
 import lombok.NonNull;
@@ -47,6 +54,60 @@ import lombok.extern.slf4j.Slf4j;
 public class TypeConverter {
     private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
     private static final Map<Class<?>, MethodHandle> valueOfMethod = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Function<String, Result>> info = Map.ofEntries(
+            // see https://ideone.com/WtNDN2
+            entry(Double.class, value -> new Result(processNumbers(value), Double.class)),
+            entry(double.class, value -> new Result(processNumbers(value), Double.class)),
+            entry(Float.class, value -> new Result(processNumbers(value), Float.class)),
+            entry(float.class, value -> new Result(processNumbers(value), Float.class)),
+            entry(Integer.class, value -> new Result(processNumbers(value), Integer.class)),
+            entry(int.class, value -> new Result(processNumbers(value), Integer.class)),
+            entry(short.class, value -> new Result(processNumbers(value), Short.class)),
+            entry(Long.class, value -> new Result(processNumbers(value), Long.class)),
+            entry(long.class, value -> new Result(processNumbers(value), Long.class)),
+            entry(Boolean.class, value -> new Result(value, boolean.class, "parseBoolean", Boolean.class)),
+            entry(boolean.class, value -> new Result(value, boolean.class, "parseBoolean", Boolean.class)),
+            entry(BigInteger.class, value -> new Result(new BigInteger(value))),
+            entry(BigDecimal.class, value -> new Result(new BigDecimal(value))),
+            entry(LocalDate.class, value -> new Result(value, "parse", CharSequence.class, LocalDate.class)),
+            entry(LocalTime.class, value -> new Result(value, "parse", CharSequence.class, LocalTime.class)),
+            entry(LocalDateTime.class, value -> new Result(value, "parse", CharSequence.class, LocalDateTime.class))
+    );
+
+    private static class Result {
+        private final String value;
+        private final Class<?> resultType;
+        private final String method;
+        private final Class<?> classToCall;
+        private final Class<?> stringArgType;
+        private final Object actualResult;
+
+        public Result(String value, Class<?> resultType) {
+            this(value, resultType, "valueOf", resultType);
+        }
+
+        public Result(String value, Class<?> resultType, String method, Class<?> classToCall) {
+            this(value, resultType, method, classToCall, String.class, null);
+        }
+
+        public Result(String value, String method, Class<?> stringArgType, Class<?> resultType) {
+            this(value, resultType, method, resultType, stringArgType, null);
+        }
+
+        public Result(Object actualResult) {
+            this(null, null, null, null, null, actualResult);
+        }
+
+        public Result(String value, Class<?> resultType, String method, Class<?> classToCall,
+                Class<?> stringArgType, Object actualResult) {
+            this.value = value;
+            this.resultType = resultType;
+            this.method = method;
+            this.classToCall = classToCall;
+            this.stringArgType = stringArgType;
+            this.actualResult = actualResult;
+        }
+    }
 
     /**
      *
@@ -60,22 +121,13 @@ public class TypeConverter {
         if (type.equals(String.class)) {
             return (TT) strValue;
         }
-        String method = "valueOf";
-        Class<?> targetType = null;
-        if (type.equals(Double.class) || type.equals(double.class)) {
-            strValue = processNumbers(strValue);
-            targetType = Double.class;
-        } else if (type.equals(Float.class) || type.equals(float.class)) {
-            strValue = processNumbers(strValue);
-            targetType = Float.class;
-        } else if (type.equals(Integer.class) || type.equals(int.class)) {
-            strValue = processNumbers(strValue);
-            targetType = Integer.class;
-        } else if (type.equals(Long.class) || type.equals(long.class)) {
-            strValue = processNumbers(strValue);
-            targetType = Long.class;
+        Result result = info.getOrDefault(type, value -> new Result(value, type)).apply(strValue);
+        if (result.actualResult != null) {
+            return (TT) result.actualResult;
+        } else {
+            return (TT) callMethod(result.value, result.method, result.classToCall,
+                    result.resultType, result.stringArgType);
         }
-        return (TT) callMethod(strValue, method, targetType != null ? targetType : type);
     }
 
     /**
@@ -161,11 +213,12 @@ public class TypeConverter {
      * @param type
      * @return
      */
-    private static <TT> TT callMethod(String strValue, String methodName, Class<?> type) {
+    private static <TT> TT callMethod(String strValue, String methodName, Class<?> type,
+            Class<?> resultType, Class<?> stringArgType) {
         try {
             MethodHandle method = valueOfMethod.computeIfAbsent(type, (k) -> {
                 try {
-                    return lookup.findStatic(type, methodName, MethodType.methodType(type, String.class));
+                    return lookup.findStatic(type, methodName, MethodType.methodType(resultType, stringArgType));
                 } catch (ReflectiveOperationException ex) {
                     throw Lombok.sneakyThrow(ex);
                 }

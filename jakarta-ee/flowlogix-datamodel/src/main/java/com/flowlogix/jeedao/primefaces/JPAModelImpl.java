@@ -16,9 +16,9 @@
 package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.jeedao.primefaces.Filter.FilterData;
+import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
-import com.flowlogix.jeedao.primefaces.hooks.Filter;
-import com.flowlogix.jeedao.primefaces.hooks.Sorter;
 import com.flowlogix.util.TypeConverter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,21 +115,23 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
             try {
                 Class<?> fieldType = root.get(key).getJavaType();
                 if (fieldType == String.class) {
-                    cond = predicateFromFilter(cb, root.get(key), filterMeta, value.toString());
+                    value = value.toString();
+                    cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
                 } else {
                     var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
                     if (convertedValue.isValid()) {
-                        cond = predicateFromFilter(cb, root.get(key), filterMeta, convertedValue.getValue());
+                        value = convertedValue.getValue();
+                        cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
                         if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
                             @SuppressWarnings({"unchecked", "rawtypes"})
-                            Comparable<? super Comparable> cv = (Comparable)convertedValue.getValue();
+                            Comparable<? super Comparable> cv = (Comparable)value;
                             cond = predicateFromFilterComparable(cb, root.get(key), filterMeta, cv);
                         }
                     }
                 }
             }
             catch(IllegalArgumentException e) { /* ignore possibly extra filter fields */}
-            predicates.put(key, new FilterData(value.toString(), cond));
+            predicates.put(key, new FilterData(value, cond));
         });
         filter.filter(predicates, cb, root);
         return cb.and(predicates.values().stream().map(FilterData::getPredicate)

@@ -229,7 +229,8 @@
                     <configuration>
                         <doclint>all,-reference</doclint>
                         <overview>${project.basedir}/src/main/java/overview.html</overview>
-                        <sourcepath>${project.build.directory}/generated-sources/delombok</sourcepath>
+                        <sourcepath>${project.build.directory}/generated-sources/delombok
+                            :${project.build.directory}/generated-sources/annotations</sourcepath>
                     </configuration>
                     <executions>
                         <execution>

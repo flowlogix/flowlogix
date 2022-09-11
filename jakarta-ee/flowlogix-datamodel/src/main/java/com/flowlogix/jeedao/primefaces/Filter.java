@@ -15,23 +15,42 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
+import java.util.Map;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * filter data
- * this is what you replace with your own filter
+ * Filter Hook
+ *
+ * @param <TT> Entity Type
  */
-@RequiredArgsConstructor
-@Getter
-public class FilterData {
+@FunctionalInterface
+public interface Filter<TT> {
     /**
-     * filter field value
+     * filter data this is what you replace with your own filter
      */
-    private final String fieldValue;
+    @RequiredArgsConstructor
+    @Getter
+    public class FilterData {
+        /**
+         * filter field value
+         */
+        private final Object fieldValue;
+        /**
+         * Existing or null predicate, can replace with custom
+         */
+        private final Predicate predicate;
+    }
+
     /**
-     * Existing or null predicate, can replace with custom
+     * hook to supply custom filter
+     *
+     * @param filters user input
+     * @param cb
+     * @param root
      */
-    private final Predicate predicate;
+    void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<TT> root);
 }

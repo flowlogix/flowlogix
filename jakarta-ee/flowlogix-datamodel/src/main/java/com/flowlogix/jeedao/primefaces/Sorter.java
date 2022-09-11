@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.hooks;
+package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.SortData;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
+import lombok.Getter;
+import org.primefaces.model.SortMeta;
 
 /**
  * Sorter Hook
@@ -25,6 +31,27 @@ import javax.persistence.criteria.Root;
  */
 @FunctionalInterface
 public interface Sorter<TT> {
+    /**
+     * return type for the sorter hook
+     *
+     * @author lprimak
+     */
+    @Getter
+    public class SortData {
+        public SortData(Map<String, SortMeta> sm) {
+            sortMeta = new HashMap<>(sm);
+        }
+
+        /**
+         * Sort based on fields
+         */
+        private final Map<String, SortMeta> sortMeta;
+        /**
+         * global sort order added by the client
+         */
+        private final List<Order> sortOrder = new ArrayList<>();
+    }
+
     /**
      * Hook for sort criteria application
      * can remove elements from the SortMeta lists and do your own action

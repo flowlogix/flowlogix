@@ -58,7 +58,7 @@ public class Forms {
         public void login() {
             if (Faces.getRequestAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null) {
                 loginFailed();
-            } else if (Faces.<Boolean>getRequestAttribute(FORM_AUTH_ATTR_NAME, () -> Boolean.FALSE)) {
+            } else if (Faces.getRequestAttribute(FORM_AUTH_ATTR_NAME, () -> Boolean.FALSE)) {
                 redirectToView();
             } else {
                 throw new IllegalStateException("Not enough context to log in, need username / password");

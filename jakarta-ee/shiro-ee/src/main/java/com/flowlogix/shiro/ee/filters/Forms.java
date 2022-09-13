@@ -55,7 +55,7 @@ public class Forms {
          * login wait time is handled by Shiro configuration
          */
         public void login() {
-            if (Faces.getRequestAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null) {
+            if (isLoginFailure()) {
                 loginFailed();
             } else {
                 throw new IllegalStateException("Not enough context to log in, need username / password");
@@ -96,7 +96,8 @@ public class Forms {
         }
 
         public boolean isLoginFailure() {
-            return Faces.getFlashAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null;
+            return Faces.getRequestAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null ||
+                    Faces.getFlashAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null;
         }
     }
 

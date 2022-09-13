@@ -16,6 +16,7 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_PREDICATE_ATTR_NAME;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_WAITTIME_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.NO_PREDICATE;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.savePostDataForResubmit;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.saveRequestReferer;
@@ -23,12 +24,16 @@ import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import static com.flowlogix.shiro.ee.filters.LogoutFilter.LOGOUT_PREDICATE_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.LogoutFilter.YES_PREDICATE;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.SneakyThrows;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 
@@ -44,15 +49,25 @@ class AuthenticationFilterDelegate {
         boolean isLoginRequest(ServletRequest request, ServletResponse response);
         String getLoginUrl();
         boolean preHandle(ServletRequest request, ServletResponse response) throws Exception;
+        boolean onLoginFailure(AuthenticationToken token, AuthenticationException e,
+            ServletRequest request, ServletResponse response);
     }
 
     private final MethodsFromFilter methods;
+    /**
+     * true if rememberMe cookie is set and valid
+     */
     private @Getter @Setter boolean useRemembered = false;
+    /**
+     * number of seconds to sleep if authentication fails
+     */
+    private @Getter @Setter int loginFailedWaitTime = 0;
     private @Getter @Setter FallbackPredicate loginFallbackType = NO_PREDICATE;
     private @Getter @Setter FallbackPredicate logoutFallbackType = YES_PREDICATE;
 
     public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
         request.setAttribute(LOGIN_PREDICATE_ATTR_NAME, loginFallbackType);
+        request.setAttribute(LOGIN_WAITTIME_ATTR_NAME, loginFailedWaitTime);
         request.setAttribute(LOGOUT_PREDICATE_ATTR_NAME, logoutFallbackType);
         return methods.preHandle(request, response);
     }
@@ -99,6 +114,15 @@ class AuthenticationFilterDelegate {
             saveRequestReferer(rv, WebUtils.toHttp(request), WebUtils.toHttp(response));
         }
         return rv;
+    }
+
+    @SneakyThrows(InterruptedException.class)
+    public boolean onLoginFailure(AuthenticationToken token, AuthenticationException e,
+            ServletRequest request, ServletResponse response) {
+        if (loginFailedWaitTime != 0) {
+            TimeUnit.SECONDS.sleep(loginFailedWaitTime);
+        }
+        return methods.onLoginFailure(token, e, request, response);
     }
 
     /**

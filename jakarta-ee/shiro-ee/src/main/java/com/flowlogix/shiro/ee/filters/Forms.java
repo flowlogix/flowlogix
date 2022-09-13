@@ -15,15 +15,22 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.FORM_AUTH_ATTR_NAME;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_PREDICATE_ATTR_NAME;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_WAITTIME_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SESSION_EXPIRED_PARAMETER;
 import static com.flowlogix.shiro.ee.filters.LogoutFilter.LOGOUT_PREDICATE_ATTR_NAME;
+import java.util.concurrent.TimeUnit;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import static org.apache.shiro.web.filter.authc.FormAuthenticationFilter.DEFAULT_ERROR_KEY_ATTRIBUTE_NAME;
 import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
 import org.omnifaces.util.Faces;
@@ -43,8 +50,40 @@ public class Forms {
     @Named("authc")
     @ApplicationScoped
     public static class AuthenticationMethods {
+        /**
+         * let Shiro filter handle the login,
+         * this method should only get called if login fails
+         * login wait time is handled by Shiro configuration
+         */
         public void login() {
-            Forms.loginFailed();
+            if (Faces.getRequestAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null) {
+                loginFailed();
+            } else if (Faces.<Boolean>getRequestAttribute(FORM_AUTH_ATTR_NAME, () -> Boolean.FALSE)) {
+                redirectToView();
+            } else {
+                throw new IllegalStateException("Not enough context to log in, need username / password");
+            }
+        }
+
+        /**
+         * manual login, zero wait time
+         *
+         * @param username
+         * @param password
+         */
+        public void login(String username, String password) {
+            login(username, password, false);
+        }
+
+        /**
+         * manual login with timeout
+         *
+         * @param username
+         * @param password
+         * @param rememberMe
+         */
+        public void login(String username, String password, boolean rememberMe) {
+            Forms.login(username, password, rememberMe);
         }
 
         public void logout() {
@@ -87,6 +126,27 @@ public class Forms {
      */
     public static void redirectToView() {
         FormResubmitSupport.redirectToView(Faces.getRequest(), Faces.getResponse());
+    }
+
+    /**
+     * manually login, used via {@link PassThruAuthenticationFilter}
+     * @param username
+     * @param password
+     * @param rememberMe
+     */
+    @SneakyThrows(InterruptedException.class)
+    public static void login(String username, String password, boolean rememberMe) {
+        try {
+            SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password, rememberMe));
+            redirectToSaved(Faces.getRequestAttribute(LOGIN_PREDICATE_ATTR_NAME), "");
+        } catch (AuthenticationException e) {
+            Faces.setFlashAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME, e);
+            int loginFailedWaitTime = Faces.getRequestAttribute(LOGIN_WAITTIME_ATTR_NAME);
+            if (loginFailedWaitTime != 0) {
+                TimeUnit.SECONDS.sleep(loginFailedWaitTime);
+            }
+            redirectToView();
+        }
     }
 
     /**

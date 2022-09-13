@@ -20,6 +20,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 
 /**
@@ -41,6 +43,12 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
         @Override
         public boolean isLoginRequest(ServletRequest request, ServletResponse response) {
             return PassThruAuthenticationFilter.super.isLoginRequest(request, response);
+        }
+
+        @Override
+        public boolean onLoginFailure(AuthenticationToken token, AuthenticationException e,
+                ServletRequest request, ServletResponse response) {
+            throw new UnsupportedOperationException();
         }
 
         @Override

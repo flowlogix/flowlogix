@@ -22,6 +22,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import lombok.experimental.Delegate;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
@@ -35,6 +36,8 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_P
  */
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {
     static final String LOGIN_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.login-predicate";
+    static final String LOGIN_WAITTIME_ATTR_NAME = "com.flowlogix.shiro.ee.login-wait-time";
+    static final String FORM_AUTH_ATTR_NAME = "com.flowlogix.shiro.ee.is-form-auth-filter";
     private final @Delegate AuthenticationFilterDelegate delegate;
     static final FallbackPredicate NO_PREDICATE = (path, request) -> false;
 
@@ -50,12 +53,19 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
         }
 
         @Override
+        public boolean onLoginFailure(AuthenticationToken token, AuthenticationException e,
+                ServletRequest request, ServletResponse response) {
+            return FormAuthenticationFilter.super.onLoginFailure(token, e, request, response);
+        }
+
+        @Override
         public String getLoginUrl() {
             return FormAuthenticationFilter.super.getLoginUrl();
         }
 
         @Override
         public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+            request.setAttribute(FORM_AUTH_ATTR_NAME, Boolean.TRUE);
             return FormAuthenticationFilter.super.preHandle(request, response);
         }
     };
@@ -68,7 +78,7 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
     protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
         if (request instanceof HttpServletRequest) {
             FallbackPredicate loginFallbackType = (FallbackPredicate) request.getAttribute(LOGIN_PREDICATE_ATTR_NAME);
-            redirectToSaved(WebUtils.toHttp(request), WebUtils.toHttp(response), loginFallbackType::useFallback, "");
+            redirectToSaved(WebUtils.toHttp(request), WebUtils.toHttp(response), loginFallbackType, "");
         }
         return false;
     }

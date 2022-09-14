@@ -22,6 +22,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import lombok.experimental.Delegate;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 
@@ -55,6 +57,12 @@ public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter
         public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
             return LogoutFilter.super.preHandle(request, response);
         }
+
+        @Override
+        public boolean onLoginFailure(AuthenticationToken token, AuthenticationException e,
+                ServletRequest request, ServletResponse response) {
+            throw new UnsupportedOperationException();
+        }
     }
 
     public LogoutFilter() {
@@ -65,8 +73,7 @@ public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter
     protected void issueRedirect(ServletRequest request, ServletResponse response, String redirectUrl) throws Exception {
         if (request instanceof HttpServletRequest) {
             FallbackPredicate logoutFallbackType = (FallbackPredicate) request.getAttribute(LOGOUT_PREDICATE_ATTR_NAME);
-            Forms.logout(WebUtils.toHttp(request), WebUtils.toHttp(response),
-                    logoutFallbackType::useFallback, redirectUrl);
+            Forms.logout(WebUtils.toHttp(request), WebUtils.toHttp(response), logoutFallbackType, redirectUrl);
         } else {
             super.issueRedirect(request, response, redirectUrl);
         }

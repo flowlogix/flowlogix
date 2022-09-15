@@ -303,7 +303,7 @@ public class FormResubmitSupport {
             try {
                 return (int)Duration.ofMinutes(request.getServletContext().getSessionTimeout()).toSeconds();
             } catch (Throwable e) {
-                // default one hour
+                // workaround for https://github.com/eclipse/jetty.project/issues/8556
                 return (int)Duration.ofHours(1).toSeconds();
             }
         }

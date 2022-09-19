@@ -16,6 +16,12 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.isWebContainerSessions;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderContstants.CONTENT_TYPE;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderContstants.LOCATION;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderContstants.SET_COOKIE;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpResponseCodes.FOUND;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpResponseCodes.OK;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.MediaType.APPLICATION_FORM_URLENCODED;
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import com.flowlogix.shiro.ee.filters.ShiroFilter.WrappedSecurityManager;
 import java.io.IOException;
@@ -44,12 +50,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.HttpMethod;
-import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
-import static javax.ws.rs.core.HttpHeaders.LOCATION;
-import static javax.ws.rs.core.HttpHeaders.SET_COOKIE;
-import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
-import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -86,6 +86,25 @@ public class FormResubmitSupport {
     static final String FORM_IS_RESUBMITTED = "com.flowlogix.form-is-resubmitted";
     static final String DONT_ADD_ANY_MORE_COOKIES = "com.flowlogix.no-more-cookies";
 
+    static class HttpMethod {
+        static final String GET = "GET";
+        static final String POST = "POST";
+    }
+
+    static class HttpHeaderContstants {
+        static final String CONTENT_TYPE = "Content-Type";
+        static final String LOCATION = "Location";
+        static final String SET_COOKIE = "Set-Cookie";
+    }
+
+    static class MediaType {
+        final static String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
+    }
+
+    static class HttpResponseCodes {
+        static final int OK = 200;
+        static final int FOUND = 302;
+    }
 
     static void savePostDataForResubmit(HttpServletRequest request, HttpServletResponse response, String loginUrl) {
         if (isPostRequest(request) && unwrapSecurityManager(SecurityUtils.getSecurityManager())
@@ -354,7 +373,7 @@ public class FormResubmitSupport {
     private static String processResubmitResponse(HttpResponse<String> response,
             HttpServletRequest originalRequest, HttpServletResponse originalResponse,
             HttpHeaders headers, String savedRequest, ServletContext servletContext) throws IOException {
-        switch (Response.Status.fromStatusCode(response.statusCode())) {
+        switch (response.statusCode()) {
             case FOUND:
                 // can't use Faces.redirect() here
                 originalResponse.setStatus(response.statusCode());
@@ -426,7 +445,7 @@ public class FormResubmitSupport {
             throws IOException, InterruptedException {
         var getRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest)).GET().build();
         HttpResponse<String> htmlResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
-        if (htmlResponse.statusCode() == Response.Status.OK.getStatusCode()) {
+        if (htmlResponse.statusCode() == OK) {
             savedFormData = extractJSFNewViewState(htmlResponse.body(), savedFormData);
         }
         return savedFormData;

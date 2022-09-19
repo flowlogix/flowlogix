@@ -52,6 +52,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TypeConverter {
+    private static final MethodHandles.Lookup publicLookup = MethodHandles.publicLookup();
     private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
     private static final Map<Class<?>, MethodHandle> valueOfMethod = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Function<String, Result>> info = Map.ofEntries(
@@ -218,7 +219,8 @@ public class TypeConverter {
         try {
             MethodHandle method = valueOfMethod.computeIfAbsent(type, (k) -> {
                 try {
-                    return lookup.findStatic(type, methodName, MethodType.methodType(resultType, stringArgType));
+                    return (resultType.isEnum() ? lookup : publicLookup)
+                            .findStatic(type, methodName, MethodType.methodType(resultType, stringArgType));
                 } catch (ReflectiveOperationException ex) {
                     throw Lombok.sneakyThrow(ex);
                 }

@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>5.x-SNAPSHOT</version>
+    <version>5.0-M3</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Utility Library Root POM</description>
@@ -452,7 +452,7 @@
         <url>https://github.com/flowlogix/flowlogix</url>
         <connection>scm:git:git@github.com:flowlogix/flowlogix.git</connection>
         <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>Version-5.0-M3</tag>
     </scm>
 
     <distributionManagement>

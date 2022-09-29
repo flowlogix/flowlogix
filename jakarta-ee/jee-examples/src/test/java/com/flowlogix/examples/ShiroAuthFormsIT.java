@@ -321,6 +321,16 @@ public class ShiroAuthFormsIT {
                 secondFormMessages.getText());
     }
 
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void alreadyLoggedIn() {
+        webDriver.get(baseURL + "shiro/form");
+        login();
+        webDriver.get(baseURL + "shiro/auth/loginform");
+        login();
+        assertEquals("Index", webDriver.getTitle());
+    }
+
     private void login() {
         username.sendKeys("webuser");
         password.sendKeys("webpwd");

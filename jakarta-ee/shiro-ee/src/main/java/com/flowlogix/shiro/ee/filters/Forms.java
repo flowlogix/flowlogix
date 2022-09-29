@@ -57,6 +57,8 @@ public class Forms {
         public void login() {
             if (isLoginFailure()) {
                 loginFailed();
+            } else if (isLoggedIn()) {
+                redirectToView(Faces.getRequestAttribute(LOGOUT_PREDICATE_ATTR_NAME), "");
             } else {
                 throw new IllegalStateException("Not enough context to log in, need username / password");
             }
@@ -124,6 +126,10 @@ public class Forms {
      */
     public static void redirectToView() {
         FormResubmitSupport.redirectToView(Faces.getRequest(), Faces.getResponse());
+    }
+
+    private static void redirectToView(FallbackPredicate useFallbackPath, String fallbackPath) {
+        FormResubmitSupport.redirectToView(Faces.getRequest(), Faces.getResponse(), useFallbackPath, fallbackPath);
     }
 
     /**

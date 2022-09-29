@@ -58,7 +58,7 @@ public class Forms {
             if (isLoginFailure()) {
                 loginFailed();
             } else if (isLoggedIn()) {
-                redirectToView(Faces.getRequestAttribute(LOGOUT_PREDICATE_ATTR_NAME), "");
+                redirectIfLoggedIn();
             } else {
                 throw new IllegalStateException("Not enough context to log in, need username / password");
             }
@@ -91,6 +91,14 @@ public class Forms {
 
         public boolean isLoggedIn() {
             return Forms.isLoggedIn();
+        }
+
+        public void redirectIfLoggedIn() {
+            redirectToView(Faces.getRequestAttribute(LOGOUT_PREDICATE_ATTR_NAME), "");
+        }
+
+        public void redirectIfLoggedIn(String view) {
+            redirectToView(Faces.getRequestAttribute(LOGOUT_PREDICATE_ATTR_NAME), view);
         }
 
         public boolean isSessionExpired() {
@@ -128,7 +136,7 @@ public class Forms {
         FormResubmitSupport.redirectToView(Faces.getRequest(), Faces.getResponse());
     }
 
-    private static void redirectToView(FallbackPredicate useFallbackPath, String fallbackPath) {
+    public static void redirectToView(FallbackPredicate useFallbackPath, String fallbackPath) {
         FormResubmitSupport.redirectToView(Faces.getRequest(), Faces.getResponse(), useFallbackPath, fallbackPath);
     }
 

@@ -467,7 +467,8 @@ public class FormResubmitSupport {
     }
 
     static String noJSFAjaxRequests(String savedFormData) {
-        return PARTIAL_REQUEST_PATTERN.matcher(savedFormData).replaceAll("");
+        return PARTIAL_REQUEST_PATTERN.matcher(savedFormData).replaceAll("")
+                .replaceFirst("^\\&", "");
     }
 
     static boolean isJSFStatefulForm(@NonNull String savedFormData) {

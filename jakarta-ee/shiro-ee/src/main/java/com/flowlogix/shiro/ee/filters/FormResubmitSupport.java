@@ -80,6 +80,7 @@ public class FormResubmitSupport {
     private static final String PARTIAL_VIEW = "javax.faces.partial";
     private static final Pattern PARTIAL_REQUEST_PATTERN
             = Pattern.compile(String.format("[\\&]?%s.\\w+=[\\w\\s:%%\\d]*", PARTIAL_VIEW));
+    private static final Pattern INITIAL_AMPERSAND = Pattern.compile("^\\&");
     private static final String FORM_DATA_CACHE = "com.flowlogix.form-data-cache";
     static final String SHIRO_FORM_DATA_KEY = "com.flowlogix.form-data-key";
     static final String SESSION_EXPIRED_PARAMETER = "com.flowlogix.sessionExpired";
@@ -333,7 +334,7 @@ public class FormResubmitSupport {
             ServletContext servletContext, boolean rememberedAjaxResubmit)
             throws InterruptedException, URISyntaxException, IOException {
         log.debug("saved form data: {}", savedFormData);
-        HttpClient client = buildHttpClient(savedRequest, servletContext);
+        HttpClient client = buildHttpClient(savedRequest, servletContext, originalRequest);
         String decodedFormData = parseFormData(savedFormData, savedRequest, client, servletContext);
         HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest))
                 .POST(HttpRequest.BodyPublishers.ofString(decodedFormData))
@@ -379,10 +380,10 @@ public class FormResubmitSupport {
                 originalResponse.setStatus(response.statusCode());
                 originalResponse.setHeader(LOCATION, response.headers().firstValue(LOCATION).orElseThrow());
             case OK:
-                // do not duplicate the session cookie
+                // do not duplicate the session cookie(s)
                 transformCookieHeader(headers.allValues(SET_COOKIE))
                         .entrySet().stream().filter(not(entry -> entry.getKey()
-                        .equals(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()))))
+                        .startsWith(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()))))
                         .forEach(entry -> addCookie(originalResponse, servletContext,
                                 entry.getKey(), entry.getValue(), -1));
                 originalResponse.getWriter().append(response.body());
@@ -401,12 +402,21 @@ public class FormResubmitSupport {
                 .collect(Collectors.toMap(k -> k[0], v -> (v.length > 1) ? v[1] : ""));
     }
 
-    private static HttpClient buildHttpClient(String savedRequest, ServletContext servletContext) throws URISyntaxException {
+    private static HttpClient buildHttpClient(String savedRequest, ServletContext servletContext,
+            HttpServletRequest originalRequest) throws URISyntaxException {
         CookieManager cookieManager = new CookieManager();
-        HttpCookie cookie = new HttpCookie(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()),
-                SecurityUtils.getSubject().getSession().getId().toString());
-        cookie.setPath(servletContext.getContextPath());
-        cookieManager.getCookieStore().add(new URI(savedRequest), cookie);
+        var session = SecurityUtils.getSubject().getSession();
+        var sessionCookieName = getSessionCookieName(servletContext, SecurityUtils.getSecurityManager());
+        var sessionCookie = new HttpCookie(sessionCookieName, session.getId().toString());
+        sessionCookie.setPath(servletContext.getContextPath());
+        cookieManager.getCookieStore().add(new URI(savedRequest), sessionCookie);
+        for (Cookie origCookie : originalRequest.getCookies()) {
+            if (!origCookie.getName().equals(sessionCookieName)) {
+                HttpCookie cookie = new HttpCookie(origCookie.getName(), origCookie.getValue());
+                cookie.setPath(servletContext.getContextPath());
+                cookieManager.getCookieStore().add(new URI(savedRequest), cookie);
+            }
+        }
         return HttpClient.newBuilder().cookieHandler(cookieManager).build();
     }
 
@@ -467,8 +477,8 @@ public class FormResubmitSupport {
     }
 
     static String noJSFAjaxRequests(String savedFormData) {
-        return PARTIAL_REQUEST_PATTERN.matcher(savedFormData).replaceAll("")
-                .replaceFirst("^\\&", "");
+        return INITIAL_AMPERSAND.matcher(PARTIAL_REQUEST_PATTERN
+                .matcher(savedFormData).replaceAll("")).replaceFirst("");
     }
 
     static boolean isJSFStatefulForm(@NonNull String savedFormData) {

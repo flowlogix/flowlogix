@@ -291,7 +291,7 @@ public class FormResubmitSupport {
         }
     }
 
-    private static boolean hasFacesContext() {
+    static boolean hasFacesContext() {
         try {
             return Faces.hasContext();
         } catch (Throwable e) {

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-fragment xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-fragment_4_0.xsd"
+              version="4.0">
+    <resource-ref>
+        <res-ref-name>jsf/ProjectStage</res-ref-name>
+        <res-type>java.lang.String</res-type>
+    </resource-ref>
+    <context-param>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+    </context-param>
+
+    <!-- PrimeFaces fonts -->
+    <mime-mapping>
+        <extension>ttf</extension>
+        <mime-type>application/octet-stream</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff</extension>
+        <mime-type>application/octet-stream</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff2</extension>
+        <mime-type>application/octet-stream</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>eot</extension>
+        <mime-type>application/octet-stream</mime-type>
+    </mime-mapping>
+</web-fragment>

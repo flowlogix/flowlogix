@@ -27,10 +27,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
-        <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
-        <docs.phase>deploy</docs.phase>
         <payara.start.skip>${skipITs}</payara.start.skip>
+
+        <docs.phase>deploy</docs.phase>
+        <release.profile>release-flowlogix-to-central</release.profile>
+        <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
+        <staging.server>flowlogix-maven-central</staging.server>
+        <nexus.url>https://oss.sonatype.org/</nexus.url>
+        <skip.staging>false</skip.staging>
         <auto.release>true</auto.release>
+
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>5.2022.3</payara.version>
         <groovy.version>4.0.5</groovy.version>
@@ -299,7 +305,7 @@
                         <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
                         <preparationGoals>validate</preparationGoals>
-                        <releaseProfiles>release-flowlogix-prod</releaseProfiles>
+                        <releaseProfiles>${release.profile}</releaseProfiles>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>
                     </configuration>
                 </plugin>
@@ -309,9 +315,10 @@
                     <version>1.6.13</version>
                     <extensions>true</extensions>
                     <configuration>
-                        <serverId>flowlogix-maven-central</serverId>
-                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                        <serverId>${staging.server}</serverId>
+                        <nexusUrl>${nexus.url}</nexusUrl>
                         <autoReleaseAfterClose>${auto.release}</autoReleaseAfterClose>
+                        <skipStaging>${skip.staging}</skipStaging>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -408,7 +415,7 @@
             </build>
         </profile>
         <profile>
-            <id>release-flowlogix-prod</id>
+            <id>release-flowlogix-to-central</id>
             <properties>
                 <docs.phase>package</docs.phase>
             </properties>
@@ -419,6 +426,27 @@
                     </plugin>
                 </plugins>
             </build>
+            <distributionManagement>
+                <repository>
+                    <id>${staging.server}</id>
+                    <url>${nexus.url}service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>release-flowlogix-to-hope</id>
+            <properties>
+                <docs.phase>package</docs.phase>
+                <staging.server>hope-nexus-artifacts</staging.server>
+                <nexus.url>https://nexus.hope.nyc.ny.us/</nexus.url>
+                <skip.staging>true</skip.staging>
+            </properties>
+            <distributionManagement>
+                <repository>
+                    <id>${staging.server}</id>
+                    <url>${nexus.url}repository/maven-releases</url>
+                </repository>
+            </distributionManagement>
         </profile>
         <profile>
             <id>jdk11plus</id>
@@ -456,10 +484,6 @@
     </scm>
 
     <distributionManagement>
-        <repository>
-            <id>flowlogix-maven-central</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
         <snapshotRepository>
             <id>flowlogix-maven-central</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>

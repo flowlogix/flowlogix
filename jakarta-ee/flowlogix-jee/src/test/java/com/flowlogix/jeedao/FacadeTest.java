@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,8 @@ public class FacadeTest {
                 .entityManagerSupplier(() -> em)
                 .build();
 
-        public MyControl() {
+        @SuppressWarnings("MagicNumber")
+        MyControl() {
             when(em.find(facade.getEntityClass(), 1L)).thenReturn(5);
         }
 
@@ -50,7 +51,7 @@ public class FacadeTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "MagicNumber"})
     void usage() {
         assertEquals(5, new MyControl().find(1L));
         when(em.createQuery(any(CriteriaQuery.class)).getResultList()).thenReturn(Arrays.asList(1, 2));

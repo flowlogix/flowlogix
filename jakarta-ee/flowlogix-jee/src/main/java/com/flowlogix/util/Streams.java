@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Read String from Stream
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
  *
  * @author lprimak
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("HideUtilityClassConstructor")
 public class Streams {
     public static String readString(InputStream strm) throws IOException {
         return new BufferedReader(new InputStreamReader(strm)).lines()

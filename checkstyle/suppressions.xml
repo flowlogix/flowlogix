@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-  ~ Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+  ~ Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,4 +22,13 @@
 
 <!-- See https://github.com/hazelcast/hazelcast/blob/master/checkstyle/suppressions.xml for examples -->
 <suppressions>
+    <!-- do not require package-info.java -->
+    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]PackageMarker"/>
+    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]ui[\\/]*"/>
+    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]util[\\/]*"/>
+    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]jeedao[\\/]*"/>
+    <suppress checks="JavadocPackage" files="org[\\/]omnifaces[\\/]util[\\/]*"/>
+
+    <suppress checks="JavadocVariable" lines="46-49" files="com[\\/]flowlogix[\\/]util[\\/]ShrinkWrapManipulator"/>
+    <suppress checks="ConstantName" lines="59-62" files="com[\\/]flowlogix[\\/]util[\\/]TypeConverter"/>
 </suppressions>

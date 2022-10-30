@@ -40,6 +40,11 @@
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>5.2022.3</payara.version>
         <groovy.version>4.0.6</groovy.version>
+
+        <!-- checkstyle -->
+        <checkstyle.configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
+        <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
+        <checkstyle.headerLocation>${flowlogix.basedir}/checkstyle/header.txt</checkstyle.headerLocation>
     </properties>
 
     <modules>
@@ -168,6 +173,39 @@
             <plugin>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>checkstyle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configLocation>${checkstyle.configLocation}</configLocation>
+                    <suppressionsLocation>${checkstyle.supressionsLocation}</suppressionsLocation>
+                    <headerLocation>${checkstyle.headerLocation}</headerLocation>
+                    <enableRSS>false</enableRSS>
+                    <linkXRef>true</linkXRef>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <failOnViolation>true</failOnViolation>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <enableRulesSummary>true</enableRulesSummary>
+                    <propertyExpansion>flowlogix.basedir=${flowlogix.basedir}</propertyExpansion>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>10.3.4</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
 
@@ -341,6 +379,14 @@
             </plugins>
         </pluginManagement>
     </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>3.3.0</version>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <profiles>
         <profile>
@@ -373,46 +419,6 @@
             <properties>
                 <test_groups>any()</test_groups>
             </properties>
-        </profile>
-        <profile>
-            <id>checkstyle</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                        <version>3.2.0</version>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>checkstyle</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</configLocation>
-                            <suppressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</suppressionsLocation>
-                            <headerLocation>${flowlogix.basedir}/checkstyle/ClassHeader.txt</headerLocation>
-                            <enableRSS>false</enableRSS>
-                            <linkXRef>true</linkXRef>
-                            <consoleOutput>true</consoleOutput>
-                            <failsOnError>true</failsOnError>
-                            <failOnViolation>true</failOnViolation>
-                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                            <enableRulesSummary>true</enableRulesSummary>
-                            <propertyExpansion>flowlogix.basedir=${flowlogix.basedir}</propertyExpansion>
-                        </configuration>
-                        <dependencies>
-                            <dependency>
-                                <groupId>com.puppycrawl.tools</groupId>
-                                <artifactId>checkstyle</artifactId>
-                                <version>10.3.4</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>release-flowlogix-to-central</id>

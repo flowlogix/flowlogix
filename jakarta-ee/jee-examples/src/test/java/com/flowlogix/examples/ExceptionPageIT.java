@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ public class ExceptionPageIT {
     @Drone
     private WebDriver webDriver;
 
+    @SuppressWarnings("DeclarationOrder")
     @ArquillianResource
     protected URL baseURL;
 
@@ -169,11 +170,12 @@ public class ExceptionPageIT {
         versions("end of page - minimized");
     }
 
+    @SuppressWarnings("MagicNumber")
     private void versions(String expected) {
         assertEquals(expected, endOfPage.getText());
         List<WebElement> scripts = webDriver.findElements(By.tagName("script"));
         int count = 0;
-        for(WebElement script : scripts) {
+        for (WebElement script : scripts) {
             String href = script.getAttribute("src");
             if (StringUtils.isBlank(href)) {
                 continue;
@@ -185,7 +187,7 @@ public class ExceptionPageIT {
 
         count = 0;
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));
-        for(WebElement css : csses) {
+        for (WebElement css : csses) {
             String href = css.getAttribute("href");
             if (StringUtils.isBlank(href)) {
                 continue;

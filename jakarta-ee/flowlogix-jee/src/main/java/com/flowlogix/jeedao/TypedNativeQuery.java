@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,32 +37,32 @@ public class TypedNativeQuery {
     private final Query q;
 
     /**
-     * @param <T> return type
+     * @param <TT> return type
      * @see Query#getSingleResult()
      * @return single result
      */
     @SuppressWarnings("unchecked")
-    public <T> T getSingleResult() {
-        return (T) q.getSingleResult();
+    public <TT> TT getSingleResult() {
+        return (TT) q.getSingleResult();
     }
 
     /**
-     * @param <T> return type
+     * @param <TT> return type
      * @see Query#getResultList()
      * @return result list
      */
     @SuppressWarnings("unchecked")
-    public<T> List<T> getResultList() {
+    public <TT> List<TT> getResultList() {
         return q.getResultList();
     }
 
     /**
-     * @param <T> return type
+     * @param <TT> return type
      * @see Query#getResultStream()
      * @return result stream
      */
     @SuppressWarnings("unchecked")
-    public<T> Stream<T> getResultStream() {
+    public <TT> Stream<TT> getResultStream() {
         return q.getResultStream();
     }
 }

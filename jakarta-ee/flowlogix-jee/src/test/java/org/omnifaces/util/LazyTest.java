@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,12 @@ public class LazyTest {
         cheap.forEach(ii -> IntStream.rangeClosed(1, numThreads)
                 .forEach(iter -> exec.submit(() -> ii.get())));
         exec.shutdown();
-        exec.awaitTermination(10, TimeUnit.SECONDS);
+        await(exec);
         assertEquals(numInstances, numCreations.get());
+    }
+
+    @SuppressWarnings("MagicNumber")
+    private void await(ExecutorService exec) throws InterruptedException {
+        exec.awaitTermination(10, TimeUnit.SECONDS);
     }
 }

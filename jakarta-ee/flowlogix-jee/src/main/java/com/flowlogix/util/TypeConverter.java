@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,10 @@ import java.util.Map;
 import static java.util.Map.entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Lombok;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +53,8 @@ import lombok.extern.slf4j.Slf4j;
  * @author lprimak
  */
 @Slf4j
+@SuppressWarnings("HideUtilityClassConstructor")
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TypeConverter {
     private static final MethodHandles.Lookup publicLookup = MethodHandles.publicLookup();
     private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -83,23 +87,23 @@ public class TypeConverter {
         private final Class<?> stringArgType;
         private final Object actualResult;
 
-        public Result(String value, Class<?> resultType) {
+        Result(String value, Class<?> resultType) {
             this(value, resultType, "valueOf", resultType);
         }
 
-        public Result(String value, Class<?> resultType, String method, Class<?> classToCall) {
+        Result(String value, Class<?> resultType, String method, Class<?> classToCall) {
             this(value, resultType, method, classToCall, String.class, null);
         }
 
-        public Result(String value, String method, Class<?> stringArgType, Class<?> resultType) {
+        Result(String value, String method, Class<?> stringArgType, Class<?> resultType) {
             this(value, resultType, method, resultType, stringArgType, null);
         }
 
-        public Result(Object actualResult) {
+        Result(Object actualResult) {
             this(null, null, null, null, null, actualResult);
         }
 
-        public Result(String value, Class<?> resultType, String method, Class<?> classToCall,
+        Result(String value, Class<?> resultType, String method, Class<?> classToCall,
                 Class<?> stringArgType, Object actualResult) {
             this.value = value;
             this.resultType = resultType;
@@ -225,12 +229,13 @@ public class TypeConverter {
                     throw Lombok.sneakyThrow(ex);
                 }
             });
-            return (TT)method.invoke(strValue);
-        } catch(Throwable thr) {
+            return (TT) method.invoke(strValue);
+        } catch (Throwable thr) {
             throw Lombok.sneakyThrow(thr);
         }
     }
 
+    @SuppressWarnings("MissingSwitchDefault")
     private static String processNumbers(String strValue) {
         switch (strValue) {
             case "nan":

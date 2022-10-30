@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TypeConverterTest {
     @Test
+    @SuppressWarnings("MagicNumber")
     void natives() {
         assertEquals(20, TypeConverter.valueOf("20", Integer.class));
         assertEquals(20, TypeConverter.valueOf("20", int.class));
@@ -37,8 +38,8 @@ public class TypeConverterTest {
         assertEquals(20.0f, TypeConverter.valueOf("20.0", float.class));
         assertEquals(20.0d, TypeConverter.valueOf("20.0", double.class));
         assertEquals(20.0d, TypeConverter.valueOf("20.0", Double.class));
-        assertEquals((short)20, TypeConverter.valueOf("20", Short.class));
-        assertEquals((short)20, TypeConverter.valueOf("20", short.class));
+        assertEquals((short) 20, TypeConverter.valueOf("20", Short.class));
+        assertEquals((short) 20, TypeConverter.valueOf("20", short.class));
     }
 
     @Test

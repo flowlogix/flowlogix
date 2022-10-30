@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ public class ShiroAuthFormsIT {
     @Drone
     private WebDriver webDriver;
 
+    @SuppressWarnings("DeclarationOrder")
     @ArquillianResource
     protected URL baseURL;
 
@@ -169,8 +170,8 @@ public class ShiroAuthFormsIT {
             rememberMe.click();
         }
         login();
-        webDriver.manage().deleteCookieNamed(isShiroNativeSessionsIntegrationTest() ?
-                "native_session_cookie" : DEFAULT_SESSION_ID_NAME);
+        webDriver.manage().deleteCookieNamed(isShiroNativeSessionsIntegrationTest()
+                ? "native_session_cookie" : DEFAULT_SESSION_ID_NAME);
         webDriver.navigate().refresh();
         assertEquals("Protected Page", webDriver.getTitle());
         guardHttp(logout).click();

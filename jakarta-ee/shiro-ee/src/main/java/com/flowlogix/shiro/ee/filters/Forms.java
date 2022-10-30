@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
@@ -42,6 +44,8 @@ import org.omnifaces.util.Faces;
  * @author lprimak
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("HideUtilityClassConstructor")
 public class Forms {
     /**
      * JSF access points
@@ -109,8 +113,8 @@ public class Forms {
         }
 
         public boolean isLoginFailure() {
-            return Faces.getRequestAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null ||
-                    Faces.getFlashAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null;
+            return Faces.getRequestAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null
+                    || Faces.getFlashAttribute(DEFAULT_ERROR_KEY_ATTRIBUTE_NAME) != null;
         }
     }
 

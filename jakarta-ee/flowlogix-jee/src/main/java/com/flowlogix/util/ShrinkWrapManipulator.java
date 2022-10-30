@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,10 +54,11 @@ public class ShrinkWrapManipulator {
         private final Consumer<Node> func;
     }
 
+    @SuppressWarnings("ConstantName")
+    private static final @Getter List<Action> standardActions = initializeStandardActions();
+
     private final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
     private final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
-
-    private static final @Getter List<Action> standardActions = initializeStandardActions();
 
     /**
      * modified web.xml according to xpath and method
@@ -68,7 +69,7 @@ public class ShrinkWrapManipulator {
     @SneakyThrows
     public void webXmlXPath(WebArchive archive, List<Action> actions) {
         Document webXml;
-        try ( InputStream strm = archive.get("WEB-INF/web.xml").getAsset().openStream()) {
+        try (InputStream strm = archive.get("WEB-INF/web.xml").getAsset().openStream()) {
             webXml = builder.get().parse(strm);
         }
         var xpath = XPathFactory.newInstance().newXPath();
@@ -96,6 +97,7 @@ public class ShrinkWrapManipulator {
         if (httpUrl.getProtocol().endsWith("//")) {
             return httpUrl;
         }
+        @SuppressWarnings("MagicNumber")
         int sslPort = Integer.getInteger("sslPort", 8181);
         return new URL(httpUrl.getProtocol() + "s", httpUrl.getHost(), sslPort, httpUrl.getFile());
     }

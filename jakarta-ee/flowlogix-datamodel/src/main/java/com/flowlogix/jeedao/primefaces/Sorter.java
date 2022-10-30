@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,11 +37,7 @@ public interface Sorter<TT> {
      * @author lprimak
      */
     @Getter
-    public class SortData {
-        public SortData(Map<String, SortMeta> sm) {
-            sortMeta = new HashMap<>(sm);
-        }
-
+    class SortData {
         /**
          * Sort based on fields
          */
@@ -50,6 +46,10 @@ public interface Sorter<TT> {
          * global sort order added by the client
          */
         private final List<Order> sortOrder = new ArrayList<>();
+
+        public SortData(Map<String, SortMeta> sm) {
+            sortMeta = new HashMap<>(sm);
+        }
     }
 
     /**

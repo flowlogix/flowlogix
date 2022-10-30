@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,11 +45,12 @@ public class DataModelIT {
     @Drone
     private WebDriver webDriver;
 
+    @SuppressWarnings("DeclarationOrder")
     @ArquillianResource
     protected URL baseURL;
 
     @FindBy(id = "model1")
-    private WebElement first_table;
+    private WebElement firstTable;
 
     @FindBy(id = "model1:fullNameHeader:filter")
     private WebElement fullNameFilterInput;
@@ -71,7 +72,7 @@ public class DataModelIT {
         // sort
         guardAjax(userIdHeader.findElement(By.className("ui-column-title"))).click();
         assertEquals("anya", firstRowUserId.getText());
-        WebElement scrollable = first_table.findElement(By.className("ui-datatable-scrollable-body"));
+        WebElement scrollable = firstTable.findElement(By.className("ui-datatable-scrollable-body"));
         ((JavascriptExecutor) webDriver)
                 .executeScript("arguments[0].scroll(0, 500);", scrollable);
         ((JavascriptExecutor) webDriver)

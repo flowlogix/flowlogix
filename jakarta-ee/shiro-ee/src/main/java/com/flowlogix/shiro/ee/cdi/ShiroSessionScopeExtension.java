@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,9 @@ import org.apache.shiro.session.SessionListener;
  *
  * @author lprimak
  */
-public class ShiroSessionScopeExtension implements Extension, Serializable
-{
+public class ShiroSessionScopeExtension implements Extension, Serializable {
+    private static final long serialVersionUID = 1L;
+    @SuppressWarnings("ConstantName")
     private static final List<ShiroScopeContext> contexts = Stream.of(
             new ShiroScopeContext(ShiroSessionScoped.class, SessionScoped.class),
             new ShiroScopeContext(ShiroFacesViewScoped.class, javax.faces.view.ViewScoped.class),
@@ -112,17 +113,12 @@ public class ShiroSessionScopeExtension implements Extension, Serializable
                 Set.of(OmniViewScopedAnnotated.class.getDeclaredAnnotations()[0])));
     }
 
-    void addScope(@Observes final BeforeBeanDiscovery event)
-    {
+    void addScope(@Observes final BeforeBeanDiscovery event) {
         contexts.forEach(ctx -> event.addScope(ctx.getScope(), true, true));
     }
 
 
-    void registerContext(@Observes final AfterBeanDiscovery event)
-    {
+    void registerContext(@Observes final AfterBeanDiscovery event) {
         contexts.forEach(event::addContext);
     }
-
-
-    private static final long serialVersionUID = 1L;
 }

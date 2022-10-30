@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,23 +22,22 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author lprimak
  */
-public class LogCapture {
-    private static final LogCapture instance = new LogCapture();
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class LogCapture {
+    private static final LogCapture INSTANCE = new LogCapture();
     private static final Logger GLOBAL_LOGGER = Logger.getLogger("");
 
     private final AtomicReference<LoggingHandler> handler = new AtomicReference<>();
 
     public static LogCapture get() {
-        return instance;
-    }
-
-    private LogCapture() {
-        // nothing
+        return INSTANCE;
     }
 
     public void setupLogging(int capacity) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ public class DaoHelper<TT, KT> {
         return buildQueryCriteria(entityClass);
     }
 
-    public<RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls) {
+    public <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls) {
         CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
         CriteriaQuery<RR> cq = cb.createQuery(cls);
         return new QueryCriteria<>(cb, cq.from(cls), cq);

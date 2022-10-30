@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ import org.omnifaces.cdi.ViewScoped;
 public class ProtectedOmniViewScopedBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final AtomicInteger instanceCount = new AtomicInteger();
-    private final int count = instanceCount.incrementAndGet();
+    private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger();
+    private final int count = INSTANCE_COUNT.incrementAndGet();
 
     @PostConstruct
     void postConstruct() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,14 +40,12 @@ public class UserViewerOmni implements Serializable {
     private EntityManager em;
     @Inject
     private UserService service;
-
+    private @Getter PagedDataModel<UserEntity> lazyModel;
 
     public String getUsers() {
         return em.createQuery("select u from UserEntity u", UserEntity.class).getResultStream()
                 .map(UserEntity::getFullName).collect(Collectors.joining(", "));
     }
-
-    private @Getter PagedDataModel<UserEntity> lazyModel;
 
     @PostConstruct
     public void init() {

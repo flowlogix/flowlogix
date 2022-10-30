@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,18 +54,6 @@ import org.primefaces.model.SortMeta;
 @Slf4j
 public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     /**
-     * prevent from direct construction
-     */
-    JPAModelImpl() {
-        super(null, null);
-        this.converter = null;
-        this.filter = null;
-        this.sorter = null;
-        this.optimizer = null;
-        this.caseSensitiveQuery = false;
-    }
-
-    /**
      * convert String key into {@link KK} object
      */
     private final @Getter @NonNull Function<String, KK> converter;
@@ -91,6 +79,17 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     @Default
     private final @Getter boolean caseSensitiveQuery = true;
 
+    /**
+     * prevent from direct construction
+     */
+    JPAModelImpl() {
+        super(null, null);
+        this.converter = null;
+        this.filter = null;
+        this.sorter = null;
+        this.optimizer = null;
+        this.caseSensitiveQuery = false;
+    }
 
     int count(Map<String, FilterMeta> filters) {
         return super.count(Parameters.<TT>builder()
@@ -143,13 +142,12 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                         cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
                         if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
                             @SuppressWarnings({"unchecked", "rawtypes"})
-                            Comparable<? super Comparable> cv = (Comparable)value;
+                            Comparable<? super Comparable> cv = (Comparable) value;
                             cond = predicateFromFilterComparable(cb, root.get(key), filterMeta, cv);
                         }
                     }
                 }
-            }
-            catch(IllegalArgumentException e) { /* ignore possibly extra filter fields */}
+            } catch (IllegalArgumentException e) { /* ignore possibly extra filter fields */ }
             predicates.put(key, new FilterData(value, cond));
         });
         filter.filter(predicates, cb, root);
@@ -161,7 +159,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         private final Expression<String> expression;
         private final String value;
 
-        public ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
+        ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
             if (caseSensitiveQuery) {
                 this.expression = expression.as(String.class);
                 this.value = value.toString();
@@ -172,6 +170,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         }
     }
 
+    @SuppressWarnings({"CyclomaticComplexity", "ReturnCount", "MissingSwitchDefault"})
     private Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
             FilterMeta filter, Object filterValue) {
         var stringExpression = new Lazy<>(() -> new ExpressionEvaluator(cb, expression, filterValue));
@@ -208,9 +207,9 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         return null;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb, Expression objectExpression,
-            FilterMeta filter, TC filterValue) {
+    @SuppressWarnings({"unchecked", "rawtypes", "MissingSwitchDefault"})
+    private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
+            Expression objectExpression, FilterMeta filter, TC filterValue) {
         switch (filter.getMatchMode()) {
             case LESS_THAN:
                 return cb.lessThan(objectExpression, filterValue);
@@ -230,7 +229,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
 
         List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);
         List<Order> rv = new ArrayList<>();
-        if(appendSortOder) {
+        if (appendSortOder) {
             rv.addAll(sortMetaOrdering);
             rv.addAll(sortData.getSortOrder());
         } else {
@@ -240,10 +239,11 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         return rv;
     }
 
+    @SuppressWarnings("MissingSwitchDefault")
     private List<Order> processSortMeta(Map<String, SortMeta> sortMeta, CriteriaBuilder cb, Root<TT> root) {
         List<Order> sortMetaOrdering = new ArrayList<>();
         sortMeta.forEach((field, order) -> {
-            switch(order.getOrder()) {
+            switch (order.getOrder()) {
                 case ASCENDING:
                     sortMetaOrdering.add(cb.asc(root.get(order.getField())));
                     break;

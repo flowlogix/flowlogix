@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,27 +29,23 @@ import lombok.experimental.Delegate;
  * @author lprimak
  * @param <T> type of annotated class
  */
-class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
-{
+class AnnotatedTypeWrapper<T> implements AnnotatedType<T> {
     // the below is so the compiler doesn't complain about unchecked casts
     private abstract class AT implements AnnotatedType<T> { }
     private final @Delegate(types = AT.class) AnnotatedType<T> wrapped;
     private final @Getter Set<Annotation> annotations;
 
 
-    AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations)
-    {
+    AnnotatedTypeWrapper(AnnotatedType<T> wrapped, Annotation... additionalAnnotations) {
         this(wrapped, true, Set.of(additionalAnnotations), Set.of());
     }
 
 
     AnnotatedTypeWrapper(AnnotatedType<T> wrapped, boolean keepOriginalAnnotations,
-            Set<Annotation> additionalAnnotations, Set<Annotation> annotationsToRemove)
-    {
+            Set<Annotation> additionalAnnotations, Set<Annotation> annotationsToRemove) {
         this.wrapped = wrapped;
         Stream.Builder<Annotation> builder = Stream.builder();
-        if(keepOriginalAnnotations)
-        {
+        if (keepOriginalAnnotations) {
             var annotationTypesToExclude = annotationsToRemove.stream()
                     .map(AnnotatedTypeWrapper::checkIfAnnotation)
                     .map(Annotation::annotationType).collect(Collectors.toSet());
@@ -62,8 +58,7 @@ class AnnotatedTypeWrapper<T> implements AnnotatedType<T>
     }
 
     @Override
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationType)
-    {
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
         return annotations.stream().anyMatch(annotation -> annotationType.isInstance(annotation));
     }
 

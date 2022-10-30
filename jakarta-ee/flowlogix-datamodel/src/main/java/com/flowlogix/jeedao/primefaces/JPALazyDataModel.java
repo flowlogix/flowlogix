@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param builder
      * @return newly-created data model
      */
-    public static<TT, KK, FF extends Function<JPAModelImplBuilder<TT, KK, ?, ?>,
+    public static <TT, KK, FF extends Function<JPAModelImplBuilder<TT, KK, ?, ?>,
         JPAModelImpl<TT, KK>> & Serializable> JPALazyDataModel<TT, KK> create(FF builder) {
         @SuppressWarnings("unchecked")
         JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
@@ -96,7 +96,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param element element to be replace
      * @param fp lambda to get the new Filter predicate
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "EmptyBlock"})
     public static <TT> void replaceFilter(Map<String, FilterData> filters, String element,
             BiFunction<Predicate, TT, Predicate> fp) {
         FilterData elt = filters.get(element);

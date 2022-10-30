@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_P
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {
     static final String LOGIN_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.login-predicate";
     static final String LOGIN_WAITTIME_ATTR_NAME = "com.flowlogix.shiro.ee.login-wait-time";
-    private final @Delegate AuthenticationFilterDelegate delegate;
     static final FallbackPredicate NO_PREDICATE = (path, request) -> false;
+    private final @Delegate AuthenticationFilterDelegate delegate;
 
     private class Methods implements MethodsFromFilter {
         @Override
@@ -73,7 +73,8 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
     }
 
     @Override
-    protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
+    protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
+            ServletResponse response) throws Exception {
         if (request instanceof HttpServletRequest) {
             FallbackPredicate loginFallbackType = (FallbackPredicate) request.getAttribute(LOGIN_PREDICATE_ATTR_NAME);
             redirectToSaved(WebUtils.toHttp(request), WebUtils.toHttp(response), loginFallbackType, "");
@@ -83,7 +84,7 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
 
     @Override
     protected String getPathWithinApplication(ServletRequest request) {
-        String origPath = (String)request.getAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
+        String origPath = (String) request.getAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
         if (origPath != null) {
             return origPath;
         } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -41,8 +43,20 @@ import org.apache.shiro.authz.aop.UserAnnotationHandler;
 /**
  * Security decorator instantiation helper
  */
-class AopHelper
-{
+@SuppressWarnings("HideUtilityClassConstructor")
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+class AopHelper {
+    /**
+     * List annotations classes which can be applied (either method or a class).
+     */
+    @SuppressWarnings("ConstantName")
+    static final Map<Class<? extends Annotation>, Callable<AuthorizingAnnotationHandler>> autorizationAnnotationClasses
+            = Map.of(
+                    RequiresPermissions.class, PermissionAnnotationHandler::new,
+                    RequiresRoles.class, RoleAnnotationHandler::new,
+                    RequiresUser.class, UserAnnotationHandler::new,
+                    RequiresGuest.class, GuestAnnotationHandler::new,
+                    RequiresAuthentication.class, AuthenticatedAnnotationHandler::new);
     /**
      * Create list of
      * {@link SecurityInterceptor}
@@ -135,15 +149,4 @@ class AopHelper
             handler.assertAuthorized(getAnnotation());
         }
     }
-
-    /**
-     * List annotations classes which can be applied (either method or a class).
-     */
-    final static Map<Class<? extends Annotation>, Callable<AuthorizingAnnotationHandler>> autorizationAnnotationClasses
-            = Map.of(
-                    RequiresPermissions.class, PermissionAnnotationHandler::new,
-                    RequiresRoles.class, RoleAnnotationHandler::new,
-                    RequiresUser.class, UserAnnotationHandler::new,
-                    RequiresGuest.class, GuestAnnotationHandler::new,
-                    RequiresAuthentication.class, AuthenticatedAnnotationHandler::new);
 }

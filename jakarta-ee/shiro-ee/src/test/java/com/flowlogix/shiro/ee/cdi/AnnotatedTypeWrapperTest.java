@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ class AnnotatedTypeWrapperTest {
     }
 
     @Test
+    @SuppressWarnings("MagicNumber")
     void twoAdditionalAnnotations() {
         initializeStubs();
         var wrapper = new AnnotatedTypeWrapper<>(annotatedType,

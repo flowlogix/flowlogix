@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
         @Getter(value = AccessLevel.PRIVATE, lazy = true)
         private final StringBuffer secureRequestURL = rewriteHttpToHttps();
 
-        public WrappedRequest(HttpServletRequest wrapped, ServletContext servletContext, boolean httpSessions) {
+        WrappedRequest(HttpServletRequest wrapped, ServletContext servletContext, boolean httpSessions) {
             super(wrapped, servletContext, httpSessions);
         }
 
@@ -134,7 +134,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
     private static class WrappedResponse extends HttpServletResponseWrapper {
         private final ServletRequest request;
 
-        public WrappedResponse(HttpServletResponse response, ServletRequest request) {
+        WrappedResponse(HttpServletResponse response, ServletRequest request) {
             super(response);
             this.request = request;
         }
@@ -215,6 +215,7 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
     @Override
     @SneakyThrows
+    @SuppressWarnings("LineLength")
     protected void executeChain(ServletRequest request, ServletResponse response,
             FilterChain origChain) throws IOException, ServletException {
         if (isShiroEEDisabled(getServletContext())) {

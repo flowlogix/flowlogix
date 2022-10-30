@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,6 @@ public class ShiroScopeContextTest {
             throw new UnsupportedOperationException("Not supported");
         }
     }
-    private static final String ATTR_KEY = "FL_SViewScopedSC_com.flowlogix.shiro.ee.cdi.ShiroScopeContextTest$MyBean";
 
     @BeforeEach
     void setup() {
@@ -119,7 +118,7 @@ public class ShiroScopeContextTest {
 
     private void setupWebSessions() {
         when(SecurityUtils.getSecurityManager()).thenReturn(mock(WebSecurityManager.class));
-        WebSecurityManager wsm = (WebSecurityManager)SecurityUtils.getSecurityManager();
+        WebSecurityManager wsm = (WebSecurityManager) SecurityUtils.getSecurityManager();
         when(wsm.isHttpSessionMode()).thenReturn(true);
     }
 }

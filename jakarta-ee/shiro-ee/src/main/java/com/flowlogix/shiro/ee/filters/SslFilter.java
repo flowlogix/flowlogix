@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class SslFilter extends org.apache.shiro.web.filter.authz.SslFilter {
 
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-        if (enablePortFilter == false) {
+        if (!enablePortFilter) {
             mappedValue = new String[] { Integer.toString(request.getServerPort()) };
         }
         return super.isAccessAllowed(request, response, mappedValue);

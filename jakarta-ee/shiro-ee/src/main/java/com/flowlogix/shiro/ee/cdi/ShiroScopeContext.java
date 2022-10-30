@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,11 @@ import org.omnifaces.util.Beans;
  * @author lprimak
  */
 public class ShiroScopeContext implements Context, Serializable {
+    private static final String BEAN_STORAGE_KEY = "com.flowlogix.shiro.ee.bean-storage";
+    private static final long serialVersionUID = 1L;
     private final Class<? extends Annotation> scopeType;
     private final Class<? extends Annotation> webScopeType;
     private final boolean isViewScoped;
-    private static final String BEAN_STORAGE_KEY = "com.flowlogix.shiro.ee.bean-storage";
-    private static final long serialVersionUID = 1L;
 
     public ShiroScopeContext(Class<? extends Annotation> scopeType, Class<? extends Annotation> webScopeType) {
         this.scopeType = scopeType;
@@ -92,6 +92,7 @@ public class ShiroScopeContext implements Context, Serializable {
         return true;
     }
 
+    @SuppressWarnings("MagicNumber")
     void onCreate(Session session) {
         session.setAttribute(BEAN_STORAGE_KEY, new BeanStorage(20));
     }
@@ -125,6 +126,6 @@ public class ShiroScopeContext implements Context, Serializable {
     }
 
     private BeanStorage getBeanStorage(Session session) {
-        return (BeanStorage)session.getAttribute(BEAN_STORAGE_KEY);
+        return (BeanStorage) session.getAttribute(BEAN_STORAGE_KEY);
     }
 }

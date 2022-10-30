@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +73,13 @@ import org.omnifaces.util.Servlets;
  * @author lprimak
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("HideUtilityClassConstructor")
 public class FormResubmitSupport {
+    static final String SHIRO_FORM_DATA_KEY = "com.flowlogix.form-data-key";
+    static final String SESSION_EXPIRED_PARAMETER = "com.flowlogix.sessionExpired";
+    static final String FORM_IS_RESUBMITTED = "com.flowlogix.form-is-resubmitted";
+    static final String DONT_ADD_ANY_MORE_COOKIES = "com.flowlogix.no-more-cookies";
     // encoded view state
     private static final String FACES_VIEW_STATE = "javax.faces.ViewState";
     private static final String FACES_VIEW_STATE_EQUALS = FACES_VIEW_STATE + "=";
@@ -82,10 +90,6 @@ public class FormResubmitSupport {
             = Pattern.compile(String.format("[\\&]?%s.\\w+=[\\w\\s:%%\\d]*", PARTIAL_VIEW));
     private static final Pattern INITIAL_AMPERSAND = Pattern.compile("^\\&");
     private static final String FORM_DATA_CACHE = "com.flowlogix.form-data-cache";
-    static final String SHIRO_FORM_DATA_KEY = "com.flowlogix.form-data-key";
-    static final String SESSION_EXPIRED_PARAMETER = "com.flowlogix.sessionExpired";
-    static final String FORM_IS_RESUBMITTED = "com.flowlogix.form-is-resubmitted";
-    static final String DONT_ADD_ANY_MORE_COOKIES = "com.flowlogix.no-more-cookies";
 
     static class HttpMethod {
         static final String GET = "GET";
@@ -99,7 +103,7 @@ public class FormResubmitSupport {
     }
 
     static class MediaType {
-        final static String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
+        static final String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     }
 
     static class HttpResponseCodes {
@@ -123,7 +127,7 @@ public class FormResubmitSupport {
         }
         boolean isFacesGetRequest = HttpMethod.GET.equalsIgnoreCase(request.getMethod());
         doFacesRedirect(request, response, request.getContextPath() + loginUrl
-                + (isFacesGetRequest? "" : "?%s=true"), SESSION_EXPIRED_PARAMETER);
+                + (isFacesGetRequest ? "" : "?%s=true"), SESSION_EXPIRED_PARAMETER);
     }
 
     static boolean isPostRequest(ServletRequest request) {
@@ -146,7 +150,7 @@ public class FormResubmitSupport {
             if (dsm.getCacheManager() != null) {
                 var cache = dsm.getCacheManager().getCache(FORM_DATA_CACHE);
                 var cacheKey = UUID.fromString(savedFormDataKey);
-                savedFormData = (String)cache.get(cacheKey);
+                savedFormData = (String) cache.get(cacheKey);
                 cache.remove(cacheKey);
             }
         }
@@ -154,7 +158,7 @@ public class FormResubmitSupport {
     }
 
     static void saveRequest(HttpServletRequest request, HttpServletResponse response, boolean useReferer) {
-        String path = useReferer? getReferer(request)
+        String path = useReferer ? getReferer(request)
                 : Servlets.getRequestURLWithQueryString(request);
         if (path != null) {
             Servlets.addResponseCookie(request, response, WebUtils.SAVED_REQUEST_KEY,
@@ -165,8 +169,8 @@ public class FormResubmitSupport {
     }
 
     static void saveRequestReferer(boolean rv, HttpServletRequest request, HttpServletResponse response) {
-        if(rv && HttpMethod.GET.equalsIgnoreCase(request.getMethod())) {
-            if(Servlets.getRequestCookie(request, WebUtils.SAVED_REQUEST_KEY) == null) {
+        if (rv && HttpMethod.GET.equalsIgnoreCase(request.getMethod())) {
+            if (Servlets.getRequestCookie(request, WebUtils.SAVED_REQUEST_KEY) == null) {
                 // only save refer when there is no saved request cookie already,
                 // and only as a last resort
                 saveRequest(request, response, true);
@@ -178,7 +182,7 @@ public class FormResubmitSupport {
         String referer = request.getHeader("referer");
         if (referer != null) {
             // do not switch to https if custom port is specified
-            if(!referer.matches("^http:\\/\\/[A-z|.|[0-9]]+:[0-9]+(\\/.*|$)")) {
+            if (!referer.matches("^http:\\/\\/[A-z|.|[0-9]]+:[0-9]+(\\/.*|$)")) {
                 referer = referer.replaceFirst("^http:", "https:");
             }
         }
@@ -283,7 +287,8 @@ public class FormResubmitSupport {
      * @param path
      * @param paramValues
      */
-    private static void doFacesRedirect(HttpServletRequest request, HttpServletResponse response, String path, Object... paramValues) {
+    private static void doFacesRedirect(HttpServletRequest request, HttpServletResponse response,
+            String path, Object... paramValues) {
         if (hasFacesContext()) {
             Faces.redirect(path, paramValues);
         } else {
@@ -318,13 +323,13 @@ public class FormResubmitSupport {
     static int getCookieAge(ServletRequest request, SecurityManager securityManager) {
         var nativeSessionManager = getNativeSessionManager(securityManager);
         if (nativeSessionManager != null) {
-            return (int)Duration.ofMillis(nativeSessionManager.getGlobalSessionTimeout()).toSeconds();
+            return (int) Duration.ofMillis(nativeSessionManager.getGlobalSessionTimeout()).toSeconds();
         } else {
             try {
-                return (int)Duration.ofMinutes(request.getServletContext().getSessionTimeout()).toSeconds();
+                return (int) Duration.ofMinutes(request.getServletContext().getSessionTimeout()).toSeconds();
             } catch (Throwable e) {
                 // workaround for https://github.com/eclipse/jetty.project/issues/8556
-                return (int)Duration.ofHours(1).toSeconds();
+                return (int) Duration.ofHours(1).toSeconds();
             }
         }
     }
@@ -444,7 +449,7 @@ public class FormResubmitSupport {
 
     private static org.apache.shiro.mgt.SecurityManager unwrapSecurityManager(SecurityManager securityManager) {
         if (securityManager instanceof WrappedSecurityManager) {
-            WrappedSecurityManager wsm = (WrappedSecurityManager)securityManager;
+            WrappedSecurityManager wsm = (WrappedSecurityManager) securityManager;
             return wsm.wrapped;
         } else {
             return securityManager;

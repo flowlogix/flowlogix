@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 lprimak.
+ * Copyright (C) 2011-2022 Flow Logix, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,11 +57,11 @@ class AuthenticationFilterDelegate {
     /**
      * true if rememberMe cookie is set and valid
      */
-    private @Getter @Setter boolean useRemembered = false;
+    private @Getter @Setter boolean useRemembered;
     /**
      * number of seconds to sleep if authentication fails
      */
-    private @Getter @Setter int loginFailedWaitTime = 0;
+    private @Getter @Setter int loginFailedWaitTime;
     private @Getter @Setter FallbackPredicate loginFallbackType = NO_PREDICATE;
     private @Getter @Setter FallbackPredicate logoutFallbackType = YES_PREDICATE;
 

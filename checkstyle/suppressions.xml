@@ -30,6 +30,8 @@
     <suppress checks="JavadocPackage" files="org[\\/]omnifaces[\\/]util[\\/]*"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]shiro[\\/]ee[\\/]*"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]jeedao[\\/]primefaces[\\/]JPALazyDataModel"/>
+    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]logcapture[\\/]*"/>
+    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]examples[\\/]ui[\\/]*"/>
 
     <suppress checks="JavadocVariable" lines="46-49" files="com[\\/]flowlogix[\\/]util[\\/]ShrinkWrapManipulator"/>
     <suppress checks="JavadocVariable" lines="66" files="com[\\/]flowlogix[\\/]jeedao[\\/]primefaces[\\/]JPALazyDataModel"/>

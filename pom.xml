@@ -207,6 +207,25 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -465,14 +484,14 @@
                         <plugin>
                             <artifactId>maven-surefire-plugin</artifactId>
                             <configuration>
-                                <argLine>-Xshare:off</argLine>
+                                <argLine>@{argLine} -Xshare:off</argLine>
                             </configuration>
                         </plugin>
                         <plugin>
                             <artifactId>maven-failsafe-plugin</artifactId>
                             <configuration>
                                 <argLine>
-                                    --add-opens java.base/java.lang=ALL-UNNAMED
+                                    @{argLine} --add-opens java.base/java.lang=ALL-UNNAMED
                                 </argLine>
                             </configuration>
                         </plugin>

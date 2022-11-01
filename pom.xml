@@ -216,9 +216,9 @@
                 <version>${jacoco.version}</version>
                 <configuration>
                     <classDumpDir>${project.build.directory}/jacoco-classes</classDumpDir>
-                    <include>
+                    <includes>
                         <include>com/flowlogix/**</include>
-                    </include>
+                    </includes>
                     <excludes>
                         <exclude>net/bytebuddy/**</exclude>
                         <exclude>org/mockito/**</exclude>

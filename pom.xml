@@ -223,6 +223,7 @@
                         <exclude>net/bytebuddy/**</exclude>
                         <exclude>org/mockito/**</exclude>
                         <exclude>com/flowlogix/examples/LazyExample*</exclude>
+                        <exclude>com/flowlogix/**/*IT</exclude>
                     </excludes>
                 </configuration>
                 <executions>

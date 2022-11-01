@@ -216,6 +216,10 @@
                 <version>${jacoco.version}</version>
                 <configuration>
                     <classDumpDir>${project.build.directory}/jacoco-classes</classDumpDir>
+                    <excludes>
+                        <exclude>net/bytebuddy</exclude>
+                        <exclude>org/mockito</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>

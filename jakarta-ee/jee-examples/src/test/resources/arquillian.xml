@@ -9,14 +9,17 @@
     specific language governing permissions and limitations under the License.
 -->
 <arquillian
-	xmlns="http://jboss.org/schema/arquillian"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+    xmlns="http://jboss.org/schema/arquillian"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
     <extension qualifier="webdriver">
         <property name="browser">${webdriver.browser}</property>
         <property name="firefoxArguments">-headless</property>
         <property name="chromeBinary">${webdriver.chrome.binary}</property>
         <property name="chromeArguments">--ignore-certificate-errors</property>
+    </extension>
+    <extension qualifier="jacoco">
+        <property name="appendAsmLibrary">false</property>
     </extension>
     <container qualifier="payara-ssl" default="true">
         <configuration>

@@ -22,7 +22,6 @@
         <!-- Unfortunately ShrinkWrap only understands the older compiler source / target flags -->
         <maven.compiler.source>${maven.compiler.release}</maven.compiler.source>
         <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
-        <arquillian.version>1.7.0.Alpha13</arquillian.version>
     </properties>
 
     <dependencies>
@@ -150,6 +149,17 @@
             <artifactId>arquillian-suite-extension</artifactId>
             <version>1.2.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.core</artifactId>
+            <version>${jacoco.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-jacoco</artifactId>
+            <version>1.1.0</version>
         </dependency>
 
         <!-- Selenium test dependencies -->
@@ -291,6 +301,59 @@
                 <version>3.13.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- Jacoco and Arquillian updates -->
+            <dependency>
+                <groupId>org.jboss.arquillian.container</groupId>
+                <artifactId>arquillian-container-spi</artifactId>
+                <version>${arquillian.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.protocol</groupId>
+                <artifactId>arquillian-protocol-servlet</artifactId>
+                <version>${arquillian.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.testenricher</groupId>
+                <artifactId>arquillian-testenricher-cdi</artifactId>
+                <version>${arquillian.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.testenricher</groupId>
+                <artifactId>arquillian-testenricher-ejb</artifactId>
+                <version>${arquillian.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.testenricher</groupId>
+                <artifactId>arquillian-testenricher-initialcontext</artifactId>
+                <version>${arquillian.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.testenricher</groupId>
+                <artifactId>arquillian-testenricher-resource</artifactId>
+                <version>${arquillian.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-analysis</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-commons</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-tree</artifactId>
+                <version>${asm.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

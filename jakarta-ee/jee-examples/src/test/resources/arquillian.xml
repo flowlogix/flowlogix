@@ -20,6 +20,7 @@
     </extension>
     <extension qualifier="jacoco">
         <property name="appendAsmLibrary">false</property>
+        <property name="excludes">net.bytebuddy.*; org.mockito.*</property>
     </extension>
     <container qualifier="payara-ssl" default="true">
         <configuration>

@@ -215,7 +215,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
                 <configuration>
-                    <classDumpDir>${project.build.directory}/jacoco-classes</classDumpDir>
+                    <classDumpDir>${project.build.directory}/classes-jacoco-dump</classDumpDir>
                     <includes>
                         <include>com/flowlogix/**</include>
                     </includes>

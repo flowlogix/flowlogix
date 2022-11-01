@@ -214,6 +214,9 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+                <configuration>
+                    <classDumpDir>${project.build.outputDirectory}</classDumpDir>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

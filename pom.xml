@@ -228,6 +228,7 @@
                 <executions>
                     <execution>
                         <goals>
+                            <goal>prepare-agent</goal>
                             <goal>prepare-agent-integration</goal>
                         </goals>
                     </execution>
@@ -235,6 +236,7 @@
                         <id>report</id>
                         <phase>verify</phase>
                         <goals>
+                            <goal>report</goal>
                             <goal>report-integration</goal>
                         </goals>
                     </execution>

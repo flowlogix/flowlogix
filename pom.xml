@@ -215,16 +215,9 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
                 <configuration>
-                    <classDumpDir>${project.build.directory}/classes-jacoco-dump</classDumpDir>
                     <includes>
                         <include>com/flowlogix/**</include>
                     </includes>
-                    <excludes>
-                        <exclude>net/bytebuddy/**</exclude>
-                        <exclude>org/mockito/**</exclude>
-                        <exclude>com/flowlogix/examples/LazyExample*</exclude>
-                        <exclude>com/flowlogix/**/*IT</exclude>
-                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -235,9 +228,14 @@
                     </execution>
                     <execution>
                         <id>report</id>
-                        <phase>verify</phase>
+                        <phase>test</phase>
                         <goals>
                             <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report-integration</id>
+                        <goals>
                             <goal>report-integration</goal>
                         </goals>
                     </execution>

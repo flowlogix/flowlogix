@@ -15,7 +15,6 @@
  */
 package com.flowlogix.examples;
 
-import static com.flowlogix.examples.Deployments.removeClassesForJacoco;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
@@ -206,10 +205,10 @@ public class ExceptionPageIT {
 
     static WebArchive createDeploymentDev(String archiveName) {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
-                .loadPomFromFile("pom.xml", "disable-jacoco").importBuildOutput()
+                .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
         new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
-        return removeClassesForJacoco(archive);
+        return archive;
     }
 
     @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
@@ -219,12 +218,12 @@ public class ExceptionPageIT {
 
     static WebArchive createDeploymentProd(String archiveName) {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
-                .loadPomFromFile("pom.xml", "disable-jacoco").importBuildOutput()
+                .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
         var productionList = List.of(new Action("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value",
                 node -> node.setTextContent("Production")));
         new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
                 getStandardActions().stream()).collect(Collectors.toList()));
-        return removeClassesForJacoco(archive);
+        return archive;
     }
 }

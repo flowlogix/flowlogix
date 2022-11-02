@@ -42,8 +42,4 @@ public class Deployments {
     public static WebArchive createDeploymentLookupIT() {
         return LookupIT.createDeployment();
     }
-
-    static WebArchive removeClassesForJacoco(WebArchive archive) {
-        return archive.deletePackages(true, "com.flowlogix.examples.lazy");
-    }
 }

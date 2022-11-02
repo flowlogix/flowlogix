@@ -218,7 +218,6 @@
                     <includes>
                         <include>com/flowlogix/**</include>
                     </includes>
-                    <skip>${jacoco.skip}</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -544,12 +543,6 @@
                     </plugins>
                 </pluginManagement>
             </build>
-        </profile>
-        <profile>
-            <id>disable-jacoco</id>
-            <properties>
-                <jacoco.skip>true</jacoco.skip>
-            </properties>
         </profile>
     </profiles>
 

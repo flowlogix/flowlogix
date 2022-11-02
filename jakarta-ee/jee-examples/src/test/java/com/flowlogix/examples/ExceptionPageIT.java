@@ -206,7 +206,7 @@ public class ExceptionPageIT {
 
     static WebArchive createDeploymentDev(String archiveName) {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
-                .loadPomFromFile("pom.xml").importBuildOutput()
+                .loadPomFromFile("pom.xml", "disable-jacoco").importBuildOutput()
                 .as(WebArchive.class);
         new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
         return removeClassesForJacoco(archive);
@@ -219,7 +219,7 @@ public class ExceptionPageIT {
 
     static WebArchive createDeploymentProd(String archiveName) {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
-                .loadPomFromFile("pom.xml").importBuildOutput()
+                .loadPomFromFile("pom.xml", "disable-jacoco").importBuildOutput()
                 .as(WebArchive.class);
         var productionList = List.of(new Action("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value",
                 node -> node.setTextContent("Production")));

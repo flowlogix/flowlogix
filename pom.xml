@@ -53,6 +53,7 @@
     <modules>
         <module>flowlogix-bom</module>
         <module>jakarta-ee</module>
+        <module>coverage</module>
     </modules>
 
     <build>
@@ -218,6 +219,7 @@
                     <includes>
                         <include>com/flowlogix/**</include>
                     </includes>
+                    <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
                 </configuration>
                 <executions>
                     <execution>
@@ -238,35 +240,6 @@
                         <goals>
                             <goal>report-integration</goal>
                         </goals>
-                    </execution>
-                    <execution>
-                        <id>merge-unit-and-integration</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>merge</goal>
-                        </goals>
-                        <configuration>
-                            <fileSets>
-                                <fileSet>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>jacoco*.exec</include>
-                                    </includes>
-                                </fileSet>
-                            </fileSets>
-                            <destFile>${project.build.directory}/jacoco-merged.exec</destFile>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>create-merged-report</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <dataFile>${project.build.directory}/jacoco-merged.exec</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-report-merged</outputDirectory>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

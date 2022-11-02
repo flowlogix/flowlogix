@@ -27,13 +27,16 @@ import java.util.stream.Stream;
 import org.codehaus.plexus.util.StringUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,6 +57,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  */
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
+@RunAsClient
 public class ExceptionPageIT {
     static final String DEPLOYMENT_DEV_MODE = "DevMode";
     static final String DEPLOYMENT_PROD_MODE = "ProdMode";
@@ -198,32 +202,38 @@ public class ExceptionPageIT {
         assertEquals(2, count);
     }
 
-    @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
+    @Deployment(name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeploymentDev() {
         return createDeploymentDev("ExceptionPageTest.war");
     }
 
     static WebArchive createDeploymentDev(String archiveName) {
-        WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
-                .loadPomFromFile("pom.xml").importBuildOutput()
-                .as(WebArchive.class);
+        WebArchive archive = loadArchive(archiveName);
         new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
         return archive;
     }
 
-    @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
+    @Deployment(name = DEPLOYMENT_PROD_MODE)
     public static WebArchive createDeploymentProd() {
         return createDeploymentProd("ExceptionPageTest-prod.war");
     }
 
     static WebArchive createDeploymentProd(String archiveName) {
-        WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
-                .loadPomFromFile("pom.xml").importBuildOutput()
-                .as(WebArchive.class);
+        WebArchive archive = loadArchive(archiveName);
         var productionList = List.of(new Action("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value",
                 node -> node.setTextContent("Production")));
         new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
                 getStandardActions().stream()).collect(Collectors.toList()));
+        return archive;
+    }
+
+    static WebArchive loadArchive(String archiveName) {
+        WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
+                .loadPomFromFile("pom.xml").importBuildOutput()
+                .as(WebArchive.class);
+        System.out.println(archive.toString(true));
+        // force arquillian jacoco to instrument archives
+        archive.getAsType(JavaArchive.class, Filters.include(".+\\.(war|jar|ear|rar)"));
         return archive;
     }
 }

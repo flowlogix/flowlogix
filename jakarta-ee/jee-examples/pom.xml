@@ -256,40 +256,6 @@
                     <commitIdGenerationMode>full</commitIdGenerationMode>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                <configuration>
-                    <includes>
-                        <include>com/flowlogix/**</include>
-                    </includes>
-                    <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
-                    <destFile>${flowlogix.basedir}/target/jacoco.exec</destFile>
-                    <dataFile>${flowlogix.basedir}/target/jacoco.exec</dataFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report-integration</id>
-                        <goals>
-                            <goal>report-integration</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
 
         <pluginManagement>

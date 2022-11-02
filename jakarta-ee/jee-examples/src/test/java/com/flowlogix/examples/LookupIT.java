@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples;
 
+import static com.flowlogix.examples.Deployments.removeClassesForJacoco;
 import com.flowlogix.examples.jndi.ejbs.AnotherEJB;
 import com.flowlogix.examples.jndi.ejbs.NumberGetter;
 import java.util.concurrent.ExecutorService;
@@ -102,7 +103,7 @@ public class LookupIT {
 
     @Deployment(name = DEPLOYMENT_NAME)
     public static WebArchive createDeployment() {
-        return ShrinkWrap.create(WebArchive.class, "LookupTest.war")
+        return removeClassesForJacoco(ShrinkWrap.create(WebArchive.class, "LookupTest.war")
                 .addPackages(true, "org.omnifaces")
                 .addPackages(true, "com.flowlogix")
                 .deletePackages(true, "com.flowlogix.examples.data")
@@ -113,6 +114,6 @@ public class LookupIT {
                 .deletePackages(true, "com.flowlogix.examples.shiro")
                 .deletePackages(true, "com.flowlogix.jeedao")
                 .deletePackages(true, "org.omnifaces.persistence")
-                .deleteClass(ExceptionPageIT.class);
+                .deleteClass(ExceptionPageIT.class));
     }
 }

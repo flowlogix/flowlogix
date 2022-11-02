@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples;
 
+import static com.flowlogix.examples.Deployments.removeClassesForJacoco;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
@@ -208,7 +209,7 @@ public class ExceptionPageIT {
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
         new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
-        return archive;
+        return removeClassesForJacoco(archive);
     }
 
     @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
@@ -224,6 +225,6 @@ public class ExceptionPageIT {
                 node -> node.setTextContent("Production")));
         new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
                 getStandardActions().stream()).collect(Collectors.toList()));
-        return archive;
+        return removeClassesForJacoco(archive);
     }
 }

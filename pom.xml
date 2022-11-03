@@ -42,7 +42,7 @@
         <groovy.version>4.0.6</groovy.version>
         <arquillian.version>1.7.0.Alpha13</arquillian.version>
         <jacoco.version>0.8.8</jacoco.version>
-        <asm.version>9.3</asm.version>
+        <jacocoPort>52212</jacocoPort>
 
         <!-- checkstyle -->
         <checkstyle.configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
@@ -220,6 +220,9 @@
                         <include>com/flowlogix/**</include>
                     </includes>
                     <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
+                    <address>localhost</address>
+                    <port>${jacocoPort}</port>
+                    <reset>true</reset>
                 </configuration>
                 <executions>
                     <execution>
@@ -238,6 +241,7 @@
                     <execution>
                         <id>report-integration</id>
                         <goals>
+                            <goal>dump</goal>
                             <goal>report-integration</goal>
                         </goals>
                     </execution>

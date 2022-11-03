@@ -150,18 +150,6 @@
             <version>1.2.2</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.core</artifactId>
-            <version>${jacoco.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.extension</groupId>
-            <artifactId>arquillian-jacoco</artifactId>
-            <version>1.1.0</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- Selenium test dependencies -->
         <dependency>
@@ -304,7 +292,7 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- Jacoco and Arquillian updates -->
+            <!-- Arquillian updates -->
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
                 <artifactId>arquillian-container-spi</artifactId>
@@ -334,27 +322,6 @@
                 <groupId>org.jboss.arquillian.testenricher</groupId>
                 <artifactId>arquillian-testenricher-resource</artifactId>
                 <version>${arquillian.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>${asm.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm-analysis</artifactId>
-                <version>${asm.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm-commons</artifactId>
-                <version>${asm.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm-tree</artifactId>
-                <version>${asm.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

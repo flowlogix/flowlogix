@@ -36,10 +36,12 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import static lombok.Builder.Default;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Lazy;
@@ -54,6 +56,7 @@ import org.primefaces.model.SortMeta;
  */
 @SuperBuilder
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     /**
      * convert String key into {@link KK} object
@@ -80,18 +83,6 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
      */
     @Default
     private final @Getter boolean caseSensitiveQuery = true;
-
-    /**
-     * prevent from direct construction
-     */
-    JPAModelImpl() {
-        super(null, null);
-        this.converter = null;
-        this.filter = null;
-        this.sorter = null;
-        this.optimizer = null;
-        this.caseSensitiveQuery = false;
-    }
 
     int count(Map<String, FilterMeta> filters) {
         return super.count(Parameters.<TT>builder()

@@ -88,7 +88,7 @@ public class TypeConverterTest {
 
     @Test
     void stringClassName() {
-        assertEquals(true, TypeConverter.valueOf("true", boolean.class.getName()));
+        assertEquals(true, TypeConverter.valueOf("true", Boolean.class.getName()));
     }
 
     @Test

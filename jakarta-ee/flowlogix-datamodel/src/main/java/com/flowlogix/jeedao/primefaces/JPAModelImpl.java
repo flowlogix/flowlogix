@@ -199,8 +199,8 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
             case NOT_EXACT:
             case NOT_EQUALS:
                 return cb.notEqual(expression, filterValue);
-           case LESS_THAN:
-                return cb.lessThan(expression, (Comparable)filterValue);
+            case LESS_THAN:
+                return cb.lessThan(expression, (Comparable) filterValue);
             case LESS_THAN_EQUALS:
                 return cb.lessThanOrEqualTo(expression, (Comparable) filterValue);
             case GREATER_THAN:
@@ -220,7 +220,8 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
             case NOT_BETWEEN:
                 throw new UnsupportedOperationException("MatchMode.NOT_BETWEEN currently not supported!");
             case GLOBAL:
-                throw new UnsupportedOperationException("MatchMode.GLOBAL currently not supported!");        }
+                throw new UnsupportedOperationException("MatchMode.GLOBAL currently not supported!");
+        }
         return null;
     }
 

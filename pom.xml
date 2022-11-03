@@ -221,7 +221,10 @@
                     </includes>
                     <excludes>
                         <exclude>com/flowlogix/**/*Test</exclude>
+                        <exclude>com/flowlogix/**/*Test$*</exclude>
                         <exclude>com/flowlogix/**/*IT</exclude>
+                        <exclude>com/flowlogix/**/*IT$*</exclude>
+                        <exclude>com/flowlogix/**/__EJB31_Generated*</exclude>
                     </excludes>
                     <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
                     <address>localhost</address>

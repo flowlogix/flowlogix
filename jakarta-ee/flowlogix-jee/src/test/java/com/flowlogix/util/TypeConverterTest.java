@@ -87,7 +87,13 @@ public class TypeConverterTest {
     }
 
     @Test
+    void stringClassName() {
+        assertEquals(true, TypeConverter.valueOf("true", boolean.class.getName()));
+    }
+
+    @Test
     void invalidArgument() {
         assertThrows(IllegalArgumentException.class, () -> TypeConverter.valueOf("abc", Integer.class));
+        assertThrows(IllegalArgumentException.class, () -> TypeConverter.valueOf("abc", Integer.class.getName()));
     }
 }

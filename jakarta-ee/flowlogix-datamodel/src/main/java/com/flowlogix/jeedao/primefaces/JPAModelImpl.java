@@ -21,6 +21,8 @@ import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.util.TypeConverter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,10 +172,14 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         }
     }
 
-    @SuppressWarnings({"CyclomaticComplexity", "ReturnCount", "MissingSwitchDefault"})
-    private Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
+    @SuppressWarnings({"CyclomaticComplexity", "ReturnCount", "MissingSwitchDefault",
+        "rawtypes", "unchecked"})
+    private Predicate predicateFromFilter(CriteriaBuilder cb, Expression expression,
             FilterMeta filter, Object filterValue) {
         var stringExpression = new Lazy<>(() -> new ExpressionEvaluator(cb, expression, filterValue));
+        Lazy<Collection<Object>> filterValueAsCollection = new Lazy(
+                () -> filterValue.getClass().isArray() ? Arrays.asList((Object[]) filterValue)
+                        : (Collection<Object>) filterValue);
         switch (filter.getMatchMode()) {
             case STARTS_WITH:
                 return cb.like(stringExpression.get().expression, stringExpression.get().value + "%");
@@ -193,17 +199,28 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
             case NOT_EXACT:
             case NOT_EQUALS:
                 return cb.notEqual(expression, filterValue);
+           case LESS_THAN:
+                return cb.lessThan(expression, (Comparable)filterValue);
+            case LESS_THAN_EQUALS:
+                return cb.lessThanOrEqualTo(expression, (Comparable) filterValue);
+            case GREATER_THAN:
+                return cb.greaterThan(expression, (Comparable) filterValue);
+            case GREATER_THAN_EQUALS:
+                return cb.greaterThanOrEqualTo(expression, (Comparable) filterValue);
             case IN:
-                throw new UnsupportedOperationException("MatchMode.IN currently not supported!");
+                return filterValueAsCollection.get().size() == 1
+                        ? cb.equal(expression, filterValueAsCollection.get().iterator().next())
+                        : expression.in(filterValueAsCollection.get());
             case NOT_IN:
-                throw new UnsupportedOperationException("MatchMode.NOT_IN currently not supported!");
+                return filterValueAsCollection.get().size() == 1
+                        ? cb.notEqual(expression, filterValueAsCollection.get().iterator().next())
+                        : expression.in(filterValueAsCollection.get()).not();
             case BETWEEN:
                 throw new UnsupportedOperationException("MatchMode.BETWEEN currently not supported!");
             case NOT_BETWEEN:
                 throw new UnsupportedOperationException("MatchMode.NOT_BETWEEN currently not supported!");
             case GLOBAL:
-                throw new UnsupportedOperationException("MatchMode.GLOBAL currently not supported!");
-        }
+                throw new UnsupportedOperationException("MatchMode.GLOBAL currently not supported!");        }
         return null;
     }
 

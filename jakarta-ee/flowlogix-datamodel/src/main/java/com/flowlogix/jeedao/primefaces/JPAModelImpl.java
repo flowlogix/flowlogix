@@ -115,7 +115,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         qc.getRoot().alias(JPALazyDataModel.RESULT);
     }
 
-    private Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
+    Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
         Map<String, FilterData> predicates = new HashMap<>();
         filters.forEach((key, filterMeta) -> {
             Predicate cond = null;
@@ -124,6 +124,8 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                 Class<?> fieldType = root.get(key).getJavaType();
                 if (fieldType == String.class) {
                     value = value.toString();
+                    cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
+                } else if (fieldType.isArray() || Collection.class.isAssignableFrom(fieldType)) {
                     cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
                 } else {
                     var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
@@ -174,14 +176,13 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         }
     }
 
-    @SuppressWarnings({"CyclomaticComplexity", "ReturnCount", "MissingSwitchDefault",
-        "rawtypes", "unchecked"})
-    private Predicate predicateFromFilter(CriteriaBuilder cb, Expression expression,
+    @SuppressWarnings({"CyclomaticComplexity", "ReturnCount", "MissingSwitchDefault"})
+    Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
             FilterMeta filter, Object filterValue) {
         var stringExpression = new Lazy<>(() -> new ExpressionEvaluator(cb, expression, filterValue));
-        Lazy<Collection<Object>> filterValueAsCollection = new Lazy(
-                () -> filterValue.getClass().isArray() ? Arrays.asList((Object[]) filterValue)
-                        : (Collection<Object>) filterValue);
+        Lazy<Collection<?>> filterValueAsCollection = new Lazy<>(
+                () -> filterValue.getClass().isArray() ? Arrays.asList(filterValue)
+                        : (Collection<?>) filterValue);
         switch (filter.getMatchMode()) {
             case STARTS_WITH:
                 return cb.like(stringExpression.get().expression, stringExpression.get().value + "%");
@@ -201,14 +202,6 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
             case NOT_EXACT:
             case NOT_EQUALS:
                 return cb.notEqual(expression, filterValue);
-            case LESS_THAN:
-                return cb.lessThan(expression, (Comparable) filterValue);
-            case LESS_THAN_EQUALS:
-                return cb.lessThanOrEqualTo(expression, (Comparable) filterValue);
-            case GREATER_THAN:
-                return cb.greaterThan(expression, (Comparable) filterValue);
-            case GREATER_THAN_EQUALS:
-                return cb.greaterThanOrEqualTo(expression, (Comparable) filterValue);
             case IN:
                 return filterValueAsCollection.get().size() == 1
                         ? cb.equal(expression, filterValueAsCollection.get().iterator().next())
@@ -227,9 +220,9 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         return null;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes", "MissingSwitchDefault"})
+    @SuppressWarnings("MissingSwitchDefault")
     private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
-            Expression objectExpression, FilterMeta filter, TC filterValue) {
+            Expression<TC> objectExpression, FilterMeta filter, TC filterValue) {
         switch (filter.getMatchMode()) {
             case LESS_THAN:
                 return cb.lessThan(objectExpression, filterValue);

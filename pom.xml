@@ -40,7 +40,6 @@
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>5.2022.3</payara.version>
         <groovy.version>4.0.6</groovy.version>
-        <arquillian.version>1.7.0.Alpha13</arquillian.version>
         <jacoco.version>0.8.8</jacoco.version>
         <jacocoPort>52212</jacocoPort>
 

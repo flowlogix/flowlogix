@@ -22,6 +22,7 @@
         <!-- Unfortunately ShrinkWrap only understands the older compiler source / target flags -->
         <maven.compiler.source>${maven.compiler.release}</maven.compiler.source>
         <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
+        <arquillian.version>1.7.0.Alpha13</arquillian.version>
     </properties>
 
     <dependencies>
@@ -290,38 +291,6 @@
                 <version>3.13.0</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <!-- Arquillian updates -->
-            <dependency>
-                <groupId>org.jboss.arquillian.container</groupId>
-                <artifactId>arquillian-container-spi</artifactId>
-                <version>${arquillian.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.protocol</groupId>
-                <artifactId>arquillian-protocol-servlet</artifactId>
-                <version>${arquillian.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.testenricher</groupId>
-                <artifactId>arquillian-testenricher-cdi</artifactId>
-                <version>${arquillian.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.testenricher</groupId>
-                <artifactId>arquillian-testenricher-ejb</artifactId>
-                <version>${arquillian.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.testenricher</groupId>
-                <artifactId>arquillian-testenricher-initialcontext</artifactId>
-                <version>${arquillian.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.testenricher</groupId>
-                <artifactId>arquillian-testenricher-resource</artifactId>
-                <version>${arquillian.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -43,7 +43,6 @@
         <jacocoPort>52212</jacocoPort>
         <jacocoAgent/>
         <jdk11SurefireOptions/>
-        <jdk11FailsafeOptions/>
 
         <!-- checkstyle -->
         <checkstyle.configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
@@ -251,7 +250,7 @@
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <argLine>@{jacocoAgent} @{jdk11FailsafeOptions}</argLine>
+                        <argLine>@{jacocoAgent}</argLine>
                         <systemPropertyVariables>
                             <arquillian.launch>${arquillian.launch}</arquillian.launch>
                             <integration.test.mode>${integration.test.mode}</integration.test.mode>
@@ -524,7 +523,6 @@
             </activation>
             <properties>
                 <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>
-                <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
             </properties>
         </profile>
     </profiles>

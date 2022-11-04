@@ -20,7 +20,6 @@ import static com.flowlogix.util.ShrinkWrapManipulator.toHttpsURL;
 import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -39,7 +38,6 @@ import org.openqa.selenium.WebDriverException;
  */
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
-@RunAsClient
 public class ShiroSSLFilterIT {
     @Drone
     private WebDriver webDriver;
@@ -61,7 +59,7 @@ public class ShiroSSLFilterIT {
         assertEquals("Many Beans Unprotected", webDriver.getTitle());
     }
 
-    @Deployment(name = DEPLOYMENT_PROD_MODE)
+    @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
     public static WebArchive createDeploymentProd() {
         return ExceptionPageIT.createDeploymentProd("ShiroSSLFilterTest-prod.war");
     }

@@ -22,7 +22,6 @@ import java.net.URL;
 import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
@@ -48,7 +47,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  */
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
-@RunAsClient
 public class ShiroAuthFormsIT {
     @Drone
     private WebDriver webDriver;
@@ -340,7 +338,7 @@ public class ShiroAuthFormsIT {
         guardHttp(login).click();
     }
 
-    @Deployment(name = DEPLOYMENT_DEV_MODE)
+    @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
         return ExceptionPageIT.createDeploymentDev("shiro-auth-forms.war");
     }

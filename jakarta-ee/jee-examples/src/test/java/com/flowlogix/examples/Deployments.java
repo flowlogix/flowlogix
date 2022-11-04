@@ -28,12 +28,12 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 @ArquillianSuiteDeployment
 @SuppressWarnings("HideUtilityClassConstructor")
 public class Deployments {
-    @Deployment(name = DEPLOYMENT_DEV_MODE)
+    @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
         return ExceptionPageIT.createDeploymentDev("FlowLogixTest.war");
     }
 
-    @Deployment(name = DEPLOYMENT_PROD_MODE)
+    @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
     public static WebArchive createDeploymentProd() {
         return ExceptionPageIT.createDeploymentProd();
     }

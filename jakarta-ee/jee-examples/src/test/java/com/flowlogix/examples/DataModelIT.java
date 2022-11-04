@@ -19,7 +19,6 @@ import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import org.jboss.arquillian.junit5.ArquillianExtension;
@@ -42,7 +41,6 @@ import org.openqa.selenium.support.FindBy;
  */
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
-@RunAsClient
 public class DataModelIT {
     @Drone
     private WebDriver webDriver;
@@ -84,7 +82,7 @@ public class DataModelIT {
         assertEquals("Lovely Lady", firstRowFullName.getText());
     }
 
-    @Deployment(name = DEPLOYMENT_DEV_MODE)
+    @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
         return ExceptionPageIT.createDeploymentDev("DataModel.war");
     }

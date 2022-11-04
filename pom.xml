@@ -41,6 +41,9 @@
         <payara.version>5.2022.3</payara.version>
         <groovy.version>4.0.6</groovy.version>
         <jacocoPort>52212</jacocoPort>
+        <jacocoAgent/>
+        <jdk11SurefireOptions/>
+        <jdk11FailsafeOptions/>
 
         <!-- checkstyle -->
         <checkstyle.configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
@@ -208,53 +211,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.8</version>
-                <configuration>
-                    <includes>
-                        <include>com/flowlogix/**</include>
-                    </includes>
-                    <excludes>
-                        <exclude>com/flowlogix/**/*Test</exclude>
-                        <exclude>com/flowlogix/**/*Test$*</exclude>
-                        <exclude>com/flowlogix/**/*IT</exclude>
-                        <exclude>com/flowlogix/**/*IT$*</exclude>
-                        <exclude>com/flowlogix/**/__EJB31_Generated*</exclude>
-                        <!-- cause too many coverage misses -->
-                        <exclude>com.flowlogix/examples/entities/*</exclude>
-                        <exclude>com.flowlogix/examples/Deployments</exclude>
-                    </excludes>
-                    <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
-                    <address>localhost</address>
-                    <port>${jacocoPort}</port>
-                    <reset>true</reset>
-                    <propertyName>jacocoAgent</propertyName>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report-integration</id>
-                        <goals>
-                            <goal>dump</goal>
-                            <goal>report-integration</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -276,6 +232,7 @@
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <argLine>@{jacocoAgent} @{jdk11SurefireOptions}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -294,6 +251,7 @@
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <argLine>@{jacocoAgent} @{jdk11FailsafeOptions}</argLine>
                         <systemPropertyVariables>
                             <arquillian.launch>${arquillian.launch}</arquillian.launch>
                             <integration.test.mode>${integration.test.mode}</integration.test.mode>
@@ -506,30 +464,68 @@
             </distributionManagement>
         </profile>
         <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.8</version>
+                        <configuration>
+                            <includes>
+                                <include>com/flowlogix/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>com/flowlogix/**/*Test</exclude>
+                                <exclude>com/flowlogix/**/*Test$*</exclude>
+                                <exclude>com/flowlogix/**/*IT</exclude>
+                                <exclude>com/flowlogix/**/*IT$*</exclude>
+                                <exclude>com/flowlogix/**/__EJB31_Generated*</exclude>
+                                <!-- cause too many coverage misses -->
+                                <exclude>com.flowlogix/examples/entities/*</exclude>
+                                <exclude>com.flowlogix/examples/Deployments</exclude>
+                            </excludes>
+                            <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
+                            <address>localhost</address>
+                            <port>${jacocoPort}</port>
+                            <reset>true</reset>
+                            <propertyName>jacocoAgent</propertyName>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                    <goal>prepare-agent-integration</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report-integration</id>
+                                <goals>
+                                    <goal>dump</goal>
+                                    <goal>report-integration</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>jdk11plus</id>
             <activation>
                 <jdk>[11,)</jdk>
             </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <argLine>@{jacocoAgent} -Xshare:off</argLine>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <artifactId>maven-failsafe-plugin</artifactId>
-                            <configuration>
-                                <argLine>
-                                    @{jacocoAgent} --add-opens java.base/java.lang=ALL-UNNAMED
-                                </argLine>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
+            <properties>
+                <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>
+                <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
+            </properties>
         </profile>
     </profiles>
 

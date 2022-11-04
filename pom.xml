@@ -40,7 +40,6 @@
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>5.2022.3</payara.version>
         <groovy.version>4.0.6</groovy.version>
-        <jacoco.version>0.8.8</jacoco.version>
         <jacocoPort>52212</jacocoPort>
 
         <!-- checkstyle -->
@@ -212,7 +211,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
+                <version>0.8.8</version>
                 <configuration>
                     <includes>
                         <include>com/flowlogix/**</include>
@@ -231,6 +230,7 @@
                     <address>localhost</address>
                     <port>${jacocoPort}</port>
                     <reset>true</reset>
+                    <propertyName>jacocoAgent</propertyName>
                 </configuration>
                 <executions>
                     <execution>
@@ -516,14 +516,14 @@
                         <plugin>
                             <artifactId>maven-surefire-plugin</artifactId>
                             <configuration>
-                                <argLine>@{argLine} -Xshare:off</argLine>
+                                <argLine>@{jacocoAgent} -Xshare:off</argLine>
                             </configuration>
                         </plugin>
                         <plugin>
                             <artifactId>maven-failsafe-plugin</artifactId>
                             <configuration>
                                 <argLine>
-                                    @{argLine} --add-opens java.base/java.lang=ALL-UNNAMED
+                                    @{jacocoAgent} --add-opens java.base/java.lang=ALL-UNNAMED
                                 </argLine>
                             </configuration>
                         </plugin>

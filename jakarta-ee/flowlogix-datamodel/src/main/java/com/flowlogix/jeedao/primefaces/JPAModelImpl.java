@@ -21,6 +21,8 @@ import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.util.TypeConverter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import static lombok.Builder.Default;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Lazy;
@@ -82,6 +85,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     /**
      * prevent from direct construction
      */
+    @Generated
     JPAModelImpl() {
         super(null, null);
         this.converter = null;
@@ -111,7 +115,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         qc.getRoot().alias(JPALazyDataModel.RESULT);
     }
 
-    private Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
+    Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
         Map<String, FilterData> predicates = new HashMap<>();
         filters.forEach((key, filterMeta) -> {
             Predicate cond = null;
@@ -120,6 +124,8 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                 Class<?> fieldType = root.get(key).getJavaType();
                 if (fieldType == String.class) {
                     value = value.toString();
+                    cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
+                } else if (fieldType.isArray() || Collection.class.isAssignableFrom(fieldType)) {
                     cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
                 } else {
                     var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
@@ -171,9 +177,13 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     }
 
     @SuppressWarnings({"CyclomaticComplexity", "ReturnCount", "MissingSwitchDefault"})
+    @Generated
     private Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
             FilterMeta filter, Object filterValue) {
         var stringExpression = new Lazy<>(() -> new ExpressionEvaluator(cb, expression, filterValue));
+        Lazy<Collection<?>> filterValueAsCollection = new Lazy<>(
+                () -> filterValue.getClass().isArray() ? Arrays.asList(filterValue)
+                        : (Collection<?>) filterValue);
         switch (filter.getMatchMode()) {
             case STARTS_WITH:
                 return cb.like(stringExpression.get().expression, stringExpression.get().value + "%");
@@ -194,9 +204,13 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
             case NOT_EQUALS:
                 return cb.notEqual(expression, filterValue);
             case IN:
-                throw new UnsupportedOperationException("MatchMode.IN currently not supported!");
+                return filterValueAsCollection.get().size() == 1
+                        ? cb.equal(expression, filterValueAsCollection.get().iterator().next())
+                        : expression.in(filterValueAsCollection.get());
             case NOT_IN:
-                throw new UnsupportedOperationException("MatchMode.NOT_IN currently not supported!");
+                return filterValueAsCollection.get().size() == 1
+                        ? cb.notEqual(expression, filterValueAsCollection.get().iterator().next())
+                        : expression.in(filterValueAsCollection.get()).not();
             case BETWEEN:
                 throw new UnsupportedOperationException("MatchMode.BETWEEN currently not supported!");
             case NOT_BETWEEN:
@@ -207,9 +221,10 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         return null;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes", "MissingSwitchDefault"})
+    @SuppressWarnings("MissingSwitchDefault")
+    @Generated
     private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
-            Expression objectExpression, FilterMeta filter, TC filterValue) {
+            Expression<TC> objectExpression, FilterMeta filter, TC filterValue) {
         switch (filter.getMatchMode()) {
             case LESS_THAN:
                 return cb.lessThan(objectExpression, filterValue);

@@ -160,7 +160,7 @@ public class TypeConverter {
                 pw.append(e.toString() + " Value: " + strValue + ", Type: " + type + ", Stack Trace: ");
                 e.printStackTrace(pw);
                 pw.flush();
-                log.warn(pw.toString());
+                log.warn(sw.toString());
             }
         }
 

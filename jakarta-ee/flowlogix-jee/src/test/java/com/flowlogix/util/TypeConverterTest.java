@@ -20,7 +20,9 @@ import java.math.BigInteger;
 import java.sql.Time;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -87,7 +89,20 @@ public class TypeConverterTest {
     }
 
     @Test
+    void stringClassName() {
+        assertEquals(true, TypeConverter.valueOf("true", Boolean.class.getName()));
+    }
+
+    @Test
     void invalidArgument() {
         assertThrows(IllegalArgumentException.class, () -> TypeConverter.valueOf("abc", Integer.class));
+        assertThrows(IllegalArgumentException.class, () -> TypeConverter.valueOf("abc", Integer.class.getName()));
+        assertEquals("abc", TypeConverter.valueOf("abc", "invalid"));
+    }
+
+    @Test
+    void checkType() {
+        assertTrue(TypeConverter.checkType("true", boolean.class));
+        assertFalse(TypeConverter.checkType("5", boolean.class));
     }
 }

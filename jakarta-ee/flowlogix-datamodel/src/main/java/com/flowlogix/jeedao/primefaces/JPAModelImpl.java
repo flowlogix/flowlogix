@@ -177,6 +177,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     }
 
     @SuppressWarnings({"CyclomaticComplexity", "ReturnCount", "MissingSwitchDefault"})
+    @Generated
     Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
             FilterMeta filter, Object filterValue) {
         var stringExpression = new Lazy<>(() -> new ExpressionEvaluator(cb, expression, filterValue));
@@ -221,6 +222,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     }
 
     @SuppressWarnings("MissingSwitchDefault")
+    @Generated
     private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
             Expression<TC> objectExpression, FilterMeta filter, TC filterValue) {
         switch (filter.getMatchMode()) {

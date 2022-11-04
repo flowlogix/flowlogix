@@ -43,7 +43,9 @@ public class ModelTest {
     @Mock
     CriteriaBuilder cb;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    Root<Object> root;
+    Root<Object> rootObject;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    Root<Integer> rootInteger;
 
     @Test
     void resultField() {
@@ -51,7 +53,7 @@ public class ModelTest {
     }
 
     @Test
-    void simpleFilter() {
+    void stringFilter() {
         var impl = JPAModelImpl.builder()
                 .entityManagerSupplier(() -> em)
                 .entityClass(Object.class)
@@ -59,9 +61,23 @@ public class ModelTest {
                 .filter(ModelTest::filter)
                 .build();
         var fm = new FilterMeta();
-        when(root.get(any(String.class)).getJavaType()).thenAnswer((a) -> String.class);
+        when(rootObject.get(any(String.class)).getJavaType()).thenAnswer((a) -> String.class);
         fm.setFilterValue("hello");
-        impl.getFilters(Map.of("column", fm), cb, root);
+        impl.getFilters(Map.of("column", fm), cb, rootObject);
+    }
+
+    @Test
+    @SuppressWarnings("MagicNumber")
+    void integerFilter() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManagerSupplier(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        var fm = new FilterMeta();
+        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer((a) -> Integer.class);
+        fm.setFilterValue(5);
+        impl.getFilters(Map.of("column", fm), cb, rootInteger);
     }
 
     private static void filter(Map<String, Filter.FilterData> filters, CriteriaBuilder cb, Root<Object> root) {

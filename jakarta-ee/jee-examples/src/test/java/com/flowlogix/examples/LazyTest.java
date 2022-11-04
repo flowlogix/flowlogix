@@ -15,33 +15,20 @@
  */
 package com.flowlogix.examples;
 
-import static com.flowlogix.examples.LookupIT.DEPLOYMENT_NAME;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit5.ArquillianExtension;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 
 /**
  *
  * @author lprimak
  */
-@ExtendWith(ArquillianExtension.class)
-@RunAsClient
-public class LazyIT {
+public class LazyTest {
     @Test
     public void lazy() {
         LazyExample example = new LazyExample();
         assertEquals(1, example.numInitialized.get());
         example.usingLazy();
         assertEquals(2, example.numInitialized.get());
-    }
-
-    @Deployment(name = DEPLOYMENT_NAME)
-    public static WebArchive createDeployment() {
-        return LookupIT.createDeployment();
     }
 }

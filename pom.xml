@@ -276,6 +276,7 @@
                     <configuration>
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -293,6 +294,7 @@
                     <configuration>
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <systemPropertyVariables>
                             <arquillian.launch>${arquillian.launch}</arquillian.launch>
                             <integration.test.mode>${integration.test.mode}</integration.test.mode>

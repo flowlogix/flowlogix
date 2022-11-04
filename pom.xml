@@ -450,8 +450,6 @@
             <id>release-flowlogix-to-central</id>
             <properties>
                 <docs.phase>package</docs.phase>
-                <checkstyle.skip>true</checkstyle.skip>
-                <maven.jxr.skip>true</maven.jxr.skip>
             </properties>
             <build>
                 <plugins>
@@ -474,8 +472,6 @@
                 <staging.server>hope-nexus-artifacts</staging.server>
                 <nexus.url>https://nexus.hope.nyc.ny.us/</nexus.url>
                 <skip.staging>true</skip.staging>
-                <checkstyle.skip>true</checkstyle.skip>
-                <maven.jxr.skip>true</maven.jxr.skip>
             </properties>
             <distributionManagement>
                 <repository>
@@ -486,6 +482,12 @@
         </profile>
         <profile>
             <id>checkstyle</id>
+            <activation>
+                <property>
+                    <name>checkstyle.skip</name>
+                    <value>!true</value>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

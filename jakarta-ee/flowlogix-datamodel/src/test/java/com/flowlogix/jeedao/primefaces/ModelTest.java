@@ -27,10 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.omnifaces.util.Faces;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.MatchMode;
 
@@ -94,6 +98,21 @@ public class ModelTest {
         fm.setFilterValue(List.of("one", "two"));
         fm.setMatchMode(MatchMode.IN);
         impl.getFilters(Map.of("column", fm), cb, rootInteger);
+    }
+
+    @Test
+    void jsfConversionTest() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManagerSupplier(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        var fm = new FilterMeta();
+        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer((a) -> Integer.class);
+        fm.setFilterValue("xxx");
+        try (var mockedStatic = mockStatic(Faces.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+            impl.getFilters(Map.of("column", fm), cb, rootInteger);
+        }
     }
 
     private static void filter(Map<String, Filter.FilterData> filters, CriteriaBuilder cb, Root<Object> root) {

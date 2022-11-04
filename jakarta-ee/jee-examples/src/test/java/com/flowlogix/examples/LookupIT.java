@@ -66,6 +66,8 @@ public class LookupIT {
     public void happyPath() {
         assertEquals(5, example.getNumber());
         assertNotNull(example.getLocator().getObject(AnotherEJB.class), "should not be null");
+        assertNotNull(example.createLocatorWithEnvironment().getObject(AnotherEJB.class), "should not be null");
+        assertNotNull(example.createLocatorWithNoCaching().getObject(AnotherEJB.class), "should not be null");
     }
 
     @Test

@@ -178,7 +178,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
 
     @SuppressWarnings({"CyclomaticComplexity", "ReturnCount", "MissingSwitchDefault"})
     @Generated
-    Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
+    private Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
             FilterMeta filter, Object filterValue) {
         var stringExpression = new Lazy<>(() -> new ExpressionEvaluator(cb, expression, filterValue));
         Lazy<Collection<?>> filterValueAsCollection = new Lazy<>(

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-import javax.annotation.Generated;
 import javax.faces.component.UIComponent;
 import javax.faces.convert.Converter;
 import javax.persistence.TypedQuery;
@@ -41,6 +40,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import static lombok.Builder.Default;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Lazy;
@@ -85,7 +85,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     /**
      * prevent from direct construction
      */
-    @Generated("no-manual-creation")
+    @Generated
     JPAModelImpl() {
         super(null, null);
         this.converter = null;

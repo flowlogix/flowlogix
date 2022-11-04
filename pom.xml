@@ -182,14 +182,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>checkstyle</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <configLocation>${checkstyle.configLocation}</configLocation>
                     <suppressionsLocation>${checkstyle.supressionsLocation}</suppressionsLocation>
@@ -487,6 +479,31 @@
                     <url>${nexus.url}repository/maven-releases</url>
                 </repository>
             </distributionManagement>
+        </profile>
+        <profile>
+            <id>checkstyle</id>
+            <activation>
+                <property>
+                    <name>checkstyle.skip</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>checkstyle</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>coverage</id>

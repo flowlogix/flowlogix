@@ -17,6 +17,7 @@ package com.flowlogix.jeedao.primefaces;
 
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.RESULT;
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.replaceFilter;
+import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -31,6 +32,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.primefaces.model.FilterMeta;
+import org.primefaces.model.MatchMode;
 
 /**
  *
@@ -77,6 +79,20 @@ public class ModelTest {
         var fm = new FilterMeta();
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer((a) -> Integer.class);
         fm.setFilterValue(5);
+        impl.getFilters(Map.of("column", fm), cb, rootInteger);
+    }
+
+    @Test
+    void collectionFilter() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManagerSupplier(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        var fm = new FilterMeta();
+        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer((a) -> List.class);
+        fm.setFilterValue(List.of("one", "two"));
+        fm.setMatchMode(MatchMode.IN);
         impl.getFilters(Map.of("column", fm), cb, rootInteger);
     }
 

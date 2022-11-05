@@ -17,7 +17,7 @@ Snapshots] are automatically released by Jenkins for the current head
 
 === News
 
-- 7/16/2022: Moving on to 5.x with Java 11 being the minimum default
+- 11/5/2022: Version 5.0 has been released with Java 11 being the minimum default
 - 3/15/2022: Version 4.0.7 has been released. Java 8 through 18
 compatible.
 - 12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel Major

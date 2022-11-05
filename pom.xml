@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>5.x-SNAPSHOT</version>
+    <version>5.0</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Utility Library Root POM</description>
@@ -41,9 +41,9 @@
         <payara.version>5.2022.3</payara.version>
         <groovy.version>4.0.6</groovy.version>
         <jacocoPort>52212</jacocoPort>
-        <jacocoAgent/>
-        <jdk11SurefireOptions/>
-        <jdk11FailsafeOptions/>
+        <jacocoAgent />
+        <jdk11SurefireOptions />
+        <jdk11FailsafeOptions />
 
         <!-- checkstyle -->
         <checkstyle.configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
@@ -540,7 +540,7 @@
         <url>https://github.com/flowlogix/flowlogix</url>
         <connection>scm:git:git@github.com:flowlogix/flowlogix.git</connection>
         <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>Version-5.0</tag>
     </scm>
 
     <distributionManagement>

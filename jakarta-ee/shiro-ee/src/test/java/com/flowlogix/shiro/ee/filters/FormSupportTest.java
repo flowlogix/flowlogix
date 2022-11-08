@@ -17,24 +17,25 @@ package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.extractJSFNewViewState;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getReferer;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFStatefulForm;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.noJSFAjaxRequests;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.transformCookieHeader;
+import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import javax.servlet.http.HttpServletRequest;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFStatefulForm;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.noJSFAjaxRequests;
 
 /**
  *
@@ -79,11 +80,12 @@ public class FormSupportTest {
     void viewStatePattern() {
         String statefulFormData
                 = "j_idt5%3Dj_idt5%26j_idt5%3Aj_idt7%3Daaa%26j_idt5%3Aj_idt9%3Dbbb%26j_idt5%3A"
-                + "j_idt11%3DSubmit+...%26javax.faces.ViewState%3D-8335355445345003673%3A-6008443334776649058";
+                + "j_idt11%3DSubmit+...%26" + jakartify("javax.faces.ViewState")
+                + "%3D-8335355445345003673%3A-6008443334776649058";
         assertTrue(isJSFStatefulForm(decode(statefulFormData)));
         String statelessFormData
                 = "j_idt5%3Dj_idt5%26j_idt5%3Aj_idt7%3Daaa%26j_idt5%3Aj_idt9%3Dbbb%26j_idt5%3A"
-                + "j_idt11%3DSubmit+...%26javax.faces.ViewState%3Dstateless";
+                + "j_idt11%3DSubmit+...%26" + jakartify("javax.faces.ViewState") + "%3Dstateless";
         assertFalse(isJSFStatefulForm(statelessFormData));
         assertThrows(NullPointerException.class, () -> isJSFStatefulForm(null));
         String nonJSFFormData
@@ -97,42 +99,48 @@ public class FormSupportTest {
     void extractViewState() {
         assertThrows(NullPointerException.class, () -> extractJSFNewViewState(null, null));
         assertEquals("hello", extractJSFNewViewState("", "hello"));
-        assertEquals("javax.faces.ViewState=stateless&hello=bye",
-                extractJSFNewViewState("xxx", "javax.faces.ViewState=stateless&hello=bye"));
-        assertEquals("javax.faces.ViewState=stateless&hello=bye",
-                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>",
-                        "javax.faces.ViewState=stateless&hello=bye"));
-        assertEquals("aaa=bbb&javax.faces.ViewState=xxx:yyy&hello=bye",
-                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>",
-                        "aaa=bbb&javax.faces.ViewState=xxx:yyy&hello=bye"));
-        assertEquals("javax.faces.ViewState=123:456&hello=bye",
-                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>",
-                        "javax.faces.ViewState=987:654&hello=bye"));
-        assertEquals("javax.faces.ViewState=-123:-456&hello=bye",
-                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
-                        "javax.faces.ViewState=987:654&hello=bye"));
-        assertEquals("javax.faces.ViewState=-123:-456&hello=bye",
-                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
-                        "javax.faces.ViewState=-987:-654&hello=bye"));
-        assertEquals("aaa=bbb&javax.faces.ViewState=-123:-456&hello=bye",
-                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
-                        "aaa=bbb&javax.faces.ViewState=-987:-654&hello=bye"));
-        assertEquals("aaa=bbb&javax.faces.ViewState=-123:-456",
-                extractJSFNewViewState("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>",
-                        "aaa=bbb&javax.faces.ViewState=-987:-654"));
+        assertEquals(jakartify("javax.faces.ViewState=stateless&hello=bye"),
+                extractJSFNewViewState("xxx", jakartify("javax.faces.ViewState=stateless&hello=bye")));
+        assertEquals(jakartify("javax.faces.ViewState=stateless&hello=bye"),
+                extractJSFNewViewState(jakartify("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>"),
+                        jakartify("javax.faces.ViewState=stateless&hello=bye")));
+        assertEquals(jakartify("aaa=bbb&javax.faces.ViewState=xxx:yyy&hello=bye"),
+                extractJSFNewViewState(jakartify("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>"),
+                        jakartify("aaa=bbb&javax.faces.ViewState=xxx:yyy&hello=bye")));
+        assertEquals(jakartify("javax.faces.ViewState=123:456&hello=bye"),
+                extractJSFNewViewState(jakartify("<input name=\"javax.faces.ViewState\" value=\"123:456\"/>"),
+                        jakartify("javax.faces.ViewState=987:654&hello=bye")));
+        assertEquals(jakartify("javax.faces.ViewState=-123:-456&hello=bye"),
+                extractJSFNewViewState(jakartify("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>"),
+                        jakartify("javax.faces.ViewState=987:654&hello=bye")));
+        assertEquals(jakartify("javax.faces.ViewState=-123:-456&hello=bye"),
+                extractJSFNewViewState(jakartify("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>"),
+                        jakartify("javax.faces.ViewState=-987:-654&hello=bye")));
+        assertEquals(jakartify("aaa=bbb&javax.faces.ViewState=-123:-456&hello=bye"),
+                extractJSFNewViewState(jakartify("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>"),
+                        jakartify("aaa=bbb&javax.faces.ViewState=-987:-654&hello=bye")));
+        assertEquals(jakartify("aaa=bbb&javax.faces.ViewState=-123:-456"),
+                extractJSFNewViewState(jakartify("<input name=\"javax.faces.ViewState\" value=\"-123:-456\"/>"),
+                       jakartify("aaa=bbb&javax.faces.ViewState=-987:-654")));
     }
 
     @Test
     void noAjaxRequests() {
-        assertEquals("aaa=bbb&javax.faces.ViewState=-123:-456&hello=bye",
-                noJSFAjaxRequests("aaa=bbb&javax.faces.ViewState=-123:-456&javax.faces.partial.ajax=true&hello=bye"));
+        assertEquals(jakartify("aaa=bbb&javax.faces.ViewState=-123:-456&hello=bye"),
+                noJSFAjaxRequests(jakartify("aaa=bbb&javax.faces.ViewState=-123:-456")
+                        + jakartify("&javax.faces.partial.ajax=true&hello=bye")));
         assertEquals("j_idt12=j_idt12&j_idt12:j_idt14=asdf&j_idt12:j_idt16=asdf"
-                + "&javax.faces.ViewState=7709788254588873136:-8052771455757429917&javax.faces.source=j_idt12:j_idt18"
-                + "&javax.faces.behavior.event=action",
+                + jakartify("&javax.faces.ViewState=7709788254588873136:-8052771455757429917")
+                + jakartify("&javax.faces.source=j_idt12:j_idt18")
+                + jakartify("&javax.faces.behavior.event=action"),
                 noJSFAjaxRequests("j_idt12=j_idt12&j_idt12:j_idt14=asdf&j_idt12:j_idt16=asdf"
-                + "&javax.faces.ViewState=7709788254588873136:-8052771455757429917&javax.faces.source=j_idt12:j_idt18"
-                + "&javax.faces.partial.event=click&javax.faces.partial.execute=j_idt12:j_idt18 j_idt12"
-                + "&javax.faces.partial.render=j_idt12&javax.faces.behavior.event=action&javax.faces.partial.ajax=false"));
+                + jakartify("&javax.faces.ViewState=7709788254588873136:-8052771455757429917")
+                        + jakartify("&javax.faces.source=j_idt12:j_idt18")
+                + jakartify("&javax.faces.partial.event=click")
+                        + jakartify("&javax.faces.partial.execute=j_idt12:j_idt18 j_idt12")
+                + jakartify("&javax.faces.partial.render=j_idt12")
+                        + jakartify("&javax.faces.behavior.event=action")
+                        + jakartify("&javax.faces.partial.ajax=false")));
     }
 
     @Test

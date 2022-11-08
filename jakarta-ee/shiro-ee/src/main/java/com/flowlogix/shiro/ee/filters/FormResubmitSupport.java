@@ -24,6 +24,7 @@ import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpResponseCod
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.MediaType.APPLICATION_FORM_URLENCODED;
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import com.flowlogix.shiro.ee.filters.ShiroFilter.WrappedSecurityManager;
+import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.HttpCookie;
@@ -81,11 +82,11 @@ public class FormResubmitSupport {
     static final String FORM_IS_RESUBMITTED = "com.flowlogix.form-is-resubmitted";
     static final String DONT_ADD_ANY_MORE_COOKIES = "com.flowlogix.no-more-cookies";
     // encoded view state
-    private static final String FACES_VIEW_STATE = "javax.faces.ViewState";
+    private static final String FACES_VIEW_STATE = jakartify("javax.faces.ViewState");
     private static final String FACES_VIEW_STATE_EQUALS = FACES_VIEW_STATE + "=";
     private static final Pattern VIEW_STATE_PATTERN
             = Pattern.compile(String.format("(.*)(%s[-]?[\\d]+:[-]?[\\d]+)(.*)", FACES_VIEW_STATE_EQUALS));
-    private static final String PARTIAL_VIEW = "javax.faces.partial";
+    private static final String PARTIAL_VIEW = jakartify("javax.faces.partial");
     private static final Pattern PARTIAL_REQUEST_PATTERN
             = Pattern.compile(String.format("[\\&]?%s.\\w+=[\\w\\s:%%\\d]*", PARTIAL_VIEW));
     private static final Pattern INITIAL_AMPERSAND = Pattern.compile("^\\&");

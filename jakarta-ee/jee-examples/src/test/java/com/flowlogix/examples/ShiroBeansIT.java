@@ -16,6 +16,7 @@
 package com.flowlogix.examples;
 
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
+import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -117,7 +118,7 @@ public class ShiroBeansIT {
                 "anonymous user should get an exception");
         webDriver.get(baseURL + "lastException");
         assertTrue(webDriver.findElement(By.tagName("body")).getText()
-                .startsWith("WARNING: javax.ejb.EJBException: Attempting to perform a user-only operation"),
+                .startsWith(jakartify("WARNING: javax.ejb.EJBException: Attempting to perform a user-only operation")),
                 "capturing correct warning from the server");
     }
 

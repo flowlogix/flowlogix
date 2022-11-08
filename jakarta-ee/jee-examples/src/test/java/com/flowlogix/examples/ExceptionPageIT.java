@@ -15,6 +15,7 @@
  */
 package com.flowlogix.examples;
 
+import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
@@ -154,7 +155,7 @@ public class ExceptionPageIT {
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
         webDriver.get(baseURL + "lastException");
-        assertEquals("WARNING: javax.faces.FacesException: #{exceptionBean.throwExceptionFromMethod()}: "
+        assertEquals(jakartify("WARNING: javax.faces.FacesException: #{exceptionBean.throwExceptionFromMethod()}: ")
                 + "java.sql.SQLException: sql-from-method", webDriver.findElement(By.tagName("body")).getText());
     }
 
@@ -220,7 +221,8 @@ public class ExceptionPageIT {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
-        var productionList = List.of(new Action("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value",
+        var productionList = List.of(new Action(
+                jakartify("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value"),
                 node -> node.setTextContent("Production")));
         new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
                 getStandardActions().stream()).collect(Collectors.toList()));

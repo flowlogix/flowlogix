@@ -15,6 +15,7 @@
  */
 package com.flowlogix.util;
 
+import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
@@ -105,7 +106,7 @@ public class ShrinkWrapManipulator {
     private static List<Action> initializeStandardActions() {
         switch (System.getProperty(INTEGRATION_TEST_MODE_PROPERTY)) {
             case CLIENT_STATE_SAVING:
-                return List.of(new Action(getParamValue("javax.faces.STATE_SAVING_METHOD"),
+                return List.of(new Action(getParamValue(jakartify("javax.faces.STATE_SAVING_METHOD")),
                         node -> node.setTextContent("client")));
             case SHIRO_NATIVE_SESSIONS:
                 return List.of(new Action(getParamValue("shiroConfigLocations"),

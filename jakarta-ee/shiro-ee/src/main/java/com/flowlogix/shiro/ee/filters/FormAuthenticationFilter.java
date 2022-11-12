@@ -37,6 +37,7 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_P
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {
     static final String LOGIN_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.login-predicate";
     static final String LOGIN_WAITTIME_ATTR_NAME = "com.flowlogix.shiro.ee.login-wait-time";
+    static final String LOGIN_URL_ATTR_NAME = "com.flowlogix.shiro.ee.login-url";
     static final FallbackPredicate NO_PREDICATE = (path, request) -> false;
     private final @Delegate AuthenticationFilterDelegate delegate;
 

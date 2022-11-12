@@ -15,13 +15,19 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
-import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.isWebContainerSessions;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_URL_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderContstants.CONTENT_TYPE;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderContstants.LOCATION;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderContstants.SET_COOKIE;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpResponseCodes.FOUND;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpResponseCodes.OK;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.MediaType.APPLICATION_FORM_URLENCODED;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.DONT_ADD_ANY_MORE_COOKIES;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.addCookie;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.deleteCookie;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.getCookieAge;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.getSessionCookieName;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.transformCookieHeader;
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import com.flowlogix.shiro.ee.filters.ShiroFilter.WrappedSecurityManager;
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
@@ -36,9 +42,6 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import static java.util.function.Predicate.not;
@@ -60,7 +63,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;
-import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.util.WebUtils;
 import org.jsoup.Jsoup;
@@ -80,7 +82,6 @@ public class FormResubmitSupport {
     static final String SHIRO_FORM_DATA_KEY = "com.flowlogix.form-data-key";
     static final String SESSION_EXPIRED_PARAMETER = "com.flowlogix.sessionExpired";
     static final String FORM_IS_RESUBMITTED = "com.flowlogix.form-is-resubmitted";
-    static final String DONT_ADD_ANY_MORE_COOKIES = "com.flowlogix.no-more-cookies";
     // encoded view state
     private static final String FACES_VIEW_STATE = jakartify("javax.faces.ViewState");
     private static final String FACES_VIEW_STATE_EQUALS = FACES_VIEW_STATE + "=";
@@ -269,7 +270,10 @@ public class FormResubmitSupport {
         boolean useFallback = useFallbackPath.useFallback(request.getRequestURI(), request);
         String referer = getReferer(request);
         String redirectPath = Servlets.getRequestURLWithQueryString(request);
-        if (useFallback && referer != null) {
+        if (useFallback && referer != null && !isLoginUrl(request)) {
+            // the following is used in the logout flow only,
+            // because login flow saves the request automatically, without
+            // needing a referrer
             useFallback = useFallbackPath.useFallback(referer, request);
             redirectPath = referer;
         }
@@ -305,34 +309,9 @@ public class FormResubmitSupport {
         }
     }
 
-    static void addCookie(@NonNull HttpServletResponse response, ServletContext servletContext,
-            @NonNull String cokieName, @NonNull String cookieValue, int maxAge) {
-        var cookie = new Cookie(cokieName, cookieValue);
-        cookie.setPath(servletContext.getContextPath());
-        cookie.setMaxAge(maxAge);
-        response.addCookie(cookie);
-    }
-
-    static void deleteCookie(@NonNull HttpServletResponse response, ServletContext servletContext,
-            @NonNull String cokieName) {
-        var cookieToDelete = new Cookie(cokieName, "tbd");
-        cookieToDelete.setPath(servletContext.getContextPath());
-        cookieToDelete.setMaxAge(0);
-        response.addCookie(cookieToDelete);
-    }
-
-    static int getCookieAge(ServletRequest request, SecurityManager securityManager) {
-        var nativeSessionManager = getNativeSessionManager(securityManager);
-        if (nativeSessionManager != null) {
-            return (int) Duration.ofMillis(nativeSessionManager.getGlobalSessionTimeout()).toSeconds();
-        } else {
-            try {
-                return (int) Duration.ofMinutes(request.getServletContext().getSessionTimeout()).toSeconds();
-            } catch (Throwable e) {
-                // workaround for https://github.com/eclipse/jetty.project/issues/8556
-                return (int) Duration.ofHours(1).toSeconds();
-            }
-        }
+    static boolean isLoginUrl(HttpServletRequest request) {
+        String loginUrl = (String) request.getAttribute(LOGIN_URL_ATTR_NAME);
+        return loginUrl != null && request.getRequestURI().equals(request.getContextPath() + loginUrl);
     }
 
     static String resubmitSavedForm(@NonNull String savedFormData, @NonNull String savedRequest,
@@ -403,11 +382,6 @@ public class FormResubmitSupport {
         }
     }
 
-    static Map<String, String> transformCookieHeader(@NonNull List<String> cookies) {
-        return cookies.stream().map(s -> s.split("[=;]"))
-                .collect(Collectors.toMap(k -> k[0], v -> (v.length > 1) ? v[1] : ""));
-    }
-
     private static HttpClient buildHttpClient(String savedRequest, ServletContext servletContext,
             HttpServletRequest originalRequest) throws URISyntaxException {
         CookieManager cookieManager = new CookieManager();
@@ -424,15 +398,6 @@ public class FormResubmitSupport {
             }
         }
         return HttpClient.newBuilder().cookieHandler(cookieManager).build();
-    }
-
-    private static String getSessionCookieName(ServletContext context, SecurityManager securityManager) {
-        if (!isWebContainerSessions(securityManager) && getNativeSessionManager(securityManager) != null) {
-            return getNativeSessionManager(securityManager).getSessionIdCookie().getName();
-        } else {
-            return context.getSessionCookieConfig().getName() != null
-                    ? context.getSessionCookieConfig().getName() : DEFAULT_SESSION_ID_NAME;
-        }
     }
 
     public static DefaultWebSessionManager getNativeSessionManager(SecurityManager securityManager) {

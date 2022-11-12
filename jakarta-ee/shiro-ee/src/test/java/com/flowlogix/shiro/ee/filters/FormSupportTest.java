@@ -19,7 +19,7 @@ import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.extractJSFNewVi
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getReferer;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFStatefulForm;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.noJSFAjaxRequests;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.transformCookieHeader;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.transformCookieHeader;
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;

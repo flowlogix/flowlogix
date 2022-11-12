@@ -100,8 +100,8 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
         return (String path, HttpServletRequest request) -> {
             String referer = getReferer(request);
             boolean usePredicate = path.equals(referer);
-            String loginUrl = request.getContextPath() + request.getAttribute(LOGIN_URL_ATTR_NAME);
-            if (path.equals(loginUrl)) {
+            String loginUrl = (String) request.getAttribute(LOGIN_URL_ATTR_NAME);
+            if (loginUrl != null && path.equals(request.getContextPath() + loginUrl)) {
                 return true;
             }
             return isLogout ? !usePredicate : usePredicate;

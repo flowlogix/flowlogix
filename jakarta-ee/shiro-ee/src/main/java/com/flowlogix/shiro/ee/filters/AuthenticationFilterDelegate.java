@@ -74,7 +74,11 @@ class AuthenticationFilterDelegate {
         request.setAttribute(LOGIN_WAITTIME_ATTR_NAME, loginFailedWaitTime);
         request.setAttribute(LOGOUT_PREDICATE_ATTR_NAME, logoutFallbackType);
         request.setAttribute(LOGIN_REDIRECT_PREDICATE_ATTR_NAME, loginRedirectFallbackType);
-        request.setAttribute(LOGIN_URL_ATTR_NAME, methods.getLoginUrl());
+        try {
+            request.setAttribute(LOGIN_URL_ATTR_NAME, methods.getLoginUrl());
+        } catch (UnsupportedOperationException e) {
+            // LogoutFilter does not support this, safely ignore
+        }
         return methods.preHandle(request, response);
     }
 

@@ -16,6 +16,7 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.isWebContainerSessions;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_URL_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderContstants.CONTENT_TYPE;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderContstants.LOCATION;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderContstants.SET_COOKIE;
@@ -269,7 +270,7 @@ public class FormResubmitSupport {
         boolean useFallback = useFallbackPath.useFallback(request.getRequestURI(), request);
         String referer = getReferer(request);
         String redirectPath = Servlets.getRequestURLWithQueryString(request);
-        if (useFallback && referer != null) {
+        if (useFallback && referer != null && !isLoginUrl(request)) {
             useFallback = useFallbackPath.useFallback(referer, request);
             redirectPath = referer;
         }
@@ -303,6 +304,11 @@ public class FormResubmitSupport {
         } catch (Throwable e) {
             return false;
         }
+    }
+
+    static boolean isLoginUrl(HttpServletRequest request) {
+        String loginUrl = (String) request.getAttribute(LOGIN_URL_ATTR_NAME);
+        return loginUrl != null && request.getRequestURI().equals(request.getContextPath() + loginUrl);
     }
 
     static void addCookie(@NonNull HttpServletResponse response, ServletContext servletContext,

@@ -16,12 +16,12 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.cdi.ShiroScopeContext.addScopeSessionListeners;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.DONT_ADD_ANY_MORE_COOKIES;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getPostData;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFClientStateSavingMethod;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isPostRequest;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.DONT_ADD_ANY_MORE_COOKIES;
 import static com.flowlogix.shiro.ee.listeners.EnvironmentLoaderListener.isShiroEEDisabled;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -82,7 +82,7 @@ public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter
     static FallbackPredicate createPredicate() {
         return (String path, HttpServletRequest request) -> {
             String referer = getReferer(request);
-            return path.equals(referer);
+            return !path.equals(referer);
         };
     }
 }

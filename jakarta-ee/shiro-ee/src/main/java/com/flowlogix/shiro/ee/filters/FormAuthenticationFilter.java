@@ -16,6 +16,7 @@
 package com.flowlogix.shiro.ee.filters;
 
 import com.flowlogix.shiro.ee.filters.AuthenticationFilterDelegate.MethodsFromFilter;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getReferer;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.redirectToSaved;
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import javax.servlet.ServletRequest;
@@ -36,8 +37,10 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_P
  */
 public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.FormAuthenticationFilter {
     static final String LOGIN_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.login-predicate";
+    static final String LOGIN_REDIRECT_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.login-redirect-predicate";
     static final String LOGIN_WAITTIME_ATTR_NAME = "com.flowlogix.shiro.ee.login-wait-time";
     static final FallbackPredicate NO_PREDICATE = (path, request) -> false;
+    static final FallbackPredicate LOGIN_REDIRECT_PREDICATE = createPredicate(false);
     private final @Delegate AuthenticationFilterDelegate delegate;
 
     private class Methods implements MethodsFromFilter {
@@ -90,5 +93,13 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
         } else {
             return super.getPathWithinApplication(request);
         }
+    }
+
+    static FallbackPredicate createPredicate(boolean isLogout) {
+        return (String path, HttpServletRequest request) -> {
+            String referer = getReferer(request);
+            boolean usePredicate = path.equals(referer);
+            return isLogout ? !usePredicate : usePredicate;
+        };
     }
 }

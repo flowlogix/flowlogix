@@ -16,7 +16,7 @@
 package com.flowlogix.shiro.ee.filters;
 
 import com.flowlogix.shiro.ee.filters.AuthenticationFilterDelegate.MethodsFromFilter;
-import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getReferer;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.createPredicate;
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -33,7 +33,7 @@ import org.apache.shiro.web.util.WebUtils;
  * @author lprimak
  */
 public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter {
-    static final FallbackPredicate YES_PREDICATE = createPredicate();
+    static final FallbackPredicate YES_PREDICATE = createPredicate(true);
     static final String LOGOUT_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.logout-predicate";
     private final @Delegate AuthenticationFilterDelegate delegate;
 
@@ -77,12 +77,5 @@ public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter
         } else {
             super.issueRedirect(request, response, redirectUrl);
         }
-    }
-
-    static FallbackPredicate createPredicate() {
-        return (String path, HttpServletRequest request) -> {
-            String referer = getReferer(request);
-            return !path.equals(referer);
-        };
     }
 }

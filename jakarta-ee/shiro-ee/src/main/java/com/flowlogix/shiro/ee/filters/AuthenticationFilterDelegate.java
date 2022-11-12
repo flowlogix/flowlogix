@@ -16,6 +16,8 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_PREDICATE_ATTR_NAME;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_REDIRECT_PREDICATE;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_REDIRECT_PREDICATE_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_WAITTIME_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.NO_PREDICATE;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.savePostDataForResubmit;
@@ -63,12 +65,14 @@ class AuthenticationFilterDelegate {
      */
     private @Getter @Setter int loginFailedWaitTime;
     private @Getter @Setter FallbackPredicate loginFallbackType = NO_PREDICATE;
+    private @Getter @Setter FallbackPredicate loginRedirectFallbackType = LOGIN_REDIRECT_PREDICATE;
     private @Getter @Setter FallbackPredicate logoutFallbackType = YES_PREDICATE;
 
     public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
         request.setAttribute(LOGIN_PREDICATE_ATTR_NAME, loginFallbackType);
         request.setAttribute(LOGIN_WAITTIME_ATTR_NAME, loginFailedWaitTime);
         request.setAttribute(LOGOUT_PREDICATE_ATTR_NAME, logoutFallbackType);
+        request.setAttribute(LOGIN_REDIRECT_PREDICATE_ATTR_NAME, loginRedirectFallbackType);
         return methods.preHandle(request, response);
     }
 

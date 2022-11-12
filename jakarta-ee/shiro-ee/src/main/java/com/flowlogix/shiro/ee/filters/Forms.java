@@ -16,6 +16,7 @@
 package com.flowlogix.shiro.ee.filters;
 
 import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_PREDICATE_ATTR_NAME;
+import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_REDIRECT_PREDICATE_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_WAITTIME_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SESSION_EXPIRED_PARAMETER;
@@ -101,7 +102,7 @@ public class Forms {
 
         public boolean redirectIfLoggedIn(String view) {
             if (isLoggedIn()) {
-                redirectToView(Faces.getRequestAttribute(LOGOUT_PREDICATE_ATTR_NAME), view);
+                redirectToView(Faces.getRequestAttribute(LOGIN_REDIRECT_PREDICATE_ATTR_NAME), view);
                 return true;
             } else {
                 return false;

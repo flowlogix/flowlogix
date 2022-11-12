@@ -271,6 +271,9 @@ public class FormResubmitSupport {
         String referer = getReferer(request);
         String redirectPath = Servlets.getRequestURLWithQueryString(request);
         if (useFallback && referer != null && !isLoginUrl(request)) {
+            // the following is used in the logout flow only,
+            // because login flow saves the request automatically, without
+            // needing a referrer
             useFallback = useFallbackPath.useFallback(referer, request);
             redirectPath = referer;
         }

@@ -15,6 +15,7 @@
  */
 package com.flowlogix.shiro.ee.filters;
 
+import com.flowlogix.shiro.ee.filters.FormResubmitSupport.PartialAjaxResult;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.extractJSFNewViewState;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.getReferer;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFStatefulForm;
@@ -126,13 +127,15 @@ public class FormSupportTest {
 
     @Test
     void noAjaxRequests() {
-        assertEquals(jakartify("aaa=bbb&javax.faces.ViewState=-123:-456&hello=bye"),
+        assertEquals(
+                new PartialAjaxResult(
+                        jakartify("aaa=bbb&javax.faces.ViewState=-123:-456&hello=bye"), true),
                 noJSFAjaxRequests(jakartify("aaa=bbb&javax.faces.ViewState=-123:-456")
                         + jakartify("&javax.faces.partial.ajax=true&hello=bye")));
-        assertEquals("j_idt12=j_idt12&j_idt12:j_idt14=asdf&j_idt12:j_idt16=asdf"
+        assertEquals(new PartialAjaxResult("j_idt12=j_idt12&j_idt12:j_idt14=asdf&j_idt12:j_idt16=asdf"
                 + jakartify("&javax.faces.ViewState=7709788254588873136:-8052771455757429917")
                 + jakartify("&javax.faces.source=j_idt12:j_idt18")
-                + jakartify("&javax.faces.behavior.event=action"),
+                + jakartify("&javax.faces.behavior.event=action"), true),
                 noJSFAjaxRequests("j_idt12=j_idt12&j_idt12:j_idt14=asdf&j_idt12:j_idt16=asdf"
                 + jakartify("&javax.faces.ViewState=7709788254588873136:-8052771455757429917")
                         + jakartify("&javax.faces.source=j_idt12:j_idt18")

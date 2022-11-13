@@ -352,7 +352,7 @@ public class FormResubmitSupport {
                 savedFormData = getJSFNewViewState(savedRequest, client, decodedFormData);
             }
         }
-        return noJSFAjaxRequests(savedFormData);
+        return savedFormData;
     }
 
     @SuppressWarnings("fallthrough")

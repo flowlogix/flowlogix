@@ -371,10 +371,15 @@ public class FormResubmitSupport {
                         .startsWith(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()))))
                         .forEach(entry -> addCookie(originalResponse, servletContext,
                                 entry.getKey(), entry.getValue(), -1));
-                originalResponse.getWriter().append(response.body());
-                originalRequest.setAttribute(DONT_ADD_ANY_MORE_COOKIES, Boolean.TRUE);
-                if (hasFacesContext()) {
-                    Faces.responseComplete();
+                if (hasFacesContext() && Faces.isAjaxRequest()) {
+                    originalResponse.setStatus(FOUND);
+                    originalResponse.setHeader(LOCATION, savedRequest);
+                } else {
+                    originalResponse.getWriter().append(response.body());
+                    originalRequest.setAttribute(DONT_ADD_ANY_MORE_COOKIES, Boolean.TRUE);
+                    if (hasFacesContext()) {
+                        Faces.responseComplete();
+                    }
                 }
                 return null;
             default:

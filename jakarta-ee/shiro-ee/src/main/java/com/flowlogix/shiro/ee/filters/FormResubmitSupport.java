@@ -466,7 +466,7 @@ public class FormResubmitSupport {
 
     static PartialAjaxResult noJSFAjaxRequests(String savedFormData) {
         var partialMatcher = PARTIAL_REQUEST_PATTERN.matcher(savedFormData);
-        boolean hasPartialAjax = partialMatcher.matches();
+        boolean hasPartialAjax = partialMatcher.find();
         return new PartialAjaxResult(INITIAL_AMPERSAND.matcher(partialMatcher
                 .replaceAll("")).replaceFirst(""), hasPartialAjax);
     }

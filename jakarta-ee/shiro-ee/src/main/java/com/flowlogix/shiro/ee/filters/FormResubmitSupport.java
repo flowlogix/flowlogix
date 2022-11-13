@@ -60,6 +60,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -116,7 +117,7 @@ public class FormResubmitSupport {
     }
 
     @RequiredArgsConstructor
-    @EqualsAndHashCode
+    @EqualsAndHashCode @ToString
     @SuppressWarnings("VisibilityModifier")
     static class PartialAjaxResult {
         public final String result;

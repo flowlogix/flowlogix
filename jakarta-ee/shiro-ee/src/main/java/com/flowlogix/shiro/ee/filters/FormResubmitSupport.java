@@ -55,8 +55,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
@@ -111,6 +113,14 @@ public class FormResubmitSupport {
     static class HttpResponseCodes {
         static final int OK = 200;
         static final int FOUND = 302;
+    }
+
+    @RequiredArgsConstructor
+    @EqualsAndHashCode
+    @SuppressWarnings("VisibilityModifier")
+    static class PartialAjaxResult {
+        public final String result;
+        public final boolean isPartialAjaxRequest;
     }
 
     static void savePostDataForResubmit(HttpServletRequest request, HttpServletResponse response, String loginUrl) {
@@ -320,9 +330,9 @@ public class FormResubmitSupport {
             throws InterruptedException, URISyntaxException, IOException {
         log.debug("saved form data: {}", savedFormData);
         HttpClient client = buildHttpClient(savedRequest, servletContext, originalRequest);
-        String decodedFormData = parseFormData(savedFormData, savedRequest, client, servletContext);
+        PartialAjaxResult decodedFormData = parseFormData(savedFormData, savedRequest, client, servletContext);
         HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(savedRequest))
-                .POST(HttpRequest.BodyPublishers.ofString(decodedFormData))
+                .POST(HttpRequest.BodyPublishers.ofString(decodedFormData.result))
                 .headers(CONTENT_TYPE, APPLICATION_FORM_URLENCODED,
                         FORM_IS_RESUBMITTED, Boolean.TRUE.toString())
                 .build();
@@ -336,15 +346,15 @@ public class FormResubmitSupport {
             var redirectResponse = client.send(redirectRequest, HttpResponse.BodyHandlers.ofString());
             log.debug("Redirect request: {}, response: {}", redirectRequest, redirectResponse);
             return processResubmitResponse(redirectResponse, originalRequest, originalResponse,
-                    response.headers(), savedRequest, servletContext);
+                    response.headers(), savedRequest, servletContext, decodedFormData.isPartialAjaxRequest);
         } else {
             deleteCookie(originalResponse, servletContext, SHIRO_FORM_DATA_KEY);
             return processResubmitResponse(response, originalRequest, originalResponse,
-                    response.headers(), savedRequest, servletContext);
+                    response.headers(), savedRequest, servletContext, decodedFormData.isPartialAjaxRequest);
         }
     }
 
-    private static String parseFormData(String savedFormData, String savedRequest,
+    private static PartialAjaxResult parseFormData(String savedFormData, String savedRequest,
             HttpClient client, ServletContext servletContext) throws IOException, InterruptedException {
         if (!isJSFClientStateSavingMethod(servletContext)) {
             String decodedFormData = URLDecoder.decode(savedFormData, StandardCharsets.UTF_8);
@@ -358,7 +368,8 @@ public class FormResubmitSupport {
     @SuppressWarnings("fallthrough")
     private static String processResubmitResponse(HttpResponse<String> response,
             HttpServletRequest originalRequest, HttpServletResponse originalResponse,
-            HttpHeaders headers, String savedRequest, ServletContext servletContext) throws IOException {
+            HttpHeaders headers, String savedRequest, ServletContext servletContext,
+            boolean isPartialAjaxRequest) throws IOException {
         switch (response.statusCode()) {
             case FOUND:
                 // can't use Faces.redirect() here
@@ -371,15 +382,15 @@ public class FormResubmitSupport {
                         .startsWith(getSessionCookieName(servletContext, SecurityUtils.getSecurityManager()))))
                         .forEach(entry -> addCookie(originalResponse, servletContext,
                                 entry.getKey(), entry.getValue(), -1));
-                if (hasFacesContext() && Faces.isAjaxRequest()) {
+                if (isPartialAjaxRequest) {
                     originalResponse.setStatus(FOUND);
                     originalResponse.setHeader(LOCATION, savedRequest);
                 } else {
                     originalResponse.getWriter().append(response.body());
-                    originalRequest.setAttribute(DONT_ADD_ANY_MORE_COOKIES, Boolean.TRUE);
-                    if (hasFacesContext()) {
-                        Faces.responseComplete();
-                    }
+                }
+                originalRequest.setAttribute(DONT_ADD_ANY_MORE_COOKIES, Boolean.TRUE);
+                if (hasFacesContext()) {
+                    Faces.responseComplete();
                 }
                 return null;
             default:
@@ -452,9 +463,11 @@ public class FormResubmitSupport {
         return savedFormData;
     }
 
-    static String noJSFAjaxRequests(String savedFormData) {
-        return INITIAL_AMPERSAND.matcher(PARTIAL_REQUEST_PATTERN
-                .matcher(savedFormData).replaceAll("")).replaceFirst("");
+    static PartialAjaxResult noJSFAjaxRequests(String savedFormData) {
+        var partialMatcher = PARTIAL_REQUEST_PATTERN.matcher(savedFormData);
+        boolean hasPartialAjax = partialMatcher.matches();
+        return new PartialAjaxResult(INITIAL_AMPERSAND.matcher(partialMatcher
+                .replaceAll("")).replaceFirst(""), hasPartialAjax);
     }
 
     static boolean isJSFStatefulForm(@NonNull String savedFormData) {

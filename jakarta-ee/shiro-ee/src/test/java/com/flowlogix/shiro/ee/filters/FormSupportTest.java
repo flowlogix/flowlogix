@@ -135,7 +135,7 @@ public class FormSupportTest {
         assertEquals(new PartialAjaxResult("j_idt12=j_idt12&j_idt12:j_idt14=asdf&j_idt12:j_idt16=asdf"
                 + jakartify("&javax.faces.ViewState=7709788254588873136:-8052771455757429917")
                 + jakartify("&javax.faces.source=j_idt12:j_idt18")
-                + jakartify("&javax.faces.behavior.event=action"), false),
+                + jakartify("&javax.faces.behavior.event=action"), true),
                 noJSFAjaxRequests("j_idt12=j_idt12&j_idt12:j_idt14=asdf&j_idt12:j_idt16=asdf"
                 + jakartify("&javax.faces.ViewState=7709788254588873136:-8052771455757429917")
                         + jakartify("&javax.faces.source=j_idt12:j_idt18")

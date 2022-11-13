@@ -347,7 +347,7 @@ public class FormResubmitSupport {
             var redirectResponse = client.send(redirectRequest, HttpResponse.BodyHandlers.ofString());
             log.debug("Redirect request: {}, response: {}", redirectRequest, redirectResponse);
             return processResubmitResponse(redirectResponse, originalRequest, originalResponse,
-                    response.headers(), savedRequest, servletContext, decodedFormData.isPartialAjaxRequest);
+                    response.headers(), savedRequest, servletContext, false);
         } else {
             deleteCookie(originalResponse, servletContext, SHIRO_FORM_DATA_KEY);
             return processResubmitResponse(response, originalRequest, originalResponse,

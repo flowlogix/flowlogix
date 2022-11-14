@@ -387,6 +387,7 @@ public class FormResubmitSupport {
                                 entry.getKey(), entry.getValue(), -1));
                 if (isPartialAjaxRequest) {
                     originalResponse.setHeader(CONTENT_TYPE, TEXT_XML);
+                    originalResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
                     originalResponse.getWriter().append(String.format(
                             "<partial-response><redirect url=\"%s\"></redirect></partial-response>",
                             savedRequest));

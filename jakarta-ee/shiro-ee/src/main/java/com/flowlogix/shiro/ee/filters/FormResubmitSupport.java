@@ -22,6 +22,7 @@ import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpHeaderConts
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpResponseCodes.FOUND;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.HttpResponseCodes.OK;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.MediaType.APPLICATION_FORM_URLENCODED;
+import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.MediaType.TEXT_XML;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.DONT_ADD_ANY_MORE_COOKIES;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.addCookie;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.deleteCookie;
@@ -109,6 +110,7 @@ public class FormResubmitSupport {
 
     static class MediaType {
         static final String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
+        static final String TEXT_XML = "text/xml";
     }
 
     static class HttpResponseCodes {
@@ -384,8 +386,11 @@ public class FormResubmitSupport {
                         .forEach(entry -> addCookie(originalResponse, servletContext,
                                 entry.getKey(), entry.getValue(), -1));
                 if (isPartialAjaxRequest) {
-                    originalResponse.setStatus(FOUND);
-                    originalResponse.setHeader(LOCATION, savedRequest);
+                    originalResponse.setHeader(CONTENT_TYPE, TEXT_XML);
+                    originalResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                    originalResponse.getWriter().append(String.format(
+                            "<partial-response><redirect url=\"%s\"></redirect></partial-response>",
+                            savedRequest));
                 } else {
                     originalResponse.getWriter().append(response.body());
                 }

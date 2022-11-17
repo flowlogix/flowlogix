@@ -64,6 +64,7 @@ import lombok.SneakyThrows;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.AbstractRememberMeManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;
@@ -133,7 +134,16 @@ public class FormResubmitSupport {
             var cacheKey = UUID.randomUUID();
             var dsm = (DefaultSecurityManager) unwrapSecurityManager(SecurityUtils.getSecurityManager());
             if (dsm.getCacheManager() != null) {
-                dsm.getCacheManager().getCache(FORM_DATA_CACHE).put(cacheKey, postData);
+                var cache = dsm.getCacheManager().getCache(FORM_DATA_CACHE);
+                var rememberMeManager = (AbstractRememberMeManager) dsm.getRememberMeManager();
+                if (rememberMeManager != null && rememberMeManager.getCipherService() != null) {
+                    cache.put(cacheKey, rememberMeManager.getCipherService()
+                            .encrypt(postData.getBytes(StandardCharsets.UTF_8),
+                                    rememberMeManager.getEncryptionCipherKey()).getBytes());
+                } else {
+                    log.warn("Post-data was saved in plain text due to rememberMeManager not being available");
+                    cache.put(cacheKey, postData);
+                }
                 addCookie(response, request.getServletContext(), SHIRO_FORM_DATA_KEY,
                         cacheKey.toString(), getCookieAge(request, dsm));
             } else {
@@ -165,7 +175,15 @@ public class FormResubmitSupport {
             if (dsm.getCacheManager() != null) {
                 var cache = dsm.getCacheManager().getCache(FORM_DATA_CACHE);
                 var cacheKey = UUID.fromString(savedFormDataKey);
-                savedFormData = (String) cache.get(cacheKey);
+                var rememberMeManager = (AbstractRememberMeManager) dsm.getRememberMeManager();
+                if (rememberMeManager != null && rememberMeManager.getCipherService() != null) {
+                    var encryptedFormData = (byte[]) cache.get(cacheKey);
+                    savedFormData = new String(rememberMeManager.getCipherService()
+                            .decrypt(encryptedFormData, rememberMeManager.getDecryptionCipherKey()).getBytes(),
+                            StandardCharsets.UTF_8);
+                } else {
+                    savedFormData = (String) cache.get(cacheKey);
+                }
                 cache.remove(cacheKey);
             }
         }

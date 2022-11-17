@@ -22,6 +22,7 @@ import org.apache.shiro.crypto.AesCipherService;
 import org.apache.shiro.mgt.AbstractRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.omnifaces.util.Beans;
+import org.omnifaces.util.Lazy;
 
 /**
  * Shiro cipher key generator
@@ -29,6 +30,8 @@ import org.omnifaces.util.Beans;
  * @author lprimak
  */
 public class KeyGen {
+    private final Lazy<AesCipherService> cipherService = new Lazy<>(AesCipherService::new);
+
     public interface CipherKeySupplier extends Supplier<String> {
     }
 
@@ -40,11 +43,11 @@ public class KeyGen {
     }
 
     private byte[] generateCipherKey() {
-        String key = Beans.getReference(CipherKeySupplier.class).get();
-        if (StringUtils.isBlank(key)) {
-            return new AesCipherService().generateNewKey().getEncoded();
+        var cipherKeySupplier = Beans.getReference(CipherKeySupplier.class);
+        if (cipherKeySupplier == null || StringUtils.isBlank(cipherKeySupplier.get())) {
+            return cipherService.get().generateNewKey().getEncoded();
         } else {
-            return key.getBytes(StandardCharsets.UTF_8);
+            return cipherKeySupplier.get().getBytes(StandardCharsets.UTF_8);
         }
     }
 }

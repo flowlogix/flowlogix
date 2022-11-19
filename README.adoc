@@ -3,6 +3,7 @@ image:https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.hope.nyc
 image:https://img.shields.io/jenkins/coverage/jacoco?color=aquamarine&jobUrl=https%3A%2F%2Fjenkins.hope.nyc.ny.us%2Fjob%2Fflowlogix-ee-integration%2Fjob%2Fmain&style=plastic[Jenkins Coverage]
 image:https://img.shields.io/jenkins/tests?compact_message&failed_label=failed&jobUrl=https%3A%2F%2Fjenkins.hope.nyc.ny.us%2Fjob%2Fflowlogix-ee-integration%2Fjob%2Fmain%2F&passed_label=passed&skipped_label=skipped&style=plastic[Jenkins tests]
 image:https://img.shields.io/github/commit-activity/m/flowlogix/flowlogix?style=plastic[GitHub commit activity]
+image:https://img.shields.io/snyk/vulnerabilities/github/flowlogix/flowlogix?style=plastic[Snyk Vulnerabilities for GitHub Repo]
 
 === Current Projects
 

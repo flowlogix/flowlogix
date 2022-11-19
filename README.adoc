@@ -16,7 +16,7 @@ image:https://img.shields.io/snyk/vulnerabilities/github/flowlogix/flowlogix?sty
 === Maven Central Coordinates
 
 Releases are available on
-https://search.maven.org/search?q=g:com.flowlogix[Maven Central]
+https://search.maven.org/search?q=g:com.flowlogix[Maven Central] +
 https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/[Maven
 Snapshots] are automatically released by Jenkins for the current head
 

@@ -475,6 +475,10 @@
                                 <shadedPattern>jakarta.inject</shadedPattern>
                             </relocation>
                             <relocation>
+                                <pattern>javax.interceptor</pattern>
+                                <shadedPattern>jakarta.interceptor</shadedPattern>
+                            </relocation>
+                            <relocation>
                                 <pattern>javax.activation</pattern>
                                 <shadedPattern>jakarta.activation</shadedPattern>
                             </relocation>

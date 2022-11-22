@@ -17,6 +17,7 @@ package com.flowlogix.util;
 
 import javax.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -26,8 +27,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("HideUtilityClassConstructor")
 public class JakartaTransformerUtils {
+    @Getter
+    @SuppressWarnings("ConstantName")
+    private static final boolean jakarta = HttpServletRequest.class.getPackageName().startsWith("jakarta");
+
     public static String jakartify(String className) {
-        return className.replaceFirst("javax.faces.", HttpServletRequest.class.getPackageName().startsWith("javax")
-                ? "javax.faces." : "jakarta.faces.");
+        return className.replaceFirst("javax\\.faces\\.",
+                isJakarta() ? "jakarta.faces." : "javax.faces.");
     }
 }

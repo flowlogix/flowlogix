@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 @SuppressWarnings("HideUtilityClassConstructor")
 public class JakartaTransformerUtils {
     @Getter
+    @SuppressWarnings("ConstantName")
     private static final boolean jakarta = HttpServletRequest.class.getPackageName().startsWith("jakarta");
 
     public static String jakartify(String className) {

@@ -32,7 +32,7 @@ public class JakartaTransformerUtils {
     private static final boolean jakarta = HttpServletRequest.class.getPackageName().startsWith("jakarta");
 
     public static String jakartify(String className) {
-        return className.replaceFirst("javax\\.faces\\.",
-                isJakarta() ? "jakarta.faces." : "javax.faces.");
+        return className.replaceAll("javax\\.(\\w+)\\.",
+                isJakarta() ? "jakarta.$1." : "javax.$1.");
     }
 }

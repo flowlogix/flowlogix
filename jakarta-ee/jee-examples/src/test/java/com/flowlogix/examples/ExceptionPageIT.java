@@ -155,8 +155,11 @@ public class ExceptionPageIT {
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
         webDriver.get(baseURL + "lastException");
-        assertEquals(jakartify("WARNING: javax.faces.FacesException: #{exceptionBean.throwExceptionFromMethod()}: ")
-                + "java.sql.SQLException: sql-from-method", webDriver.findElement(By.tagName("body")).getText());
+        assertTrue(webDriver.findElement(By.tagName("body")).getText().matches(
+                jakartify("^WARNING: javax.faces.FacesException: "
+                        + "#\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*")
+                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\.")),
+                "exceptionBean.throwExceptionFromMethod() - exception string doesn't match");
     }
 
     @Test

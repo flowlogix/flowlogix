@@ -132,24 +132,7 @@
                         <configuration>
                             <scripts>
                                 <!-- combine individual test profiles into a single test group property -->
-                                <script>
-                                    <![CDATA[
-                                    def groups = System.getProperty 'maven.test.property.profiles'
-                                    if (!groups) {
-                                        groups = 'none(),'
-                                        (project.activeProfiles).each{ profile ->
-                                            def test_group = profile.properties.test_groups
-                                            if (test_group) {
-                                                groups += test_group + ","
-                                            }
-                                        }
-                                        project.properties.groups = groups.substring(0, groups.length() - 1)
-                                        System.setProperty 'maven.test.property.profiles', project.properties.groups
-                                    } else {
-                                        project.properties.groups = groups
-                                    }
-                                    ]]>
-                                </script>
+                                <script>${flowlogix.basedir}/setTestGroupProperties.groovy</script>
                             </scripts>
                         </configuration>
                     </execution>

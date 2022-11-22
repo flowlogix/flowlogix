@@ -15,9 +15,9 @@
  */
 package com.flowlogix.util;
 
-import javax.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.ClassUtils;
 
 /**
  *
@@ -27,7 +27,11 @@ import lombok.NoArgsConstructor;
 @SuppressWarnings("HideUtilityClassConstructor")
 public class JakartaTransformerUtils {
     public static String jakartify(String className) {
-        return className.replaceFirst("javax.faces.", HttpServletRequest.class.getPackageName().startsWith("javax")
-                ? "javax.faces." : "jakarta.faces.");
+        boolean isJakarta = false;
+        try {
+            isJakarta = ClassUtils.getClass("jakarta.servlet.http.HttpServletRequest") != null;
+        } catch (ClassNotFoundException ex) {
+        }
+        return className.replaceFirst("javax.faces.", isJakarta ? "jakarta.faces." : "javax.faces.");
     }
 }

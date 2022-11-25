@@ -40,6 +40,24 @@
         <plugins>
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jakarta-shiro2</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedClassifierName>jakarta-shiro2</shadedClassifierName>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.shiro.crypto.AesCipherService</pattern>
+                                    <shadedPattern>org.apache.shiro.crypto.cipher.AesCipherService</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

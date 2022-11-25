@@ -178,9 +178,7 @@ public class FormResubmitSupport {
                 var rememberMeManager = (AbstractRememberMeManager) dsm.getRememberMeManager();
                 if (rememberMeManager != null && rememberMeManager.getCipherService() != null) {
                     var encryptedFormData = (byte[]) cache.get(cacheKey);
-                    savedFormData = new String(rememberMeManager.getCipherService()
-                            .decrypt(encryptedFormData, rememberMeManager.getDecryptionCipherKey()).getBytes(),
-                            StandardCharsets.UTF_8);
+                    savedFormData = CryptoSupport.decrypt(encryptedFormData, rememberMeManager);
                 } else {
                     savedFormData = (String) cache.get(cacheKey);
                 }

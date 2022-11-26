@@ -24,6 +24,7 @@ import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.saveRequestRefe
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import static com.flowlogix.shiro.ee.filters.LogoutFilter.LOGOUT_PREDICATE_ATTR_NAME;
 import static com.flowlogix.shiro.ee.filters.LogoutFilter.YES_PREDICATE;
+import static com.flowlogix.shiro.ee.listeners.EnvironmentLoaderListener.isFormResumbitDisabled;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.ServletRequest;
@@ -100,7 +101,7 @@ class AuthenticationFilterDelegate {
      * @throws IOException
      */
     public void redirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
-        if (request instanceof HttpServletRequest) {
+        if (request instanceof HttpServletRequest && !isFormResumbitDisabled(request.getServletContext())) {
             savePostDataForResubmit(WebUtils.toHttp(request), WebUtils.toHttp(response),
                     methods.getLoginUrl());
         }

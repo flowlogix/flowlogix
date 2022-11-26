@@ -20,6 +20,7 @@ import static com.flowlogix.shiro.ee.filters.FormAuthenticationFilter.LOGIN_WAIT
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.FORM_IS_RESUBMITTED;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.SESSION_EXPIRED_PARAMETER;
 import static com.flowlogix.shiro.ee.filters.LogoutFilter.LOGOUT_PREDICATE_ATTR_NAME;
+import static com.flowlogix.shiro.ee.listeners.EnvironmentLoaderListener.isFormResumbitDisabled;
 import java.util.concurrent.TimeUnit;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
@@ -132,7 +133,8 @@ public class Forms {
      * @param fallbackPath
      */
     public static void redirectToSaved(FallbackPredicate useFallbackPath, String fallbackPath) {
-        FormResubmitSupport.redirectToSaved(Faces.getRequest(), Faces.getResponse(), useFallbackPath, fallbackPath, true);
+        FormResubmitSupport.redirectToSaved(Faces.getRequest(), Faces.getResponse(), useFallbackPath, fallbackPath,
+                !isFormResumbitDisabled(Faces.getRequest().getServletContext()));
     }
 
     /**

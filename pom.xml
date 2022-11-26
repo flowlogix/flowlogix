@@ -420,7 +420,7 @@
                                 <include>${project.groupId}:${project.artifactId}</include>
                             </includes>
                         </artifactSet>
-                        <relocations>
+                        <relocations combine.children="append">
                             <relocation>
                                 <pattern>javax.faces</pattern>
                                 <shadedPattern>jakarta.faces</shadedPattern>

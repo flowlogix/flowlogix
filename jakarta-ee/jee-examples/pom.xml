@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>jee-examples</artifactId>
-    <version>5.x-SNAPSHOT</version>
+    <version>5.1.2</version>
     <packaging>war</packaging>
     <name>JEE Services and PrimeFaces Examples</name>
 
@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix-bom</artifactId>
-        <version>5.x-SNAPSHOT</version>
+        <version>5.1.2</version>
         <relativePath>../../flowlogix-bom</relativePath>
     </parent>
 

@@ -51,8 +51,16 @@
                             <shadedClassifierName>jakarta-shiro2</shadedClassifierName>
                             <relocations>
                                 <relocation>
+                                    <pattern>org.apache.shiro.crypto.CipherService</pattern>
+                                    <shadedPattern>org.apache.shiro.crypto.cipher.CipherService</shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>org.apache.shiro.crypto.AesCipherService</pattern>
                                     <shadedPattern>org.apache.shiro.crypto.cipher.AesCipherService</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.shiro.util.ByteSource</pattern>
+                                    <shadedPattern>org.apache.shiro.lang.util.ByteSource</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

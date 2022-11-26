@@ -20,46 +20,65 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.nio.charset.StandardCharsets;
 import lombok.AccessLevel;
-import lombok.Lombok;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.shiro.crypto.CipherService;
 import org.apache.shiro.mgt.AbstractRememberMeManager;
 import org.apache.shiro.util.ByteSource;
 
 /**
+ * Combines seamless support for Shiro 1/2
  *
  * @author lprimak
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 @SuppressWarnings("HideUtilityClassConstructor")
 class CryptoSupport {
     private static final MethodHandles.Lookup publicLookup = MethodHandles.publicLookup();
-    private static final MethodType methodType = MethodType.methodType(byte[].class);
+    private static final MethodType getClonedBytesMT = MethodType.methodType(byte[].class);
     private static final MethodHandle getClonedBytesHandle;
+    private static final MethodHandle decryptHandle;
 
     static {
-        MethodHandle mh = null;
+        MethodHandle getClonedMH = null;
+        MethodHandle decryptMH = null;
         try {
-            mh = publicLookup.findVirtual(ByteSource.class, "getClonedBytes", methodType);
+            Class<?> byteSourceBroker = ClassUtils.getClass("org.apache.shiro.crypto.cipher.ByteSourceBroker");
+            getClonedMH = publicLookup.findVirtual(byteSourceBroker, "getClonedBytes", getClonedBytesMT);
+            MethodType getDecryptMT = MethodType.methodType(byteSourceBroker, byte[].class, byte[].class);
+            decryptMH = publicLookup.in(CipherService.class).findVirtual(CipherService.class, "decrypt", getDecryptMT);
         } catch (ReflectiveOperationException ex) {
+            log.debug("Shiro 2 initialization failed, falling back to Shiro 1", ex);
             try {
-                mh = publicLookup.findVirtual(ByteSource.class, "getBytes", methodType);
+                getClonedMH = publicLookup.findVirtual(ByteSource.class, "getBytes", getClonedBytesMT);
+                MethodType getDecryptMT = MethodType.methodType(ByteSource.class, byte[].class, byte[].class);
+                decryptMH = publicLookup.in(CipherService.class).findVirtual(CipherService.class, "decrypt", getDecryptMT);
             } catch (ReflectiveOperationException ex1) {
-                Lombok.sneakyThrow(ex1);
+                ExceptionUtils.rethrow(ex1);
             }
         } finally {
-            getClonedBytesHandle = mh;
+            getClonedBytesHandle = getClonedMH;
+            decryptHandle = decryptMH;
         }
     }
 
     static String decrypt(byte[] encrypted, AbstractRememberMeManager rememberMeManager) {
-        return new String(getClonedBytes(rememberMeManager.getCipherService()
-                .decrypt(encrypted, rememberMeManager.getDecryptionCipherKey())),
+        return new String(getClonedBytes(decrypt(rememberMeManager.getCipherService(),
+                encrypted, rememberMeManager.getDecryptionCipherKey())),
                 StandardCharsets.UTF_8);
     }
 
     @SneakyThrows
-    static byte[] getClonedBytes(ByteSource byteSource) {
-        return (byte[]) getClonedBytesHandle.invokeExact(byteSource);
+    private static byte[] getClonedBytes(Object byteSourceBroker) {
+        return (byte[]) getClonedBytesHandle.invoke(byteSourceBroker);
+    }
+
+    @SneakyThrows
+    private static Object decrypt(CipherService cipherService, byte[] encrypted, byte[] key) {
+        return decryptHandle.invoke(cipherService, encrypted, key);
     }
 }

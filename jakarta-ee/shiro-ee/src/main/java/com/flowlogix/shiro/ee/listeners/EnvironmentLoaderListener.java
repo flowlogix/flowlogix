@@ -32,9 +32,14 @@ import org.apache.shiro.web.env.WebEnvironment;
 @WebListener
 public class EnvironmentLoaderListener extends EnvironmentLoader implements ServletContextListener {
     private static final String SHIRO_EE_DISABLED_PARAM = "com.flowlogix.shiro.ee.disabled";
+    private static final String FORM_RESUBMIT_DISABLED_PARAM = "com.flowlogix.shiro.form-resubmit.disabled";
 
     public static boolean isShiroEEDisabled(ServletContext ctx) {
         return Boolean.TRUE.equals(ctx.getAttribute(SHIRO_EE_DISABLED_PARAM));
+    }
+
+    public static boolean isFormResumbitDisabled(ServletContext ctx) {
+        return Boolean.TRUE.equals(ctx.getAttribute(FORM_RESUBMIT_DISABLED_PARAM));
     }
 
     @Override

@@ -31,6 +31,7 @@ import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.getSessi
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.transformCookieHeader;
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
 import com.flowlogix.shiro.ee.filters.ShiroFilter.WrappedSecurityManager;
+import static com.flowlogix.shiro.ee.listeners.EnvironmentLoaderListener.isFormResumbitDisabled;
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.io.IOException;
 import java.net.CookieManager;
@@ -127,7 +128,7 @@ public class FormResubmitSupport {
         public final boolean isPartialAjaxRequest;
     }
 
-    static void savePostDataForResubmit(HttpServletRequest request, HttpServletResponse response, String loginUrl) {
+    static void savePostDataForResubmit(HttpServletRequest request, HttpServletResponse response, @NonNull String loginUrl) {
         if (isPostRequest(request) && unwrapSecurityManager(SecurityUtils.getSecurityManager())
                 instanceof DefaultSecurityManager) {
             String postData = getPostData(request);
@@ -252,7 +253,8 @@ public class FormResubmitSupport {
      */
     static void redirectToSaved(HttpServletRequest request, HttpServletResponse response,
             FallbackPredicate useFallbackPath, String fallbackPath) {
-        redirectToSaved(request, response, useFallbackPath, fallbackPath, true);
+        redirectToSaved(request, response, useFallbackPath, fallbackPath,
+                !isFormResumbitDisabled(request.getServletContext()));
     }
 
 

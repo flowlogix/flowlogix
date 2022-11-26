@@ -177,8 +177,9 @@ public class FormResubmitSupport {
                 var cacheKey = UUID.fromString(savedFormDataKey);
                 var rememberMeManager = (AbstractRememberMeManager) dsm.getRememberMeManager();
                 if (rememberMeManager != null && rememberMeManager.getCipherService() != null) {
-                    var encryptedFormData = (byte[]) cache.get(cacheKey);
-                    savedFormData = CryptoSupport.decrypt(encryptedFormData, rememberMeManager);
+                    var cachedData = Optional.ofNullable((byte[]) cache.get(cacheKey));
+                    savedFormData = cachedData.map(encryptedData ->
+                            CryptoSupport.decrypt(encryptedData, rememberMeManager)).orElse(savedFormData);
                 } else {
                     savedFormData = (String) cache.get(cacheKey);
                 }

@@ -15,6 +15,7 @@
  */
 package com.flowlogix.ui;
 
+import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import javax.faces.application.ResourceHandler;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -32,7 +33,7 @@ public class UnmappedResourceHandlerMapper implements ServletContextListener {
         var faces = sce.getServletContext().getServletRegistration("FacesServlet");
         if (Boolean.parseBoolean(sce.getServletContext()
                 .getInitParameter("com.flowlogix.add-unmapped-resources")) && faces != null) {
-            faces.addMapping(ResourceHandler.RESOURCE_IDENTIFIER + "/*");
+            faces.addMapping(jakartify(ResourceHandler.RESOURCE_IDENTIFIER) + "/*");
         }
     }
 

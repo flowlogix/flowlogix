@@ -158,10 +158,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.2.0</version>
@@ -169,7 +165,6 @@
                     <configLocation>${checkstyle.configLocation}</configLocation>
                     <suppressionsLocation>${checkstyle.supressionsLocation}</suppressionsLocation>
                     <headerLocation>${checkstyle.headerLocation}</headerLocation>
-                    <enableRSS>false</enableRSS>
                     <linkXRef>true</linkXRef>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
@@ -511,6 +506,18 @@
                             <version>0.0.3</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.3.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>

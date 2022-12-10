@@ -32,6 +32,7 @@ import javax.xml.xpath.XPathFactory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.omnifaces.util.Lazy;
@@ -43,6 +44,7 @@ import org.w3c.dom.Node;
  *
  * @author lprimak
  */
+@Slf4j
 public class ShrinkWrapManipulator {
     public static final String INTEGRATION_TEST_MODE_PROPERTY = "integration.test.mode";
     public static final String CLIENT_STATE_SAVING = "clientStateSaving";
@@ -53,6 +55,11 @@ public class ShrinkWrapManipulator {
     public static class Action {
         private final String path;
         private final Consumer<Node> func;
+        private final boolean optional;
+
+        public Action(String path, Consumer<Node> func) {
+            this(path, func, false);
+        }
     }
 
     @SuppressWarnings("ConstantName")
@@ -77,7 +84,11 @@ public class ShrinkWrapManipulator {
         for (Action action : actions) {
             var expr = xpath.compile(action.path);
             Node node = (Node) expr.evaluate(webXml, XPathConstants.NODE);
-            action.func.accept(node);
+            if (node == null && action.optional) {
+                log.debug("Optional path {} ignored", action.path);
+            } else {
+                action.func.accept(node);
+            }
         }
         StringWriter writer = new StringWriter();
         transformer.get().transform(new DOMSource(webXml), new StreamResult(writer));
@@ -114,7 +125,9 @@ public class ShrinkWrapManipulator {
                                 + ",classpath:META-INF/shiro-native-sessions.ini")));
             case SHIRO_EE_DISABLED:
                 return List.of(new Action(getParamValue("com.flowlogix.shiro.ee.disabled"),
-                        node -> node.setTextContent("true")));
+                        node -> node.setTextContent("true"), true),
+                        new Action(getParamValue("org.apache.shiro.ee.disabled"),
+                                node -> node.setTextContent("true"), true));
             default:
                 return List.of();
         }

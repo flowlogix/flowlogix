@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>shiro-ee</artifactId>
     <name>Shiro Jakarta EE Integration</name>
-    <description>Flow Logix JavaEE Integration with Shiro Security</description>
+    <description>Flow Logix Jakarta EE Integration with Apache Shiro Security</description>
     <packaging>jar</packaging>
 
     <parent>

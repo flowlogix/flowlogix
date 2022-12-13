@@ -363,16 +363,16 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <groupId>org.simplify4u.plugins</groupId>
+                    <artifactId>sign-maven-plugin</artifactId>
+                    <version>1.0.1</version>
                     <configuration>
-                        <keyname>${gpg.keyname}</keyname>
-                        <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                        <serverId>${gpg.keyname}</serverId>
+                        <skipNoKey>false</skipNoKey>
                     </configuration>
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
-                            <phase>verify</phase>
                             <goals>
                                 <goal>sign</goal>
                             </goals>
@@ -575,7 +575,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <artifactId>maven-gpg-plugin</artifactId>
+                        <groupId>org.simplify4u.plugins</groupId>
+                        <artifactId>sign-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>

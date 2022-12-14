@@ -115,7 +115,7 @@ public class ShrinkWrapManipulator {
     }
 
     private static List<Action> initializeStandardActions() {
-        switch (System.getProperty(INTEGRATION_TEST_MODE_PROPERTY)) {
+        switch (System.getProperty(INTEGRATION_TEST_MODE_PROPERTY, "none")) {
             case CLIENT_STATE_SAVING:
                 return List.of(new Action(getParamValue(jakartify("javax.faces.STATE_SAVING_METHOD")),
                         node -> node.setTextContent("client")));

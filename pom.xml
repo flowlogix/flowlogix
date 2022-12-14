@@ -325,18 +325,9 @@
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>3.0.0</version>
-                    <executions>
-                        <execution>
-                            <id>default-deploy</id>
-                            <phase>none</phase>
-                        </execution>
-                        <execution>
-                            <id>deploy</id>
-                            <goals>
-                                <goal>deploy</goal>
-                            </goals>
-                        </execution>
-                    </executions>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
@@ -361,6 +352,14 @@
                         <autoReleaseAfterClose>${auto.release}</autoReleaseAfterClose>
                         <skipStaging>${skip.staging}</skipStaging>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>deploy</id>
+                            <goals>
+                                <goal>deploy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.simplify4u.plugins</groupId>

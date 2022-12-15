@@ -15,6 +15,7 @@
  */
 package com.flowlogix.util;
 
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,9 +31,10 @@ public class JakartaTransformerUtils {
     @Getter
     @SuppressWarnings("ConstantName")
     private static final boolean jakarta = HttpServletRequest.class.getPackageName().startsWith("jakarta");
+    private static final Pattern REPLACE_JAVA_WITH_JAKARTA_PATTERN = Pattern.compile("javax\\.(\\w+)\\.");
 
     public static String jakartify(String className) {
-        return className.replaceAll("javax\\.(\\w+)\\.",
+        return REPLACE_JAVA_WITH_JAKARTA_PATTERN.matcher(className).replaceAll(
                 isJakarta() ? "jakarta.$1." : "javax.$1.");
     }
 }

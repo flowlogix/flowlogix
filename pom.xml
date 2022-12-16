@@ -414,7 +414,7 @@
                                 </delegates>
                             </transformer>
                         </transformers>
-                        <relocations combine.children="append">
+                        <relocations>
                             <relocation>
                                 <pattern>javax.faces</pattern>
                                 <shadedPattern>jakarta.faces</shadedPattern>

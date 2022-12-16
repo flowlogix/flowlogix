@@ -49,7 +49,7 @@
                         </goals>
                         <configuration>
                             <shadedClassifierName>shiro2</shadedClassifierName>
-                            <relocations>
+                            <relocations combine.children="append">
                                 <relocation>
                                     <pattern>org.apache.shiro.crypto.CipherService</pattern>
                                     <shadedPattern>org.apache.shiro.crypto.cipher.CipherService</shadedPattern>

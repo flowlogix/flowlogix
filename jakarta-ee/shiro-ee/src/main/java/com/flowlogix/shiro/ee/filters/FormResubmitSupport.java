@@ -368,11 +368,12 @@ public class FormResubmitSupport {
             var redirectResponse = client.send(redirectRequest, HttpResponse.BodyHandlers.ofString());
             log.debug("Redirect request: {}, response: {}", redirectRequest, redirectResponse);
             return processResubmitResponse(redirectResponse, originalRequest, originalResponse,
-                    response.headers(), savedRequest, servletContext, false);
+                    response.headers(), savedRequest, servletContext, true, rememberedAjaxResubmit);
         } else {
             deleteCookie(originalResponse, servletContext, SHIRO_FORM_DATA_KEY);
             return processResubmitResponse(response, originalRequest, originalResponse,
-                    response.headers(), savedRequest, servletContext, decodedFormData.isPartialAjaxRequest);
+                    response.headers(), savedRequest, servletContext,
+                    decodedFormData.isPartialAjaxRequest, rememberedAjaxResubmit);
         }
     }
 
@@ -391,12 +392,16 @@ public class FormResubmitSupport {
     private static String processResubmitResponse(HttpResponse<String> response,
             HttpServletRequest originalRequest, HttpServletResponse originalResponse,
             HttpHeaders headers, String savedRequest, ServletContext servletContext,
-            boolean isPartialAjaxRequest) throws IOException {
+            boolean isPartialAjaxRequest, boolean rememberedAjaxResubmit) throws IOException {
         switch (response.statusCode()) {
             case FOUND:
-                // can't use Faces.redirect() here
-                originalResponse.setStatus(response.statusCode());
-                originalResponse.setHeader(LOCATION, response.headers().firstValue(LOCATION).orElseThrow());
+                if (rememberedAjaxResubmit) {
+                    originalResponse.setStatus(OK);
+                } else {
+                    // can't use Faces.redirect() here
+                    originalResponse.setStatus(response.statusCode());
+                    originalResponse.setHeader(LOCATION, response.headers().firstValue(LOCATION).orElseThrow());
+                }
             case OK:
                 // do not duplicate the session cookie(s)
                 transformCookieHeader(headers.allValues(SET_COOKIE))

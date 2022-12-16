@@ -38,7 +38,7 @@
         <auto.release>true</auto.release>
 
         <webdriver.browser>chromeheadless</webdriver.browser>
-        <payara.version>5.2022.3</payara.version>
+        <payara.version>5.2022.5</payara.version>
         <groovy.version>4.0.6</groovy.version>
         <jacocoPort>52212</jacocoPort>
         <jacocoAgent/>
@@ -382,8 +382,13 @@
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>3.4.1</version>
                     <configuration>
-                        <shadedArtifactAttached>true</shadedArtifactAttached>
                         <shadedClassifierName>jakarta</shadedClassifierName>
+                        <shadedArtifactAttached>true</shadedArtifactAttached>
+                        <artifactSet>
+                            <includes>
+                                <include>${project.groupId}:${project.artifactId}</include>
+                            </includes>
+                        </artifactSet>
                         <createDependencyReducedPom>false</createDependencyReducedPom>
                         <minimizeJar>false</minimizeJar>
                         <transformers>
@@ -409,11 +414,6 @@
                                 </delegates>
                             </transformer>
                         </transformers>
-                        <artifactSet>
-                            <includes>
-                                <include>${project.groupId}:${project.artifactId}</include>
-                            </includes>
-                        </artifactSet>
                         <relocations combine.children="append">
                             <relocation>
                                 <pattern>javax.faces</pattern>

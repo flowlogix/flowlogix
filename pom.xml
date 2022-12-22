@@ -173,6 +173,14 @@
                     <enableRulesSummary>true</enableRulesSummary>
                     <propertyExpansion>flowlogix.basedir=${flowlogix.basedir}</propertyExpansion>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>checkstyle</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <dependencies>
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
@@ -602,11 +610,10 @@
             </distributionManagement>
         </profile>
         <profile>
-            <id>checkstyle</id>
+            <id>skip-checkstyle</id>
             <activation>
                 <property>
                     <name>checkstyle.skip</name>
-                    <value>!true</value>
                 </property>
             </activation>
             <build>
@@ -616,10 +623,7 @@
                         <artifactId>maven-checkstyle-plugin</artifactId>
                         <executions>
                             <execution>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>checkstyle</goal>
-                                </goals>
+                                <phase>none</phase>
                             </execution>
                         </executions>
                     </plugin>

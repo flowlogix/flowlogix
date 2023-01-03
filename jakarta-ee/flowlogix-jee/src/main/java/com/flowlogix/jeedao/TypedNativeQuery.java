@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import javax.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Delegate;
 
 /**
  * type-safe native query, avoids casts or unchecked warnings
@@ -34,7 +35,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class TypedNativeQuery {
-    private final Query q;
+    private final @Delegate Query q;
 
     /**
      * @param <TT> return type

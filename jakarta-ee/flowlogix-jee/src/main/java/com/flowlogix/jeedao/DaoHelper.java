@@ -160,7 +160,7 @@ public class DaoHelper<TT, KT> {
         return new TypedNativeQuery(q);
     }
 
-    protected TypedNativeQuery createNativeQuery(String sql, String resultMapping) {
+    public TypedNativeQuery createNativeQuery(String sql, String resultMapping) {
         Query q = getEntityManager().createNativeQuery(sql, resultMapping);
         return new TypedNativeQuery(q);
     }

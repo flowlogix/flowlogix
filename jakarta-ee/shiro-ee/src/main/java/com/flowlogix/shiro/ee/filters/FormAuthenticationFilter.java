@@ -18,6 +18,7 @@ package com.flowlogix.shiro.ee.filters;
 import com.flowlogix.shiro.ee.filters.AuthenticationFilterDelegate.MethodsFromFilter;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.redirectToSaved;
 import com.flowlogix.shiro.ee.filters.Forms.FallbackPredicate;
+import java.util.function.Supplier;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -85,11 +86,15 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
 
     @Override
     protected String getPathWithinApplication(ServletRequest request) {
+        return getPathWithinApplication(request, () -> super.getPathWithinApplication(request));
+    }
+
+    static String getPathWithinApplication(ServletRequest request, Supplier<String> superMethod) {
         String origPath = (String) request.getAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
         if (origPath != null) {
             return origPath;
         } else {
-            return super.getPathWithinApplication(request);
+            return superMethod.get();
         }
     }
 }

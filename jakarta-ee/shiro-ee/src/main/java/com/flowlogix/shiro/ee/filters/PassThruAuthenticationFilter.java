@@ -65,4 +65,10 @@ public class PassThruAuthenticationFilter extends org.apache.shiro.web.filter.au
     public PassThruAuthenticationFilter() {
         delegate = new AuthenticationFilterDelegate(new Methods());
     }
+
+    @Override
+    protected String getPathWithinApplication(ServletRequest request) {
+        return com.flowlogix.shiro.ee.filters.FormAuthenticationFilter
+                .getPathWithinApplication(request, () -> super.getPathWithinApplication(request));
+    }
 }

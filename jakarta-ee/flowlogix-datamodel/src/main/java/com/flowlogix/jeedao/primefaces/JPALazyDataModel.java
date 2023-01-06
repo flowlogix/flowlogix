@@ -122,11 +122,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
 
     @Override
     public String getRowKey(TT key) {
-        if (impl.getKeyConverter() == null) {
-            return super.getRowKey(key);
-        } else {
-            return impl.getKeyConverter().apply(key);
-        }
+        return impl.getKeyConverter().apply(key);
     }
 
     @Override

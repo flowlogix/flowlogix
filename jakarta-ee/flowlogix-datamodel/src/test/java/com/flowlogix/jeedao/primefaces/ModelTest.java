@@ -115,6 +115,16 @@ public class ModelTest {
         }
     }
 
+    @Test
+    void defaultConverters() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManagerSupplier(() -> em)
+                .entityClass(Integer.class)
+                .build();
+        assertEquals(5L, impl.getConverter().apply("5"));
+        assertEquals("10", impl.getKeyConverter().apply(10));
+    }
+
     private static void filter(Map<String, Filter.FilterData> filters, CriteriaBuilder cb, Root<Object> root) {
         replaceFilter(filters, "column",
                 (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value));

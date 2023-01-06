@@ -16,9 +16,13 @@
 package com.flowlogix.ui;
 
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
+import java.util.Optional;
 import javax.faces.application.ResourceHandler;
+import javax.faces.webapp.FacesServlet;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRegistration;
 import javax.servlet.annotation.WebListener;
 
 /**
@@ -30,14 +34,20 @@ import javax.servlet.annotation.WebListener;
 public class UnmappedResourceHandlerMapper implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        var faces = sce.getServletContext().getServletRegistration("FacesServlet");
         if (Boolean.parseBoolean(sce.getServletContext()
-                .getInitParameter("com.flowlogix.add-unmapped-resources")) && faces != null) {
-            faces.addMapping(jakartify(ResourceHandler.RESOURCE_IDENTIFIER) + "/*");
+                .getInitParameter("com.flowlogix.add-unmapped-resources"))) {
+            getFacesServlet(sce.getServletContext()).ifPresent(faces -> faces
+                    .addMapping(jakartify(ResourceHandler.RESOURCE_IDENTIFIER) + "/*"));
         }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+    }
+
+    private Optional<? extends ServletRegistration> getFacesServlet(ServletContext ctx) {
+        return ctx.getServletRegistrations().values().stream()
+                .filter(it -> FacesServlet.class.getName().equals(it.getClassName()))
+                .findFirst();
     }
 }

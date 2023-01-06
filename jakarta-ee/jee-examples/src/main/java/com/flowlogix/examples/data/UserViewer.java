@@ -48,7 +48,6 @@ public class UserViewer implements Serializable {
             JPALazyDataModel.create(builder -> builder
                     .entityManagerSupplier(() -> em)
                     .entityClass(UserEntity.class)
-                    .converter(Long::parseLong)
                     .caseSensitiveQuery(false)
 //                    .sorter(UserViewer::sorter)
 //                    .filter(UserViewer::filter)

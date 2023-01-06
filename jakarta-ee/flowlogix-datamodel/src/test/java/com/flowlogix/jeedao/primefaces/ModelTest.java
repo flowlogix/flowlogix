@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import lombok.RequiredArgsConstructor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +45,7 @@ import org.primefaces.model.MatchMode;
  */
 @ExtendWith(MockitoExtension.class)
 public class ModelTest {
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     EntityManager em;
     @Mock
     CriteriaBuilder cb;
@@ -67,7 +68,7 @@ public class ModelTest {
                 .filter(ModelTest::filter)
                 .build();
         var fm = new FilterMeta();
-        when(rootObject.get(any(String.class)).getJavaType()).thenAnswer((a) -> String.class);
+        when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
         fm.setFilterValue("hello");
         impl.getFilters(Map.of("column", fm), cb, rootObject);
     }
@@ -81,7 +82,7 @@ public class ModelTest {
                 .converter(Long::valueOf)
                 .build();
         var fm = new FilterMeta();
-        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer((a) -> Integer.class);
+        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
         fm.setFilterValue(5);
         impl.getFilters(Map.of("column", fm), cb, rootInteger);
     }
@@ -94,7 +95,7 @@ public class ModelTest {
                 .converter(Long::valueOf)
                 .build();
         var fm = new FilterMeta();
-        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer((a) -> List.class);
+        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> List.class);
         fm.setFilterValue(List.of("one", "two"));
         fm.setMatchMode(MatchMode.IN);
         impl.getFilters(Map.of("column", fm), cb, rootInteger);
@@ -108,11 +109,33 @@ public class ModelTest {
                 .converter(Long::valueOf)
                 .build();
         var fm = new FilterMeta();
-        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer((a) -> Integer.class);
+        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
         fm.setFilterValue("xxx");
         try (var mockedStatic = mockStatic(Faces.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
             impl.getFilters(Map.of("column", fm), cb, rootInteger);
         }
+    }
+
+    @RequiredArgsConstructor
+    public static class MyEntity {
+        final Long id;
+        @SuppressWarnings("MagicNumber")
+        public MyEntity() {
+            this.id = 1L;
+        }
+    }
+
+    @Test
+    @SuppressWarnings("MagicNumber")
+    void defaultConverters() {
+        var impl = JPAModelImpl.<MyEntity, Long>builder()
+                .entityManagerSupplier(() -> em)
+                .entityClass(MyEntity.class)
+                .build();
+        when(em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(any(MyEntity.class)))
+                .thenAnswer(entry -> entry.<MyEntity>getArgument(0).id);
+        assertEquals(5L, impl.getConverter().apply("5"));
+        assertEquals("10", impl.getKeyConverter().apply(new MyEntity(10L)));
     }
 
     private static void filter(Map<String, Filter.FilterData> filters, CriteriaBuilder cb, Root<Object> root) {

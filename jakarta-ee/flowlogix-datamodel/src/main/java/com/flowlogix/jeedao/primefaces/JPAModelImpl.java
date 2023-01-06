@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import javax.faces.component.UIComponent;
 import javax.faces.convert.Converter;
@@ -41,7 +42,9 @@ import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import static lombok.Builder.Default;
 import lombok.Generated;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Lazy;
 import org.primefaces.model.FilterMeta;
@@ -59,11 +62,11 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     /**
      * convert String key into {@link KK} object
      */
-    private final @Getter @NonNull Function<String, KK> converter;
+    private final Function<String, KK> converter;
     /**
      * convert typed key to String
      */
-    private final @Getter Function<TT, String> keyConverter;
+    private final Function<TT, String> keyConverter;
     /**
      * adds {@link Filter} object
      */
@@ -85,6 +88,9 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
      */
     @Default
     private final @Getter boolean caseSensitiveQuery = true;
+
+    private final Lazy<Function<String, KK>> defaultConverter = new Lazy<>(this::createConverter);
+    private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
 
     /**
      * prevent from direct construction
@@ -112,6 +118,22 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                         .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
                         .hints(optimizer::apply)
                         .build());
+    }
+
+    Function<String, KK> getConverter() {
+        return converter != null ? converter : defaultConverter.get();
+    }
+
+    Function<TT, String> getKeyConverter() {
+        return keyConverter != null ? keyConverter : defaultKeyConverter.get();
+    }
+
+    private Function<String, KK> createConverter() {
+        return keyValue -> TypeConverter.valueOf(keyValue, getPrimaryKeyClass());
+    }
+
+    private Function<TT, String> createKeyConverter() {
+        return entry -> getPrimaryKey(Optional.of(entry)).toString();
     }
 
     private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
@@ -273,5 +295,17 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
             }
         });
         return sortMetaOrdering;
+    }
+
+    @SuppressWarnings("unchecked")
+    @SneakyThrows(ReflectiveOperationException.class)
+    private KK getPrimaryKey(Optional<TT> entry) {
+        return (KK) getEntityManager().getEntityManagerFactory().getPersistenceUnitUtil()
+                .getIdentifier(entry.orElse(ConstructorUtils.invokeConstructor(getEntityClass())));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<KK> getPrimaryKeyClass() {
+        return (Class<KK>) getPrimaryKey(Optional.empty()).getClass();
     }
 }

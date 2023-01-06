@@ -61,6 +61,10 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
      */
     private final @Getter @NonNull Function<String, KK> converter;
     /**
+     * convert typed key to String
+     */
+    private final @Getter Function<TT, String> keyConverter;
+    /**
      * adds {@link Filter} object
      */
     @Default
@@ -89,6 +93,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     JPAModelImpl() {
         super(null, null);
         this.converter = null;
+        this.keyConverter = null;
         this.filter = null;
         this.sorter = null;
         this.optimizer = null;

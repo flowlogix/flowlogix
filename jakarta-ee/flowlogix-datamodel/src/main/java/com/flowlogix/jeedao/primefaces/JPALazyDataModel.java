@@ -121,6 +121,15 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     }
 
     @Override
+    public String getRowKey(TT key) {
+        if (impl.getKeyConverter() == null) {
+            return super.getRowKey(key);
+        } else {
+            return impl.getKeyConverter().apply(key);
+        }
+    }
+
+    @Override
     @Transactional
     public TT getRowData(String rowKey) {
         return impl.getEntityManager().find(impl.getEntityClass(), impl.getConverter().apply(rowKey));

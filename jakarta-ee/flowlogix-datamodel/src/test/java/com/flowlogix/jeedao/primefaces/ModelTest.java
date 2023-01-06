@@ -116,6 +116,7 @@ public class ModelTest {
     }
 
     @Test
+    @SuppressWarnings("MagicNumber")
     void defaultConverters() {
         var impl = JPAModelImpl.<Integer, Long>builder()
                 .entityManagerSupplier(() -> em)

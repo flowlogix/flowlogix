@@ -142,9 +142,8 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         return impl.count(map);
     }
 
-    @SuppressWarnings("serial")
-    void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-         stream.defaultReadObject();
-         impl = builder.apply(JPAModelImpl.builder());
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        impl = builder.apply(JPAModelImpl.builder());
     }
 }

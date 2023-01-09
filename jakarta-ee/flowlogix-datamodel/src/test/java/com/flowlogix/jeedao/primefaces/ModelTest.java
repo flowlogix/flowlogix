@@ -17,6 +17,9 @@ package com.flowlogix.jeedao.primefaces;
 
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.RESULT;
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.replaceFilter;
+import static com.flowlogix.util.SerializeTester.serializeAndDeserialize;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
@@ -31,10 +34,12 @@ import org.mockito.Answers;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.omnifaces.util.Beans;
 import org.omnifaces.util.Faces;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.MatchMode;
@@ -44,15 +49,15 @@ import org.primefaces.model.MatchMode;
  * @author lprimak
  */
 @ExtendWith(MockitoExtension.class)
-public class ModelTest {
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+public class ModelTest implements Serializable {
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS, serializable = true)
     EntityManager em;
     @Mock
-    CriteriaBuilder cb;
+    transient CriteriaBuilder cb;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    Root<Object> rootObject;
+    transient Root<Object> rootObject;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    Root<Integer> rootInteger;
+    transient Root<Integer> rootInteger;
 
     @Test
     void resultField() {
@@ -141,5 +146,22 @@ public class ModelTest {
     private static void filter(Map<String, Filter.FilterData> filters, CriteriaBuilder cb, Root<Object> root) {
         replaceFilter(filters, "column",
                 (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value));
+    }
+
+    @Test
+    @SuppressWarnings("MagicNumber")
+    void serialization() throws IOException, ClassNotFoundException {
+        JPALazyDataModel<MyEntity, Long> model;
+        try (var mockedStatic = mockStatic(Beans.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+            mockedStatic.when(() -> Beans.getReference(JPALazyDataModel.class))
+                    .thenReturn(new JPALazyDataModel<>());
+            model = JPALazyDataModel.create(builder -> builder
+                    .entityManagerSupplier(() -> em).entityClass(MyEntity.class)
+                    .build());
+        }
+        lenient().when(em.getEntityManagerFactory().getPersistenceUnitUtil()
+                .getIdentifier(any(MyEntity.class))).thenReturn(5L);
+        var deserialized = serializeAndDeserialize(model);
+        assertEquals("5", deserialized.getRowKey(new MyEntity()));
     }
 }

@@ -8,9 +8,9 @@ image:https://img.shields.io/github/license/flowlogix/flowlogix?style=plastic[li
 
 === Current Projects
 
-- Jakarta EE Lazy Data Model for PrimeFaces DataTable
-- Apache Shiro Security / Jakarta EE integration
-- Jakarta EE DAO Helper
+- Jakarta EE Lazy Data Model for PrimeFaces DataTable image:https://javadoc.io/badge2/com.flowlogix/flowlogix-datamodel/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel"]
+- Apache Shiro Security / Jakarta EE integration image:https://javadoc.io/badge2/com.flowlogix/shiro-ee/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/shiro-ee"]
+- Jakarta EE DAO Helper image:https://javadoc.io/badge2/com.flowlogix/flowlogix-jee/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-jee"]
 - Jakarta EE JSF JavaScript Minimized resource handler
 - Utilities (String / Object Type Converter, Stream reader)
 

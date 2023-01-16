@@ -14,7 +14,7 @@
         <junit.version>5.9.2</junit.version>
         <mockito.version>4.11.0</mockito.version>
         <omnifaces.version>3.14.1</omnifaces.version>
-        <shiro.version>1.10.1</shiro.version>
+        <shiro.version>1.11.0</shiro.version>
     </properties>
 
     <parent>

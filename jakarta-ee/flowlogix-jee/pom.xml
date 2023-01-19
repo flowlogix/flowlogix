@@ -34,7 +34,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.coderplus.maven.plugins</groupId>
+                <groupId>com.github.monkeywie</groupId>
                 <artifactId>copy-rename-maven-plugin</artifactId>
                 <version>1.0</version>
                 <executions>

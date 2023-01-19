@@ -34,19 +34,25 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.monkeywie</groupId>
-                <artifactId>copy-rename-maven-plugin</artifactId>
-                <version>1.0</version>
+                <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>jakarta</id>
                         <phase>process-resources</phase>
                         <goals>
-                            <goal>copy</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <sourceFile>target/classes/META-INF/web-fragment.xml</sourceFile>
-                            <destinationFile>target/replacer/web-fragment-jakarta.xml</destinationFile>
+                            <outputDirectory>target/replacer</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>target/classes/META-INF</directory>
+                                    <includes>
+                                        <include>web-fragment.xml</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -80,8 +86,8 @@
                             <goal>find-and-replace</goal>
                         </goals>
                         <configuration>
-                            <findRegex>javax.faces.PROJECT_STAGE</findRegex>
-                            <replaceValue>jakarta.faces.PROJECT_STAGE</replaceValue>
+                            <findRegex>javax.faces</findRegex>
+                            <replaceValue>jakarta.faces</replaceValue>
                         </configuration>
                     </execution>
                 </executions>
@@ -100,7 +106,7 @@
                     <transformers combine.children="append">
                         <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                             <resource>META-INF/web-fragment.xml</resource>
-                            <file>target/replacer/web-fragment-jakarta.xml</file>
+                            <file>target/replacer/web-fragment.xml</file>
                         </transformer>
                     </transformers>
                 </configuration>

@@ -22,6 +22,7 @@ import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isJSFClientStat
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.isPostRequest;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupport.resubmitSavedForm;
 import static com.flowlogix.shiro.ee.filters.FormResubmitSupportCookies.DONT_ADD_ANY_MORE_COOKIES;
+import static com.flowlogix.shiro.ee.listeners.EnvironmentLoaderListener.isServletNoPrincipal;
 import static com.flowlogix.shiro.ee.listeners.EnvironmentLoaderListener.isShiroEEDisabled;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -93,7 +94,11 @@ public class ShiroFilter extends org.apache.shiro.web.servlet.ShiroFilter {
 
         @Override
         public Principal getUserPrincipal() {
-            return null;
+            if (isServletNoPrincipal(servletContext)) {
+                return null;
+            } else {
+                return super.getUserPrincipal();
+            }
         }
 
         @Override

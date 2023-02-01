@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -153,7 +154,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                     value = value.toString();
                     cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
                 } else if (fieldType.isArray() || Collection.class.isAssignableFrom(fieldType)) {
-                    cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
+                    cond = predicateFromFilterOrComparable(cond, cb, root, key, filterMeta, value, fieldType);
                 } else {
                     var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
                     boolean valid = convertedValue.isValid();
@@ -172,12 +173,7 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                         }
                     }
                     if (valid) {
-                        cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
-                        if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
-                            @SuppressWarnings({"unchecked", "rawtypes"})
-                            Comparable<? super Comparable> cv = (Comparable) value;
-                            cond = predicateFromFilterComparable(cb, root.get(key), filterMeta, cv);
-                        }
+                        cond = predicateFromFilterOrComparable(cond, cb, root, key, filterMeta, value, fieldType);
                     }
                 }
             } catch (IllegalArgumentException e) { /* ignore possibly extra filter fields */ }
@@ -186,6 +182,17 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         filter.filter(predicates, cb, root);
         return cb.and(predicates.values().stream().map(FilterData::getPredicate)
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
+    }
+
+    private Predicate predicateFromFilterOrComparable(Predicate cond, CriteriaBuilder cb, Root<TT> root,
+            String key, FilterMeta filterMeta, Object value, Class<?> fieldType) {
+        cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
+        if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
+            @SuppressWarnings({"unchecked", "rawtypes"})
+                    Comparable<? super Comparable> cv = (Comparable) value;
+            cond = predicateFromFilterComparable(cb, root.get(key), filterMeta, cv);
+        }
+        return cond;
     }
 
     private class ExpressionEvaluator {
@@ -238,10 +245,6 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                 return filterValueAsCollection.get().size() == 1
                         ? cb.notEqual(expression, filterValueAsCollection.get().iterator().next())
                         : expression.in(filterValueAsCollection.get()).not();
-            case BETWEEN:
-                throw new UnsupportedOperationException("MatchMode.BETWEEN currently not supported!");
-            case NOT_BETWEEN:
-                throw new UnsupportedOperationException("MatchMode.NOT_BETWEEN currently not supported!");
             case GLOBAL:
                 throw new UnsupportedOperationException("MatchMode.GLOBAL currently not supported!");
         }
@@ -252,6 +255,10 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     @Generated
     private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
             Expression<TC> objectExpression, FilterMeta filter, TC filterValue) {
+        @SuppressWarnings("unchecked")
+        Lazy<Collection<TC>> filterValueAsCollection = new Lazy<>(
+                () -> filterValue.getClass().isArray() ? Arrays.asList(filterValue)
+                        : (Collection<TC>) filterValue);
         switch (filter.getMatchMode()) {
             case LESS_THAN:
                 return cb.lessThan(objectExpression, filterValue);
@@ -261,8 +268,19 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
                 return cb.greaterThan(objectExpression, filterValue);
             case GREATER_THAN_EQUALS:
                 return cb.greaterThanOrEqualTo(objectExpression, filterValue);
+            case BETWEEN:
+                return between(cb, objectExpression, filterValueAsCollection);
+            case NOT_BETWEEN:
+                return between(cb, objectExpression, filterValueAsCollection).not();
         }
         return null;
+    }
+
+    private <TC extends Comparable<? super TC>> Predicate between(CriteriaBuilder cb,
+            Expression<TC> objectExpression, Lazy<Collection<TC>> filterValueAsCollection) {
+        Iterator<TC> iterBetween = filterValueAsCollection.get().iterator();
+        return cb.and(cb.greaterThanOrEqualTo(objectExpression, iterBetween.next()),
+                cb.lessThanOrEqualTo(objectExpression, iterBetween.next()));
     }
 
     private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {

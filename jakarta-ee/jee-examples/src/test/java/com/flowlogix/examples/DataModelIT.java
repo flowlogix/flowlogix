@@ -21,6 +21,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
+import static org.jboss.arquillian.graphene.Graphene.waitAjax;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -79,6 +80,7 @@ public class DataModelIT {
                 .executeScript("arguments[0].scroll(0, 0);", scrollable);
         fullNameFilterInput.sendKeys("ly l");
         guardAjax(fullNameFilterInput).sendKeys(Keys.RETURN);
+        waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Lovely Lady");
         assertEquals("Lovely Lady", firstRowFullName.getText());
     }
 

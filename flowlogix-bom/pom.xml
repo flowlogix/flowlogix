@@ -13,7 +13,7 @@
         <slf4j.version>2.0.6</slf4j.version>
         <junit.version>5.9.2</junit.version>
         <mockito.version>5.1.1</mockito.version>
-        <omnifaces.version>3.14.1</omnifaces.version>
+        <omnifaces.version>3.14.2</omnifaces.version>
         <shiro.version>1.11.0</shiro.version>
     </properties>
 

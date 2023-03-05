@@ -10,3 +10,9 @@ updates:
     open-pull-requests-limit: 50
     schedule:
       interval: "daily"
+  - package-ecosystem: "maven"
+    target-branch: '5.x'
+    directory: "/" # Location of package manifests
+    open-pull-requests-limit: 50
+    schedule:
+      interval: "daily"

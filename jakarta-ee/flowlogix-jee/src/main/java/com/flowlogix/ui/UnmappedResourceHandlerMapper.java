@@ -17,13 +17,13 @@ package com.flowlogix.ui;
 
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.util.Optional;
-import javax.faces.application.ResourceHandler;
-import javax.faces.webapp.FacesServlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletRegistration;
-import javax.servlet.annotation.WebListener;
+import jakarta.faces.application.ResourceHandler;
+import jakarta.faces.webapp.FacesServlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.annotation.WebListener;
 
 /**
  * aids in implementation of OmniFaces {@link UnmappedResourceHandler}

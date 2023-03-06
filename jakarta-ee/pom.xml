@@ -15,10 +15,13 @@
         <relativePath>../flowlogix-bom</relativePath>
     </parent>
 
+    <properties>
+        <jakarta.ee.version>10.0.0</jakarta.ee.version>
+    </properties>
+
     <modules>
         <module>flowlogix-jee</module>
         <module>flowlogix-datamodel</module>
-        <module>shiro-ee</module>
         <module>jee-examples</module>
     </modules>
 
@@ -26,11 +29,27 @@
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
-            <version>8.0.0</version>
+            <version>${jakarta.ee.version}</version>
+            <scope>provided</scope>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.platform</groupId>
+                    <artifactId>jakarta.jakartaee-web-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-web-api</artifactId>
+            <version>${jakarta.ee.version}</version>
+            <scope>provided</scope>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.omnifaces</groupId>

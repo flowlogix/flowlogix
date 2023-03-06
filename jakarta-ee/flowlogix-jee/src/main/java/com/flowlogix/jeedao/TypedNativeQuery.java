@@ -17,7 +17,7 @@ package com.flowlogix.jeedao;
 
 import java.util.List;
 import java.util.stream.Stream;
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 

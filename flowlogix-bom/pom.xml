@@ -13,8 +13,7 @@
         <slf4j.version>2.0.6</slf4j.version>
         <junit.version>5.9.2</junit.version>
         <mockito.version>5.1.1</mockito.version>
-        <omnifaces.version>3.14.2</omnifaces.version>
-        <shiro.version>1.11.0</shiro.version>
+        <omnifaces.version>4.1</omnifaces.version>
     </properties>
 
     <parent>
@@ -67,6 +66,7 @@
                 <groupId>org.primefaces</groupId>
                 <artifactId>primefaces</artifactId>
                 <version>12.0.0</version>
+                <classifier>jakarta</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -89,16 +89,6 @@
                 <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
                 <version>${groovy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-core</artifactId>
-                <version>${shiro.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-web</artifactId>
-                <version>${shiro.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

@@ -225,7 +225,7 @@ public class ExceptionPageIT {
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
         var productionList = List.of(new Action(
-                jakartify("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value"),
+                "//web-app/context-param[param-name = 'jakarta.faces.PROJECT_STAGE']/param-value",
                 node -> node.setTextContent("Production")));
         new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
                 getStandardActions().stream()).collect(Collectors.toList()));

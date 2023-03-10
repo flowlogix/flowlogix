@@ -1,0 +1,8 @@
+jdk:
+  - openjdk17
+before_install:
+  - sdk install java 19.0.2-zulu
+  - sdk use java 19.0.2-zulu
+  - sdk install maven
+install:
+  - mvn install -DskipTests -DskipITs

@@ -39,7 +39,7 @@
 
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>6.2023.2</payara.version>
-        <groovy.version>4.0.9</groovy.version>
+        <groovy.version>4.0.10</groovy.version>
         <jacocoPort>52212</jacocoPort>
         <jacocoAgent/>
         <jdk11SurefireOptions/>

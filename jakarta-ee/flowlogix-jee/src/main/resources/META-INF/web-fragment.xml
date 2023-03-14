@@ -5,11 +5,11 @@
               version="6.0">
     <distributable/>
     <resource-ref>
-        <res-ref-name>jsf/ProjectStage</res-ref-name>
+        <res-ref-name>faces/ProjectStage</res-ref-name>
         <res-type>java.lang.String</res-type>
     </resource-ref>
     <context-param>
-        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-name>jakarta.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
 

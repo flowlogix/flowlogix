@@ -5,4 +5,4 @@ before_install:
   - sdk use java 19.0.2-zulu
   - sdk install maven
 install:
-  - mvn install -DskipTests -DskipITs
+  - mvn install -Dmaven.test.skip -DskipITs

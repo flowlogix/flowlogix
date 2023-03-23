@@ -108,14 +108,14 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
     }
 
     int count(Map<String, FilterMeta> filters) {
-        return super.count(Parameters.<TT>builder()
+        return super.count(builder -> builder
                 .countQueryCriteria(cqc -> cqc.getQuery().where(getFilters(filters, cqc.getBuilder(), cqc.getRoot())))
                 .build());
     }
 
     List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
         return super.findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
-                Parameters.<TT>builder()
+                builder -> builder
                         .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
                         .hints(optimizer::apply)
                         .build());

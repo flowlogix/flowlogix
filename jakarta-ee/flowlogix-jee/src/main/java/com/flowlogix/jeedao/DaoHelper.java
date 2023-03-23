@@ -19,6 +19,7 @@ import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.jeedao.querycriteria.CountQueryCriteria;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -80,23 +81,28 @@ public class DaoHelper<TT, KT> {
     }
 
     public List<TT> findAll() {
-        return findAll(Parameters.<TT>builder().build());
+        return findAll(builder -> builder.build());
     }
 
     /**
      * find all with added criteria and hints
+     * <p>
+     * Example:
+     * <p>
+     * {@code findAll(builder -> builder.build())}
      *
-     * @param parms
+     * @param paramsBuilder
      * @return
      */
-    public List<TT> findAll(Parameters<TT> parms) {
-        TypedQuery<TT> tq = createFindQuery(parms);
-        parms.hints.accept(tq);
+    public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>> List<TT> findAll(FF paramsBuilder) {
+        var params = paramsBuilder.apply(Parameters.builder());
+        TypedQuery<TT> tq = createFindQuery(params);
+        params.hints.accept(tq);
         return tq.getResultList();
     }
 
     public List<TT> findRange(int min, int max) {
-        return findRange(min, max, Parameters.<TT>builder().build());
+        return findRange(min, max, builder -> builder.build());
     }
 
     /**
@@ -104,26 +110,30 @@ public class DaoHelper<TT, KT> {
      *
      * @param min
      * @param max
-     * @param parms
+     * @param paramsBuilder
      * @return
      */
-    public List<TT> findRange(int min, int max, Parameters<TT> parms) {
-        TypedQuery<TT> tq = createFindQuery(parms);
+    public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>>
+    List<TT> findRange(int min, int max, FF paramsBuilder) {
+        var params = paramsBuilder.apply(Parameters.builder());
+        TypedQuery<TT> tq = createFindQuery(params);
         tq.setMaxResults(max - min);
         tq.setFirstResult(min);
-        parms.hints.accept(tq);
+        params.hints.accept(tq);
         return tq.getResultList();
     }
 
     public int count() {
-        return count(Parameters.<TT>builder().build());
+        return count(builder -> builder.build());
     }
 
-    public int count(Parameters<TT> parms) {
+    public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>>
+    int count(FF paramsBuilder) {
+        var params = paramsBuilder.apply(Parameters.builder());
         CriteriaQuery<Long> cq = getEntityManager().getCriteriaBuilder().createQuery(Long.class);
         Root<TT> rt = cq.from(entityClass);
         cq.select(getEntityManager().getCriteriaBuilder().count(rt));
-        parms.countQueryCriteria.accept(new CountQueryCriteria<>(getEntityManager().getCriteriaBuilder(), rt, cq));
+        params.countQueryCriteria.accept(new CountQueryCriteria<>(getEntityManager().getCriteriaBuilder(), rt, cq));
         TypedQuery<Long> q = getEntityManager().createQuery(cq);
         return q.getSingleResult().intValue();
     }
@@ -155,11 +165,11 @@ public class DaoHelper<TT, KT> {
         return new TypedNativeQuery(q);
     }
 
-    private TypedQuery<TT> createFindQuery(Parameters<TT> parms) {
+    private TypedQuery<TT> createFindQuery(Parameters<TT> params) {
         CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
         Root<TT> root = cq.from(entityClass);
         cq.select(root);
-        parms.queryCriteria.accept(new QueryCriteria<>(getEntityManager().getCriteriaBuilder(), root, cq));
+        params.queryCriteria.accept(new QueryCriteria<>(getEntityManager().getCriteriaBuilder(), root, cq));
         return getEntityManager().createQuery(cq);
     }
 }

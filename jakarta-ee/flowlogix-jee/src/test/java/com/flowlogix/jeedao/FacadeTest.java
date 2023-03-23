@@ -20,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaQuery;
 import lombok.experimental.Delegate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,9 +63,22 @@ public class FacadeTest {
     }
 
     @Test
-    void nullTest() {
+    void nulls() {
         assertThrows(NullPointerException.class, () -> {
             DaoHelper<Long, Integer> facade = new DaoHelper<>(() -> null, null);
         });
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void inheritableDao() {
+        InheritableDaoHelper<Integer, Long> helper = new InheritableDaoHelper<>();
+        assertNull(helper.daoHelper);
+        helper.daoHelper = DaoHelper.<Integer, Long>builder()
+                .entityManagerSupplier(() -> em)
+                .entityClass(Integer.class)
+                .build();
+        when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(2L);
+        assertEquals(2, helper.count());
     }
 }

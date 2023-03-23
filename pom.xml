@@ -304,7 +304,7 @@
                     <artifactId>lombok-maven-plugin</artifactId>
                     <version>1.18.20.0</version>
                     <configuration>
-                        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
                         <addOutputDirectory>false</addOutputDirectory>
                     </configuration>
                     <executions>

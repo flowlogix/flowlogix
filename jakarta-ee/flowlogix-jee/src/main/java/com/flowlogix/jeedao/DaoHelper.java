@@ -20,7 +20,6 @@ import com.flowlogix.jeedao.querycriteria.CountQueryCriteria;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -42,8 +41,7 @@ import lombok.experimental.SuperBuilder;
  * as well as {@link #count()} methods
  * <p>
  * Another differentiator is that this class doesn't require inheritance,
- * although one of the use cases is for EJB {@link Stateless} bean to
- * inherit from this class.
+ * although some use cases could inherit from {@link InheritableDaoHelper} class.
  *
  * @param <TT> Entity Type
  * @param <KT> Primary Key Type
@@ -92,11 +90,7 @@ public class DaoHelper<TT, KT> {
      * @return
      */
     public List<TT> findAll(Parameters<TT> parms) {
-        CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
-        Root<TT> root = cq.from(entityClass);
-        cq.select(root);
-        parms.queryCriteria.accept(new QueryCriteria<>(getEntityManager().getCriteriaBuilder(), root, cq));
-        TypedQuery<TT> tq = getEntityManager().createQuery(cq);
+        TypedQuery<TT> tq = createFindQuery(parms);
         parms.hints.accept(tq);
         return tq.getResultList();
     }
@@ -114,15 +108,11 @@ public class DaoHelper<TT, KT> {
      * @return
      */
     public List<TT> findRange(int min, int max, Parameters<TT> parms) {
-        CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
-        Root<TT> root = cq.from(entityClass);
-        cq.select(root);
-        parms.queryCriteria.accept(new QueryCriteria<>(getEntityManager().getCriteriaBuilder(), root, cq));
-        TypedQuery<TT> q = getEntityManager().createQuery(cq);
-        q.setMaxResults(max - min);
-        q.setFirstResult(min);
-        parms.hints.accept(q);
-        return q.getResultList();
+        TypedQuery<TT> tq = createFindQuery(parms);
+        tq.setMaxResults(max - min);
+        tq.setFirstResult(min);
+        parms.hints.accept(tq);
+        return tq.getResultList();
     }
 
     public int count() {
@@ -163,5 +153,13 @@ public class DaoHelper<TT, KT> {
     public TypedNativeQuery createNativeQuery(String sql, String resultMapping) {
         Query q = getEntityManager().createNativeQuery(sql, resultMapping);
         return new TypedNativeQuery(q);
+    }
+
+    private TypedQuery<TT> createFindQuery(Parameters<TT> parms) {
+        CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
+        Root<TT> root = cq.from(entityClass);
+        cq.select(root);
+        parms.queryCriteria.accept(new QueryCriteria<>(getEntityManager().getCriteriaBuilder(), root, cq));
+        return getEntityManager().createQuery(cq);
     }
 }

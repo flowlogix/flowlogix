@@ -41,8 +41,10 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Builder;
 import static lombok.Builder.Default;
@@ -63,6 +65,7 @@ import org.primefaces.model.SortMeta;
  */
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.NONE)
 @Slf4j
 public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
     /**
@@ -105,21 +108,6 @@ public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
 
     private final Lazy<Function<String, KK>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
-
-    /**
-     * prevent from direct construction
-     */
-    @Generated
-    JPAModelImpl() {
-        this.entityManagerSupplier = null;
-        this.entityClass = null;
-        this.converter = null;
-        this.keyConverter = null;
-        this.filter = null;
-        this.sorter = null;
-        this.optimizer = null;
-        this.caseSensitiveQuery = false;
-    }
 
     int count(Map<String, FilterMeta> filters) {
         return super.count(builder -> builder

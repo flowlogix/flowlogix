@@ -51,7 +51,7 @@ import lombok.experimental.SuperBuilder;
  */
 @SuperBuilder
 @RequiredArgsConstructor
-public class DaoHelper<TT, KT> {
+public final class DaoHelper<TT, KT> {
     /**
      * Return entity manager to operate on
      */

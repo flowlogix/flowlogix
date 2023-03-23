@@ -16,6 +16,7 @@
 package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.jeedao.InheritableDaoHelper;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
@@ -30,17 +31,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.convert.Converter;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import static lombok.Builder.Default;
 import lombok.Generated;
 import lombok.SneakyThrows;
@@ -57,9 +61,18 @@ import org.primefaces.model.SortMeta;
  * @param <TT>
  * @param <KK>
  */
-@SuperBuilder
+@Builder
+@AllArgsConstructor
 @Slf4j
-public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
+public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
+    /**
+     * Return entity manager to operate on
+     */
+    private final @NonNull Supplier<EntityManager> entityManagerSupplier;
+    /**
+     * entity class
+     */
+    private final @NonNull @Getter Class<TT> entityClass;
     /**
      * convert String key into {@link KK} object
      */
@@ -98,7 +111,8 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
      */
     @Generated
     JPAModelImpl() {
-        super(null, null);
+        this.entityManagerSupplier = null;
+        this.entityClass = null;
         this.converter = null;
         this.keyConverter = null;
         this.filter = null;
@@ -182,6 +196,10 @@ public class JPAModelImpl<TT, KK> extends DaoHelper<TT, KK> {
         filter.filter(predicates, cb, root);
         return cb.and(predicates.values().stream().map(FilterData::getPredicate)
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
+    }
+
+    void postConstruct() {
+        daoHelper = new DaoHelper<>(entityManagerSupplier, entityClass);
     }
 
     private Predicate predicateFromFilterOrComparable(Predicate cond, CriteriaBuilder cb, Root<TT> root,

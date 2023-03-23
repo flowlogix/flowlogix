@@ -67,7 +67,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     private static final long serialVersionUID = 2L;
     private transient JPAModelImpl<TT, KK> impl;
     @SuppressWarnings("serial")
-    private Function<JPAModelImplBuilder<TT, KK, ?, ?>, JPAModelImpl<TT, KK>> builder;
+    private Function<JPAModelImplBuilder<TT, KK>, JPAModelImpl<TT, KK>> builder;
 
     /**
      * Set up this particular instance of the data model
@@ -79,12 +79,13 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param builder
      * @return newly-created data model
      */
-    public static <TT, KK, FF extends Function<JPAModelImplBuilder<TT, KK, ?, ?>,
+    public static <TT, KK, FF extends Function<JPAModelImplBuilder<TT, KK>,
         JPAModelImpl<TT, KK>> & Serializable> JPALazyDataModel<TT, KK> create(FF builder) {
         @SuppressWarnings("unchecked")
         JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
         model.builder = builder;
         model.impl = builder.apply(JPAModelImpl.builder());
+        model.impl.postConstruct();
         return model;
     }
 
@@ -145,5 +146,6 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
         impl = builder.apply(JPAModelImpl.builder());
+        impl.postConstruct();
     }
 }

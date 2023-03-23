@@ -40,6 +40,7 @@
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>6.2023.2</payara.version>
         <groovy.version>4.0.10</groovy.version>
+        <lombok.version>1.18.26</lombok.version>
         <jacocoPort>52212</jacocoPort>
         <jacocoAgent/>
         <jdk11SurefireOptions/>
@@ -314,6 +315,13 @@
                             </goals>
                         </execution>
                     </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>

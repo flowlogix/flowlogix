@@ -85,7 +85,6 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
         model.builder = builder;
         model.impl = builder.apply(JPAModelImpl.builder());
-        model.impl.postConstruct();
         return model;
     }
 
@@ -146,6 +145,5 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
         impl = builder.apply(JPAModelImpl.builder());
-        impl.postConstruct();
     }
 }

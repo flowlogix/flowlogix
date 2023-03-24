@@ -16,7 +16,6 @@
 package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.DaoHelper;
-import com.flowlogix.jeedao.InheritableDaoHelper;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
@@ -64,7 +63,7 @@ import org.primefaces.model.SortMeta;
 @Builder
 @AllArgsConstructor
 @Slf4j
-public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
+public class JPAModelImpl<TT, KK> {
     /**
      * Return entity manager to operate on
      */
@@ -76,6 +75,7 @@ public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
     /**
      * convert String key into {@link KK} object
      */
+    private final Lazy<DaoHelper<TT, KK>> daoHelper = new Lazy<>(this::createDaoHelper);
     private final Function<String, KK> converter;
     /**
      * convert typed key to String
@@ -107,17 +107,21 @@ public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
 
     int count(Map<String, FilterMeta> filters) {
-        return super.count(builder -> builder
+        return daoHelper.get().count(builder -> builder
                 .countQueryCriteria(cqc -> cqc.getQuery().where(getFilters(filters, cqc.getBuilder(), cqc.getRoot())))
                 .build());
     }
 
     List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        return super.findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
+        return daoHelper.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
                 builder -> builder
                         .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
                         .hints(optimizer::apply)
                         .build());
+    }
+
+    EntityManager getEntityManager() {
+        return daoHelper.get().getEntityManager();
     }
 
     Function<String, KK> getConverter() {
@@ -126,6 +130,10 @@ public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
 
     Function<TT, String> getKeyConverter() {
         return keyConverter != null ? keyConverter : defaultKeyConverter.get();
+    }
+
+    private DaoHelper<TT, KK> createDaoHelper() {
+        return new DaoHelper<>(entityManagerSupplier, entityClass);
     }
 
     private Function<String, KK> createConverter() {
@@ -181,10 +189,6 @@ public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
         filter.filter(predicates, cb, root);
         return cb.and(predicates.values().stream().map(FilterData::getPredicate)
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
-    }
-
-    void postConstruct() {
-        daoHelper = new DaoHelper<>(entityManagerSupplier, entityClass);
     }
 
     private Predicate predicateFromFilterOrComparable(Predicate cond, CriteriaBuilder cb, Root<TT> root,
@@ -321,7 +325,7 @@ public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
     @SuppressWarnings("unchecked")
     @SneakyThrows(ReflectiveOperationException.class)
     private KK getPrimaryKey(Optional<TT> entry) {
-        return (KK) getEntityManager().getEntityManagerFactory().getPersistenceUnitUtil()
+        return (KK) daoHelper.get().getEntityManager().getEntityManagerFactory().getPersistenceUnitUtil()
                 .getIdentifier(entry.orElse(ConstructorUtils.invokeConstructor(getEntityClass())));
     }
 

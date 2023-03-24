@@ -137,7 +137,6 @@ public class ModelTest implements Serializable {
                 .entityManagerSupplier(() -> em)
                 .entityClass(MyEntity.class)
                 .build();
-        impl.postConstruct();
         when(em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(any(MyEntity.class)))
                 .thenAnswer(entry -> entry.<MyEntity>getArgument(0).id);
         assertEquals(5L, impl.getConverter().apply("5"));

@@ -31,7 +31,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 /**
  * Lightweight wrapper around common JPA methods
@@ -49,7 +48,7 @@ import lombok.experimental.SuperBuilder;
  *
  * @author lprimak
  */
-@SuperBuilder
+@Builder
 @RequiredArgsConstructor
 public final class DaoHelper<TT, KT> {
     /**

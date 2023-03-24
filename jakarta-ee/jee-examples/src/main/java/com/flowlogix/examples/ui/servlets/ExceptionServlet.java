@@ -36,6 +36,7 @@ public class ExceptionServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
+    @SuppressWarnings("EmptyBlock")
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter out = resp.getWriter();
         resp.setContentType(TEXT_PLAIN);
@@ -44,8 +45,14 @@ public class ExceptionServlet extends HttpServlet {
         LogRecord record = LogCapture.get().poll();
         while (record != null) {
             if (record.getThrown() != null) {
-                out.printf("%s: %s", record.getLevel(), record.getThrown());
-                out.print(System.lineSeparator());
+                var thrownString = record.getThrown().toString();
+                if (thrownString.contains("Unsupported class file major version")
+                    || record.getMessage().contains("class was compiled with an unsupported JDK")) {
+                    // do not report outdated ASM class file errors
+                } else {
+                    out.printf("%s: %s", record.getLevel(), thrownString);
+                    out.print(System.lineSeparator());
+                }
             }
             record = LogCapture.get().poll();
         }

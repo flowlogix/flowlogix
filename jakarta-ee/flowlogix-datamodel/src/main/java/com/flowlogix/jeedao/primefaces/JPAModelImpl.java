@@ -40,7 +40,6 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Builder;
@@ -61,7 +60,6 @@ import org.primefaces.model.SortMeta;
  * @param <KK>
  */
 @Builder
-@AllArgsConstructor
 @Slf4j
 public class JPAModelImpl<TT, KK> {
     /**

@@ -65,7 +65,7 @@ import org.primefaces.model.SortMeta;
  */
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.NONE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
     /**

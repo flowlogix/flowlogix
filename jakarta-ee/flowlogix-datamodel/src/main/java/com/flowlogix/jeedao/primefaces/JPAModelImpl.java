@@ -41,10 +41,8 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Builder;
 import static lombok.Builder.Default;
@@ -65,7 +63,6 @@ import org.primefaces.model.SortMeta;
  */
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class JPAModelImpl<TT, KK> extends InheritableDaoHelper<TT, KK> {
     /**

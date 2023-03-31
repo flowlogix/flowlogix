@@ -19,13 +19,8 @@ import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
-import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
-import static com.flowlogix.util.ShrinkWrapManipulator.isClientStateSavingIntegrationTest;
-import static com.flowlogix.util.ShrinkWrapManipulator.isShiroNativeSessionsIntegrationTest;
 import java.net.URL;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.codehaus.plexus.util.StringUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -131,18 +126,6 @@ public class ExceptionPageIT {
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    void checkStateSavingDev() {
-        assertEquals(Boolean.parseBoolean(stateSaving.getText()), isClientStateSavingIntegrationTest());
-    }
-
-    @Test
-    @OperateOnDeployment(DEPLOYMENT_PROD_MODE)
-    void checkStateSavingProd() {
-        assertEquals(Boolean.parseBoolean(stateSaving.getText()), isClientStateSavingIntegrationTest());
-    }
-
-    @Test
-    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void lateSqlThrow() {
         guardAjax(lateSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
@@ -188,7 +171,7 @@ public class ExceptionPageIT {
             assertTrue(href.contains("v="), "not versioned");
             ++count;
         }
-        assertEquals(isShiroNativeSessionsIntegrationTest() ? 4 : 3, count);
+        assertEquals(3, count);
 
         count = 0;
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));
@@ -212,7 +195,6 @@ public class ExceptionPageIT {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
-        new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
         return archive;
     }
 
@@ -227,8 +209,7 @@ public class ExceptionPageIT {
                 .as(WebArchive.class);
         var productionList = List.of(new Action(getContextParamValue("jakarta.faces.PROJECT_STAGE"),
                 node -> node.setTextContent("Production")));
-        new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
-                getStandardActions().stream()).collect(Collectors.toList()));
+        new ShrinkWrapManipulator().webXmlXPath(archive, productionList);
         return archive;
     }
 }

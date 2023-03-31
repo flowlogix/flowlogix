@@ -15,7 +15,6 @@
  */
 package com.flowlogix.util;
 
-import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
@@ -29,7 +28,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -46,11 +44,6 @@ import org.w3c.dom.Node;
  */
 @Slf4j
 public class ShrinkWrapManipulator {
-    public static final String INTEGRATION_TEST_MODE_PROPERTY = "integration.test.mode";
-    public static final String CLIENT_STATE_SAVING = "clientStateSaving";
-    public static final String SHIRO_NATIVE_SESSIONS = "shiroNativeSessions";
-    public static final String SHIRO_EE_DISABLED = "disableShiroEE";
-
     @RequiredArgsConstructor
     public static class Action {
         private final String path;
@@ -61,9 +54,6 @@ public class ShrinkWrapManipulator {
             this(path, func, false);
         }
     }
-
-    @SuppressWarnings("ConstantName")
-    private static final @Getter List<Action> standardActions = initializeStandardActions();
 
     private final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
     private final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
@@ -96,14 +86,6 @@ public class ShrinkWrapManipulator {
         archive.setWebXML(new StringAsset(newXmlText));
     }
 
-    public static boolean isClientStateSavingIntegrationTest() {
-        return CLIENT_STATE_SAVING.equals(System.getProperty(INTEGRATION_TEST_MODE_PROPERTY));
-    }
-
-    public static boolean isShiroNativeSessionsIntegrationTest() {
-        return SHIRO_NATIVE_SESSIONS.equals(System.getProperty(INTEGRATION_TEST_MODE_PROPERTY));
-    }
-
     @SneakyThrows
     public static URL toHttpsURL(URL httpUrl) {
         if (httpUrl.getProtocol().endsWith("//")) {
@@ -116,25 +98,6 @@ public class ShrinkWrapManipulator {
 
     public static String getContextParamValue(String paramName) {
         return String.format("//web-app/context-param[param-name = '%s']/param-value", paramName);
-    }
-
-    private static List<Action> initializeStandardActions() {
-        switch (System.getProperty(INTEGRATION_TEST_MODE_PROPERTY, "none")) {
-            case CLIENT_STATE_SAVING:
-                return List.of(new Action(getContextParamValue(jakartify("javax.faces.STATE_SAVING_METHOD")),
-                        node -> node.setTextContent("client")));
-            case SHIRO_NATIVE_SESSIONS:
-                return List.of(new Action(getContextParamValue("shiroConfigLocations"),
-                        node -> node.setTextContent(node.getTextContent()
-                                + ",classpath:META-INF/shiro-native-sessions.ini")));
-            case SHIRO_EE_DISABLED:
-                return List.of(new Action(getContextParamValue("com.flowlogix.shiro.ee.disabled"),
-                        node -> node.setTextContent("true"), true),
-                        new Action(getContextParamValue("org.apache.shiro.ee.disabled"),
-                                node -> node.setTextContent("true"), true));
-            default:
-                return List.of();
-        }
     }
 
     @SneakyThrows

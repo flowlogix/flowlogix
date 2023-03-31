@@ -70,10 +70,10 @@ public class JPAModelImpl<TT, KK> {
      * entity class
      */
     private final @NonNull @Getter Class<TT> entityClass;
+    private final Lazy<DaoHelper<TT, KK>> daoHelper = new Lazy<>(this::createDaoHelper);
     /**
      * convert String key into {@link KK} object
      */
-    private final Lazy<DaoHelper<TT, KK>> daoHelper = new Lazy<>(this::createDaoHelper);
     private final Function<String, KK> converter;
     /**
      * convert typed key to String

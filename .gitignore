@@ -13,3 +13,5 @@ target
 **.idea
 **nb-configuration.xml
 **faces-config.NavData
+**.gradle
+**.sdkmanrc

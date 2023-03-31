@@ -114,27 +114,27 @@ public class ShrinkWrapManipulator {
         return new URL(httpUrl.getProtocol() + "s", httpUrl.getHost(), sslPort, httpUrl.getFile());
     }
 
+    public static String getContextParamValue(String paramName) {
+        return String.format("//web-app/context-param[param-name = '%s']/param-value", paramName);
+    }
+
     private static List<Action> initializeStandardActions() {
         switch (System.getProperty(INTEGRATION_TEST_MODE_PROPERTY, "none")) {
             case CLIENT_STATE_SAVING:
-                return List.of(new Action(getParamValue(jakartify("javax.faces.STATE_SAVING_METHOD")),
+                return List.of(new Action(getContextParamValue(jakartify("javax.faces.STATE_SAVING_METHOD")),
                         node -> node.setTextContent("client")));
             case SHIRO_NATIVE_SESSIONS:
-                return List.of(new Action(getParamValue("shiroConfigLocations"),
+                return List.of(new Action(getContextParamValue("shiroConfigLocations"),
                         node -> node.setTextContent(node.getTextContent()
                                 + ",classpath:META-INF/shiro-native-sessions.ini")));
             case SHIRO_EE_DISABLED:
-                return List.of(new Action(getParamValue("com.flowlogix.shiro.ee.disabled"),
+                return List.of(new Action(getContextParamValue("com.flowlogix.shiro.ee.disabled"),
                         node -> node.setTextContent("true"), true),
-                        new Action(getParamValue("org.apache.shiro.ee.disabled"),
+                        new Action(getContextParamValue("org.apache.shiro.ee.disabled"),
                                 node -> node.setTextContent("true"), true));
             default:
                 return List.of();
         }
-    }
-
-    private static String getParamValue(String paramName) {
-        return String.format("//web-app/context-param[param-name = '%s']/param-value", paramName);
     }
 
     @SneakyThrows

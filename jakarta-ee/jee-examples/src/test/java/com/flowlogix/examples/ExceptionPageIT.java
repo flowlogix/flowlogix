@@ -18,6 +18,7 @@ package com.flowlogix.examples;
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
+import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
 import static com.flowlogix.util.ShrinkWrapManipulator.getStandardActions;
 import static com.flowlogix.util.ShrinkWrapManipulator.isClientStateSavingIntegrationTest;
 import static com.flowlogix.util.ShrinkWrapManipulator.isShiroNativeSessionsIntegrationTest;
@@ -224,8 +225,7 @@ public class ExceptionPageIT {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class);
-        var productionList = List.of(new Action(
-                jakartify("//web-app/context-param[param-name = 'javax.faces.PROJECT_STAGE']/param-value"),
+        var productionList = List.of(new Action(getContextParamValue(jakartify("javax.faces.PROJECT_STAGE")),
                 node -> node.setTextContent("Production")));
         new ShrinkWrapManipulator().webXmlXPath(archive, Stream.concat(productionList.stream(),
                 getStandardActions().stream()).collect(Collectors.toList()));

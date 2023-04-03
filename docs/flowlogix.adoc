@@ -1,0 +1,286 @@
+:jbake-title: Flow Logix Jakarta EE Components
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-menu: arc42
+:jbake-order: 1
+:filename: /all.adoc
+ifndef::imagesdir[:imagesdir: ../../images]
+
+:toc:
+
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-introduction-and-features]]
+== Introduction and Features
+
+[role="arc42help"]
+****
+.Why another utility library?
+Admittedly, most functionality is already covered by Jakarta EE, PrimeFaces, OmniFaces, Apache Shiro and other very popular software. However, there are still a few missing pieces that remain.
+
+.What are the features provided?
+FlowLogix Jakarta EE library fills in the last few gaps that are left over in PrimeFaces, OmniFaces and Jakarta EE itself, including:
+
+* Provides automatic DAO functionality with delegation and without inheritance
+* Adds Type-safe Native SQL query with JPA via generics
+* Declares Jakarta Faces PROJECT_STAGE development mode automatically
+* Automatically uses minimized versions of assets with Jakarta Faces
+* Provides easy and automatic initialization of OmniFaces' UnmappedResourceHandler
+* Easier-to-use JPA Lazy Data Model for PrimeFaces
+* Automatically includes PrimeFaces font mime types in your web applications, preventing warnings and extra entries in your web.xml
+* Convert strings to arbitrary types on a best-effort basis
+* Transforms names between javax and jakarta namespaces
+* Checks if objects are truly serializable by testing them
+* Easy Transform Streams to Strings
+* Simplify manipulation of ShrinkWrap archives including assets
+****
+
+=== Where does FlowLogix fit into your application arhitecture?
+[role="arc42help"]
+****
+.Is it a framework?
+No. FlowLogix fits within the Jakarta EE design philosophy and works with MicroProfile, Jakarta EE, OmniFaces and PrimeFaces ecosystem. FlowLogix tries to be the least intrusive, automatic and with the fewest requirements possible.
+
+.What are the design principles?
+Simplicity is the #1 principal. FlowLogix doesn't make you inherit from base classes or interfaces, unless absolutely necessary. Annotations are also used sparingly, being careful not to introduce any unnecessary cognitive load and complexity.
+
+.Project Lombok is mentioned a lot. Is it required?
+No. Although the library itself uses Lombok to avoid boilerplate code, it is completely optional to the user, and is not required to be a dependency of user code. Having said that, even though Java itself currently has lots of features only available with Lombok in prior years, Lombok still has many features not available in Java today, and is very useful and highly recommended.
+****
+
+== Installation and Compatibility
+=== Compatibility
+****
+FlowLogix 5.x is compatible with Java 11+ and Java EE 8, Jakarta EE 8 and later. Jakarta EE 9 and later (jakarta.* namespace) is available via the `jakarta` maven classifier. +
+FlowLogix 6.x is compatible with Java 17+ and Jakarta EE 9 and later. No classifier is required.
+****
+
+=== Installation
+****
+Artifacts are available in the Sonatype's
+link:https://central.sonatype.com/search?smo=true&q=com.flowlogix&sort=published[Maven Central repository].
+Both 5.x and 6.x snapshots are available in the
+link:https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix[Maven Central snapshot] repository
+****
+
+=== Flow Logix BOM
+****
+Flow Logix includes an easy way to declare all the required dependency versions, via the BOM.
+See the link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms[Maven Documentation] for more information
+****
+
+== Developer's Guide
+=== FlowLogix Utility Library
+****
+.JPA: Delegation-based Helper for Data Access Objects and business logic
+There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to inherit from an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `daoHelper` protected field in your `@PostConstruct` method.
+
+You can leverage Project Lombok @Delegate annotation to transparently implement Data Access Objects without any specific requirements. Alternatively, developers can write manual forwarder methods, dynamic proxies, or
+other bytecode generators to delegate to `DaoHelper` from an interface.
+
+Recommended approach is to use Lombok's `@Delegate` annotation. This introduces the fewest amount of magic, results in the least amount of code, and absolute minimum (if any) boilerplate.
+
+_Fluent Builder_ pattern is used to create `DaoHelper` object, which requires EntityManager `Supplier` and entity `Class`
+
+`findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can specify JPA `hints`, and `queryCriteria` enhancements for either `count()` or `findXXX()` use cases. This takes a form of `builder -> builder.xxx().yyy().build()` to make  settings easy.
+
+[source,java]
+====
+Example TBD (snippet/link/copy-of)
+====
+.JPA: Generics-based Type-safe native query
+`DaoHelper` has a convenience method `createNativeQuery()` which will return `TypedNativeQuery` object. This is a thin wrapper over JPA's `Query` object, however it's `getResult*()` methods return typed results via generics, which avoids casting and makes the results easier and safer to use.
+[source,java]
+====
+Example TBD (snippet/link/copy-of)
+====
+
+.Jakarta Faces: Automated PROJECT_STAGE
+Jakarta Faces runs in production mode by default. However, most applications set up development mode by modifiying `web.xml`. Traditionally, it's been difficult to set up environment-based switch from development to production mode. FlowLogix sets this up automatically via `web-fragment.xml` and allows JNDI-based switch to production mode.
+
+Below is an example of setting up production mode with Payara and GlassFish with Jakarta EE 9 or later:
+[source,shell]
+====
+$ asadmin create-custom-resource --resType=java.lang.String --factoryClass=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory faces/ProjectStage
+set resources.custom-resource.faces/ProjectStage.property.value=Production
+====
+With Jakarta EE or Java EE 8 and earlier, replaces `faces/` with `jsf/`.
+
+.Jakarta Faces: Use minified assets automatically in production mode
+Most front-end applications want to use minified versions of their assets, such as JavaScript and CSS files in production. FlowLogix allows this via `MinimizedHandler` which will automatically insert `min` prefix into the appropriate assets, for example `resource.js -> resource.min.js` and `resource.css -> resource.min.css`.
+This is configurable via web.xml parameters `com.flowlogix.MINIMIZED_PREFIX` and `com.flowlogix.MINIMIZED_FILE_TYPES`
+
+.faces-confix.xml
+[source,xml]
+====
+ <application>
+    <resource-handler>com.flowlogix.ui.MinimizedHandler</resource-handler>
+ </application>
+====
+
+.index.xhtml
+[source,xml]
+====
+    <h:outputScript name="myjavascript.js"/>
+====
+
+.web.xml
+[source,xml]
+====
+ <context-param>
+    <param-name>com.flowlogix.MINIMIZED_PREFIX</param-name>
+    <param-value>minimized</param-value>
+ </context-param>
+
+ <!-- Optional, default is "css,js" -->
+ <context-param>
+    <param-name>com.flowlogix.MINIMIZED_FILE_TYPES</param-name>
+    <param-value>css,js,tsx, sass, less</param-value>
+ </context-param>
+====
+
+.OmniFaces: Automatic initialization of `UnmappedResourceHandler`
+In order to initialize https://showcase.omnifaces.org/resourcehandlers/UnmappedResourceHandler[OmniFaces' UnmappedResourceHandler], both `web.xml` and `faces.xml` entries are ordinarily required. FlowLogix automates a more complicated `web.xml` requirements by automatically configuring the servlet container to include all resources. In order to enable this, add the below context parameter in `web.xml`:
+[source,xml]
+====
+ <context-param>
+    <param-name>com.flowlogix.add-unmapped-resources</param-name>
+    <param-value>true</param-value>
+ </context-param>
+====
+
+.PrimeFaces: Font mime-types automatically included
+PrineFaces automatically includes fonts as part of the application. However, the file extensions of these fonts are not usually included in most servlet containers by default. FlowLogix adds those mime types automatically and prevents the warnings such as below from appearing in log files:
+[source]
+====
+ WARNING: JSF1091: No mime type could be found for file font1.woff2
+====
+
+.Convert Strings to arbitrary types
+Most classes that can be constructed from `String` include `valueOf(String)` method by convention.
+`TypeConverter` class uses this to generically convert a String to any type specified.
+If unable to convert the class, an exception is thrown. +
+`TypeConverter` specifically does _not_ support custom converters for simplicity.
+If those are desired, other libraries do a great job of handling custom converters, including Jakarta Faces' Converters.
+
+.Transform java -> jakarta namespace at run-time (jakartify)
+FlowLogix provides a convenience method for converting strings from `javax` to `jakarta` namespace:
+[source,java]
+====
+ jakartify(Servlet.class.getName());
+====
+FlowLogix automatically detects which environment it's in, and converts `javax`-based names into `jakarta`-based namespace accordingly. Keep in mind that the environment check occurs at compile time, and not runtime. This method works not only for classes, but also for error messages and other Strings.
+
+.Serialization Tester
+Generic `serializeAndDeserialize()` can be used to check the true ability to serialize a class. It returns the object passed after going through serialization and deserialization, so the new state can be checked for correctness.
+
+.Read String from Stream easily
+FlowLogix provides an easy way to read a String from any input stream:
+[source,java]
+====
+ String s = Streams.readString(strm);
+====
+
+.Simplify ShrinkWrap archive manipulation for testing
+`ShrinkWrapManupulator` class has a few utility methods that make Arquillian tests easier. +
+Some tests require TLS/SSL to execute properly. Arquillian uses plain http by default. To facilitate tests that require TLS/SSL, `toHttpsURL(url)` takes a URL and converts it to it's https equivalent, taking the `sslPort` system property into account. Default port is 8181
+
+.Below, toHttpsUtl("http://host/index.html") will return "https://host:8282/index.html"
+[source,bash]
+====
+ $ mvn verify -DsslPort=8282
+====
+`webXmlXPath()` takes a `List<Action>` and will manipulate archive's `web.xml` to achieve the desired test configuration. For example, if Jakarta Faces production mode is desired for the particular archive, `web.xml` `context-param` is changed below:
+[source,java]
+====
+ @Deployment
+ public static WebArchive deploy() {
+    WebArchive archive = ShrinkWrap.create(...);
+    new ShrinkWrapManipulator().webXmlXPath(archive, List.of(new Action(
+        getContextParamValue(jakartify("javax.faces.PROJECT_STAGE")),
+        node -> node.setTextContent("Production"))));
+ }
+====
+`getContextParamValue()` is a shorthand to produce XPath for `web.xml` context parameter (`<context-param>`) element:
+[source,xml]
+====
+ //web-app/context-param[param-name = 'jakarta.faces.PROJECT_STAGE']/param-value
+====
+The second parameter is DOM `Node` class `Consumer` lambda, which allows for manipulation of the DOM element directly by the user. +
+Above, we also combine `web.xml` manipulation with `jakartify` to be compatible with both Jakarta EE 8 or 9, if desired.
+****
+
+=== FlowLogix PrimeFaces Lazy Data Model backed by JPA
+****
+.An easier alternative to PrimeFaces JPA Lazy Data model
+PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier and with a lot less code.
+[source,xhtml]
+====
+ <p:dataTable lazy="true" value="#{userViewer.lazyModel}" var="user">
+    ... specify columns as usual ...
+ </p:dataTable>
+====
+[source,java]
+====
+ @Named
+ @ViewScoped
+ public class UserViewer implements Serializable {
+    @PersistenceContext
+    private EntityManager em;
+
+    private @Getter final JPALazyDataModel<UserEntity, Long> lazyModel =
+            JPALazyDataModel.create(builder -> builder
+                    .entityManagerSupplier(() -> em)
+                    .entityClass(UserEntity.class)
+                    .caseSensitiveQuery(false)
+                    .build());
+}
+====
+Above we created a model with case-insensitive filtering.
+
+`JPALazyDataModel` only requires `entityManagerSupplier` and `entityClass` to work, everything else is optional:
+
+* sorter: Apply custom sort criteria
+* filter: Apply custom filter criteria
+* optimizer: Apply custom JPA hints, works with `DaoHelper`
+* converter: `Function` that converts String representation of a primary key into an primary key object. Needed only if the default is insufficient.
+* keyConverter: `Function` that converts an entity object into primary key in `String` form. Needed only if the default is insufficient.
+
+Let's use custom sort criteria to add address to the default sort criteria:
+[source,java]
+====
+ JPALazyDataModel.create(builder -> builder.sorter(UserViewer::sorter).entityXXX().build());
+
+ private static boolean sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
+        sortData.getSortOrder().add(cb.asc(root.get(UserEntity_.address)));
+        return false;
+}
+====
+Let's use custom filter criteria using `replaceFilter` convenience method. Here we make sure that only zip codes greater than that in the filter are returned:
+[source,java]
+====
+ JPALazyDataModel.create(builder -> builder.filter(UserViewer::filter).entityXXX().build());
+
+ private static void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<UserEntity> root) {
+        replaceFilter(filters, UserEntity_.zipCode.getName(),
+                (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value));
+ }
+====
+Optimizer hints can be used to batch fetch dependent entities. The `Function` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner.
+[source,java]
+====
+ private static TypedQuery<UserEntity> optimizer(TypedQuery<UserEntity> query) {
+    return query.setHint(QueryHints.BATCH, getResultField("userSettings"))
+        .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN)
+        .setHint(QueryHints.BATCH, getResultField("alternateEmails"));
+ }
+====
+****
+
+== API Reference
+****
+FlowLogix features a full API references:
+
+link:https://javadoc.io/doc/com.flowlogix/flowlogix-jee[Utility Library API Reference] +
+link:https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel[PrimeFaces JPA Lazy Data Model API Reference]
+****

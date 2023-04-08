@@ -1,0 +1,3 @@
+[submodule "docs/docs-template"]
+	path = docs/docs-template
+	url = git@github.com:flowlogix/docs-template.git

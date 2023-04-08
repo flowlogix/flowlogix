@@ -15,8 +15,8 @@ image:https://img.shields.io/github/license/flowlogix/flowlogix?style=plastic[li
 - Jakarta EE JSF JavaScript Minimized resource handler
 - Utilities (String / Object Type Converter, Stream reader)
 
-=== Documentation and Feature List
-link:docs/flowlogix.adoc[Developer's Guide^] is here including full feature list
+=== Documentation and Features
+link:docs/content/flowlogix.adoc[Developer's Guide^] is here including full feature list
 
 === Maven Central Coordinates
 

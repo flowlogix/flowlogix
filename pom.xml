@@ -354,7 +354,7 @@
                         <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
                         <preparationGoals>validate</preparationGoals>
-                        <releaseProfiles>${release.profile}</releaseProfiles>
+                        <releaseProfiles>${release.profile},docs</releaseProfiles>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>
                     </configuration>
                 </plugin>
@@ -457,9 +457,6 @@
         </profile>
         <profile>
             <id>release-flowlogix-to-central</id>
-            <properties>
-                <docs.phase>package</docs.phase>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -478,7 +475,6 @@
         <profile>
             <id>release-flowlogix-to-hope</id>
             <properties>
-                <docs.phase>package</docs.phase>
                 <staging.server>hope-nexus-artifacts</staging.server>
                 <nexus.url>https://nexus.hope.nyc.ny.us/</nexus.url>
                 <skip.staging>true</skip.staging>
@@ -489,6 +485,12 @@
                     <url>${nexus.url}repository/maven-releases</url>
                 </repository>
             </distributionManagement>
+        </profile>
+        <profile>
+            <id>docs</id>
+            <properties>
+                <docs.phase>package</docs.phase>
+            </properties>
         </profile>
         <profile>
             <id>skip-checkstyle</id>

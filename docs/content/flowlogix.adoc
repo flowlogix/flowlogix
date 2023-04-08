@@ -16,7 +16,7 @@ ifndef::imagesdir[:imagesdir: ../images]
 [role="arc42help"]
 ****
 .Why another utility library?
-Admittedly, most functionality is already covered by Jakarta EE, PrimeFaces, OmniFaces, Apache Shiro and other very popular software. However, there are still a few missing pieces that remain.
+FlowLogix provides a few remaining missing pieces that remain in what is covered by Jakarta EE, PrimeFaces, OmniFaces, Apache Shiro and other very popular software.
 
 .What are the features provided?
 FlowLogix Jakarta EE library fills in the last few gaps that are left over in PrimeFaces, OmniFaces and Jakarta EE itself, including:
@@ -35,7 +35,7 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Simplify manipulation of ShrinkWrap archives including assets
 ****
 
-=== Where does FlowLogix fit into your application arhitecture?
+=== Where does FlowLogix fit into your application architecture?
 [role="arc42help"]
 ****
 .Is it a framework?

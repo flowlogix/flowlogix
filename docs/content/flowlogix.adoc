@@ -1,21 +1,17 @@
 :jbake-title: Flow Logix Jakarta EE Components
 :jbake-type: page_toc
 :jbake-status: published
-:jbake-menu: arc42
-:jbake-order: 1
-:filename: /all.adoc
-ifndef::imagesdir[:imagesdir: ../../images]
 
 :toc:
 
-ifndef::imagesdir[:imagesdir: ../images]
+++++
+<!-- endtoc -->
+++++
 
 [[section-introduction-and-features]]
 == Introduction and Features
-
-[role="arc42help"]
 ****
-.Why another utility library?
+.Why another utility / component library?
 FlowLogix provides a few remaining missing pieces that remain in what is covered by Jakarta EE, PrimeFaces, OmniFaces, Apache Shiro and other very popular software.
 
 .What are the features provided?
@@ -35,8 +31,8 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Simplify manipulation of ShrinkWrap archives including assets
 ****
 
+[[section-architecture]]
 === Where does FlowLogix fit into your application architecture?
-[role="arc42help"]
 ****
 .Is it a framework?
 No. FlowLogix fits within the Jakarta EE design philosophy and works with MicroProfile, Jakarta EE, OmniFaces and PrimeFaces ecosystem. FlowLogix tries to be the least intrusive, automatic and with the fewest requirements possible.
@@ -48,6 +44,7 @@ Simplicity is the #1 principal. FlowLogix doesn't make you inherit from base cla
 No. Although the library itself uses Lombok to avoid boilerplate code, it is completely optional to the user, and is not required to be a dependency of user code. Having said that, even though Java itself currently has lots of features only available with Lombok in prior years, Lombok still has many features not available in Java today, and is very useful and highly recommended.
 ****
 
+[[section-installation]]
 == Installation and Compatibility
 === Compatibility
 ****
@@ -58,19 +55,21 @@ FlowLogix 6.x is compatible with Java 17+ and Jakarta EE 9 and later. No classif
 === Installation
 ****
 Artifacts are available in the Sonatype's
-link:https://central.sonatype.com/search?smo=true&q=com.flowlogix&sort=published[Maven Central repository].
+link:https://central.sonatype.com/search?smo=true&q=com.flowlogix&sort=published[Maven Central repository^].
 Both 5.x and 6.x snapshots are available in the
-link:https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix[Maven Central snapshot] repository
+link:https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix[Maven Central snapshot^] repository
 ****
 
 === Flow Logix BOM
 ****
 Flow Logix includes an easy way to declare all the required dependency versions, via the BOM.
-See the link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms[Maven Documentation] for more information
+See the link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms[Maven Documentation^] for more information
 ****
 
+[[section-dev-guide]]
 == Developer's Guide
-=== FlowLogix Utility Library
+[[section-jee]]
+=== FlowLogix Jakarta EE Components
 ****
 .JPA: Delegation-based Helper for Data Access Objects and business logic
 There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to inherit from an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `daoHelper` protected field in your `@PostConstruct` method.
@@ -139,7 +138,7 @@ This is configurable via web.xml parameters `com.flowlogix.MINIMIZED_PREFIX` and
  </context-param>
 ====
 
-.OmniFaces: Automatic initialization of `UnmappedResourceHandler`
+.OmniFaces: Automatic initialization of _UnmappedResourceHandler_
 In order to initialize https://showcase.omnifaces.org/resourcehandlers/UnmappedResourceHandler[OmniFaces' UnmappedResourceHandler], both `web.xml` and `faces.xml` entries are ordinarily required. FlowLogix automates a more complicated `web.xml` requirements by automatically configuring the servlet container to include all resources. In order to enable this, add the below context parameter in `web.xml`:
 [source,xml]
 ====
@@ -185,7 +184,7 @@ FlowLogix provides an easy way to read a String from any input stream:
 `ShrinkWrapManupulator` class has a few utility methods that make Arquillian tests easier. +
 Some tests require TLS/SSL to execute properly. Arquillian uses plain http by default. To facilitate tests that require TLS/SSL, `toHttpsURL(url)` takes a URL and converts it to it's https equivalent, taking the `sslPort` system property into account. Default port is 8181
 
-.Below, toHttpsUtl("http://host/index.html") will return "https://host:8282/index.html"
+.Below, toHttpsUrl("http://host/index.html") will return "https://host:8282/index.html"
 [source,bash]
 ====
  $ mvn verify -DsslPort=8282
@@ -210,10 +209,11 @@ The second parameter is DOM `Node` class `Consumer` lambda, which allows for man
 Above, we also combine `web.xml` manipulation with `jakartify` to be compatible with both Jakarta EE 8 or 9, if desired.
 ****
 
+[[section-jpa-lazymodel]]
 === FlowLogix PrimeFaces Lazy Data Model backed by JPA
 ****
 .An easier alternative to PrimeFaces JPA Lazy Data model
-PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier and with a lot less code.
+PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier and with a lot less code.
 [source,xhtml]
 ====
  <p:dataTable lazy="true" value="#{userViewer.lazyModel}" var="user">
@@ -281,6 +281,6 @@ Optimizer hints can be used to batch fetch dependent entities. The `Function` sh
 ****
 FlowLogix features a full API references:
 
-link:https://javadoc.io/doc/com.flowlogix/flowlogix-jee[Utility Library API Reference] +
-link:https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel[PrimeFaces JPA Lazy Data Model API Reference]
+link:https://javadoc.io/doc/com.flowlogix/flowlogix-jee[Jakarta EE Components API Reference^] +
+link:https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel[PrimeFaces JPA Lazy Data Model API Reference^]
 ****

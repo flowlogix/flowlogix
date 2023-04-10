@@ -16,7 +16,7 @@ image:https://img.shields.io/github/license/flowlogix/flowlogix?style=plastic[li
 - Utilities (String / Object Type Converter, Stream reader)
 
 === Documentation and Features
-link:docs/content/flowlogix.adoc[Developer's Guide^] is here including full feature list
+link:https://docs.flowlogix.com[Developer's Guide] is here.
 
 === Maven Central Coordinates
 

@@ -15,3 +15,4 @@ target
 **faces-config.NavData
 **.gradle
 **.sdkmanrc
+/docs/output

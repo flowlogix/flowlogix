@@ -100,7 +100,7 @@ Jakarta Faces runs in production mode by default. However, most applications set
 Below is an example of setting up production mode with Payara and GlassFish with Jakarta EE 9 or later:
 [source,shell]
 ====
-$ asadmin create-custom-resource --resType=java.lang.String --factoryClass=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory faces/ProjectStage
+ $ asadmin create-custom-resource --resType=java.lang.String --factoryClass=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory faces/ProjectStage
 set resources.custom-resource.faces/ProjectStage.property.value=Production
 ====
 With Jakarta EE or Java EE 8 and earlier, replaces `faces/` with `jsf/`.

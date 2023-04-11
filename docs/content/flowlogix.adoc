@@ -8,7 +8,7 @@
 == Introduction and Features
 ****
 .Why another utility / component library?
-FlowLogix provides a few remaining missing pieces that remain in what is covered by Jakarta EE, PrimeFaces, OmniFaces, Apache Shiro and other very popular software.
+FlowLogix provides a few remaining missing pieces in what is covered by Jakarta EE, PrimeFaces, OmniFaces, Apache Shiro and other very popular software.
 
 .What are the features provided?
 FlowLogix Jakarta EE library fills in the last few gaps that are left over in PrimeFaces, OmniFaces and Jakarta EE itself, including:

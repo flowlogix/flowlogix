@@ -4,10 +4,6 @@
 
 :toc:
 
-++++
-<!-- endtoc -->
-++++
-
 [[section-introduction-and-features]]
 == Introduction and Features
 ****

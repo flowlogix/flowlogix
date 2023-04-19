@@ -1,3 +1,6 @@
 [submodule "docs/docs-template"]
 	path = docs/docs-template
 	url = git@github.com:flowlogix/docs-template.git
+[submodule "docs/jbake-maven"]
+	path = docs/jbake-maven
+	url = git@github.com:flowlogix/jbake-maven.git

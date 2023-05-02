@@ -80,25 +80,25 @@ _Fluent Builder_ pattern is used to create `DaoHelper` object, which requires En
 `findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can specify JPA `hints`, and `queryCriteria` enhancements for either `count()` or `findXXX()` use cases. This takes a form of `builder -> builder.xxx().yyy().build()` to make  settings easy.
 
 [source,java]
-====
+----
 Example TBD (snippet/link/copy-of)
-====
+----
 .JPA: Generics-based Type-safe native query
 `DaoHelper` has a convenience method `createNativeQuery()` which will return `TypedNativeQuery` object. This is a thin wrapper over JPA's `Query` object, however it's `getResult*()` methods return typed results via generics, which avoids casting and makes the results easier and safer to use.
 [source,java]
-====
+----
 Example TBD (snippet/link/copy-of)
-====
+----
 
 .Jakarta Faces: Automated PROJECT_STAGE
 Jakarta Faces runs in production mode by default. However, most applications set up development mode by modifiying `web.xml`. Traditionally, it's been difficult to set up environment-based switch from development to production mode. FlowLogix sets this up automatically via `web-fragment.xml` and allows JNDI-based switch to production mode.
 
 Below is an example of setting up production mode with Payara and GlassFish with Jakarta EE 9 or later:
 [source,shell]
-====
- $ asadmin create-custom-resource --resType=java.lang.String --factoryClass=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory faces/ProjectStage
-set resources.custom-resource.faces/ProjectStage.property.value=Production
-====
+----
+$ asadmin create-custom-resource --resType=java.lang.String --factoryClass=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory faces/ProjectStage
+$ asadmin set resources.custom-resource.faces/ProjectStage.property.value=Production
+----
 With Jakarta EE or Java EE 8 and earlier, replaces `faces/` with `jsf/`.
 
 .Jakarta Faces: Use minified assets automatically in production mode
@@ -107,49 +107,49 @@ This is configurable via web.xml parameters `com.flowlogix.MINIMIZED_PREFIX` and
 
 .faces-confix.xml
 [source,xml]
-====
- <application>
+----
+<application>
     <resource-handler>com.flowlogix.ui.MinimizedHandler</resource-handler>
- </application>
-====
+</application>
+----
 
 .index.xhtml
 [source,xml]
-====
-    <h:outputScript name="myjavascript.js"/>
-====
+----
+<h:outputScript name="myjavascript.js"/>
+----
 
 .web.xml
 [source,xml]
-====
- <context-param>
+----
+<context-param>
     <param-name>com.flowlogix.MINIMIZED_PREFIX</param-name>
     <param-value>minimized</param-value>
- </context-param>
+</context-param>
 
- <!-- Optional, default is "css,js" -->
- <context-param>
+<!-- Optional, default is "css,js" -->
+<context-param>
     <param-name>com.flowlogix.MINIMIZED_FILE_TYPES</param-name>
     <param-value>css,js,tsx, sass, less</param-value>
- </context-param>
-====
+</context-param>
+----
 
 .OmniFaces: Automatic initialization of _UnmappedResourceHandler_
 In order to initialize https://showcase.omnifaces.org/resourcehandlers/UnmappedResourceHandler[OmniFaces' UnmappedResourceHandler], both `web.xml` and `faces.xml` entries are ordinarily required. FlowLogix automates a more complicated `web.xml` requirements by automatically configuring the servlet container to include all resources. In order to enable this, add the below context parameter in `web.xml`:
 [source,xml]
-====
- <context-param>
+----
+<context-param>
     <param-name>com.flowlogix.add-unmapped-resources</param-name>
     <param-value>true</param-value>
- </context-param>
-====
+</context-param>
+----
 
 .PrimeFaces: Font mime-types automatically included
 PrineFaces automatically includes fonts as part of the application. However, the file extensions of these fonts are not usually included in most servlet containers by default. FlowLogix adds those mime types automatically and prevents the warnings such as below from appearing in log files:
 [source]
-====
+----
  WARNING: JSF1091: No mime type could be found for file font1.woff2
-====
+----
 
 .Convert Strings to arbitrary types
 Most classes that can be constructed from `String` include `valueOf(String)` method by convention.
@@ -161,9 +161,9 @@ If those are desired, other libraries do a great job of handling custom converte
 .Transform java -> jakarta namespace at run-time (jakartify)
 FlowLogix provides a convenience method for converting strings from `javax` to `jakarta` namespace:
 [source,java]
-====
- jakartify(Servlet.class.getName());
-====
+----
+jakartify(Servlet.class.getName());
+----
 FlowLogix automatically detects which environment it's in, and converts `javax`-based names into `jakarta`-based namespace accordingly. Keep in mind that the environment check occurs at compile time, and not runtime. This method works not only for classes, but also for error messages and other Strings.
 
 .Serialization Tester
@@ -172,35 +172,35 @@ Generic `serializeAndDeserialize()` can be used to check the true ability to ser
 .Read String from Stream easily
 FlowLogix provides an easy way to read a String from any input stream:
 [source,java]
-====
- String s = Streams.readString(strm);
-====
+----
+String s = Streams.readString(strm);
+----
 
 .Simplify ShrinkWrap archive manipulation for testing
 `ShrinkWrapManupulator` class has a few utility methods that make Arquillian tests easier. +
 Some tests require TLS/SSL to execute properly. Arquillian uses plain http by default. To facilitate tests that require TLS/SSL, `toHttpsURL(url)` takes a URL and converts it to it's https equivalent, taking the `sslPort` system property into account. Default port is 8181
 
 .Below, toHttpsUrl("http://host/index.html") will return "https://host:8282/index.html"
-[source,bash]
-====
- $ mvn verify -DsslPort=8282
-====
+[source,shell]
+----
+$ mvn verify -DsslPort=8282
+----
 `webXmlXPath()` takes a `List<Action>` and will manipulate archive's `web.xml` to achieve the desired test configuration. For example, if Jakarta Faces production mode is desired for the particular archive, `web.xml` `context-param` is changed below:
 [source,java]
-====
- @Deployment
- public static WebArchive deploy() {
+----
+@Deployment
+public static WebArchive deploy() {
     WebArchive archive = ShrinkWrap.create(...);
     new ShrinkWrapManipulator().webXmlXPath(archive, List.of(new Action(
         getContextParamValue(jakartify("javax.faces.PROJECT_STAGE")),
         node -> node.setTextContent("Production"))));
- }
-====
+}
+----
 `getContextParamValue()` is a shorthand to produce XPath for `web.xml` context parameter (`<context-param>`) element:
 [source,xml]
-====
- //web-app/context-param[param-name = 'jakarta.faces.PROJECT_STAGE']/param-value
-====
+----
+//web-app/context-param[param-name = 'jakarta.faces.PROJECT_STAGE']/param-value
+----
 The second parameter is DOM `Node` class `Consumer` lambda, which allows for manipulation of the DOM element directly by the user. +
 Above, we also combine `web.xml` manipulation with `jakartify` to be compatible with both Jakarta EE 8 or 9, if desired.
 ****
@@ -211,16 +211,16 @@ Above, we also combine `web.xml` manipulation with `jakartify` to be compatible 
 .An easier alternative to PrimeFaces JPA Lazy Data model
 PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier and with a lot less code.
 [source,xhtml]
-====
- <p:dataTable lazy="true" value="#{userViewer.lazyModel}" var="user">
+----
+<p:dataTable lazy="true" value="#{userViewer.lazyModel}" var="user">
     ... specify columns as usual ...
- </p:dataTable>
-====
+</p:dataTable>
+----
 [source,java]
-====
- @Named
- @ViewScoped
- public class UserViewer implements Serializable {
+----
+@Named
+@ViewScoped
+public class UserViewer implements Serializable {
     @PersistenceContext
     private EntityManager em;
 
@@ -231,7 +231,7 @@ PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/prime
                     .caseSensitiveQuery(false)
                     .build());
 }
-====
+----
 Above we created a model with case-insensitive filtering.
 
 `JPALazyDataModel` only requires `entityManagerSupplier` and `entityClass` to work, everything else is optional:
@@ -244,33 +244,33 @@ Above we created a model with case-insensitive filtering.
 
 Let's use custom sort criteria to add address to the default sort criteria:
 [source,java]
-====
- JPALazyDataModel.create(builder -> builder.sorter(UserViewer::sorter).entityXXX().build());
+----
+JPALazyDataModel.create(builder -> builder.sorter(UserViewer::sorter).entityXXX().build());
 
- private static boolean sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
+private static boolean sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
         sortData.getSortOrder().add(cb.asc(root.get(UserEntity_.address)));
         return false;
 }
-====
+----
 Let's use custom filter criteria using `replaceFilter` convenience method. Here we make sure that only zip codes greater than that in the filter are returned:
 [source,java]
-====
- JPALazyDataModel.create(builder -> builder.filter(UserViewer::filter).entityXXX().build());
+----
+JPALazyDataModel.create(builder -> builder.filter(UserViewer::filter).entityXXX().build());
 
- private static void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<UserEntity> root) {
+private static void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<UserEntity> root) {
         replaceFilter(filters, UserEntity_.zipCode.getName(),
                 (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value));
- }
-====
+}
+----
 Optimizer hints can be used to batch fetch dependent entities. The `Function` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner.
 [source,java]
-====
- private static TypedQuery<UserEntity> optimizer(TypedQuery<UserEntity> query) {
+----
+private static TypedQuery<UserEntity> optimizer(TypedQuery<UserEntity> query) {
     return query.setHint(QueryHints.BATCH, getResultField("userSettings"))
         .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN)
         .setHint(QueryHints.BATCH, getResultField("alternateEmails"));
- }
-====
+}
+----
 ****
 
 == API Reference

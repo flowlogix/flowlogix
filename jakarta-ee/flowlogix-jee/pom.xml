@@ -8,7 +8,6 @@
 
     <name>Flow Logix JEE Services</name>
     <description>Flow Logix Utility Library for JavaEE</description>
-    <url>http://code.google.com/p/flowlogix</url>
 
     <parent>
         <groupId>com.flowlogix</groupId>

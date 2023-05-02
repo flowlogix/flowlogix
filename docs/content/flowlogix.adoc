@@ -105,22 +105,22 @@ With Jakarta EE or Java EE 8 and earlier, replaces `faces/` with `jsf/`.
 Most front-end applications want to use minified versions of their assets, such as JavaScript and CSS files in production. FlowLogix allows this via `MinimizedHandler` which will automatically insert `min` prefix into the appropriate assets, for example `resource.js -> resource.min.js` and `resource.css -> resource.min.css`.
 This is configurable via web.xml parameters `com.flowlogix.MINIMIZED_PREFIX` and `com.flowlogix.MINIMIZED_FILE_TYPES`
 
-.faces-confix.xml
 [source,xml]
+.faces-config.xml
 ----
 <application>
     <resource-handler>com.flowlogix.ui.MinimizedHandler</resource-handler>
 </application>
 ----
 
-.index.xhtml
 [source,xml]
+.index.xhtml
 ----
 <h:outputScript name="myjavascript.js"/>
 ----
 
-.web.xml
 [source,xml]
+.web.xml
 ----
 <context-param>
     <param-name>com.flowlogix.MINIMIZED_PREFIX</param-name>

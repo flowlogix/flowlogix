@@ -31,20 +31,7 @@
             <artifactId>jakarta.jakartaee-api</artifactId>
             <version>${jakarta.ee.version}</version>
             <scope>provided</scope>
-            <type>pom</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.platform</groupId>
-                    <artifactId>jakarta.jakartaee-web-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.platform</groupId>
-            <artifactId>jakarta.jakartaee-web-api</artifactId>
-            <version>${jakarta.ee.version}</version>
-            <scope>provided</scope>
-            <type>pom</type>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

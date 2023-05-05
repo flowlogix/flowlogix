@@ -32,8 +32,8 @@
         <docs.phase>deploy</docs.phase>
         <release.profile>release-flowlogix-to-central</release.profile>
         <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
-        <staging.server>flowlogix-maven-central</staging.server>
-        <nexus.url>https://oss.sonatype.org/</nexus.url>
+        <staging.server>flowlogix-maven-central-s01</staging.server>
+        <nexus.url>https://s01.oss.sonatype.org/</nexus.url>
         <skip.staging>false</skip.staging>
         <auto.release>true</auto.release>
 

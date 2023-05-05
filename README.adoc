@@ -10,7 +10,7 @@ image:https://img.shields.io/github/license/flowlogix/flowlogix?style=plastic[li
 === Current Projects
 
 - Jakarta EE Lazy Data Model for PrimeFaces DataTable image:https://javadoc.io/badge2/com.flowlogix/flowlogix-datamodel/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel"]
-- Apache Shiro Security / Jakarta EE integration image:https://javadoc.io/badge2/com.flowlogix/shiro-ee/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/shiro-ee"]
+- Apache Shiro Security / Jakarta EE integration - Now part of https://shiro.apache.org/jakarta-ee.html[Apache Shiro]
 - Jakarta EE DAO Helper image:https://javadoc.io/badge2/com.flowlogix/flowlogix-jee/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-jee"]
 - Jakarta EE JSF JavaScript Minimized resource handler
 - Utilities (String / Object Type Converter, Stream reader)
@@ -27,7 +27,8 @@ Snapshots] are automatically released by Jenkins for the current head
 
 === News
 
-- 3/3/2/23: Documentation is here!, Version 6.x (Java 17, Jakarta EE 10) is on the way!
+- 5/4/2023: Version 6.0 has been released (Java 17, Jakarta EE 10)
+- 3/3/2023: Documentation is here!
 - 2/1/2023: Version 5.x is moved to maintenance mode
 - 11/5/2022: Version 5.0 has been released with Java 11 being the minimum default
 - 3/15/2022: Version 4.0.7 has been released. Java 8 through 18

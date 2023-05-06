@@ -1,5 +1,6 @@
-== Welcome to Flow Logix Project Home Page
+= Welcome to Flow Logix Project Home Page
 :linkattrs:
+
 image:https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.hope.nyc.ny.us%2Fjob%2Fflowlogix-ee-integration%2Fjob%2Fmain&style=plastic[link="https://jenkins.hope.nyc.ny.us/job/flowlogix-ee-integration/job/main/"]
 image:https://img.shields.io/jenkins/coverage/jacoco?color=brightgreen&jobUrl=https%3A%2F%2Fjenkins.hope.nyc.ny.us%2Fjob%2Fflowlogix-ee-integration%2Fjob%2Fmain&style=plastic[link="https://jenkins.hope.nyc.ny.us/job/flowlogix-ee-integration/job/main/lastCompletedBuild/jacoco/"]
 image:https://img.shields.io/jenkins/tests?compact_message&failed_label=failed&jobUrl=https%3A%2F%2Fjenkins.hope.nyc.ny.us%2Fjob%2Fflowlogix-ee-integration%2Fjob%2Fmain%2F&passed_label=passed&skipped_label=skipped&style=plastic[link="https://jenkins.hope.nyc.ny.us/job/flowlogix-ee-integration/job/main/lastCompletedBuild/testReport/"]
@@ -9,21 +10,21 @@ image:https://img.shields.io/github/license/flowlogix/flowlogix?style=plastic[li
 
 === Current Projects
 
-- Jakarta EE Lazy Data Model for PrimeFaces DataTable image:https://javadoc.io/badge2/com.flowlogix/flowlogix-datamodel/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel"]
-- Apache Shiro Security / Jakarta EE integration - Now part of https://shiro.apache.org/jakarta-ee.html[Apache Shiro]
-- Jakarta EE DAO Helper image:https://javadoc.io/badge2/com.flowlogix/flowlogix-jee/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-jee"]
+- Jakarta EE Lazy Data Model for PrimeFaces DataTable image:https://javadoc.io/badge2/com.flowlogix/flowlogix-datamodel/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel",window=_blank]
+- Apache Shiro Security / Jakarta EE integration - Now part of https://shiro.apache.org/jakarta-ee.html[Apache Shiro^]
+- Jakarta EE DAO Helper image:https://javadoc.io/badge2/com.flowlogix/flowlogix-jee/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-jee",window=_blank]
 - Jakarta EE JSF JavaScript Minimized resource handler
 - Utilities (String / Object Type Converter, Stream reader)
 
 === Documentation and Features
-link:https://docs.flowlogix.com[Developer's Guide] is here.
+link:https://docs.flowlogix.com[Developer's Guide^] is here.
 
 === Maven Central Coordinates
 
 Releases are available on
-https://search.maven.org/search?q=g:com.flowlogix[Maven Central] +
+https://search.maven.org/search?q=g:com.flowlogix[Maven Central^] +
 https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/[Maven
-Snapshots] are automatically released by Jenkins for the current head
+Snapshots^] are automatically released by Jenkins for the current head
 
 === News
 
@@ -35,7 +36,7 @@ Snapshots] are automatically released by Jenkins for the current head
 compatible.
 - 12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel Major
 refactor and contributed many EE and JSF modules to
-https://omnifaces.org[OmniFaces]
+https://omnifaces.org[OmniFaces^]
 
 [[deprecated-projects-up-to-4x-only]]
 === Deprecated Projects (up to 4.x only)

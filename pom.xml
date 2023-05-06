@@ -553,8 +553,8 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>flowlogix-maven-central</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>${staging.server}</id>
+            <url>${nexus.url}content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 

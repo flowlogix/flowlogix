@@ -15,9 +15,9 @@
  */
 
 /**
- * This package contains the JNDI locator class
+ * This package contains Jakarta EE DAO Helper and Typed Native Query
  */
 @PackageMarker
-package com.flowlogix.jndi;
+package com.flowlogix.jeedao;
 
 import com.flowlogix.PackageMarker;

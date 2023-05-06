@@ -6,8 +6,8 @@
     <version>6.x-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Flow Logix JEE Services</name>
-    <description>Flow Logix Utility Library for JavaEE</description>
+    <name>Flow Logix JEE Components</name>
+    <description>Flow Logix Components for Jakarta EE</description>
 
     <parent>
         <groupId>com.flowlogix</groupId>

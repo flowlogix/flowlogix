@@ -5,7 +5,8 @@
     <version>6.x-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
-    <description>Flow Logix Utility Library Root POM</description>
+    <description>Flow Logix Jakarta EE Components Root POM</description>
+    <inceptionYear>2011</inceptionYear>
 
     <url>https://github.com/flowlogix/flowlogix</url>
     <licenses>
@@ -30,6 +31,7 @@
         <payara.start.skip>${skipITs}</payara.start.skip>
 
         <docs.phase>deploy</docs.phase>
+        <javadoc.title>${project.name}</javadoc.title>
         <release.profile>release-flowlogix-to-central</release.profile>
         <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
         <staging.server>flowlogix-maven-central-s01</staging.server>
@@ -285,9 +287,11 @@
                     <version>3.5.0</version>
                     <configuration>
                         <doclint>all,-reference</doclint>
-                        <overview>${project.basedir}/src/main/java/overview.html</overview>
+                        <overview>${project.build.sourceDirectory}/overview.html</overview>
                         <sourcepath>${project.build.directory}/generated-sources/delombok
                             :${project.build.directory}/generated-sources/annotations</sourcepath>
+                        <doctitle>${javadoc.title}</doctitle>
+                        <bottom>Copyright © ${project.inceptionYear}-2023 Flow Logix, Inc. All Rights Reserved.</bottom>
                     </configuration>
                     <executions>
                         <execution>
@@ -354,7 +358,7 @@
                         <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
                         <preparationGoals>validate</preparationGoals>
-                        <releaseProfiles>${release.profile},docs</releaseProfiles>
+                        <releaseProfiles>${release.profile},docs,javadoc-release</releaseProfiles>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>
                     </configuration>
                 </plugin>
@@ -490,6 +494,12 @@
             <id>docs</id>
             <properties>
                 <docs.phase>package</docs.phase>
+            </properties>
+        </profile>
+        <profile>
+            <id>javadoc-release</id>
+            <properties>
+                <javadoc.title>${project.name} ${project.version}</javadoc.title>
             </properties>
         </profile>
         <profile>

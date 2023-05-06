@@ -24,6 +24,7 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.ServletRegistration;
 import jakarta.servlet.annotation.WebListener;
+import org.omnifaces.resourcehandler.UnmappedResourceHandler;
 
 /**
  * aids in implementation of OmniFaces {@link UnmappedResourceHandler}

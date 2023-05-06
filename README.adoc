@@ -24,7 +24,9 @@ link:https://docs.flowlogix.com[Developer's Guide^] is here.
 Releases are available on
 https://search.maven.org/search?q=g:com.flowlogix[Maven Central^] +
 https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/[Maven
-Snapshots^] are automatically released by Jenkins for the current head
+Snapshots^] are automatically released by Jenkins for the current head +
+Snapshot Javadocs are available for https://javadoc.flowlogix.com/jee-apidocs[Jakarta EE Components^]
+and https://javadoc.flowlogix.com/datamodel-apidocs[PrimeFaces Lazy Data Model^]
 
 === News
 

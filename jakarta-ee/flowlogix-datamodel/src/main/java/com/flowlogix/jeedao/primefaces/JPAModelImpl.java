@@ -56,6 +56,7 @@ import org.primefaces.model.SortMeta;
 /**
  * JPA DAO facade implementation for the PrimeFaces lazy table model
  * @author lprimak
+ * @hidden
  * @param <TT>
  * @param <KK>
  */

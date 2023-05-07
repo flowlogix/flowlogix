@@ -236,7 +236,7 @@ include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data
 ----
 Above we created a model with case-insensitive filtering.
 
-`JPALazyDataModel` only requires `entityManagerSupplier` and `entityClass` to work, everything else is optional:
+`JPALazyDataModel` only requires `entityManager` and `entityClass` to work, everything else is optional:
 
 * sorter: Apply custom sort criteria
 * filter: Apply custom filter criteria

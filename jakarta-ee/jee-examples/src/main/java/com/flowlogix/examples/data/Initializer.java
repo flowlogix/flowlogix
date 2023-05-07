@@ -40,7 +40,7 @@ public class Initializer {
     void init() {
         var helper = DaoHelper.<UserEntity, Long>builder()
                 .entityClass(UserEntity.class)
-                .entityManagerSupplier(() -> em)
+                .entityManager(() -> em)
                 .build();
         if (helper.count() == 0) {
             List<UserEntity> userList = Stream.of(

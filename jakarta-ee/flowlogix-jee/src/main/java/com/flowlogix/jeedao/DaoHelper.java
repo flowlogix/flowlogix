@@ -57,7 +57,7 @@ public final class DaoHelper<TT, KT> {
     /**
      * Return entity manager to operate on
      */
-    private final @NonNull Supplier<EntityManager> entityManagerSupplier;
+    private final @NonNull Supplier<EntityManager> entityManager;
     /**
      * entity class
      */
@@ -144,7 +144,7 @@ public final class DaoHelper<TT, KT> {
      * @return entity manager
      */
     public EntityManager getEntityManager() {
-        return entityManagerSupplier.get();
+        return entityManager.get();
     }
 
     public QueryCriteria<TT> buildQueryCriteria() {

@@ -38,7 +38,7 @@ public class FacadeTest {
         @Delegate
         final DaoHelper<Integer, Long> facade = DaoHelper.<Integer, Long>builder()
                 .entityClass(Integer.class)
-                .entityManagerSupplier(() -> em)
+                .entityManager(() -> em)
                 .build();
 
         @SuppressWarnings("MagicNumber")
@@ -75,7 +75,7 @@ public class FacadeTest {
         InheritableDaoHelper<Integer, Long> helper = new InheritableDaoHelper<>();
         assertNull(helper.daoHelper);
         helper.daoHelper = DaoHelper.<Integer, Long>builder()
-                .entityManagerSupplier(() -> em)
+                .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .build();
         when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(2L);

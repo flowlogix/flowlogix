@@ -66,7 +66,7 @@ public class JPAModelImpl<TT, KK> {
     /**
      * Return entity manager to operate on
      */
-    private final @NonNull Supplier<EntityManager> entityManagerSupplier;
+    private final @NonNull Supplier<EntityManager> entityManager;
     /**
      * entity class
      */
@@ -132,7 +132,7 @@ public class JPAModelImpl<TT, KK> {
     }
 
     private DaoHelper<TT, KK> createDaoHelper() {
-        return new DaoHelper<>(entityManagerSupplier, entityClass);
+        return new DaoHelper<>(entityManager, entityClass);
     }
 
     private Function<String, KK> createConverter() {

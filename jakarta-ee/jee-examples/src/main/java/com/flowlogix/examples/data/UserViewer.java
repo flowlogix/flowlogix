@@ -49,7 +49,7 @@ public class UserViewer implements Serializable {
 
     private @Getter final JPALazyDataModel<UserEntity, Long> lazyModel =
             JPALazyDataModel.create(builder -> builder
-                    .entityManagerSupplier(() -> em)
+                    .entityManager(() -> em)
                     .entityClass(UserEntity.class)
                     // the line below is optional, default is case-sensitive (true)
                     .caseSensitiveQuery(false)

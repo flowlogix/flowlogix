@@ -67,7 +67,7 @@ public class ModelTest implements Serializable {
     @Test
     void stringFilter() {
         var impl = JPAModelImpl.builder()
-                .entityManagerSupplier(() -> em)
+                .entityManager(() -> em)
                 .entityClass(Object.class)
                 .converter(s -> new Object())
                 .filter(ModelTest::filter)
@@ -82,7 +82,7 @@ public class ModelTest implements Serializable {
     @SuppressWarnings("MagicNumber")
     void integerFilter() {
         var impl = JPAModelImpl.<Integer, Long>builder()
-                .entityManagerSupplier(() -> em)
+                .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
                 .build();
@@ -95,7 +95,7 @@ public class ModelTest implements Serializable {
     @Test
     void collectionFilter() {
         var impl = JPAModelImpl.<Integer, Long>builder()
-                .entityManagerSupplier(() -> em)
+                .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
                 .build();
@@ -109,7 +109,7 @@ public class ModelTest implements Serializable {
     @Test
     void jsfConversionTest() {
         var impl = JPAModelImpl.<Integer, Long>builder()
-                .entityManagerSupplier(() -> em)
+                .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
                 .build();
@@ -134,7 +134,7 @@ public class ModelTest implements Serializable {
     @SuppressWarnings("MagicNumber")
     void defaultConverters() {
         var impl = JPAModelImpl.<MyEntity, Long>builder()
-                .entityManagerSupplier(() -> em)
+                .entityManager(() -> em)
                 .entityClass(MyEntity.class)
                 .build();
         when(em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(any(MyEntity.class)))
@@ -156,7 +156,7 @@ public class ModelTest implements Serializable {
             mockedStatic.when(() -> Beans.getReference(JPALazyDataModel.class))
                     .thenReturn(new JPALazyDataModel<>());
             model = JPALazyDataModel.create(builder -> builder
-                    .entityManagerSupplier(() -> em).entityClass(MyEntity.class)
+                    .entityManager(() -> em).entityClass(MyEntity.class)
                     .build());
         }
         lenient().when(em.getEntityManagerFactory().getPersistenceUnitUtil()

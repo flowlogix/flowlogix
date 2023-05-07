@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>6.x-SNAPSHOT</version>
+    <version>6.1</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
@@ -49,9 +49,9 @@
         <groovy.version>4.0.11</groovy.version>
         <lombok.version>1.18.26</lombok.version>
         <jacocoPort>52212</jacocoPort>
-        <jacocoAgent/>
-        <jdk11SurefireOptions/>
-        <jdk11FailsafeOptions/>
+        <jacocoAgent />
+        <jdk11SurefireOptions />
+        <jdk11FailsafeOptions />
 
         <!-- checkstyle -->
         <checkstyle.configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
@@ -587,7 +587,7 @@
         <url>https://github.com/flowlogix/flowlogix</url>
         <connection>scm:git:git@github.com:flowlogix/flowlogix.git</connection>
         <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>Version-6.1</tag>
     </scm>
 
     <distributionManagement>

@@ -41,6 +41,9 @@ import lombok.Getter;
 @ViewScoped
 public class UserViewer implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    // @start region="simpleLazyDataModelUsage"
+    // tag::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
     @PersistenceContext
     private EntityManager em;
 
@@ -48,10 +51,16 @@ public class UserViewer implements Serializable {
             JPALazyDataModel.create(builder -> builder
                     .entityManagerSupplier(() -> em)
                     .entityClass(UserEntity.class)
+                    // the line below is optional, default is case-sensitive (true)
                     .caseSensitiveQuery(false)
-//                    .sorter(UserViewer::sorter)
-//                    .filter(UserViewer::filter)
+                    // tag::simpleOptionalLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
+                    // the following 2 lines are optional
+//                    .sorter(UserViewer::sorter) // @replace regex="^\/\/" replacement=""
+//                    .filter(UserViewer::filter) // @replace regex="^\/\/" replacement=""
+                    // end::simpleOptionalLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
                     .build());
+    // end::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
+    // @end
 
     public String getUsers() {
         return em.createQuery("select u from UserEntity u", UserEntity.class).getResultStream()

@@ -219,25 +219,19 @@ Above, we also combine `web.xml` manipulation with `jakartify` to be compatible 
 .An easier alternative to PrimeFaces JPA Lazy Data model
 PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier and with a lot less code.
 [source,xhtml]
+.userviewer.xhtml
 ----
 <p:dataTable lazy="true" value="#{userViewer.lazyModel}" var="user">
     ... specify columns as usual ...
 </p:dataTable>
 ----
 [source,java]
+.UserViewer.java
 ----
 @Named
 @ViewScoped
 public class UserViewer implements Serializable {
-    @PersistenceContext
-    private EntityManager em;
-
-    private @Getter final JPALazyDataModel<UserEntity, Long> lazyModel =
-            JPALazyDataModel.create(builder -> builder
-                    .entityManagerSupplier(() -> em)
-                    .entityClass(UserEntity.class)
-                    .caseSensitiveQuery(false)
-                    .build());
+include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage,!simpleOptionalLazyDataModelUsage"]
 }
 ----
 Above we created a model with case-insensitive filtering.

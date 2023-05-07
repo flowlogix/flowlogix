@@ -47,18 +47,8 @@ import org.primefaces.model.SortMeta;
  * @param <TT> Data Type
  * @param <KK> Key Type
  *
- * <p>
- * Example:
- * <pre>
- * {@code
- *     private @Getter final JPALazyDataModel<UserEntity, Long> lazyModel =
- *           JPALazyDataModel.create(builder -> builder
- *                   .entityManagerSupplier(() -> em)
- *                   .entityClass(UserEntity.class)
- *                   .converter(Long::parseLong)
- *                   .build());
- * }
- * </pre>
+ * <em>Simple Example:</em>
+ * {@snippet class = "com.flowlogix.examples.data.UserViewer" region = "simpleLazyDataModelUsage"}
  */
 @Dependent
 @Slf4j

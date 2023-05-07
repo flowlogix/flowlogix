@@ -10,9 +10,9 @@
     <!-- parent is only present for testing profiles -->
     <parent>
         <groupId>com.flowlogix</groupId>
-        <artifactId>flowlogix-bom</artifactId>
+        <artifactId>flowlogix</artifactId>
         <version>6.x-SNAPSHOT</version>
-        <relativePath>../../flowlogix-bom</relativePath>
+        <relativePath>../..</relativePath>
     </parent>
 
     <properties>
@@ -133,8 +133,19 @@
         </dependency>
     </dependencies>
 
+    <!-- tag::depManagementStart[] -->
     <dependencyManagement>
         <dependencies>
+        <!-- end::depManagementStart[] -->
+            <!-- tag::bomUsage[] // @replace regex='.*\n' replacement="" -->
+            <dependency>
+                <groupId>com.flowlogix</groupId>
+                <artifactId>flowlogix-bom</artifactId>
+                <version>6.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- end::bomUsage[] // @replace regex='.*\n' replacement="" -->
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
@@ -156,8 +167,10 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+        <!-- tag::depManagementEnd[] -->
         </dependencies>
     </dependencyManagement>
+    <!-- end::depManagementEnd[] -->
 
     <build>
         <plugins>

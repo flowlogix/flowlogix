@@ -42,6 +42,9 @@ import lombok.RequiredArgsConstructor;
  * <p>
  * Another differentiator is that this class doesn't require inheritance,
  * although some use cases could inherit from {@link InheritableDaoHelper} class.
+ * <p>
+ * <em>Simple Example:</em>
+ * {@snippet class="com.flowlogix.jeedao.ExampleDAO" region="simpleExampleDAO"}
  *
  * @param <TT> Entity Type
  * @param <KT> Primary Key Type

@@ -32,6 +32,10 @@
 
         <docs.phase>deploy</docs.phase>
         <javadoc.title>${project.name}</javadoc.title>
+        <snippet.p1>${project.build.sourceDirectory}</snippet.p1>
+        <snippet.p2>${project.build.testSourceDirectory}</snippet.p2>
+        <snippet.p3>${project.basedir}/src/demo/java</snippet.p3>
+        <snippet.path>${snippet.p1}:${snippet.p2}:${snippet.p3}</snippet.path>
         <release.profile>release-flowlogix-to-central</release.profile>
         <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
         <staging.server>flowlogix-maven-central-s01</staging.server>
@@ -86,6 +90,24 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-demos</id>
+                        <configuration>
+                            <sources>
+                                <source>src/demo/java</source>
+                            </sources>
+                        </configuration>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
@@ -290,6 +312,7 @@
                         <overview>${project.build.sourceDirectory}/overview.html</overview>
                         <sourcepath>${project.build.directory}/generated-sources/delombok
                             :${project.build.directory}/generated-sources/annotations</sourcepath>
+                        <additionalOptions>--snippet-path ${snippet.path}</additionalOptions>
                         <doctitle>${javadoc.title}</doctitle>
                         <bottom>Copyright © ${project.inceptionYear}-2023 Flow Logix, Inc. All Rights Reserved.</bottom>
                     </configuration>
@@ -302,6 +325,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.projectlombok</groupId>

@@ -42,13 +42,13 @@ import org.primefaces.model.SortMeta;
  * <p>
  * An instance of this class is to be put into your {@link ViewScoped} or {@link SessionScoped} beans
  * The implementation is serializable and works with failover to a different server instances
+ * <p>
+ * <em>Simple Example:</em>
+ * {@snippet class = "com.flowlogix.examples.data.UserViewer" region = "simpleLazyDataModelUsage"}
  *
  * @author lprimak
  * @param <TT> Data Type
  * @param <KK> Key Type
- *
- * <em>Simple Example:</em>
- * {@snippet class = "com.flowlogix.examples.data.UserViewer" region = "simpleLazyDataModelUsage"}
  */
 @Dependent
 @Slf4j

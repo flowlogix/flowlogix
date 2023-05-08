@@ -15,25 +15,42 @@
  */
 package com.flowlogix.util;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.stream.Collectors;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
  * Read String from Stream
- * Does not close the stream afterwards
+ * Does not close the stream afterward
  *
  * @author lprimak
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("HideUtilityClassConstructor")
 public class Streams {
+    /**
+     * Converts InputStream to String
+     *
+     * @param strm Stream
+     * @return Stream converted to String
+     * @throws IOException
+     */
     public static String readString(InputStream strm) throws IOException {
-        return new BufferedReader(new InputStreamReader(strm)).lines()
-                .collect(Collectors.joining("\n"));
+        return readString(strm, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Converts InputStream to String
+     *
+     * @param strm Stream
+     * @param charset Charset to convert with
+     * @return Stream converted to String
+     * @throws IOException
+     */
+    public static String readString(InputStream strm, Charset charset) throws IOException {
+        return new String(strm.readAllBytes(), charset);
     }
 }

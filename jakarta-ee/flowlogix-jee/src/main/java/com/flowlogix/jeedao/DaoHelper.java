@@ -56,7 +56,7 @@ import lombok.NonNull;
  * @author lprimak
  */
 public final class DaoHelper<TT, KT> implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * Return entity manager to operate on
@@ -188,18 +188,15 @@ public final class DaoHelper<TT, KT> implements Serializable {
     }
 
     private void writeObject(ObjectOutputStream stream) throws IOException {
-        var em = entityManager.get();
-        Supplier<EntityManager> supplier = (Supplier<EntityManager> & Serializable) () -> em;
-        stream.writeObject(supplier);
+        stream.writeObject(entityManager.get());
         stream.writeObject(entityClass);
     }
 
     private void readObject(ObjectInputStream stream) throws ClassNotFoundException, IOException {
-        @SuppressWarnings("unchecked")
-        var supplier = (Supplier<EntityManager>) stream.readObject();
+        var entityManager = (EntityManager) stream.readObject();
         @SuppressWarnings("unchecked")
         var cls = (Class<TT>) stream.readObject();
-        serializedForm = new DaoHelper<>(supplier, cls);
+        serializedForm = new DaoHelper<>(() -> entityManager, cls);
     }
 
     Object readResolve() {

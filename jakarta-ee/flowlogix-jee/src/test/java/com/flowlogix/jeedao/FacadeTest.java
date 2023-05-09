@@ -15,11 +15,15 @@
  */
 package com.flowlogix.jeedao;
 
+import com.flowlogix.util.SerializeTester;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaQuery;
 import lombok.experimental.Delegate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
@@ -27,14 +31,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 /**
  *
  * @author lprimak
  */
-public class FacadeTest {
-    private final EntityManager em = mock(EntityManager.class, RETURNS_DEEP_STUBS);
-    class MyControl {
+public class FacadeTest implements Serializable {
+    private final EntityManager em = mock(EntityManager.class, withSettings().serializable()
+            .defaultAnswer(RETURNS_DEEP_STUBS));
+    class MyControl implements Serializable {
         @Delegate
         final DaoHelper<Integer, Long> facade = DaoHelper.<Integer, Long>builder()
                 .entityClass(Integer.class)
@@ -80,5 +86,14 @@ public class FacadeTest {
                 .build();
         when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(2L);
         assertEquals(2, helper.count());
+    }
+
+    @Test
+    @SuppressWarnings("MagicNumber")
+    void serialize() throws IOException, ClassNotFoundException {
+        var mc = SerializeTester.serializeAndDeserialize(new MyControl());
+        assertNotNull(mc.getEntityManager());
+        assertEquals(5, mc.find(1L));
+        assertNull(mc.find(2L));
     }
 }

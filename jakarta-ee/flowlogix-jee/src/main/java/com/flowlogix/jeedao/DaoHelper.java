@@ -17,6 +17,10 @@ package com.flowlogix.jeedao;
 
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.jeedao.querycriteria.CountQueryCriteria;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,9 +32,9 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Lightweight wrapper around common JPA methods
@@ -51,9 +55,9 @@ import lombok.RequiredArgsConstructor;
  *
  * @author lprimak
  */
-@Builder
-@RequiredArgsConstructor
-public final class DaoHelper<TT, KT> {
+public final class DaoHelper<TT, KT> implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Return entity manager to operate on
      */
@@ -63,22 +67,30 @@ public final class DaoHelper<TT, KT> {
      */
     private final @NonNull @Getter Class<TT> entityClass;
 
+    private transient DaoHelper<TT, KT> serializedForm;
+
+    @Builder
+    public DaoHelper(@NonNull Supplier<EntityManager> entityManager, @NonNull Class<TT> entityClass) {
+        this.entityManager = entityManager;
+        this.entityClass = entityClass;
+    }
+
     @Builder
     public static class Parameters<TT> {
         /**
          * add hints to queries here
          */
-        @Builder.Default
+        @Default
         private final Consumer<TypedQuery<TT>> hints = (tq) -> { };
         /**
          * add query criteria here
          */
-        @Builder.Default
+        @Default
         private final Consumer<QueryCriteria<TT>> queryCriteria = (c) -> { };
         /**
          * add query criteria to count operation here
          */
-        @Builder.Default
+        @Default
         private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = (c) -> { };
     }
 
@@ -173,5 +185,24 @@ public final class DaoHelper<TT, KT> {
         cq.select(root);
         params.queryCriteria.accept(new QueryCriteria<>(getEntityManager().getCriteriaBuilder(), root, cq));
         return getEntityManager().createQuery(cq);
+    }
+
+    private void writeObject(ObjectOutputStream stream) throws IOException {
+        var em = entityManager.get();
+        Supplier<EntityManager> supplier = (Supplier<EntityManager> & Serializable) () -> em;
+        stream.writeObject(supplier);
+        stream.writeObject(entityClass);
+    }
+
+    private void readObject(ObjectInputStream stream) throws ClassNotFoundException, IOException {
+        @SuppressWarnings("unchecked")
+        var supplier = (Supplier<EntityManager>) stream.readObject();
+        @SuppressWarnings("unchecked")
+        var cls = (Class<TT>) stream.readObject();
+        serializedForm = new DaoHelper<>(supplier, cls);
+    }
+
+    Object readResolve() {
+        return serializedForm;
     }
 }

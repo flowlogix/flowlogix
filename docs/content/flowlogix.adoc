@@ -82,7 +82,9 @@ other bytecode generators to delegate to `DaoHelper` from an interface.
 
 Recommended approach is to use Lombok's `@Delegate` annotation. This introduces the fewest amount of magic, results in the least amount of code, and absolute minimum (if any) boilerplate.
 
-_Fluent Builder_ pattern is used to create `DaoHelper` object, which requires EntityManager `Supplier` and entity `Class`
+`DaoHelper` is Serializable and thus can be used inside `@ViewScoped` beans, for example.
+
+_Fluent Builder_ pattern is used to create `DaoHelper` object, which requires EntityManager `Supplier` and entity `Class`.
 
 `findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can specify JPA `hints`, and `queryCriteria` enhancements for either `count()` or `findXXX()` use cases. This takes a form of `builder -> builder.xxx().yyy().build()` to make  settings easy.
 

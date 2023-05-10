@@ -25,6 +25,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import lombok.NonNull;
 import org.omnifaces.util.Beans;
 
 /**
@@ -57,7 +58,7 @@ public class DaoHelperProducer {
      * @return {@link EntityManager}
      * @throws IllegalStateException if entity manager cannot be found
      */
-    public static EntityManager findEntityManager(List<Annotation> qualifiers) throws IllegalStateException {
+    public static EntityManager findEntityManager(@NonNull List<Annotation> qualifiers) throws IllegalStateException {
         return Optional.ofNullable(Beans.getReference(EntityManager.class,
                 qualifiers.toArray(Annotation[]::new))).orElseThrow(() -> new IllegalStateException(
                 String.format("Unable to find EntityManager with qualifiers: %s",

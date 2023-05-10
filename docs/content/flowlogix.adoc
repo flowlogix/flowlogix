@@ -103,6 +103,11 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/Examp
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InjectedDAO.java[tags=injectedExampleDAO,ident=0]
 ----
 [source,java]
+.Non-Default annotation example
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/NonDefault.java[tags=nonDefault,indent=0]
+----
+[source,java]
 .Injected DAO with non-default EntityManager
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InjectedNonDefaultDAO.java[tags=injectedNonDefaultExampleDAO,ident=0]

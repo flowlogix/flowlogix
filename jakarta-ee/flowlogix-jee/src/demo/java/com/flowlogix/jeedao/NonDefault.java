@@ -20,8 +20,12 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+// @start region="NonDefault"
+// tag::nonDefault[] // @replace regex='.*\n' replacement=""
 @Qualifier
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NonDefault {
 }
+// end::nonDefault[] // @replace regex='.*\n' replacement=""
+// @end

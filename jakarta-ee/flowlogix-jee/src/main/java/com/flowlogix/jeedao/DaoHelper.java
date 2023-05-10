@@ -49,6 +49,12 @@ import lombok.NonNull;
  * <p>
  * <em>Simple Example:</em>
  * {@snippet class="com.flowlogix.jeedao.ExampleDAO" region="simpleExampleDAO"}
+ * <p>
+ * <em>Injected Example:</em>
+ * {@snippet class="com.flowlogix.jeedao.InjectedDAO" region="injectedExampleDAO"}
+ * <p>
+ * <em>Injected Example with non-default EntityManager:</em>
+ * {@snippet class="com.flowlogix.jeedao.InjectedNonDefaultDAO" region="injectedNonDefaultExampleDAO"}
  *
  * @param <TT> Entity Type
  *

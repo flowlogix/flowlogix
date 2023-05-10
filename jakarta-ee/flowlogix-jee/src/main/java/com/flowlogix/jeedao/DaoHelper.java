@@ -51,11 +51,10 @@ import lombok.NonNull;
  * {@snippet class="com.flowlogix.jeedao.ExampleDAO" region="simpleExampleDAO"}
  *
  * @param <TT> Entity Type
- * @param <KT> Primary Key Type
  *
  * @author lprimak
  */
-public final class DaoHelper<TT, KT> implements Serializable {
+public final class DaoHelper<TT> implements Serializable {
     private static final long serialVersionUID = 2L;
 
     /**
@@ -67,7 +66,7 @@ public final class DaoHelper<TT, KT> implements Serializable {
      */
     private final @NonNull @Getter Class<TT> entityClass;
 
-    private transient DaoHelper<TT, KT> serializedForm;
+    private transient DaoHelper<TT> serializedForm;
 
     @Builder
     public DaoHelper(@NonNull Supplier<EntityManager> entityManager, @NonNull Class<TT> entityClass) {

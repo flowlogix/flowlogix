@@ -15,17 +15,20 @@
  */
 package com.flowlogix.jeedao;
 
-import lombok.experimental.Delegate;
+import jakarta.enterprise.util.Nonbinding;
+import jakarta.inject.Qualifier;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Data Access Object pattern implementation that is meant to be inherited by the user's classes.
- * This is an alternative to {@link DaoHelper}, which does not have requirements
- * for inheritance. {@link DaoHelper} is the preferred method of implementing DAOs.
- *
- * @see DaoHelper
- * @param <TT> Entity Type
+ * Qualifier specify annotation that inject a particular {@link jakarta.persistence.EntityManager}
  */
-public class InheritableDaoHelper<TT> {
-    @Delegate
-    protected DaoHelper<TT> daoHelper;
+@Qualifier
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+public @interface EntityManagerSelector {
+    @Nonbinding
+    Class<? extends Annotation> [] value();
 }

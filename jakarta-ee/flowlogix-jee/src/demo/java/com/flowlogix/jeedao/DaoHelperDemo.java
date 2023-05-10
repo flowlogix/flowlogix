@@ -21,9 +21,15 @@ import jakarta.inject.Inject;
 public class DaoHelperDemo {
     @Inject
     ExampleDAO dao;
+    @Inject
+    InjectedDAO injectedDAO;
 
     public int count() {
         return dao.count();
+    }
+
+    public int injectedCount() {
+        return injectedDAO.count();
     }
 
     public UserEntity findById(Long id) {

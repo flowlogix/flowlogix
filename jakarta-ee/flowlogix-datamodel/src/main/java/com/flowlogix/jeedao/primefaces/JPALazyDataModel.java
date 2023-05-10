@@ -29,6 +29,7 @@ import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.view.ViewScoped;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import org.omnifaces.util.Beans;
@@ -55,6 +56,7 @@ import org.primefaces.model.SortMeta;
 public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     public static final String RESULT = "result";
     private static final long serialVersionUID = 2L;
+    @Delegate
     private transient JPAModelImpl<TT, KK> impl;
     @SuppressWarnings("serial")
     private Function<JPAModelImplBuilder<TT, KK>, JPAModelImpl<TT, KK>> builder;

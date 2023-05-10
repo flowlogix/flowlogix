@@ -82,9 +82,13 @@ other bytecode generators to delegate to `DaoHelper` from an interface.
 
 Recommended approach is to use Lombok's `@Delegate` annotation. This introduces the fewest amount of magic, results in the least amount of code, and absolute minimum (if any) boilerplate.
 
+`DaoHelper` can also be `@Inject` ed and it will infer the `EntityManager` via CDI. If default CDI producer for the EntityManager is insufficient, `@EntityManagerSelector` annotation can be used to specify qualifiers for non-default `EntityManager` producer
+
 `DaoHelper` is Serializable and thus can be used inside `@ViewScoped` beans, for example.
 
 _Fluent Builder_ pattern is used to create `DaoHelper` object, which requires EntityManager `Supplier` and entity `Class`.
+
+Often a question comes up: Why does `DaoHelper` take `Supplier` as a parameter instead of `EntityManager` directly? Because `EntityManager` is not initialized when the object is created. `Supplier` lets you delay the initialization of `DaoHelper` until `EntityManager` is actually needed at run-time and is already initialized. This is why `InheritableDAOHelper` needs to be initialized in `@PostConstruct` method instead of the constructor.
 
 `findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can specify JPA `hints`, and `queryCriteria` enhancements for either `count()` or `findXXX()` use cases. This takes a form of `builder -> builder.xxx().yyy().build()` to make  settings easy.
 
@@ -93,6 +97,23 @@ _Fluent Builder_ pattern is used to create `DaoHelper` object, which requires En
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/ExampleDAO.java[tags=simpleExampleDAO,indent=0]
 ----
+[source,java]
+.Injected DAO example
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InjectedDAO.java[tags=injectedExampleDAO,ident=0]
+----
+[source,java]
+.Injected DAO with non-default EntityManager
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InjectedNonDefaultDAO.java[tags=injectedNonDefaultExampleDAO,ident=0]
+----
+[source,java]
+.Non-default EntityManager Producer example
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/EntityManagerProducer.java[tags=nonDefaultEntityProducer,ident=0]
+----
+The `@NonDefault` can be removed to use it as a Default producer. If there is only one Persistence Unit, `unitName` can be also omitted.
+
 .JPA: Generics-based Type-safe native query
 `DaoHelper` has a convenience method `createNativeQuery()` which will return `TypedNativeQuery` object. This is a thin wrapper over JPA's `Query` object, however it's `getResult*()` methods return typed results via generics, which avoids casting and makes the results easier and safer to use.
 [source,java]

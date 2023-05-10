@@ -15,17 +15,19 @@
  */
 package com.flowlogix.jeedao;
 
-import lombok.experimental.Delegate;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
-/**
- * Data Access Object pattern implementation that is meant to be inherited by the user's classes.
- * This is an alternative to {@link DaoHelper}, which does not have requirements
- * for inheritance. {@link DaoHelper} is the preferred method of implementing DAOs.
- *
- * @see DaoHelper
- * @param <TT> Entity Type
- */
-public class InheritableDaoHelper<TT> {
-    @Delegate
-    protected DaoHelper<TT> daoHelper;
+// @start region="nonDefaultEntityProducer"
+// tag::nonDefaultEntityProducer[] // @replace regex='.*\n' replacement=""
+@ApplicationScoped
+public class EntityManagerProducer {
+    @Produces
+    @NonDefault
+    @PersistenceContext(unitName = "nonDefault")
+    EntityManager em;
 }
+// end::nonDefaultEntityProducer[] // @replace regex='.*\n' replacement=""
+// @end

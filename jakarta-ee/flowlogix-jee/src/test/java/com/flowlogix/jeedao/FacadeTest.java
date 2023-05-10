@@ -42,7 +42,7 @@ public class FacadeTest implements Serializable {
             .defaultAnswer(RETURNS_DEEP_STUBS));
     class MyControl implements Serializable {
         @Delegate
-        final DaoHelper<Integer, Long> facade = DaoHelper.<Integer, Long>builder()
+        final DaoHelper<Integer> facade = DaoHelper.<Integer>builder()
                 .entityClass(Integer.class)
                 .entityManager(() -> em)
                 .build();
@@ -71,16 +71,16 @@ public class FacadeTest implements Serializable {
     @Test
     void nulls() {
         assertThrows(NullPointerException.class, () -> {
-            DaoHelper<Long, Integer> facade = new DaoHelper<>(() -> null, null);
+            DaoHelper<Long> facade = new DaoHelper<>(() -> null, null);
         });
     }
 
     @Test
     @SuppressWarnings("unchecked")
     void inheritableDao() {
-        InheritableDaoHelper<Integer, Long> helper = new InheritableDaoHelper<>();
+        InheritableDaoHelper<Integer> helper = new InheritableDaoHelper<>();
         assertNull(helper.daoHelper);
-        helper.daoHelper = DaoHelper.<Integer, Long>builder()
+        helper.daoHelper = DaoHelper.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .build();

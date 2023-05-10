@@ -15,17 +15,21 @@
  */
 package com.flowlogix.examples.data;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ejb.Stateless;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-@ApplicationScoped
+@Stateless
 public class EntityManagerProducer {
+    @PersistenceContext
+    EntityManager em;
+
     @Produces
     @Default
     @AnotherEntityManager
-    @PersistenceContext
-    EntityManager em;
+    public EntityManager get() {
+        return em;
+    }
 }

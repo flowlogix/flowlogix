@@ -135,7 +135,7 @@ Below is an example of setting up production mode with Payara and GlassFish with
 $ asadmin create-custom-resource --resType=java.lang.String --factoryClass=org.glassfish.resources.custom.factory.PrimitivesAndStringFactory faces/ProjectStage
 $ asadmin set resources.custom-resource.faces/ProjectStage.property.value=Production
 ----
-With Jakarta EE or Java EE 8 and earlier, replaces `faces/` with `jsf/`.
+With Jakarta EE or Java EE 8 and earlier, replace `faces/` with `jsf/`.
 
 .Jakarta Faces: Use minified assets automatically in production mode
 Most front-end applications want to use minified versions of their assets, such as JavaScript and CSS files in production. FlowLogix allows this via `MinimizedHandler` which will automatically insert `min` prefix into the appropriate assets, for example `resource.js -> resource.min.js` and `resource.css -> resource.min.css`.

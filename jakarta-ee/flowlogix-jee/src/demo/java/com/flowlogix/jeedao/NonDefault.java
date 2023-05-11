@@ -13,11 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.flowlogix.jeedao;
 
-/**
- * This package contains the JNDI locator tests
- */
-@PackageMarker
-package com.flowlogix.jndi;
+import jakarta.inject.Qualifier;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-import com.flowlogix.PackageMarker;
+// @start region="NonDefault"
+// tag::nonDefault[] // @replace regex='.*\n' replacement=""
+@Qualifier
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+public @interface NonDefault {
+}
+// end::nonDefault[] // @replace regex='.*\n' replacement=""
+// @end

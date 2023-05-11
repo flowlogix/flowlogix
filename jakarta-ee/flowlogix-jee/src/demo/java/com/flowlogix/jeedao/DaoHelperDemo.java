@@ -16,17 +16,28 @@
 package com.flowlogix.jeedao;
 
 import com.flowlogix.jeedao.entities.UserEntity;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
+@Named
+@ApplicationScoped
 public class DaoHelperDemo {
     @Inject
     ExampleDAO dao;
+    @Inject
+    InjectedDAO injectedDAO;
 
     public int count() {
         return dao.count();
     }
 
+    public int injectedCount() {
+        return injectedDAO.count();
+    }
+
     public UserEntity findById(Long id) {
-        return dao.getEntityManager().find(dao.getEntityClass(), id);
+        return dao.getEntityManager().get()
+                .find(dao.getEntityClass(), id);
     }
 }

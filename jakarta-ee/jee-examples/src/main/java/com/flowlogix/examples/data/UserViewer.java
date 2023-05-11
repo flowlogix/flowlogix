@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -44,12 +42,8 @@ public class UserViewer implements Serializable {
 
     // @start region="simpleLazyDataModelUsage"
     // tag::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
-    @PersistenceContext
-    private EntityManager em;
-
     private @Getter final JPALazyDataModel<UserEntity, Long> lazyModel =
             JPALazyDataModel.create(builder -> builder
-                    .entityManager(() -> em)
                     .entityClass(UserEntity.class)
                     // the line below is optional, default is case-sensitive (true)
                     .caseSensitiveQuery(false)
@@ -63,7 +57,8 @@ public class UserViewer implements Serializable {
     // @end
 
     public String getUsers() {
-        return em.createQuery("select u from UserEntity u", UserEntity.class).getResultStream()
+        return lazyModel.getEntityManager().get()
+                .createQuery("select u from UserEntity u", lazyModel.getEntityClass()).getResultStream()
                 .map(UserEntity::getFullName).collect(Collectors.joining(", "));
     }
 

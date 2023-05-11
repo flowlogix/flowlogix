@@ -20,6 +20,7 @@ import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.util.TypeConverter;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,6 +44,7 @@ import jakarta.persistence.criteria.Root;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Builder;
+import static com.flowlogix.jeedao.DaoHelperProducer.findEntityManager;
 import static lombok.Builder.Default;
 import lombok.Generated;
 import lombok.SneakyThrows;
@@ -50,6 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Lazy;
+import org.omnifaces.util.Lazy.SerializableSupplier;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 
@@ -66,12 +69,17 @@ public class JPAModelImpl<TT, KK> {
     /**
      * Return entity manager to operate on
      */
-    private final @NonNull Supplier<EntityManager> entityManager;
+    private final SerializableSupplier<EntityManager> entityManager;
+    /**
+     * List of qualifiers to use when finding {@link EntityManager via CDI} (optional)
+     */
+    @Default
+    private final List<Annotation> entityManagerQualifiers = List.of();
     /**
      * entity class
      */
     private final @NonNull @Getter Class<TT> entityClass;
-    private final Lazy<DaoHelper<TT, KK>> daoHelper = new Lazy<>(this::createDaoHelper);
+    private final Lazy<DaoHelper<TT>> daoHelper = new Lazy<>(this::createDaoHelper);
     /**
      * convert String key into {@link KK} object
      */
@@ -119,7 +127,7 @@ public class JPAModelImpl<TT, KK> {
                         .build());
     }
 
-    EntityManager getEntityManager() {
+    public Supplier<EntityManager> getEntityManager() {
         return daoHelper.get().getEntityManager();
     }
 
@@ -131,8 +139,12 @@ public class JPAModelImpl<TT, KK> {
         return keyConverter != null ? keyConverter : defaultKeyConverter.get();
     }
 
-    private DaoHelper<TT, KK> createDaoHelper() {
-        return new DaoHelper<>(entityManager, entityClass);
+    private DaoHelper<TT> createDaoHelper() {
+        if (entityManager != null) {
+            return new DaoHelper<>(entityManager, entityClass);
+        } else {
+            return new DaoHelper<>(findEntityManager(entityManagerQualifiers), entityClass);
+        }
     }
 
     private Function<String, KK> createConverter() {
@@ -324,7 +336,7 @@ public class JPAModelImpl<TT, KK> {
     @SuppressWarnings("unchecked")
     @SneakyThrows(ReflectiveOperationException.class)
     private KK getPrimaryKey(Optional<TT> entry) {
-        return (KK) daoHelper.get().getEntityManager().getEntityManagerFactory().getPersistenceUnitUtil()
+        return (KK) daoHelper.get().getEntityManager().get().getEntityManagerFactory().getPersistenceUnitUtil()
                 .getIdentifier(entry.orElse(ConstructorUtils.invokeConstructor(getEntityClass())));
     }
 

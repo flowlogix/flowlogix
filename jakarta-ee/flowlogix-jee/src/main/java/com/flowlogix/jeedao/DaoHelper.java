@@ -17,6 +17,7 @@ package com.flowlogix.jeedao;
 
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.jeedao.querycriteria.CountQueryCriteria;
+import java.io.Serializable;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,9 +29,10 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.omnifaces.util.Lazy.SerializableSupplier;
 
 /**
  * Lightweight wrapper around common JPA methods
@@ -45,40 +47,51 @@ import lombok.RequiredArgsConstructor;
  * <p>
  * <em>Simple Example:</em>
  * {@snippet class="com.flowlogix.jeedao.ExampleDAO" region="simpleExampleDAO"}
+ * <p>
+ * <em>Injected Example:</em>
+ * {@snippet class="com.flowlogix.jeedao.InjectedDAO" region="injectedExampleDAO"}
+ * <p>
+ * <em>Injected Example with non-default EntityManager:</em>
+ * {@snippet class="com.flowlogix.jeedao.InjectedNonDefaultDAO" region="injectedNonDefaultExampleDAO"}
  *
  * @param <TT> Entity Type
- * @param <KT> Primary Key Type
  *
  * @author lprimak
  */
-@Builder
-@RequiredArgsConstructor
-public final class DaoHelper<TT, KT> {
+public final class DaoHelper<TT> implements Serializable {
+    private static final long serialVersionUID = 3L;
+
     /**
      * Return entity manager to operate on
      */
-    private final @NonNull Supplier<EntityManager> entityManager;
+    private final @NonNull SerializableSupplier<EntityManager> entityManager;
     /**
      * entity class
      */
     private final @NonNull @Getter Class<TT> entityClass;
 
     @Builder
+    public DaoHelper(@NonNull SerializableSupplier<EntityManager> entityManager, @NonNull Class<TT> entityClass) {
+        this.entityManager = entityManager;
+        this.entityClass = entityClass;
+    }
+
+    @Builder
     public static class Parameters<TT> {
         /**
          * add hints to queries here
          */
-        @Builder.Default
+        @Default
         private final Consumer<TypedQuery<TT>> hints = (tq) -> { };
         /**
          * add query criteria here
          */
-        @Builder.Default
+        @Default
         private final Consumer<QueryCriteria<TT>> queryCriteria = (c) -> { };
         /**
          * add query criteria to count operation here
          */
-        @Builder.Default
+        @Default
         private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = (c) -> { };
     }
 
@@ -132,18 +145,29 @@ public final class DaoHelper<TT, KT> {
     public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>>
     int count(FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
-        CriteriaQuery<Long> cq = getEntityManager().getCriteriaBuilder().createQuery(Long.class);
+        CriteriaQuery<Long> cq = em().getCriteriaBuilder().createQuery(Long.class);
         Root<TT> rt = cq.from(entityClass);
-        cq.select(getEntityManager().getCriteriaBuilder().count(rt));
-        params.countQueryCriteria.accept(new CountQueryCriteria<>(getEntityManager().getCriteriaBuilder(), rt, cq));
-        TypedQuery<Long> q = getEntityManager().createQuery(cq);
+        cq.select(em().getCriteriaBuilder().count(rt));
+        params.countQueryCriteria.accept(new CountQueryCriteria<>(em().getCriteriaBuilder(), rt, cq));
+        TypedQuery<Long> q = em().createQuery(cq);
         return q.getSingleResult().intValue();
     }
 
     /**
-     * @return entity manager
+     * Entity Manager cannot be saved because it's not thread-safe
+     *
+     * @return {@link Supplier} of {@link EntityManager}
      */
-    public EntityManager getEntityManager() {
+    public Supplier<EntityManager> getEntityManager() {
+        return entityManager;
+    }
+
+    /**
+     * Do not make this public because entity manager is not thread-safe
+     *
+     * @return Entity Manager
+     */
+    EntityManager em() {
         return entityManager.get();
     }
 
@@ -152,26 +176,26 @@ public final class DaoHelper<TT, KT> {
     }
 
     public <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls) {
-        CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+        CriteriaBuilder cb = em().getCriteriaBuilder();
         CriteriaQuery<RR> cq = cb.createQuery(cls);
         return new QueryCriteria<>(cb, cq.from(cls), cq);
     }
 
     public TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass) {
-        Query q = getEntityManager().createNativeQuery(sql, resultClass);
+        Query q = em().createNativeQuery(sql, resultClass);
         return new TypedNativeQuery(q);
     }
 
     public TypedNativeQuery createNativeQuery(String sql, String resultMapping) {
-        Query q = getEntityManager().createNativeQuery(sql, resultMapping);
+        Query q = em().createNativeQuery(sql, resultMapping);
         return new TypedNativeQuery(q);
     }
 
     private TypedQuery<TT> createFindQuery(Parameters<TT> params) {
-        CriteriaQuery<TT> cq = getEntityManager().getCriteriaBuilder().createQuery(entityClass);
+        CriteriaQuery<TT> cq = em().getCriteriaBuilder().createQuery(entityClass);
         Root<TT> root = cq.from(entityClass);
         cq.select(root);
-        params.queryCriteria.accept(new QueryCriteria<>(getEntityManager().getCriteriaBuilder(), root, cq));
-        return getEntityManager().createQuery(cq);
+        params.queryCriteria.accept(new QueryCriteria<>(em().getCriteriaBuilder(), root, cq));
+        return em().createQuery(cq);
     }
 }

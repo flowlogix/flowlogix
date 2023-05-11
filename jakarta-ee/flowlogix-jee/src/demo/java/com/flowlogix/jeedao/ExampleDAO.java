@@ -28,7 +28,7 @@ public class ExampleDAO {
     @PersistenceContext
     EntityManager em;
     @Delegate
-    DaoHelper<UserEntity, Long> helper = new DaoHelper<>(() -> em, UserEntity.class);
+    DaoHelper<UserEntity> helper = new DaoHelper<>(() -> em, UserEntity.class);
 }
 // end::simpleExampleDAO[] // @replace regex='.*\n' replacement=""
 // @end

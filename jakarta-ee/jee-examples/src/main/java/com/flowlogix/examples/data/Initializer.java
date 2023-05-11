@@ -17,14 +17,14 @@ package com.flowlogix.examples.data;
 
 import com.flowlogix.examples.entities.UserEntity;
 import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.jeedao.EntityManagerSelector;
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 
 /**
  *
@@ -32,16 +32,13 @@ import jakarta.persistence.PersistenceContext;
  */
 @Singleton @Startup
 public class Initializer {
-    @PersistenceContext
-    private EntityManager em;
+    @Inject
+    @EntityManagerSelector(AnotherEntityManager.class)
+    DaoHelper<UserEntity> helper;
 
     @PostConstruct
     @SuppressWarnings("MagicNumber")
     void init() {
-        var helper = DaoHelper.<UserEntity, Long>builder()
-                .entityClass(UserEntity.class)
-                .entityManager(() -> em)
-                .build();
         if (helper.count() == 0) {
             List<UserEntity> userList = Stream.of(
                     UserEntity.builder().userId("lprimak").fullName("Lenny Primak")
@@ -55,7 +52,7 @@ public class Initializer {
                     UserEntity.builder().userId("cousin").fullName("Cool Cousin")
                             .address("Beastly Court").zipCode(68502).build()
             ).collect(Collectors.toList());
-            userList.forEach(em::merge);
+            userList.forEach(helper.getEntityManager().get()::merge);
         }
     }
 }

@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.examples.data;
+package com.flowlogix.jeedao;
 
 import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
-import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.Getter;
 import static jakarta.ejb.TransactionAttributeType.SUPPORTS;
 
+// @start region="statelessEntityProducer"
+// tag::statelessEntityProducer[] // @replace regex='.*\n' replacement=""
 @Stateless
 @TransactionAttribute(SUPPORTS)
-public class EntityManagerProducer {
-    @Getter(onMethod = @__({@Produces, @Default, @AnotherEntityManager}))
-    @PersistenceContext
-    EntityManager entityManager;
+public class StatelessEntityManagerProducer {
+    @Getter(onMethod = @__({@Produces, @NonDefault}))
+    @PersistenceContext(unitName = "nonDefault")
+    EntityManager em;
 }
+// end::statelessEntityProducer[] // @replace regex='.*\n' replacement=""
+// @end

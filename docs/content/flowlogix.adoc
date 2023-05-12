@@ -118,6 +118,13 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/Injec
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/EntityManagerProducer.java[tags=nonDefaultEntityProducer,ident=0]
 ----
 The `@NonDefault` can be removed to use it as a Default producer. If there is only one Persistence Unit, `unitName` can be also omitted.
+[source,java]
+
+.EJB Stateless EntityManager Producer example (optimization)
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/StatelessEntityManagerProducer.java[tags=statelessEntityProducer,ident=0]
+----
+The example above works well if `@RequestScope` is unavailable and may work better because of EJB bean pooling optimizations.
 
 .JPA: Generics-based Type-safe native query
 `DaoHelper` has a convenience method `createNativeQuery()` which will return `TypedNativeQuery` object. This is a thin wrapper over JPA's `Query` object, however it's `getResult*()` methods return typed results via generics, which avoids casting and makes the results easier and safer to use.

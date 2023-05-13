@@ -40,9 +40,7 @@
         <release.profile>release-flowlogix-to-central</release.profile>
         <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
         <staging.server>flowlogix-maven-central-s01</staging.server>
-        <nexus.url>https://s01.oss.sonatype.org/</nexus.url>
-        <skip.staging>false</skip.staging>
-        <auto.release>true</auto.release>
+        <nexus.url>https://s01.oss.sonatype.org</nexus.url>
 
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>6.2023.4</payara.version>
@@ -50,8 +48,8 @@
         <lombok.version>1.18.26</lombok.version>
         <jacocoPort>52212</jacocoPort>
         <jacocoAgent/>
-        <jdk11SurefireOptions/>
-        <jdk11FailsafeOptions/>
+        <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>
+        <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
 
         <!-- checkstyle -->
         <checkstyle.configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
@@ -109,10 +107,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.commonjava.maven.plugins</groupId>
@@ -382,7 +376,8 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>3.1.1</version>
                     <configuration>
-                        <skip>true</skip>
+                        <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
+                        <deployAtEnd>true</deployAtEnd>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -396,26 +391,6 @@
                         <releaseProfiles>${release.profile},docs,javadoc-release</releaseProfiles>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.13</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <serverId>${staging.server}</serverId>
-                        <nexusUrl>${nexus.url}</nexusUrl>
-                        <autoReleaseAfterClose>${auto.release}</autoReleaseAfterClose>
-                        <skipStaging>${skip.staging}</skipStaging>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>deploy</id>
-                            <goals>
-                                <goal>deploy</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.simplify4u.plugins</groupId>
@@ -507,7 +482,7 @@
             <distributionManagement>
                 <repository>
                     <id>${staging.server}</id>
-                    <url>${nexus.url}service/local/staging/deploy/maven2/</url>
+                    <url>${nexus.url}/service/local/staging/deploy/maven2/</url>
                 </repository>
             </distributionManagement>
         </profile>
@@ -515,13 +490,12 @@
             <id>release-flowlogix-to-hope</id>
             <properties>
                 <staging.server>hope-nexus-artifacts</staging.server>
-                <nexus.url>https://nexus.hope.nyc.ny.us/</nexus.url>
-                <skip.staging>true</skip.staging>
+                <nexus.url>https://nexus.hope.nyc.ny.us</nexus.url>
             </properties>
             <distributionManagement>
                 <repository>
                     <id>${staging.server}</id>
-                    <url>${nexus.url}repository/maven-releases</url>
+                    <url>${nexus.url}/repository/maven-releases/</url>
                 </repository>
             </distributionManagement>
         </profile>
@@ -577,16 +551,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>jdk11plus</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <properties>
-                <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>
-                <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
-            </properties>
-        </profile>
     </profiles>
 
     <scm>
@@ -599,8 +563,7 @@
     <distributionManagement>
         <snapshotRepository>
             <id>${staging.server}</id>
-            <url>${nexus.url}content/repositories/snapshots</url>
+            <url>${nexus.url}/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
 </project>

@@ -53,7 +53,7 @@ FlowLogix 6.x is compatible with Java 17+ and Jakarta EE 9 and later. No classif
 Artifacts are available in the Sonatype's
 link:https://central.sonatype.com/search?smo=true&q=com.flowlogix&sort=published[Maven Central repository^].
 Both 5.x and 6.x snapshots are available in the
-link:https://oss.sonatype.org/content/repositories/snapshots/com/flowlogix/[Maven Central snapshot^] repository
+link:https://s01.oss.sonatype.org/content/repositories/snapshots/com/flowlogix/[Maven Central snapshot^] repository
 ****
 
 === Flow Logix BOM

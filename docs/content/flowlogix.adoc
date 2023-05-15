@@ -271,8 +271,10 @@ include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data
 ----
 Above we created a model with case-insensitive filtering.
 
-`JPALazyDataModel` only requires `entityManager` and `entityClass` to work, everything else is optional:
+`JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
 
+* entityManager: Provide entity manager `Supplier`. Fefault is injected via CDI
+* entityManagerQualifiers: Provides a list of qualifiers annotations to select the correct EntityManager for injection
 * sorter: Apply custom sort criteria
 * filter: Apply custom filter criteria
 * optimizer: Apply custom JPA hints, works with `DaoHelper`

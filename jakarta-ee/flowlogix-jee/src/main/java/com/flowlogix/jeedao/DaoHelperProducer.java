@@ -48,8 +48,7 @@ public class DaoHelperProducer {
         var selector = injectionPoint.getQualifiers().stream()
                 .filter(c -> c.annotationType().isAssignableFrom(EntityManagerSelector.class))
                 .map(EntityManagerSelector.class::cast).findFirst().get();
-        var qualifiers = Arrays.stream(selector.value()).map(value -> (Annotation) () -> value).toList();
-        return doProduceDaoHelper(injectionPoint, qualifiers);
+        return doProduceDaoHelper(injectionPoint, Arrays.asList(selector.value()));
     }
 
     /**
@@ -58,15 +57,17 @@ public class DaoHelperProducer {
      * @param qualifiers for the entity manager, or empty list
      * @return {@link SerializableSupplier} of {@link EntityManager}
      */
-    public static SerializableSupplier<EntityManager> findEntityManager(@NonNull List<Annotation> qualifiers) {
+    public static SerializableSupplier<EntityManager>
+    findEntityManager(@NonNull List<Class<? extends Annotation>> qualifiers) {
+        var qualifierInstances = qualifiers.stream().map(value -> (Annotation) () -> value).toList();
         return () -> Optional.ofNullable(Beans.getReference(EntityManager.class,
-                qualifiers.toArray(Annotation[]::new))).orElseThrow(() -> new IllegalStateException(
+                qualifierInstances.toArray(Annotation[]::new))).orElseThrow(() -> new IllegalStateException(
                 String.format("Unable to find EntityManager with qualifiers: %s",
-                        qualifiers.stream().map(Annotation::annotationType).toList())));
+                        qualifierInstances.stream().map(Annotation::annotationType).toList())));
     }
 
     private static <TT> DaoHelper<TT>
-    doProduceDaoHelper(InjectionPoint injectionPoint, List<Annotation> qualifiers) {
+    doProduceDaoHelper(InjectionPoint injectionPoint, List<Class<? extends Annotation>> qualifiers) {
         var entityManagerSupplier = findEntityManager(qualifiers);
         var parameterizedType = (ParameterizedType) injectionPoint.getType();
         @SuppressWarnings("unchecked")

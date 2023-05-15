@@ -74,7 +74,7 @@ public class JPAModelImpl<TT, KK> {
      * List of qualifiers to use when finding {@link EntityManager via CDI} (optional)
      */
     @Default
-    private final List<Annotation> entityManagerQualifiers = List.of();
+    private final List<Class<? extends Annotation>> entityManagerQualifiers = List.of();
     /**
      * entity class
      */

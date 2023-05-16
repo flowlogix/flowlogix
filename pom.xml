@@ -55,6 +55,8 @@
         <checkstyle.configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <checkstyle.headerLocation>${flowlogix.basedir}/checkstyle/header.txt</checkstyle.headerLocation>
+
+        <project.build.outputTimestamp>2023-01-01T00:00:00Z</project.build.outputTimestamp>
     </properties>
 
     <modules>
@@ -316,6 +318,7 @@
                             <link>https://javadoc.io/doc/org.omnifaces/omnifaces/latest/</link>
                             <link>https://javadoc.io/doc/org.primefaces/primefaces/latest/</link>
                         </links>
+                        <notimestamp>true</notimestamp>
                     </configuration>
                     <executions>
                         <execution>

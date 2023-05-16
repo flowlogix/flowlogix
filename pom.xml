@@ -427,6 +427,27 @@
                         <skipIfEmpty>true</skipIfEmpty>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>io.github.git-commit-id</groupId>
+                    <artifactId>git-commit-id-maven-plugin</artifactId>
+                    <version>6.0.0</version>
+                    <configuration>
+                        <useNativeGit>false</useNativeGit>
+                        <dotGitDirectory>${flowlogix.basedir}/.git</dotGitDirectory>
+                        <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                        <abbrevLength>7</abbrevLength>
+                        <gitDescribe>
+                            <skip>true</skip>
+                        </gitDescribe>
+                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                        <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                        <includeOnlyProperties>
+                            <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
+                            <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
+                        </includeOnlyProperties>
+                        <commitIdGenerationMode>full</commitIdGenerationMode>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>

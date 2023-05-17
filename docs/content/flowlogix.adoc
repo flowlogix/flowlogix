@@ -1,7 +1,7 @@
 :jbake-title: Flow Logix Jakarta EE Components
 :jbake-type: page_toc
 :jbake-status: published
-:jbake-keywords: docs jee jakarta-ee jakartaee dao jpalazydatamodel primefaces jpa components cdi java-ee javaee
+:jbake-keywords: docs jee jakarta-ee jakartaee dao jpalazydatamodel primefaces jpa components cdi java-ee javaee lazydatamodel
 
 :toc:
 

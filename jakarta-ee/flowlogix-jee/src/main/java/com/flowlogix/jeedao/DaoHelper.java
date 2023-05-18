@@ -32,6 +32,7 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.Delegate;
 import org.omnifaces.util.Lazy.SerializableSupplier;
 
 /**
@@ -60,6 +61,17 @@ import org.omnifaces.util.Lazy.SerializableSupplier;
  */
 public final class DaoHelper<TT> implements Serializable {
     private static final long serialVersionUID = 3L;
+
+    /**
+     * Convenience interface for use with {@link Delegate} when forwarding methods
+     * of {@link EntityManager} so DaoHelper's own methods get exposed correctly
+     * <p>
+     * {@snippet class = "com.flowlogix.jeedao.ExampleDelegateDAO" region = "delegateDAO"}
+     */
+    public interface EntityManagerExclusions {
+        Query createNativeQuery(String sql, Class resultClass);
+        Query createNativeQuery(String sql, String resultMapping);
+    }
 
     /**
      * Return entity manager to operate on

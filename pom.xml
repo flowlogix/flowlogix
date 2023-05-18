@@ -317,6 +317,7 @@
                             <link>https://javadoc.io/doc/org.jboss.shrinkwrap/shrinkwrap-api/latest/</link>
                             <link>https://javadoc.io/doc/org.omnifaces/omnifaces/latest/</link>
                             <link>https://javadoc.io/doc/org.primefaces/primefaces/latest/</link>
+                            <link>https://javadoc.io/doc/org.projectlombok/lombok/latest/</link>
                         </links>
                         <notimestamp>true</notimestamp>
                     </configuration>

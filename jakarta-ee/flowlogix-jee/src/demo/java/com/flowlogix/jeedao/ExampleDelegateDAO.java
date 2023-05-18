@@ -15,30 +15,23 @@
  */
 package com.flowlogix.jeedao;
 
+import com.flowlogix.jeedao.DaoHelper.EntityManagerExclusions;
 import com.flowlogix.jeedao.entities.UserEntity;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
+import jakarta.persistence.EntityManager;
+import lombok.experimental.Delegate;
 
-@Named
-@ApplicationScoped
-public class DaoHelperDemo {
+// @start region="delegateDAO"
+// tag::delegateDAO[] // @replace regex='.*\n' replacement=""
+@Stateless
+public class ExampleDelegateDAO {
     @Inject
-    ExampleDAO dao;
+    @Delegate(excludes = EntityManagerExclusions.class)
+    EntityManager entityManager;
     @Inject
-    InjectedDAO injectedDAO;
-    @Inject
-    ExampleDelegateDAO daoWithDelegate;
-
-    public int count() {
-        return dao.count();
-    }
-
-    public int injectedCount() {
-        return injectedDAO.count();
-    }
-
-    public UserEntity findById(Long id) {
-        return daoWithDelegate.find(daoWithDelegate.getEntityClass(), id);
-    }
+    @Delegate
+    DaoHelper<UserEntity> helper;
 }
+// end::delegateDAO[] // @replace regex='.*\n' replacement=""
+// @end

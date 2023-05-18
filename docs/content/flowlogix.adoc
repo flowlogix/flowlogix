@@ -78,8 +78,8 @@ See the link:https://maven.apache.org/guides/introduction/introduction-to-depend
 == Developer's Guide
 [[section-jee]]
 === FlowLogix Jakarta EE Components
-.JPA: Delegation-based Helper for Data Access Objects and business logic
-There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to inherit from an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `daoHelper` protected field in your `@PostConstruct` method.
+==== `DaoHelper` for JPA: Delegation-based Helper for Data Access Objects and business logic
+There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to implement an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `daoHelper` protected field in your `@PostConstruct` method.
 
 You can leverage Project Lombok @Delegate annotation to transparently implement Data Access Objects without any specific requirements. Alternatively, developers can write manual forwarder methods, dynamic proxies, or
 other bytecode generators to delegate to `DaoHelper` from an interface.
@@ -90,9 +90,9 @@ Recommended approach is to use Lombok's `@Delegate` annotation. This introduces 
 
 `DaoHelper` is Serializable and thus can be used inside `@ViewScoped` beans, for example.
 
-_Fluent Builder_ pattern is used to create `DaoHelper` object, which requires EntityManager `Supplier` and entity `Class`.
+_Fluent Builder_ pattern can be used to create `DaoHelper` object, which requires EntityManager `Supplier` and entity `Class`.
 
-Often a question comes up: Why does `DaoHelper` take `Supplier` as a parameter instead of `EntityManager` directly? Because `EntityManager` is not initialized when the object is created. `Supplier` lets you delay the initialization of `DaoHelper` until `EntityManager` is actually needed at run-time and is already initialized. This is why `InheritableDAOHelper` needs to be initialized in `@PostConstruct` method instead of the constructor.
+Often a question comes up: Why does `DaoHelper` take `Supplier` as a parameter instead of `EntityManager` directly? That's Because `EntityManager` is not initialized when the object is created. `Supplier` lets you delay the initialization of `DaoHelper` until `EntityManager` is actually needed at run-time and is already initialized. This is why `InheritableDAOHelper` needs to be initialized in `@PostConstruct` method instead of the constructor.
 
 `findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can specify JPA `hints`, and `queryCriteria` enhancements for either `count()` or `findXXX()` use cases. This takes a form of `builder -> builder.xxx().yyy().build()` to make  settings easy.
 
@@ -112,16 +112,26 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/Injec
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/NonDefault.java[tags=nonDefault,indent=0]
 ----
 [source,java]
+.Non-Default EntityManager injection example
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InjectedEntityManager.java[tags=injectedEntityManager]
+----
+[source,java]
 .Injected DAO with non-default EntityManager
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InjectedNonDefaultDAO.java[tags=injectedNonDefaultExampleDAO,ident=0]
+----
+[source,java]
+.More complete DAO example that forwards `EntityManager` methods
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/ExampleDelegateDAO.java[tags=delegateDAO]
 ----
 [source,java]
 .Non-default EntityManager Producer example
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/EntityManagerProducer.java[tags=nonDefaultEntityProducer,ident=0]
 ----
-The `@NonDefault` can be removed to use it as a Default producer. If there is only one Persistence Unit, `unitName` can be also omitted.
+NOTE: `@NonDefault` annotation can be removed to use it as a Default producer. If there is only one Persistence Unit, `unitName` can be also omitted.
 [source,java]
 
 .EJB Stateless EntityManager Producer example (optimization)
@@ -137,8 +147,10 @@ The example above works well if `@RequestScope` is unavailable and may work bett
 Example TBD (snippet/link/copy-of)
 ----
 
-.Jakarta Faces: Automated PROJECT_STAGE
-Jakarta Faces runs in production mode by default. However, most applications set up development mode by modifiying `web.xml`. Traditionally, it's been difficult to set up environment-based switch from development to production mode. FlowLogix sets this up automatically via `web-fragment.xml` and allows JNDI-based switch to production mode.
+.Jakarta Faces: Automated PROJECT_STAGE configuration
+Jakarta Faces runs in production mode by default. However, most applications set up development mode by modifiying `web.xml`. Traditionally, it's been difficult to set up environment-based switching from development to production mode. FlowLogix sets this up automatically via `web-fragment.xml` and allows JNDI-based switch to production mode.
+
+NOTE: Special entries in `web.xml`, `glassfish-web.xml` or any other container-specific configuration are no longer required and can be removed.
 
 Below is an example of setting up production mode with Payara and GlassFish with Jakarta EE 9 or later:
 [source,shell]
@@ -192,11 +204,12 @@ In order to initialize https://showcase.omnifaces.org/resourcehandlers/UnmappedR
 ----
 
 .PrimeFaces: Font mime-types automatically included
-PrineFaces automatically includes fonts as part of the application. However, the file extensions of these fonts are not usually included in most servlet containers by default. FlowLogix adds those mime types automatically and prevents the warnings such as below from appearing in log files:
+PrimeFaces automatically includes fonts as part of the application. However, the file extensions of these fonts are not usually included in most servlet containers by default. FlowLogix adds those mime types automatically and prevents the warnings such as below from appearing in log files:
 [source]
 ----
  WARNING: JSF1091: No mime type could be found for file font1.woff2
 ----
+This way, no extra `mime-mapping` entries are required in `web.xml`
 
 .Convert Strings to arbitrary types
 Most classes that can be constructed from `String` include `valueOf(String)` method by convention.

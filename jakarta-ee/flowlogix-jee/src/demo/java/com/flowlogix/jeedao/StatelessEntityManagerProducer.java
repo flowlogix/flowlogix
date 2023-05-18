@@ -30,7 +30,7 @@ import static jakarta.ejb.TransactionAttributeType.SUPPORTS;
 public class StatelessEntityManagerProducer {
     @Getter(onMethod = @__({@Produces, @NonDefault}))
     @PersistenceContext(unitName = "nonDefault")
-    EntityManager em;
+    EntityManager entityManager;
 }
 // end::statelessEntityProducer[] // @replace regex='.*\n' replacement=""
 // @end

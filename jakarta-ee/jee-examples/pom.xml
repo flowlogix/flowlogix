@@ -23,19 +23,26 @@
         <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
         <jakarta.ee.version>10.0.0</jakarta.ee.version>
         <arquillian.version>1.7.0.Final</arquillian.version>
+        <flowlogix.version>${project.version}</flowlogix.version>
     </properties>
 
+    <!-- tag::dependenciesStart[] -->
     <dependencies>
+        <!-- end::dependenciesStart[] -->
+        <!-- tag::jeeDependency[] -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.flowlogix</groupId>
             <artifactId>flowlogix-jee</artifactId>
-            <version>${project.version}</version>
+            <version>${flowlogix.version}</version>
         </dependency>
+        <!-- end::jeeDependency[] -->
+        <!-- tag::datamodelDependency[] -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.flowlogix</groupId>
             <artifactId>flowlogix-datamodel</artifactId>
-            <version>${project.version}</version>
+            <version>${flowlogix.version}</version>
         </dependency>
+        <!-- end::datamodelDependency[] -->
         <dependency>
             <groupId>org.omnifaces</groupId>
             <artifactId>omnifaces</artifactId>
@@ -131,7 +138,9 @@
             <scope>test</scope>
             <type>pom</type>
         </dependency>
+        <!-- tag::dependenciesEnd[] -->
     </dependencies>
+    <!-- end::dependenciesEnd[] -->
 
     <!-- tag::depManagementStart[] -->
     <dependencyManagement>

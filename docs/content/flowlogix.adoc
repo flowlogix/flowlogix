@@ -7,8 +7,7 @@
 
 [[section-introduction-and-features]]
 == Introduction and Features
-****
-.Why another utility / component library?
+.Why another utility or component library?
 FlowLogix provides a few remaining missing pieces in what is covered by Jakarta EE, PrimeFaces, OmniFaces, Apache Shiro and other very popular software.
 
 .What are the features provided?
@@ -26,11 +25,9 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Checks if objects are truly serializable by testing them
 * Easy Transform Streams to Strings
 * Simplify manipulation of ShrinkWrap archives including assets
-****
 
 [[section-architecture]]
 === Where does FlowLogix fit into your application architecture?
-****
 .Is it a framework?
 No. FlowLogix fits within the Jakarta EE design philosophy and works with MicroProfile, Jakarta EE, OmniFaces and PrimeFaces ecosystem. FlowLogix tries to be the least intrusive, automatic and with the fewest requirements possible.
 
@@ -39,27 +36,35 @@ Simplicity is the #1 principal. FlowLogix doesn't make you inherit from base cla
 
 .Project Lombok is mentioned a lot. Is it required?
 No. Although the library itself uses Lombok to avoid boilerplate code, it is completely optional to the user, and is not required to be a dependency of user code. Having said that, even though Java itself currently has lots of features only available with Lombok in prior years, Lombok still has many features not available in Java today, and is very useful and highly recommended.
-****
 
 [[section-installation]]
 == Installation and Compatibility
 === Compatibility
-****
 FlowLogix 5.x is compatible with Java 11+ and Java EE 8, Jakarta EE 8 and later. Jakarta EE 9 and later (jakarta.* namespace) is available via the `jakarta` maven classifier. +
 FlowLogix 6.x is compatible with Java 17+ and Jakarta EE 9 and later. No classifier is required.
-****
 
 === Installation
-****
 Artifacts are available in the Sonatype's
 link:https://central.sonatype.com/search?smo=true&q=com.flowlogix&sort=published[Maven Central repository^].
 Both 5.x and 6.x snapshots are available in the
 link:https://s01.oss.sonatype.org/content/repositories/snapshots/com/flowlogix/[Maven Central snapshot^] repository
-****
+[source,xml]
+.Maven Example (Jakarta EE Components)
+----
+include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesStart,indent=0]
+include::../../jakarta-ee/jee-examples/pom.xml[tags=jeeDependency,indent=4]
+include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesEnd,indent=0]
+----
+[source,xml]
+.Maven Example (PrimeFaces JPA LazyDataModel)
+----
+include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesStart,indent=0]
+include::../../jakarta-ee/jee-examples/pom.xml[tags=datamodelDependency,indent=4]
+include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesEnd,indent=0]
+----
 
 === Flow Logix BOM
-****
-Flow Logix includes an easy way to declare all the required dependency versions, via the BOM.
+Flow Logix includes an easy way to declare all the required dependency versions, via the Maven Bill of Materials.
 [source,xml]
 .Example
 ----
@@ -67,14 +72,12 @@ include::../../jakarta-ee/jee-examples/pom.xml[tags=depManagementStart,indent=0]
 include::../../jakarta-ee/jee-examples/pom.xml[tags=bomUsage,indent=8]
 include::../../jakarta-ee/jee-examples/pom.xml[tags=depManagementEnd,indent=0]
 ----
-See the link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms[Maven Documentation^] for more information
-****
+See the link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms[Maven Documentation^] for more information on BOMs
 
 [[section-dev-guide]]
 == Developer's Guide
 [[section-jee]]
 === FlowLogix Jakarta EE Components
-****
 .JPA: Delegation-based Helper for Data Access Objects and business logic
 There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to inherit from an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `daoHelper` protected field in your `@PostConstruct` method.
 
@@ -247,11 +250,9 @@ public static WebArchive deploy() {
 ----
 The second parameter is DOM `Node` class `Consumer` lambda, which allows for manipulation of the DOM element directly by the user. +
 Above, we also combine `web.xml` manipulation with `jakartify` to be compatible with both Jakarta EE 8 or 9, if desired.
-****
 
 [[section-jpa-lazymodel]]
 === FlowLogix PrimeFaces Lazy Data Model backed by JPA
-****
 .An easier alternative to PrimeFaces JPA Lazy Data model
 PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier and with a lot less code.
 [source,xhtml]
@@ -311,12 +312,9 @@ private static TypedQuery<UserEntity> optimizer(TypedQuery<UserEntity> query) {
         .setHint(QueryHints.BATCH, getResultField("alternateEmails"));
 }
 ----
-****
 
 == API Reference
-****
 FlowLogix features a full API references:
 
 link:https://javadoc.io/doc/com.flowlogix/flowlogix-jee[Jakarta EE Components API Reference^] +
 link:https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel[PrimeFaces JPA Lazy Data Model API Reference^]
-****

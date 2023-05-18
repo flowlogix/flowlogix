@@ -19,22 +19,18 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
-import jakarta.persistence.EntityManager;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import lombok.NonNull;
-import org.omnifaces.util.Beans;
-import org.omnifaces.util.Lazy.SerializableSupplier;
+import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 
 /**
  * Enables CDI Injection of DaoHelper
  */
 @Dependent
 @SuppressWarnings("HideUtilityClassConstructor")
-public class DaoHelperProducer {
+class DaoHelperProducer {
     @Produces
     public static <TT> DaoHelper<TT>
     produceDaoHelper(InjectionPoint injectionPoint) {
@@ -49,21 +45,6 @@ public class DaoHelperProducer {
                 .filter(c -> c.annotationType().isAssignableFrom(EntityManagerSelector.class))
                 .map(EntityManagerSelector.class::cast).findFirst().get();
         return doProduceDaoHelper(injectionPoint, Arrays.asList(selector.value()));
-    }
-
-    /**
-     * Finds a reference to entity manager via CDI
-     *
-     * @param qualifiers for the entity manager, or empty list
-     * @return {@link SerializableSupplier} of {@link EntityManager}
-     */
-    public static SerializableSupplier<EntityManager>
-    findEntityManager(@NonNull List<Class<? extends Annotation>> qualifiers) {
-        var qualifierInstances = qualifiers.stream().map(value -> (Annotation) () -> value).toList();
-        return () -> Optional.ofNullable(Beans.getReference(EntityManager.class,
-                qualifierInstances.toArray(Annotation[]::new))).orElseThrow(() -> new IllegalStateException(
-                String.format("Unable to find EntityManager with qualifiers: %s",
-                        qualifierInstances.stream().map(Annotation::annotationType).toList())));
     }
 
     private static <TT> DaoHelper<TT>

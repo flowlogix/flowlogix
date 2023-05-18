@@ -15,10 +15,10 @@
  */
 package com.flowlogix.jeedao;
 
-import com.flowlogix.jeedao.querycriteria.QueryCriteria;
-import com.flowlogix.jeedao.querycriteria.CountQueryCriteria;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -33,6 +33,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Delegate;
+import org.omnifaces.util.Beans;
 import org.omnifaces.util.Lazy.SerializableSupplier;
 
 /**
@@ -61,6 +62,9 @@ import org.omnifaces.util.Lazy.SerializableSupplier;
  */
 public final class DaoHelper<TT> implements Serializable {
     private static final long serialVersionUID = 3L;
+
+    public record QueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<TT> query) { }
+    public record CountQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<Long> query) { }
 
     /**
      * Convenience interface for use with {@link Delegate} when forwarding methods
@@ -202,6 +206,22 @@ public final class DaoHelper<TT> implements Serializable {
         Query q = em().createNativeQuery(sql, resultMapping);
         return new TypedNativeQuery(q);
     }
+
+    /**
+     * Finds a reference to entity manager via CDI
+     *
+     * @param qualifiers for the entity manager, or empty list
+     * @return {@link SerializableSupplier} of {@link EntityManager}
+     */
+    public static SerializableSupplier<EntityManager>
+    findEntityManager(@NonNull List<Class<? extends Annotation>> qualifiers) {
+        var qualifierInstances = qualifiers.stream().map(value -> (Annotation) () -> value).toList();
+        return () -> Optional.ofNullable(Beans.getReference(EntityManager.class,
+                qualifierInstances.toArray(Annotation[]::new))).orElseThrow(() -> new IllegalStateException(
+                String.format("Unable to find EntityManager with qualifiers: %s",
+                        qualifierInstances.stream().map(Annotation::annotationType).toList())));
+    }
+
 
     private TypedQuery<TT> createFindQuery(Parameters<TT> params) {
         CriteriaQuery<TT> cq = em().getCriteriaBuilder().createQuery(entityClass);

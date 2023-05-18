@@ -16,9 +16,9 @@
 package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.jeedao.DaoHelper.QueryCriteria;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
-import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.util.TypeConverter;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ import jakarta.persistence.criteria.Root;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Builder;
-import static com.flowlogix.jeedao.DaoHelperProducer.findEntityManager;
+import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 import static lombok.Builder.Default;
 import lombok.Generated;
 import lombok.SneakyThrows;
@@ -115,7 +115,7 @@ public class JPAModelImpl<TT, KK> {
 
     int count(Map<String, FilterMeta> filters) {
         return daoHelper.get().count(builder -> builder
-                .countQueryCriteria(cqc -> cqc.getQuery().where(getFilters(filters, cqc.getBuilder(), cqc.getRoot())))
+                .countQueryCriteria(cqc -> cqc.query().where(getFilters(filters, cqc.builder(), cqc.root())))
                 .build());
     }
 
@@ -156,9 +156,9 @@ public class JPAModelImpl<TT, KK> {
     }
 
     private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        qc.getQuery().where(getFilters(filters, qc.getBuilder(), qc.getRoot()));
-        qc.getQuery().orderBy(getSort(sortMeta, qc.getBuilder(), qc.getRoot()));
-        qc.getRoot().alias(JPALazyDataModel.RESULT);
+        qc.query().where(getFilters(filters, qc.builder(), qc.root()));
+        qc.query().orderBy(getSort(sortMeta, qc.builder(), qc.root()));
+        qc.root().alias(JPALazyDataModel.RESULT);
     }
 
     Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {

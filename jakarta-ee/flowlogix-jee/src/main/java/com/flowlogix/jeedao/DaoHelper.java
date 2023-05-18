@@ -210,6 +210,15 @@ public final class DaoHelper<TT> implements Serializable {
     /**
      * Finds a reference to entity manager via CDI
      *
+     * @return {@link SerializableSupplier} of default {@link EntityManager}
+     */
+    public static SerializableSupplier<EntityManager> findEntityManager() {
+        return findEntityManager(List.of());
+    }
+
+    /**
+     * Finds a reference to entity manager via CDI
+     *
      * @param qualifiers for the entity manager, or empty list
      * @return {@link SerializableSupplier} of {@link EntityManager}
      */

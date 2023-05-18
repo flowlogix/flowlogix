@@ -16,35 +16,22 @@
 package com.flowlogix.jeedao;
 
 import com.flowlogix.jeedao.entities.UserEntity;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.annotation.PostConstruct;
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
+import jakarta.persistence.EntityManager;
 
-@Named
-@ApplicationScoped
-public class DaoHelperDemo {
+// @start region="inheritedDAO"
+// tag::inheritedDAO[] // @replace regex='.*\n' replacement=""
+@Stateless
+public class InheritedDAO extends InheritableDaoHelper<UserEntity> {
     @Inject
-    ExampleDAO dao;
-    @Inject
-    InjectedDAO injectedDAO;
-    @Inject
-    ExampleDelegateDAO daoWithDelegate;
-    @Inject
-    InheritedDAO inheritedDAO;
+    EntityManager entityManager;
 
-    public int count() {
-        return dao.count();
-    }
-
-    public int injectedCount() {
-        return injectedDAO.count();
-    }
-
-    public int inheritedCount() {
-        return inheritedDAO.count();
-    }
-
-    public UserEntity findById(Long id) {
-        return daoWithDelegate.find(daoWithDelegate.getEntityClass(), id);
+    @PostConstruct
+    void init() {
+        daoHelper = new DaoHelper<>(() -> entityManager, UserEntity.class);
     }
 }
+// end::inheritedDAO[] // @replace regex='.*\n' replacement=""
+// @end

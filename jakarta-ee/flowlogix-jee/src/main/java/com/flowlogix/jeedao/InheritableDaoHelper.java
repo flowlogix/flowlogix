@@ -21,6 +21,8 @@ import lombok.experimental.Delegate;
  * Data Access Object pattern implementation that is meant to be inherited by the user's classes.
  * This is an alternative to {@link DaoHelper}, which does not have requirements
  * for inheritance. {@link DaoHelper} is the preferred method of implementing DAOs.
+ * <p>
+ * {@snippet class="com.flowlogix.jeedao.InheritedDAO" region="inheritedDAO"}
  *
  * @see DaoHelper
  * @param <TT> Entity Type

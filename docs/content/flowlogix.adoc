@@ -148,11 +148,16 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/Inher
 ----
 
 .Enhanced Finder and count methods
-`findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can specify JPA `queryCriteria`. This takes a form of `builder -> builder.queryCriteria().countQueryCriteria().build()` to make settings easy.
+`findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can specify JPA `queryCriteria`. This takes a form of `builder -> builder.queryCriteria().countQueryCriteria().build()`. There are also `build` and `accept` convenience methods in  `QueryEnhancement` interface that can be passed via a method reference instead of a builder. `ParameterFunction` interface can be used to extract common parameters for both `count()` and `find()` methods, or customize individual methods as required.
 [source,java]
 .Enhanced query and hints example
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/UserDAO.java[tags=daoParameters,indent=0]
+----
+[source,java]
+.Enhanced query with customized parameters
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/UserDAO.java[tags=daoExtractedParameters,indent=0]
 ----
 
 [[section-nativequery]]

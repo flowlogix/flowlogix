@@ -15,6 +15,7 @@
  */
 package com.flowlogix.jeedao;
 
+import com.flowlogix.jeedao.DaoHelper.ParameterFunction;
 import com.flowlogix.jeedao.DaoHelper.QueryEnhancement;
 import com.flowlogix.jeedao.entities.UserEntity;
 import com.flowlogix.jeedao.entities.UserEntity_;
@@ -47,6 +48,28 @@ public class UserDAO {
                 .getResultList());
     }
     // end::daoParameters[] // @replace regex='.*\n' replacement=""
+    // @end
+
+    // @start region="daoExtractedParameters"
+    // tag::daoExtractedParameters[] // @replace regex='.*\n' replacement=""
+    public CountAndList extractedCountAndList(String userName) {
+        // add "where userName = 'userName'" clause
+        QueryEnhancement<UserEntity> enhancement = (partial, criteria) -> criteria
+                .where(partial.builder().equal(partial.root()
+                        .get(UserEntity_.userName), userName));
+        // descending order for queries
+        QueryEnhancement<UserEntity> orderBy = (partial, criteria) -> criteria
+                .orderBy(partial.builder().desc(partial.root().get(UserEntity_.userName)));
+
+        ParameterFunction<UserEntity> params = builder -> builder
+                .countQueryCriteria(enhancement::accept)
+                .queryCriteria(var -> enhancement.andThen(orderBy))
+                .build();
+
+        return new CountAndList(helper.count(params), helper.findAll(params)
+                .getResultList());
+    }
+    // end::daoExtractedParameters[] // @replace regex='.*\n' replacement=""
     // @end
 
     // @start region="nativeQuery"

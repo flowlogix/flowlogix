@@ -63,7 +63,22 @@ import org.omnifaces.util.Lazy.SerializableSupplier;
 public final class DaoHelper<TT> implements Serializable {
     private static final long serialVersionUID = 3L;
 
+    /**
+     * QueryCriteria record contains {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
+     * @param <TT> Entity Type of Criteria
+     * @param builder
+     * @param root
+     * @param query
+     */
     public record QueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<TT> query) { }
+    /**
+     * Specialized <b>Count</b>QueryCriteria record contains
+     * {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}{@code <Long>}
+     * @param <TT> Entity Type of Criteria
+     * @param builder
+     * @param root
+     * @param query
+     */
     public record CountQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<Long> query) { }
 
     /**
@@ -92,72 +107,91 @@ public final class DaoHelper<TT> implements Serializable {
         this.entityClass = entityClass;
     }
 
+    /**
+     * Parameters for enriching
+     * {@link #count(Function)}, {@link #findAll(Function)} and {@link #findRange(int, int, Function)}
+     * methods with additional criteria and query hints
+     * @param <TT> Entity Type
+     */
     @Builder
     public static class Parameters<TT> {
         /**
          * add hints to queries here
          */
         @Default
+        @NonNull
         private final Consumer<TypedQuery<TT>> hints = (tq) -> { };
         /**
-         * add query criteria here
+         * add additional query criteria here
          */
         @Default
+        @NonNull
         private final Consumer<QueryCriteria<TT>> queryCriteria = (c) -> { };
         /**
-         * add query criteria to count operation here
+         * add additional query criteria for count operation here
          */
         @Default
+        @NonNull
         private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = (c) -> { };
     }
 
-    public List<TT> findAll() {
+    public TypedQuery<TT> findAll() {
         return findAll(builder -> builder.build());
     }
 
     /**
-     * find all with added criteria and hints
+     * find all with enriched criteria and hints
      * <p>
      * Example:
      * <p>
      * {@code findAll(builder -> builder.build())}
      *
      * @param paramsBuilder
-     * @return
+     * @return query
      */
-    public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>> List<TT> findAll(FF paramsBuilder) {
+    public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>> TypedQuery<TT>
+    findAll(FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
         TypedQuery<TT> tq = createFindQuery(params);
         params.hints.accept(tq);
-        return tq.getResultList();
+        return tq;
     }
 
-    public List<TT> findRange(int min, int max) {
+    public TypedQuery<TT> findRange(int min, int max) {
         return findRange(min, max, builder -> builder.build());
     }
 
     /**
-     * find range with added criteria and hints
+     * find range with enriched criteria and hints
      *
      * @param min
      * @param max
      * @param paramsBuilder
-     * @return
+     * @return query
      */
     public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>>
-    List<TT> findRange(int min, int max, FF paramsBuilder) {
+    TypedQuery<TT> findRange(int min, int max, FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
         TypedQuery<TT> tq = createFindQuery(params);
         tq.setMaxResults(max - min);
         tq.setFirstResult(min);
         params.hints.accept(tq);
-        return tq.getResultList();
+        return tq;
     }
 
+    /**
+     * count rows
+     * @return row count
+     */
     public int count() {
         return count(builder -> builder.build());
     }
 
+    /**
+     * count with enriched criteria and hints
+     * @param paramsBuilder
+     * @return row count
+     */
     public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>>
     int count(FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
@@ -187,10 +221,23 @@ public final class DaoHelper<TT> implements Serializable {
         return entityManager.get();
     }
 
+    /**
+     * Convenience method for building {@link QueryCriteria} record, which contains
+     * {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
+     *
+     * @return QueryCriteria of Entity Type
+     */
     public QueryCriteria<TT> buildQueryCriteria() {
         return buildQueryCriteria(entityClass);
     }
 
+    /**
+     * Convenience method for building {@link QueryCriteria} record, which contains
+     * {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
+     *
+     * @param  cls Type of Query Criteria
+     * @return QueryCriteria of the same Entity Type as the parameter
+     */
     public <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls) {
         CriteriaBuilder cb = em().getCriteriaBuilder();
         CriteriaQuery<RR> cq = cb.createQuery(cls);

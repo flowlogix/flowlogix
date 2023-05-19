@@ -124,7 +124,7 @@ public class JPAModelImpl<TT, KK> {
                 builder -> builder
                         .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
                         .hints(optimizer::apply)
-                        .build());
+                        .build()).getResultList();
     }
 
     public Supplier<EntityManager> getEntityManager() {

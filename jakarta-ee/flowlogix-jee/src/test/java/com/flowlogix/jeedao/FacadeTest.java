@@ -62,7 +62,7 @@ public class FacadeTest implements Serializable {
     void usage() {
         assertEquals(5, new MyControl().find(1L));
         when(em.createQuery(any(CriteriaQuery.class)).getResultList()).thenReturn(Arrays.asList(1, 2));
-        assertEquals(Arrays.asList(1, 2), new MyControl().findRange(5, 7));
+        assertEquals(Arrays.asList(1, 2), new MyControl().findRange(5, 7).getResultList());
 
         when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(2L);
         assertEquals(2, new MyControl().count());

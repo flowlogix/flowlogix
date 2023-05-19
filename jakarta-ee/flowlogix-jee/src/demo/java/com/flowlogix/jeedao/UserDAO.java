@@ -15,7 +15,6 @@
  */
 package com.flowlogix.jeedao;
 
-import com.flowlogix.jeedao.DaoHelper.ParameterFunction;
 import com.flowlogix.jeedao.DaoHelper.QueryEnhancement;
 import com.flowlogix.jeedao.entities.UserEntity;
 import com.flowlogix.jeedao.entities.UserEntity_;
@@ -43,12 +42,7 @@ public class UserDAO {
                 .where(partial.builder().equal(partial.root()
                         .get(UserEntity_.userName), userName));
 
-        ParameterFunction<UserEntity> params = builder -> builder
-                .queryCriteria(criteria -> enhancement.accept(criteria.partial(), criteria.query()))
-                .countQueryCriteria(criteria -> enhancement.accept(criteria.partial(), criteria.query()))
-                .build();
-
-        return new CountAndList(helper.count(params), helper.findAll(params)
+        return new CountAndList(helper.count(enhancement::build), helper.findAll(enhancement::build)
                 .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN)
                 .getResultList());
     }

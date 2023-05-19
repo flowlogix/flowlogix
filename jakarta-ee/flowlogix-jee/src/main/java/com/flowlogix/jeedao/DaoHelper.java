@@ -23,6 +23,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import com.flowlogix.jeedao.DaoHelper.Parameters.ParametersBuilder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -36,7 +37,6 @@ import lombok.NonNull;
 import lombok.experimental.Delegate;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Lazy.SerializableSupplier;
-
 import static java.lang.Math.toIntExact;
 
 /**
@@ -128,7 +128,36 @@ public final class DaoHelper<TT> implements Serializable {
 
      * @param <TT> Entity Type
      */
-    public interface QueryEnhancement<TT> extends BiConsumer<PartialQueryCriteria<TT>, CriteriaQuery<?>> { }
+    public interface QueryEnhancement<TT> extends BiConsumer<PartialQueryCriteria<TT>, CriteriaQuery<?>> {
+        /**
+         * Convenience method for creating parameters to
+         * {@link #count(Function)} and {@link #findAll(Function)} methods and friends.
+         * Useful when the same enhanced queries are used for both count() and find() methods.
+         *
+         * @param builder
+         * @return
+         */
+        default Parameters<TT> build(ParametersBuilder<TT> builder) {
+            return builder.queryCriteria(this::accept).countQueryCriteria(this::accept)
+                    .build();
+        }
+
+        /**
+         * Convenience method for using {@link Parameters#queryCriteria} parameters
+         * @param criteria
+         */
+        default void accept(QueryCriteria<TT> criteria) {
+            accept(criteria.partial(), criteria.query());
+        }
+
+        /**
+         * Convenience method for using {@link Parameters#countQueryCriteria} parameters
+         * @param criteria
+         */
+        default void accept(CountQueryCriteria<TT> criteria) {
+            accept(criteria.partial(), criteria.query());
+        }
+    }
 
     /**
      * Convenience interface to extract parameter builder into a lambda
@@ -137,7 +166,7 @@ public final class DaoHelper<TT> implements Serializable {
      * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
      */
     @FunctionalInterface
-    public interface ParameterFunction<TT> extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>> { }
+    public interface ParameterFunction<TT> extends Function<ParametersBuilder<TT>, Parameters<TT>> { }
 
     /**
      * Return entity manager to operate on
@@ -195,7 +224,7 @@ public final class DaoHelper<TT> implements Serializable {
      * @param paramsBuilder
      * @return query
      */
-    public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>> TypedQuery<TT>
+    public <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>> TypedQuery<TT>
     findAll(FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
         return createFindQuery(params);
@@ -213,7 +242,7 @@ public final class DaoHelper<TT> implements Serializable {
      * @param paramsBuilder
      * @return query
      */
-    public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>>
+    public <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>>
     TypedQuery<TT> findRange(long min, long max, FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
         TypedQuery<TT> tq = createFindQuery(params);
@@ -235,7 +264,7 @@ public final class DaoHelper<TT> implements Serializable {
      * @param paramsBuilder
      * @return row count
      */
-    public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>>
+    public <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>>
     long count(FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
         var criteriaBuilder = em().getCriteriaBuilder();

@@ -45,6 +45,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Builder;
 import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
+import static java.lang.Math.toIntExact;
 import static lombok.Builder.Default;
 import lombok.Generated;
 import lombok.SneakyThrows;
@@ -102,7 +103,7 @@ public class JPAModelImpl<TT, KK> {
      * add optimizer hints here
      */
     @Default
-    private final @Getter @NonNull Function<TypedQuery<TT>, TypedQuery<TT>> optimizer = (a) -> a;
+    private final @Getter @NonNull Function<TypedQuery<TT>, TypedQuery<TT>> optimizer = a -> a;
 
     /**
      * whether string queries are case-sensitive
@@ -114,17 +115,16 @@ public class JPAModelImpl<TT, KK> {
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
 
     int count(Map<String, FilterMeta> filters) {
-        return daoHelper.get().count(builder -> builder
+        return toIntExact(daoHelper.get().count(builder -> builder
                 .countQueryCriteria(cqc -> cqc.query().where(getFilters(filters, cqc.builder(), cqc.root())))
-                .build());
+                .build()));
     }
 
     List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        return daoHelper.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
-                builder -> builder
-                        .queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
-                        .hints(optimizer::apply)
-                        .build()).getResultList();
+        return optimizer.apply(
+                daoHelper.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
+                        builder -> builder.queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
+                                .build())).getResultList();
     }
 
     public Supplier<EntityManager> getEntityManager() {

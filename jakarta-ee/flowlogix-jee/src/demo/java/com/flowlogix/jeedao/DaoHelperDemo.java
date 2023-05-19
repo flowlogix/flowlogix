@@ -15,6 +15,7 @@
  */
 package com.flowlogix.jeedao;
 
+import com.flowlogix.jeedao.UserDAO.CountAndList;
 import com.flowlogix.jeedao.entities.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -31,20 +32,30 @@ public class DaoHelperDemo {
     ExampleDelegateDAO daoWithDelegate;
     @Inject
     InheritedDAO inheritedDAO;
+    @Inject
+    UserDAO userDAO;
 
-    public int count() {
+    public long count() {
         return dao.count();
     }
 
-    public int injectedCount() {
+    public long injectedCount() {
         return injectedDAO.count();
     }
 
-    public int inheritedCount() {
+    public long inheritedCount() {
         return inheritedDAO.count();
     }
 
     public UserEntity findById(Long id) {
         return daoWithDelegate.find(daoWithDelegate.getEntityClass(), id);
+    }
+
+    public CountAndList enhancedFind(String userName) {
+        return userDAO.countAndList(userName);
+    }
+
+    public UserEntity nativeFind(String criteria) {
+        return userDAO.findByNative(criteria).stream().findFirst().orElseThrow();
     }
 }

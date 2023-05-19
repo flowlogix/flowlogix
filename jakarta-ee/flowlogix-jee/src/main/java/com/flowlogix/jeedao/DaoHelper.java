@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -36,12 +37,14 @@ import lombok.experimental.Delegate;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Lazy.SerializableSupplier;
 
+import static java.lang.Math.toIntExact;
+
 /**
  * Lightweight wrapper around common JPA methods
  * This is the primary class in the {@link com.flowlogix.jeedao} package
  * <p>
- * Main value-add is ability to easily add hints and query criteria to
- * {@link #findAll()} and {@link #findRange(int, int)} methods,
+ * Main value-add is ability to easily query enhancement criteria to
+ * {@link #findAll()} and {@link #findRange(long, long)} methods,
  * as well as {@link #count()} methods
  * <p>
  * Another differentiator is that this class doesn't require inheritance,
@@ -70,7 +73,14 @@ public final class DaoHelper<TT> implements Serializable {
      * @param root
      * @param query
      */
-    public record QueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<TT> query) { }
+    public record QueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<TT> query) {
+        /**
+         * @return partial query criteria, without the JPA {@link CriteriaQuery} object
+         */
+        public PartialQueryCriteria<TT> partial() {
+            return new PartialQueryCriteria<>(builder, root);
+        }
+    }
     /**
      * Specialized <b>Count</b>QueryCriteria record contains
      * {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}{@code <Long>}
@@ -79,7 +89,26 @@ public final class DaoHelper<TT> implements Serializable {
      * @param root
      * @param query
      */
-    public record CountQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<Long> query) { }
+    public record CountQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<Long> query) {
+        /**
+         * @return partial query criteria, without the JPA {@link CriteriaQuery} object
+         */
+        public PartialQueryCriteria<TT> partial() {
+            return new PartialQueryCriteria<>(builder, root);
+        }
+    }
+
+    /**
+     * Partial query criteria, only {@link CriteriaBuilder} and {@link Root}
+     * Used for common enhancing query methods / lambdas
+     * <p>
+     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
+     *
+     * @param builder
+     * @param root
+     * @param <TT>
+     */
+    public record PartialQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root) { }
 
     /**
      * Convenience interface for use with {@link Delegate} when forwarding methods
@@ -91,6 +120,24 @@ public final class DaoHelper<TT> implements Serializable {
         Query createNativeQuery(String sql, Class resultClass);
         Query createNativeQuery(String sql, String resultMapping);
     }
+
+    /**
+     * Convenience interface for use with {@link PartialQueryCriteria}
+     * <p>
+     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
+
+     * @param <TT> Entity Type
+     */
+    public interface QueryEnhancement<TT> extends BiConsumer<PartialQueryCriteria<TT>, CriteriaQuery<?>> { }
+
+    /**
+     * Convenience interface to extract parameter builder into a lambda
+     * @param <TT> Entity Type
+     * <p>
+     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
+     */
+    @FunctionalInterface
+    public interface ParameterFunction<TT> extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>> { }
 
     /**
      * Return entity manager to operate on
@@ -109,30 +156,27 @@ public final class DaoHelper<TT> implements Serializable {
 
     /**
      * Parameters for enriching
-     * {@link #count(Function)}, {@link #findAll(Function)} and {@link #findRange(int, int, Function)}
-     * methods with additional criteria and query hints
+     * {@link #count(Function)}, {@link #findAll(Function)} and {@link #findRange(long, long, Function)}
+     * methods with additional criteria
+     * <p>
+     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
+     *
      * @param <TT> Entity Type
      */
     @Builder
     public static class Parameters<TT> {
         /**
-         * add hints to queries here
+         * query criteria enhancement
          */
         @Default
         @NonNull
-        private final Consumer<TypedQuery<TT>> hints = (tq) -> { };
+        private final Consumer<QueryCriteria<TT>> queryCriteria = c -> { };
         /**
-         * add additional query criteria here
+         * query criteria enhancement for count operation here
          */
         @Default
         @NonNull
-        private final Consumer<QueryCriteria<TT>> queryCriteria = (c) -> { };
-        /**
-         * add additional query criteria for count operation here
-         */
-        @Default
-        @NonNull
-        private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = (c) -> { };
+        private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = c -> { };
     }
 
     public TypedQuery<TT> findAll() {
@@ -140,11 +184,13 @@ public final class DaoHelper<TT> implements Serializable {
     }
 
     /**
-     * find all with enriched criteria and hints
+     * find all with enriched criteria
      * <p>
      * Example:
      * <p>
      * {@code findAll(builder -> builder.build())}
+     * <p>
+     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
      *
      * @param paramsBuilder
      * @return query
@@ -152,17 +198,15 @@ public final class DaoHelper<TT> implements Serializable {
     public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>> TypedQuery<TT>
     findAll(FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
-        TypedQuery<TT> tq = createFindQuery(params);
-        params.hints.accept(tq);
-        return tq;
+        return createFindQuery(params);
     }
 
-    public TypedQuery<TT> findRange(int min, int max) {
+    public TypedQuery<TT> findRange(long min, long max) {
         return findRange(min, max, builder -> builder.build());
     }
 
     /**
-     * find range with enriched criteria and hints
+     * find range with enriched criteria
      *
      * @param min
      * @param max
@@ -170,12 +214,11 @@ public final class DaoHelper<TT> implements Serializable {
      * @return query
      */
     public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>>
-    TypedQuery<TT> findRange(int min, int max, FF paramsBuilder) {
+    TypedQuery<TT> findRange(long min, long max, FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
         TypedQuery<TT> tq = createFindQuery(params);
-        tq.setMaxResults(max - min);
-        tq.setFirstResult(min);
-        params.hints.accept(tq);
+        tq.setMaxResults(toIntExact(max - min));
+        tq.setFirstResult(toIntExact(min));
         return tq;
     }
 
@@ -183,24 +226,25 @@ public final class DaoHelper<TT> implements Serializable {
      * count rows
      * @return row count
      */
-    public int count() {
+    public long count() {
         return count(builder -> builder.build());
     }
 
     /**
-     * count with enriched criteria and hints
+     * count with enriched criteria
      * @param paramsBuilder
      * @return row count
      */
     public <FF extends Function<Parameters.ParametersBuilder<TT>, Parameters<TT>>>
-    int count(FF paramsBuilder) {
+    long count(FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
-        CriteriaQuery<Long> cq = em().getCriteriaBuilder().createQuery(Long.class);
+        var criteriaBuilder = em().getCriteriaBuilder();
+        CriteriaQuery<Long> cq = criteriaBuilder.createQuery(Long.class);
         Root<TT> rt = cq.from(entityClass);
-        cq.select(em().getCriteriaBuilder().count(rt));
-        params.countQueryCriteria.accept(new CountQueryCriteria<>(em().getCriteriaBuilder(), rt, cq));
+        cq.select(criteriaBuilder.count(rt));
+        params.countQueryCriteria.accept(new CountQueryCriteria<>(criteriaBuilder, rt, cq));
         TypedQuery<Long> q = em().createQuery(cq);
-        return q.getSingleResult().intValue();
+        return q.getSingleResult();
     }
 
     /**
@@ -244,11 +288,29 @@ public final class DaoHelper<TT> implements Serializable {
         return new QueryCriteria<>(cb, cq.from(cls), cq);
     }
 
+    /**
+     * Creates a type-safe JPA native query
+     * <p>
+     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "nativeQuery"}
+     *
+     * @param sql
+     * @param resultClass {@link EntityManager#createNativeQuery(String, Class)}
+     * @return {@link TypedNativeQuery}
+     */
     public TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass) {
         Query q = em().createNativeQuery(sql, resultClass);
         return new TypedNativeQuery(q);
     }
 
+    /**
+     * Creates a type-safe JPA native query
+     * <p>
+     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "nativeQuery"}
+     *
+     * @param sql
+     * @param resultMapping {@link EntityManager#createNativeQuery(String, String)}
+     * @return {@link TypedNativeQuery}
+     */
     public TypedNativeQuery createNativeQuery(String sql, String resultMapping) {
         Query q = em().createNativeQuery(sql, resultMapping);
         return new TypedNativeQuery(q);
@@ -280,10 +342,9 @@ public final class DaoHelper<TT> implements Serializable {
 
 
     private TypedQuery<TT> createFindQuery(Parameters<TT> params) {
-        CriteriaQuery<TT> cq = em().getCriteriaBuilder().createQuery(entityClass);
-        Root<TT> root = cq.from(entityClass);
-        cq.select(root);
-        params.queryCriteria.accept(new QueryCriteria<>(em().getCriteriaBuilder(), root, cq));
-        return em().createQuery(cq);
+        var qc = buildQueryCriteria();
+        qc.query().select(qc.root());
+        params.queryCriteria.accept(new QueryCriteria<>(qc.builder(), qc.root(), qc.query()));
+        return em().createQuery(qc.query());
     }
 }

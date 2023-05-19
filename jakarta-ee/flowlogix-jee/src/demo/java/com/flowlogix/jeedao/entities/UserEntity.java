@@ -31,4 +31,7 @@ public class UserEntity {
     @GeneratedValue
     @Column
     private Long id;
+
+    @Column
+    private String userName;
 }

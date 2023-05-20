@@ -157,6 +157,17 @@ public final class DaoHelper<TT> implements Serializable {
         default void accept(CountQueryCriteria<TT> criteria) {
             accept(criteria.partial(), criteria.query());
         }
+
+        /**
+         * Allows for combinations of enhancements via method references
+         * @see BiConsumer#andThen(BiConsumer)
+         *
+         * @param after
+         * @return combination lambda
+         */
+        default QueryEnhancement<TT> andThen(QueryEnhancement<TT> after) {
+            return (l, r) -> BiConsumer.super.andThen(after).accept(l, r);
+        }
     }
 
     /**

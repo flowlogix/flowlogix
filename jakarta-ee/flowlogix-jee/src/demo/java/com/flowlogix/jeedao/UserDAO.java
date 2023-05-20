@@ -36,7 +36,7 @@ public class UserDAO {
     DaoHelper<UserEntity> helper;
     // @start region="daoParameters"
     // tag::daoParameters[] // @replace regex='.*\n' replacement=""
-    record CountAndList(long count, List<UserEntity> list) { };
+    public record CountAndList(long count, List<UserEntity> list) { };
     public CountAndList countAndList(String userName) {
         // add "where userName = 'userName'" clause
         QueryEnhancement<UserEntity> enhancement = (partial, criteria) -> criteria
@@ -63,7 +63,7 @@ public class UserDAO {
 
         ParameterFunction<UserEntity> params = builder -> builder
                 .countQueryCriteria(enhancement::accept)
-                .queryCriteria(var -> enhancement.andThen(orderBy))
+                .queryCriteria(enhancement.andThen(orderBy)::accept)
                 .build();
 
         return new CountAndList(helper.count(params), helper.findAll(params)

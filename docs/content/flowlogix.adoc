@@ -290,6 +290,12 @@ public static WebArchive deploy() {
 ----
 The second parameter is DOM `Node` class `Consumer` lambda, which allows for manipulation of the DOM element directly by the user. +
 Above, we also combine `web.xml` manipulation with `jakartify` to be compatible with both Jakarta EE 8 or 9, if desired.
+[source,java]
+.Example of manipulation of `persistence.xml` file
+----
+TBD
+----
+
 
 [[section-jpa-lazymodel]]
 === FlowLogix PrimeFaces Lazy Data Model backed by JPA

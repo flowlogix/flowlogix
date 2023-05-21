@@ -78,7 +78,6 @@
             <version>${project.version}</version>
             <type>test-jar</type>
             <classifier>tests</classifier>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

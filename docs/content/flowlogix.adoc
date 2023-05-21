@@ -102,49 +102,49 @@ These methods are built into the EntityManager and can be accessed that way (see
 [source,java]
 .Simple DAO Example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/ExampleDAO.java[tags=simpleExampleDAO,indent=0]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/ExampleDAO.java[tags=simpleExampleDAO,indent=0]
 ----
 [source,java]
 .Injected DAO example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InjectedDAO.java[tags=injectedExampleDAO,ident=0]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InjectedDAO.java[tags=injectedExampleDAO,ident=0]
 ----
 [source,java]
 .Non-Default annotation example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/NonDefault.java[tags=nonDefault,indent=0]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/NonDefault.java[tags=nonDefault,indent=0]
 ----
 [source,java]
 .Non-Default EntityManager injection example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InjectedEntityManager.java[tags=injectedEntityManager]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InjectedEntityManager.java[tags=injectedEntityManager]
 ----
 [source,java]
 .Injected DAO with non-default EntityManager
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InjectedNonDefaultDAO.java[tags=injectedNonDefaultExampleDAO,ident=0]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InjectedNonDefaultDAO.java[tags=injectedNonDefaultExampleDAO,ident=0]
 ----
 [source,java]
 .More complete DAO example that forwards `EntityManager` methods
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/ExampleDelegateDAO.java[tags=delegateDAO]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/ExampleDelegateDAO.java[tags=delegateDAO]
 ----
 [source,java]
 .Non-default EntityManager Producer example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/EntityManagerProducer.java[tags=nonDefaultEntityProducer,ident=0]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/EntityManagerProducer.java[tags=nonDefaultEntityProducer,ident=0]
 ----
 NOTE: `@NonDefault` annotation can be removed to use it as a Default producer. If there is only one Persistence Unit, `unitName` can be also omitted.
 [source,java]
 .EJB Stateless EntityManager Producer example (optimization)
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/StatelessEntityManagerProducer.java[tags=statelessEntityProducer,ident=0]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/StatelessEntityManagerProducer.java[tags=statelessEntityProducer,ident=0]
 ----
 The example above works well if `@RequestScope` is unavailable and may work better because of EJB bean pooling optimizations.
 [source,java]
 .Inherited DaoHelper example (not recommeded)
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/InheritedDAO.java[tags=inheritedDAO]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InheritedDAO.java[tags=inheritedDAO]
 ----
 
 .Enhanced Finder and count methods
@@ -152,12 +152,12 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/Inher
 [source,java]
 .Enhanced query and hints example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/UserDAO.java[tags=daoParameters,indent=0]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoParameters,indent=0]
 ----
 [source,java]
 .Enhanced query with customized parameters
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/UserDAO.java[tags=daoExtractedParameters,indent=0]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoExtractedParameters,indent=0]
 ----
 
 [[section-nativequery]]
@@ -166,7 +166,7 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/UserD
 [source,java]
 .Native Query Example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/jeedao/UserDAO.java[tags=nativeQuery,indent=0]
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=nativeQuery,indent=0]
 ----
 
 [[section-jsf]]

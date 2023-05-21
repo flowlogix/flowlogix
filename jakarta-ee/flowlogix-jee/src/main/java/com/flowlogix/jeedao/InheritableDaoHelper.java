@@ -22,7 +22,7 @@ import lombok.experimental.Delegate;
  * This is an alternative to {@link DaoHelper}, which does not have requirements
  * for inheritance. {@link DaoHelper} is the preferred method of implementing DAOs.
  * <p>
- * {@snippet class="com.flowlogix.jeedao.InheritedDAO" region="inheritedDAO"}
+ * {@snippet class="com.flowlogix.demo.jeedao.InheritedDAO" region="inheritedDAO"}
  *
  * @see DaoHelper
  * @param <TT> Entity Type

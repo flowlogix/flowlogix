@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.examples.entities;
+package com.flowlogix.demo.jeedao.entities;
 
 import java.io.Serializable;
 import jakarta.persistence.Entity;
@@ -25,8 +25,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- *
- * @author lprimak
+ * Example entity, representing user ID
  */
 @Entity
 @Data

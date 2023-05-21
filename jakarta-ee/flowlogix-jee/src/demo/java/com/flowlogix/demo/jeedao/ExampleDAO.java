@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.demo.jeedao;
 
+import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.demo.jeedao.entities.UserEntity;
 import jakarta.ejb.Stateless;
-import jakarta.ejb.TransactionAttribute;
-import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.Getter;
-import static jakarta.ejb.TransactionAttributeType.SUPPORTS;
+import lombok.experimental.Delegate;
 
-// @start region="statelessEntityProducer"
-// tag::statelessEntityProducer[] // @replace regex='.*\n' replacement=""
+// @start region="simpleExampleDAO"
+// tag::simpleExampleDAO[] // @replace regex='.*\n' replacement=""
 @Stateless
-@TransactionAttribute(SUPPORTS)
-public class StatelessEntityManagerProducer {
-    @Getter(onMethod = @__({@Produces, @NonDefault}))
-    @PersistenceContext(unitName = "nonDefault")
-    EntityManager entityManager;
+public class ExampleDAO {
+    @PersistenceContext(unitName = "demo-pu")
+    EntityManager em;
+    @Delegate
+    DaoHelper<UserEntity> helper = new DaoHelper<>(() -> em, UserEntity.class);
 }
-// end::statelessEntityProducer[] // @replace regex='.*\n' replacement=""
+// end::simpleExampleDAO[] // @replace regex='.*\n' replacement=""
 // @end

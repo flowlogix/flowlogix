@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.demo.jeedao;
 
-import jakarta.inject.Qualifier;
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
-// @start region="NonDefault"
-// tag::nonDefault[] // @replace regex='.*\n' replacement=""
-@Qualifier
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-public @interface NonDefault {
+// @start region="nonDefaultEntityProducer"
+// tag::nonDefaultEntityProducer[] // @replace regex='.*\n' replacement=""
+@RequestScoped
+public class EntityManagerProducer {
+    @Produces
+    @NotDefault
+    @PersistenceContext(unitName = "nonDefault")
+    EntityManager entityManager;
 }
-// end::nonDefault[] // @replace regex='.*\n' replacement=""
+// end::nonDefaultEntityProducer[] // @replace regex='.*\n' replacement=""
 // @end

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.demo.jeedao;
 
-import com.flowlogix.jeedao.UserDAO.CountAndList;
-import com.flowlogix.jeedao.entities.UserEntity;
+import com.flowlogix.demo.jeedao.UserDAO.CountAndList;
+import com.flowlogix.demo.jeedao.entities.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -55,7 +55,7 @@ public class DaoHelperDemo {
         return userDAO.countAndList(userName);
     }
 
-    public UserEntity nativeFind(String criteria) {
-        return userDAO.findByNative(criteria).stream().findFirst().orElseThrow();
+    public UserEntity nativeFind(String sql) {
+        return userDAO.findByNative(sql).stream().findFirst().orElseThrow();
     }
 }

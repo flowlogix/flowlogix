@@ -28,6 +28,6 @@ import static jakarta.ejb.TransactionAttributeType.SUPPORTS;
 @TransactionAttribute(SUPPORTS)
 public class EntityManagerProducer {
     @Getter(onMethod = @__({@Produces, @Default, @AnotherEntityManager}))
-    @PersistenceContext
+    @PersistenceContext(unitName = "pu")
     EntityManager entityManager;
 }

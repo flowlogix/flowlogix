@@ -87,6 +87,17 @@
                 </executions>
             </plugin>
             <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
             <plugin>
@@ -226,8 +237,9 @@
                         <exclude>com/flowlogix/**/*IT$*</exclude>
                         <exclude>com/flowlogix/**/__EJB31_Generated*</exclude>
                         <!-- cause too many coverage misses -->
-                        <exclude>com.flowlogix/examples/entities/*</exclude>
-                        <exclude>com.flowlogix/examples/Deployments</exclude>
+                        <exclude>com/flowlogix/examples/**</exclude>
+                        <exclude>com/flowlogix/demo/**</exclude>
+                        <exclude>com/flowlogix/logcapture/**</exclude>
                     </excludes>
                     <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
                     <address>localhost</address>

@@ -15,8 +15,8 @@
  */
 package com.flowlogix.examples.data;
 
-import com.flowlogix.examples.entities.UserEntity;
-import com.flowlogix.examples.entities.UserEntity_;
+import com.flowlogix.demo.jeedao.entities.UserEntity;
+import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.replaceFilter;

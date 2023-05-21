@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.demo.jeedao;
 
-import com.flowlogix.jeedao.entities.UserEntity;
-import jakarta.annotation.PostConstruct;
-import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
+import jakarta.inject.Qualifier;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-// @start region="inheritedDAO"
-// tag::inheritedDAO[] // @replace regex='.*\n' replacement=""
-@Stateless
-public class InheritedDAO extends InheritableDaoHelper<UserEntity> {
-    @Inject
-    EntityManager entityManager;
-
-    @PostConstruct
-    void init() {
-        daoHelper = new DaoHelper<>(() -> entityManager, UserEntity.class);
-    }
+// @start region="NonDefault"
+// tag::nonDefault[] // @replace regex='.*\n' replacement=""
+@Qualifier
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+public @interface NonDefault {
 }
-// end::inheritedDAO[] // @replace regex='.*\n' replacement=""
+// end::nonDefault[] // @replace regex='.*\n' replacement=""
 // @end

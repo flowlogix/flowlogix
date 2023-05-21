@@ -107,14 +107,12 @@ public class LookupIT {
         return ShrinkWrap.create(WebArchive.class, "LookupTest.war")
                 .addPackages(true, "org.omnifaces")
                 .addPackages(true, "com.flowlogix")
+                .deletePackages(true, "com.flowlogix.demo")
                 .deletePackages(true, "com.flowlogix.examples.data")
                 .deletePackages(true, "com.flowlogix.examples.entities")
                 .deletePackages(true, "com.flowlogix.examples.ui")
                 .deletePackages(true, "com.flowlogix.logcapture")
-                .deletePackages(true, "com.flowlogix.shiro")
-                .deletePackages(true, "com.flowlogix.examples.shiro")
                 .deletePackages(true, "com.flowlogix.jeedao")
-                .deletePackages(true, "org.omnifaces.persistence")
                 .deleteClass(ExceptionPageIT.class);
     }
 }

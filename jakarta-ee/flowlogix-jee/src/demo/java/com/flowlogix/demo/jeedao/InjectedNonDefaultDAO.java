@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.demo.jeedao;
 
-import com.flowlogix.jeedao.entities.UserEntity;
+import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.jeedao.EntityManagerSelector;
+import com.flowlogix.demo.jeedao.entities.UserEntity;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;

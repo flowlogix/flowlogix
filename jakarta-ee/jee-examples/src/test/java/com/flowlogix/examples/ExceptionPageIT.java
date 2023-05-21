@@ -19,11 +19,16 @@ import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Properties;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.codehaus.plexus.util.StringUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
@@ -51,6 +56,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  */
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
+@RunAsClient
+@Slf4j
 public class ExceptionPageIT {
     static final String DEPLOYMENT_DEV_MODE = "DevMode";
     static final String DEPLOYMENT_PROD_MODE = "ProdMode";
@@ -186,7 +193,7 @@ public class ExceptionPageIT {
         assertEquals(2, count);
     }
 
-    @Deployment(testable = false, name = DEPLOYMENT_DEV_MODE)
+    @Deployment(name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeploymentDev() {
         return createDeploymentDev("ExceptionPageTest.war");
     }
@@ -194,22 +201,36 @@ public class ExceptionPageIT {
     static WebArchive createDeploymentDev(String archiveName) {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
-                .as(WebArchive.class);
+                .as(WebArchive.class)
+                .addClass(DaoHelperIT.class);
+
+        filterPersistenceXML(archive);
+        log.debug("Archive contents: {}", archive.toString(true));
         return archive;
     }
 
-    @Deployment(testable = false, name = DEPLOYMENT_PROD_MODE)
+    @Deployment(name = DEPLOYMENT_PROD_MODE)
     public static WebArchive createDeploymentProd() {
         return createDeploymentProd("ExceptionPageTest-prod.war");
     }
 
     static WebArchive createDeploymentProd(String archiveName) {
-        WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
-                .loadPomFromFile("pom.xml").importBuildOutput()
-                .as(WebArchive.class);
+        WebArchive archive = createDeploymentDev(archiveName);
         var productionList = List.of(new Action(getContextParamValue("jakarta.faces.PROJECT_STAGE"),
                 node -> node.setTextContent("Production")));
         new ShrinkWrapManipulator().webXmlXPath(archive, productionList);
         return archive;
+    }
+
+    @SneakyThrows(IOException.class)
+    static void filterPersistenceXML(WebArchive archive) {
+        try (var propStream = archive.get("WEB-INF/classes/git.properties").getAsset().openStream()) {
+            var props = new Properties();
+            props.load(propStream);
+            String version = props.getProperty("git.build.version");
+            new ShrinkWrapManipulator().persistenceXmlPath(archive,
+                    List.of(new Action("//persistence/persistence-unit/jar-file",
+                            node -> node.setTextContent(String.format("lib/flowlogix-jee-%s-tests.jar", version)))));
+        }
     }
 }

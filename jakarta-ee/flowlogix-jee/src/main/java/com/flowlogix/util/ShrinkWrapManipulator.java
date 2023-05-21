@@ -59,33 +59,33 @@ public class ShrinkWrapManipulator {
     private final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
 
     /**
-     * modified web.xml according to xpath and method
+     * modifies web.xml according to xpath and method
      *
      * @param archive to modify
      * @param actions list of actions to perform
      */
     @SneakyThrows
     public void webXmlXPath(WebArchive archive, List<Action> actions) {
-        Document webXml;
-        try (InputStream strm = archive.get("WEB-INF/web.xml").getAsset().openStream()) {
-            webXml = builder.get().parse(strm);
-        }
-        var xpath = XPathFactory.newInstance().newXPath();
-        for (Action action : actions) {
-            var expr = xpath.compile(action.path);
-            Node node = (Node) expr.evaluate(webXml, XPathConstants.NODE);
-            if (node == null && action.optional) {
-                log.debug("Optional path {} ignored", action.path);
-            } else {
-                action.func.accept(node);
-            }
-        }
-        StringWriter writer = new StringWriter();
-        transformer.get().transform(new DOMSource(webXml), new StreamResult(writer));
-        String newXmlText = writer.getBuffer().toString();
-        archive.setWebXML(new StringAsset(newXmlText));
+        var asset = "WEB-INF/web.xml";
+        archive.setWebXML(new StringAsset(parseXml(archive, actions, asset)));
     }
 
+    /**
+     * modifies persistense.xml according to xpath and method
+     *
+     * @param archive to modify
+     * @param actions list of actions to perform
+     */
+    public void persistenceXmlPath(WebArchive archive, List<Action> actions) {
+        var asset = "META-INF/persistence.xml";
+        archive.addAsResource(new StringAsset(parseXml(archive, actions, "WEB-INF/classes/" + asset)), asset);
+    }
+
+    /**
+     * Transform http to https URL using {@code sslPort} system property
+     * @param httpUrl
+     * @return https URL
+     */
     @SneakyThrows
     public static URL toHttpsURL(URL httpUrl) {
         if (httpUrl.getProtocol().endsWith("//")) {
@@ -96,8 +96,35 @@ public class ShrinkWrapManipulator {
         return new URL(httpUrl.getProtocol() + "s", httpUrl.getHost(), sslPort, httpUrl.getFile());
     }
 
+    /**
+     * Constructs XPath for web.xml context param
+     *
+     * @param paramName
+     * @return XPath for web.xml context param
+     */
     public static String getContextParamValue(String paramName) {
         return String.format("//web-app/context-param[param-name = '%s']/param-value", paramName);
+    }
+
+    @SneakyThrows
+    private String parseXml(WebArchive archive, List<Action> actions, String xmlFile) {
+        Document xmlDocument;
+        try (InputStream strm = archive.get(xmlFile).getAsset().openStream()) {
+            xmlDocument = builder.get().parse(strm);
+        }
+        var xpath = XPathFactory.newInstance().newXPath();
+        for (Action action : actions) {
+            var expr = xpath.compile(action.path);
+            Node node = (Node) expr.evaluate(xmlDocument, XPathConstants.NODE);
+            if (node == null && action.optional) {
+                log.debug("Optional path {} ignored", action.path);
+            } else {
+                action.func.accept(node);
+            }
+        }
+        StringWriter writer = new StringWriter();
+        transformer.get().transform(new DOMSource(xmlDocument), new StreamResult(writer));
+        return writer.getBuffer().toString();
     }
 
     @SneakyThrows

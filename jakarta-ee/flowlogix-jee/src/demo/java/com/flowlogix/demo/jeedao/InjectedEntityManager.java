@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.demo.jeedao;
 
-import jakarta.inject.Qualifier;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-@Qualifier
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-public @interface NotDefault {
+/**
+ * Demonstrates injecting {@link EntityManager}
+ */
+// @start region="injectedEntityManager"
+// tag::injectedEntityManager[] // @replace regex='.*\n' replacement=""
+@Stateless
+public class InjectedEntityManager {
+    @Inject
+    @NonDefault
+    EntityManager entityManager;
 }
+// end::injectedEntityManager[] // @replace regex='.*\n' replacement=""
+// @end

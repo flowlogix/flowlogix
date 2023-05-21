@@ -24,6 +24,7 @@
         <jakarta.ee.version>10.0.0</jakarta.ee.version>
         <arquillian.version>1.7.0.Final</arquillian.version>
         <flowlogix.version>${project.version}</flowlogix.version>
+        <demo.entity.jar>lib/flowlogix-jee-${flowlogix.version}-tests.jar</demo.entity.jar>
     </properties>
 
     <!-- tag::dependenciesStart[] -->
@@ -71,6 +72,14 @@
         </dependency>
 
         <!-- test dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>flowlogix-jee</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <classifier>tests</classifier>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -182,6 +191,12 @@
     <!-- end::depManagementEnd[] -->
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>

@@ -51,13 +51,13 @@ import static java.lang.Math.toIntExact;
  * although some use cases could inherit from {@link InheritableDaoHelper} class.
  * <p>
  * <em>Simple Example:</em>
- * {@snippet class="com.flowlogix.jeedao.ExampleDAO" region="simpleExampleDAO"}
+ * {@snippet class="com.flowlogix.demo.jeedao.ExampleDAO" region="simpleExampleDAO"}
  * <p>
  * <em>Injected Example:</em>
- * {@snippet class="com.flowlogix.jeedao.InjectedDAO" region="injectedExampleDAO"}
+ * {@snippet class="com.flowlogix.demo.jeedao.InjectedDAO" region="injectedExampleDAO"}
  * <p>
  * <em>Injected Example with non-default EntityManager:</em>
- * {@snippet class="com.flowlogix.jeedao.InjectedNonDefaultDAO" region="injectedNonDefaultExampleDAO"}
+ * {@snippet class="com.flowlogix.demo.jeedao.InjectedNonDefaultDAO" region="injectedNonDefaultExampleDAO"}
  *
  * @param <TT> Entity Type
  *
@@ -102,7 +102,7 @@ public final class DaoHelper<TT> implements Serializable {
      * Partial query criteria, only {@link CriteriaBuilder} and {@link Root}
      * Used for common enhancing query methods / lambdas
      * <p>
-     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
      *
      * @param builder
      * @param root
@@ -114,7 +114,7 @@ public final class DaoHelper<TT> implements Serializable {
      * Convenience interface for use with {@link Delegate} when forwarding methods
      * of {@link EntityManager} so DaoHelper's own methods get exposed correctly
      * <p>
-     * {@snippet class = "com.flowlogix.jeedao.ExampleDelegateDAO" region = "delegateDAO"}
+     * {@snippet class = "com.flowlogix.demo.jeedao.ExampleDelegateDAO" region = "delegateDAO"}
      */
     public interface EntityManagerExclusions {
         Query createNativeQuery(String sql, Class resultClass);
@@ -124,7 +124,7 @@ public final class DaoHelper<TT> implements Serializable {
     /**
      * Convenience interface for use with {@link PartialQueryCriteria}
      * <p>
-     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
 
      * @param <TT> Entity Type
      */
@@ -174,7 +174,7 @@ public final class DaoHelper<TT> implements Serializable {
      * Convenience interface to extract parameter builder into a lambda
      * @param <TT> Entity Type
      * <p>
-     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
      */
     @FunctionalInterface
     public interface ParameterFunction<TT> extends Function<ParametersBuilder<TT>, Parameters<TT>> { }
@@ -199,7 +199,7 @@ public final class DaoHelper<TT> implements Serializable {
      * {@link #count(Function)}, {@link #findAll(Function)} and {@link #findRange(long, long, Function)}
      * methods with additional criteria
      * <p>
-     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
      *
      * @param <TT> Entity Type
      */
@@ -230,7 +230,7 @@ public final class DaoHelper<TT> implements Serializable {
      * <p>
      * {@code findAll(builder -> builder.build())}
      * <p>
-     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "daoParameters"}
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
      *
      * @param paramsBuilder
      * @return query
@@ -331,7 +331,7 @@ public final class DaoHelper<TT> implements Serializable {
     /**
      * Creates a type-safe JPA native query
      * <p>
-     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "nativeQuery"}
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "nativeQuery"}
      *
      * @param sql
      * @param resultClass {@link EntityManager#createNativeQuery(String, Class)}
@@ -345,7 +345,7 @@ public final class DaoHelper<TT> implements Serializable {
     /**
      * Creates a type-safe JPA native query
      * <p>
-     * {@snippet class = "com.flowlogix.jeedao.UserDAO" region = "nativeQuery"}
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "nativeQuery"}
      *
      * @param sql
      * @param resultMapping {@link EntityManager#createNativeQuery(String, String)}

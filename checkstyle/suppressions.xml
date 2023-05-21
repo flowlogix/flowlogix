@@ -27,6 +27,7 @@
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]ui[\\/]*"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]util[\\/]*"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]jeedao[\\/]*"/>
+    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]demo[\\/]jeedao[\\/]*"/>
     <suppress checks="JavadocPackage" files="org[\\/]omnifaces[\\/]util[\\/]*"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]shiro[\\/]ee[\\/]*"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]jeedao[\\/]primefaces[\\/]JPALazyDataModel"/>

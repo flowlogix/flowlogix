@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.demo.jeedao;
 
-import com.flowlogix.jeedao.entities.UserEntity;
+import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.jeedao.DaoHelper.EntityManagerExclusions;
+import com.flowlogix.demo.jeedao.entities.UserEntity;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import lombok.experimental.Delegate;
 
-/**
- * Demonstrates injecting {@link DaoHelper} using default {@link EntityManager}
- */
-// @start region="injectedExampleDAO"
-// tag::injectedExampleDAO[] // @replace regex='.*\n' replacement=""
+// @start region="delegateDAO"
+// tag::delegateDAO[] // @replace regex='.*\n' replacement=""
 @Stateless
-public class InjectedDAO {
+public class ExampleDelegateDAO {
+    @Inject
+    @Delegate(excludes = EntityManagerExclusions.class)
+    EntityManager entityManager;
     @Inject
     @Delegate
     DaoHelper<UserEntity> helper;
 }
-// end::injectedExampleDAO[] // @replace regex='.*\n' replacement=""
+// end::delegateDAO[] // @replace regex='.*\n' replacement=""
 // @end

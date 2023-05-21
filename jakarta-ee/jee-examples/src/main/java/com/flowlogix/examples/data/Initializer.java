@@ -15,9 +15,9 @@
  */
 package com.flowlogix.examples.data;
 
-import com.flowlogix.examples.entities.UserEntity;
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.EntityManagerSelector;
+import com.flowlogix.demo.jeedao.entities.UserEntity;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;

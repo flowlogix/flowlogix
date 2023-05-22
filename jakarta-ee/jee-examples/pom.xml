@@ -34,14 +34,14 @@
         <dependency>
             <groupId>com.flowlogix</groupId>
             <artifactId>flowlogix-jee</artifactId>
-            <version>${flowlogix.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- end::jeeDependency[] -->
         <!-- tag::datamodelDependency[] -->
         <dependency>
             <groupId>com.flowlogix</groupId>
             <artifactId>flowlogix-datamodel</artifactId>
-            <version>${flowlogix.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- end::datamodelDependency[] -->
         <dependency>

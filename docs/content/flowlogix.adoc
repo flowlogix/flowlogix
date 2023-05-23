@@ -16,7 +16,7 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Provides automatic DAO functionality with delegation and without inheritance
 * Adds Type-safe Native SQL query with JPA via generics
 * Declares Jakarta Faces PROJECT_STAGE development mode automatically
-* Automatically uses minimized versions of assets with Jakarta Faces
+* Automatically uses minified versions of assets with Jakarta Faces
 * Provides easy and automatic initialization of OmniFaces' UnmappedResourceHandler
 * Easier-to-use JPA Lazy Data Model for PrimeFaces
 * Automatically includes PrimeFaces font mime types in your web applications, preventing warnings and extra entries in your web.xml
@@ -184,8 +184,10 @@ $ asadmin set resources.custom-resource.faces/ProjectStage.property.value=Produc
 With Jakarta EE or Java EE 8 and earlier, replace `faces/` with `jsf/`.
 
 ==== Jakarta Faces: Use minified assets automatically in production mode
-Most front-end applications want to use minified versions of their assets, such as JavaScript and CSS files in production. FlowLogix allows this via `MinimizedHandler` which will automatically insert `min` prefix into the appropriate assets, for example `resource.js -> resource.min.js` and `resource.css -> resource.min.css`.
+Most front-end applications want to use minified versions of their assets, such as JavaScript and CSS files in production (i.e. any non-development) modes. FlowLogix allows this via `MinimizedHandler` which will automatically insert `min` prefix into the appropriate assets, for example `resource.js -> resource.min.js` and `resource.css -> resource.min.css`.
 This is configurable via web.xml parameters `com.flowlogix.MINIMIZED_PREFIX` and `com.flowlogix.MINIMIZED_FILE_TYPES`
+
+`MinimizedHandler` works with build tools that generate minified versions of resources automatically, such as https://samaxes.github.io/minify-maven-plugin[maven minify plugin^].
 
 [source,xml]
 .faces-config.xml
@@ -194,31 +196,41 @@ This is configurable via web.xml parameters `com.flowlogix.MINIMIZED_PREFIX` and
     <resource-handler>com.flowlogix.ui.MinimizedHandler</resource-handler>
 </application>
 ----
-
+Any configured Jakarta Faces resources are resolved to their minified versions
 [source,xml]
-.index.xhtml
+.index.xhtml: automatically resolves to `myjavascript.min.js`
 ----
 <h:outputScript name="myjavascript.js"/>
 ----
-
+[source,css]
+.Importing automatically resolves to `other.min.css`
+----
+@import url("#{resource['css/other.css']}");
+----
+By default, only resources with css and js extensions are resolved to their minified versions. The `min` extension is inserted prior to their original extension.
 [source,xml]
-.web.xml
+.web.xml: change the default `.min` to `.minimized`
 ----
 <context-param>
     <param-name>com.flowlogix.MINIMIZED_PREFIX</param-name>
     <param-value>minimized</param-value>
 </context-param>
+----
+The above example changes resolution from `mycss.css` -> `mycss.min.css` to `mycss.css` -> `mycss.minimized.css`
 
-<!-- Optional, default is "css,js" -->
+[source,xml]
+.Override extensions that are resolved to their minimized versions
+----
+<!-- Optional, default is "css, js" -->
 <context-param>
     <param-name>com.flowlogix.MINIMIZED_FILE_TYPES</param-name>
-    <param-value>css,js,tsx, sass, less</param-value>
+    <param-value>css, js, tsx, sass, scss, less</param-value>
 </context-param>
 ----
 
 [[section-omnifaces]]
 ==== OmniFaces: Automatic initialization of _UnmappedResourceHandler_
-In order to initialize https://showcase.omnifaces.org/resourcehandlers/UnmappedResourceHandler[OmniFaces' UnmappedResourceHandler], both `web.xml` and `faces.xml` entries are ordinarily required. FlowLogix automates a more complicated `web.xml` requirements by automatically configuring the servlet container to include all resources. In order to enable this, add the below context parameter in `web.xml`:
+In order to initialize https://showcase.omnifaces.org/resourcehandlers/UnmappedResourceHandler[OmniFaces' UnmappedResourceHandler], both `web.xml` `servlet-mapping` and `faces.xml` entries are ordinarily required. FlowLogix automates more complicated `web.xml` requirements by configuring the servlet container to include all unmapped resources. This alleviates requirement to specify `Faces Servlet` mapping in your `web.xml` file at all. In order to enable this, add the below context parameter in `web.xml`:
 [source,xml]
 ----
 <context-param>
@@ -240,10 +252,20 @@ This way, no extra `mime-mapping` entries are required in `web.xml`
 ==== Type Converter, Serialization Tester and Integration Test Helper
 .Convert Strings to arbitrary types
 Most classes that can be constructed from `String` include `valueOf(String)` method by convention.
-`TypeConverter` class uses this to generically convert a String to any type specified.
+`TypeConverter` class uses this to generically convert a String to any type specified, thus dramatically reducing the code required.
 If unable to convert the class, an exception is thrown. +
 `TypeConverter` specifically does _not_ support custom converters for simplicity.
 If those are desired, other libraries do a great job of handling custom converters, including Jakarta Faces' Converters.
+[source,java]
+.Generically and dynamically transform a `String` to any class, throws an exception if failed
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/TypeConverterDemo.java[tags=typeConvert,indent=0]
+----
+[source,java]
+.Convert and check if returned value matches the input after the conversion, without throwing any exceptions
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/TypeConverterDemo.java[tags=checkTypeConvert,indent=0]
+----
 
 .Transform java -> jakarta namespace at run-time (jakartify)
 FlowLogix provides a convenience method for converting strings from `javax` to `jakarta` namespace:

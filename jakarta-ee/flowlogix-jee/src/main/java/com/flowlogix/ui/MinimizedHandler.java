@@ -27,8 +27,8 @@ import org.omnifaces.resourcehandler.DefaultResourceHandler;
 import org.omnifaces.util.Faces;
 
 /**
- * Automatically transforms CSS / JS, etc. resource URLs to there minimized versions in non-development mode.
- * In it's default form, it will transform my.js into my.min.js or my.css into my.min.css
+ * Automatically resolves CSS / JS, etc. resource URLs to there minimized versions in non-development mode.
+ * In its default form, it will resolve my.js into my.min.js or my.css into my.min.css
  * This works for JSF resource references only, as this is a JSF handler
  * <p>
  * Works together with Maven minimize plugin, or other build tools what will generate
@@ -55,7 +55,7 @@ import org.omnifaces.util.Faces;
  *   <!-- Optional, default is "css,js" -->
  *   <context-param>
  *       <param-name>com.flowlogix.MINIMIZED_FILE_TYPES</param-name>
- *       <param-value>css,js,tsx, sass, less</param-value>
+ *       <param-value>css, js, tsx, scss, sass, less</param-value>
  *   </context-param>
  * }
  * </pre>

@@ -39,17 +39,16 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Converts from any String to any type dynamically,
- * using static <p>{@code valueOf(String input)} method of the target type
+ * using {@code static valueOf(String input)} method of the target type,
+ * or other methods with equivalent functionality
  * <p>
  * Accepts database special values, such as {@literal inf, -inf, and nan}
  * <p>
- * Example:
+ * <em>Examples:</em>
+ * {@snippet class="com.flowlogix.demo.util.TypeConverterDemo" region="typeConverterOne"}
+ * {@snippet class="com.flowlogix.demo.util.TypeConverterDemo" region="typeConvert"}
+ * {@snippet class="com.flowlogix.demo.util.TypeConverterDemo" region="checkTypeConvert"}
  *
- * <pre>
- * {@code
- * int one = TypeConverter.valueOf("1", int.class);
- * }
- * </pre>
  * @author lprimak
  */
 @Slf4j
@@ -196,6 +195,7 @@ public class TypeConverter {
     }
 
     /**
+     * check if string representation of the converted value actually matches input
      *
      * @param <TT> type of class
      * @param value

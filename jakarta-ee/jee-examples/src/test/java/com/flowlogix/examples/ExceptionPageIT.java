@@ -228,7 +228,7 @@ public class ExceptionPageIT {
             var props = new Properties();
             props.load(propStream);
             String version = props.getProperty("git.build.version");
-            new ShrinkWrapManipulator().persistenceXmlPath(archive,
+            new ShrinkWrapManipulator().persistenceXmlXPath(archive,
                     List.of(new Action("//persistence/persistence-unit/jar-file",
                             node -> node.setTextContent(String.format("lib/flowlogix-jee-%s-tests.jar", version)))));
         }

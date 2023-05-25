@@ -38,7 +38,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- * modifies web.xml according to xpath and function
+ * modifies xml files inside the archive according to xpath and function
+ * <p>
+ * <em>Examples:</em>
+ * {@snippet class="com.flowlogix.demo.util.ShrinkWrapDemo" region="productionMode"}
+ * {@snippet class="com.flowlogix.demo.util.ShrinkWrapDemo" region="persistence"}
  *
  * @author lprimak
  */
@@ -64,35 +68,49 @@ public class ShrinkWrapManipulator {
      * @param archive to modify
      * @param actions list of actions to perform
      */
-    @SneakyThrows
     public void webXmlXPath(WebArchive archive, List<Action> actions) {
         var asset = "WEB-INF/web.xml";
-        archive.setWebXML(new StringAsset(parseXml(archive, actions, asset)));
+        archive.setWebXML(new StringAsset(manipulateXml(archive, actions, asset)));
     }
 
     /**
-     * modifies persistense.xml according to xpath and method
+     * modifies persistence.xml according to xpath and method
      *
      * @param archive to modify
      * @param actions list of actions to perform
      */
-    public void persistenceXmlPath(WebArchive archive, List<Action> actions) {
+    public void persistenceXmlXPath(WebArchive archive, List<Action> actions) {
         var asset = "META-INF/persistence.xml";
-        archive.addAsResource(new StringAsset(parseXml(archive, actions, "WEB-INF/classes/" + asset)), asset);
+        archive.addAsResource(new StringAsset(manipulateXml(archive, actions, "WEB-INF/classes/" + asset)), asset);
     }
 
     /**
-     * Transform http to https URL using {@code sslPort} system property
-     * @param httpUrl
+     * Transform http to https URL using {@code sslPort} system property,
+     * and default port 8181 if system property is not defined
+     *
+     * @param httpUrl http URL
+     * @return https URL
+     */
+    @SuppressWarnings("MagicNumber")
+    public static URL toHttpsURL(URL httpUrl) {
+        return toHttpsURL(httpUrl, "sslPort", 8181);
+    }
+
+    /**
+     * Transform http to https URL using the specified system property and default port,
+     * if the system property is not defined
+     *
+     * @param httpUrl http URL
+     * @param sslPortPropertyName
+     * @param defaultPort
      * @return https URL
      */
     @SneakyThrows
-    public static URL toHttpsURL(URL httpUrl) {
+    public static URL toHttpsURL(URL httpUrl, String sslPortPropertyName, int defaultPort) {
         if (httpUrl.getProtocol().endsWith("//")) {
             return httpUrl;
         }
-        @SuppressWarnings("MagicNumber")
-        int sslPort = Integer.getInteger("sslPort", 8181);
+        int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
         return new URL(httpUrl.getProtocol() + "s", httpUrl.getHost(), sslPort, httpUrl.getFile());
     }
 
@@ -106,10 +124,19 @@ public class ShrinkWrapManipulator {
         return String.format("//web-app/context-param[param-name = '%s']/param-value", paramName);
     }
 
+    /**
+     * Parse XML file from the archive, perform actions to modify the file,
+     * and return a string representing the modified XML file
+
+     * @param archive to retrieve the xml file from
+     * @param actions to perform on the xml file
+     * @param xmlFileName xml file name to retrive from the archive
+     * @return string representation of the modified xml file
+     */
     @SneakyThrows
-    private String parseXml(WebArchive archive, List<Action> actions, String xmlFile) {
+    public String manipulateXml(WebArchive archive, List<Action> actions, String xmlFileName) {
         Document xmlDocument;
-        try (InputStream strm = archive.get(xmlFile).getAsset().openStream()) {
+        try (InputStream strm = archive.get(xmlFileName).getAsset().openStream()) {
             xmlDocument = builder.get().parse(strm);
         }
         var xpath = XPathFactory.newInstance().newXPath();

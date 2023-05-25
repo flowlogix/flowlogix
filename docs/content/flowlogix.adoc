@@ -299,39 +299,51 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/Re
 ----
 NOTE: The input stream is not closed by the `readString` method
 
-.Simplify ShrinkWrap archive manipulation for testing
-`ShrinkWrapManupulator` class has a few utility methods that make Arquillian tests easier. +
-Some tests require TLS/SSL to execute properly. Arquillian uses plain http by default. To facilitate tests that require TLS/SSL, `toHttpsURL(url)` takes a URL and converts it to it's https equivalent, taking the `sslPort` system property into account. Default port is 8181
+.Configuring testing environments and making testing easier
+`ShrinkWrapManupulator` class has a few utility methods that make testing tricky behaviors easier.
 
-.Below, toHttpsUrl("http://host/index.html") will return "https://host:8282/index.html"
+Some tests require TLS/SSL to execute properly. Arquillian uses plain http by default. To facilitate tests that require TLS/SSL, `toHttpsURL(url)` takes a URL and converts it to it's https equivalent, taking the `sslPort` system property into account. Default TLS port is 8181.
+A more complete method `toHttpURL(url, sslPortPropertyName, defaultPort)` is available if the default system property and port are not suitable for your needs.
+
+.With command below, toHttpsUrl("http://host/index.html") will return "https://host:8282/index.html"
 [source,shell]
 ----
 $ mvn verify -DsslPort=8282
 ----
-`webXmlXPath()` takes a `List<Action>` and will manipulate archive's `web.xml` to achieve the desired test configuration. For example, if Jakarta Faces production mode is desired for the particular archive, `web.xml` `context-param` is changed below:
+
+.Configuring ShrinkWrap (Arquillian) test artifacts
+`webXmlXPath()` takes a `List<Action>` and will manipulate archive's `web.xml` to achieve the desired test configuration. For example, if Jakarta Faces production mode is desired for a particular archive, `web.xml` `context-param` can be changed below:
+
 [source,java]
+.Configure tests for Jakarta Faces production mode
 ----
 @Deployment
-public static WebArchive deploy() {
-    WebArchive archive = ShrinkWrap.create(...);
-    new ShrinkWrapManipulator().webXmlXPath(archive, List.of(new Action(
-        getContextParamValue(jakartify("javax.faces.PROJECT_STAGE")),
-        node -> node.setTextContent("Production"))));
-}
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=productionMode,indent=0]
 ----
 `getContextParamValue()` is a shorthand to produce XPath for `web.xml` context parameter (`<context-param>`) element:
-[source,xml]
+[source]
 ----
 //web-app/context-param[param-name = 'jakarta.faces.PROJECT_STAGE']/param-value
 ----
 The second parameter is DOM `Node` class `Consumer` lambda, which allows for manipulation of the DOM element directly by the user. +
 Above, we also combine `web.xml` manipulation with `jakartify` to be compatible with both Jakarta EE 8 or 9, if desired.
+
+`ShrinkWrapManipulator` can also easily manipulate `persistence.xml` file. Even though maven filtering can be used to resolve a versioned entities JAR in persistence.xml, ShrinkWrap will not do the filtering because it uses its own mechanism to create the archive. Another way is needed to create the substitution inside the `deploy()` method in ShirkWrap:
+[source,xml]
+----
+<persistence>
+    <persistence-unit>
+        <jar-file>entities-${project.version}.jar</jar-file>
+    </persistence-unit>
+</persistence>
+----
 [source,java]
 .Example of manipulation of `persistence.xml` file
 ----
-TBD
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=persistence,indent=0]
 ----
 
+Developers can transform any XML file from the archive by using the generic `manipulateXml()` method, which both `webXmlXPath()` and `persistenceXmlXPath()` methods utilize to do their job.
 
 [[section-jpa-lazymodel]]
 === FlowLogix PrimeFaces Lazy Data Model backed by JPA

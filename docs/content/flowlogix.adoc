@@ -295,8 +295,9 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/Se
 FlowLogix provides an easy way to read a String from any input stream:
 [source,java]
 ----
-String s = Streams.readString(strm);
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ReadStringDemo.java[tags=readStringFromStream,indent=0]
 ----
+NOTE: The input stream is not closed by the `readString` method
 
 .Simplify ShrinkWrap archive manipulation for testing
 `ShrinkWrapManupulator` class has a few utility methods that make Arquillian tests easier. +

@@ -25,6 +25,9 @@ import lombok.NoArgsConstructor;
 /**
  * Read String from Stream
  * Does not close the stream afterward
+ * <p>
+ * <em>Example:</em>
+ * {@snippet class="com.flowlogix.demo.util.ReadStringDemo" region="readStringFromStream"}
  *
  * @author lprimak
  */
@@ -34,23 +37,23 @@ public class Streams {
     /**
      * Converts InputStream to String
      *
-     * @param strm Stream
+     * @param stream Stream
      * @return Stream converted to String
      * @throws IOException
      */
-    public static String readString(InputStream strm) throws IOException {
-        return readString(strm, StandardCharsets.UTF_8);
+    public static String readString(InputStream stream) throws IOException {
+        return readString(stream, StandardCharsets.UTF_8);
     }
 
     /**
      * Converts InputStream to String
      *
-     * @param strm Stream
+     * @param stream Stream
      * @param charset Charset to convert with
      * @return Stream converted to String
      * @throws IOException
      */
-    public static String readString(InputStream strm, Charset charset) throws IOException {
-        return new String(strm.readAllBytes(), charset);
+    public static String readString(InputStream stream, Charset charset) throws IOException {
+        return new String(stream.readAllBytes(), charset);
     }
 }

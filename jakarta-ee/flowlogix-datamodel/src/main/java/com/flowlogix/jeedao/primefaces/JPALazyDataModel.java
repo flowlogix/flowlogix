@@ -112,23 +112,35 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         return String.format("%s.%s", RESULT, val);
     }
 
+    /**
+     * Overridden from {@link LazyDataModel#getRowKey(Object)}
+     */
     @Override
     public String getRowKey(TT key) {
         return impl.getKeyConverter().apply(key);
     }
 
+    /**
+     * Overridden from {@link LazyDataModel#getRowData(String)}
+     */
     @Override
     @Transactional
     public TT getRowData(String rowKey) {
         return impl.getEntityManager().get().find(impl.getEntityClass(), impl.getConverter().apply(rowKey));
     }
 
+    /**
+     * Overridden from {@link LazyDataModel#load(int, int, Map, Map)}
+     */
     @Override
     @Transactional
     public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
         return impl.findRows(first, pageSize, filterBy, sortBy);
     }
 
+    /**
+     * Overridden from {@link LazyDataModel#count(Map)}
+     */
     @Override
     public int count(Map<String, FilterMeta> map) {
         return impl.count(map);

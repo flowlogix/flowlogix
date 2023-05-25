@@ -15,9 +15,10 @@
  */
 
 /**
- * PrimeFaces JPA-backed {@link com.flowlogix.jeedao.primefaces.JPALazyDataModel}
+ * User Interface components including {@link com.flowlogix.ui.MinimizedHandler}
+ * and {@link com.flowlogix.ui.UnmappedResourceHandlerMapper}
  */
 @PackageMarker
-package com.flowlogix.jeedao.primefaces;
+package com.flowlogix.ui;
 
 import com.flowlogix.PackageMarker;

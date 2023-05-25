@@ -15,9 +15,11 @@
  */
 
 /**
- * PrimeFaces JPA-backed {@link com.flowlogix.jeedao.primefaces.JPALazyDataModel}
+ * Utilities including {@link com.flowlogix.util.TypeConverter} and {@link com.flowlogix.util.JakartaTransformerUtils}
+ * <br>
+ * Testing helpers including {@link com.flowlogix.util.ShrinkWrapManipulator} and {@link com.flowlogix.util.SerializeTester}
  */
 @PackageMarker
-package com.flowlogix.jeedao.primefaces;
+package com.flowlogix.util;
 
 import com.flowlogix.PackageMarker;

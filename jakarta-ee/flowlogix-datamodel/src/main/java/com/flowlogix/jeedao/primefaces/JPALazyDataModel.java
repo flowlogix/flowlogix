@@ -38,8 +38,8 @@ import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 
 /**
- * Easy implementation of PrimeFaces lazy data model
- * using Lambdas
+ * Easy implementation of PrimeFaces lazy data model using Lambdas, This is the main class in
+ * {@link com.flowlogix.jeedao.primefaces} package
  * <p>
  * An instance of this class is to be put into your {@link ViewScoped} or {@link SessionScoped} beans
  * The implementation is serializable and works with failover to a different server instances

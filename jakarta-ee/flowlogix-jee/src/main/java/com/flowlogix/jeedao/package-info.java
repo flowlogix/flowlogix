@@ -15,7 +15,7 @@
  */
 
 /**
- * This package contains Jakarta EE DAO Helper and Typed Native Query
+ * Jakarta EE DAO Helper and Typed Native Query
  */
 @PackageMarker
 package com.flowlogix.jeedao;

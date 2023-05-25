@@ -15,9 +15,7 @@
  */
 
 /**
- * PrimeFaces JPA-backed {@link com.flowlogix.jeedao.primefaces.JPALazyDataModel}
+ * Base package for all Flow Logix components
  */
 @PackageMarker
-package com.flowlogix.jeedao.primefaces;
-
-import com.flowlogix.PackageMarker;
+package com.flowlogix;

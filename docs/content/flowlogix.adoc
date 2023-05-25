@@ -284,7 +284,12 @@ FlowLogix automatically detects which environment it's in, and converts `javax`-
 The `jakartify()` utility is particularly useful in scenarios where maven `shade` plugin is used to produce both `javax` and `jakarta`-based JAR artifacts. It allows to use same source code for both and dynamically produce correct strings without additional shade plugins or complex regular expressions.
 
 .Serialization Tester
-Generic `serializeAndDeserialize()` can be used to check the true ability to serialize a class. It returns the object passed after going through serialization and deserialization, so the new state can be checked for correctness.
+Generic `serializeAndDeserialize()` method can be used to check the true ability to serialize a class. It returns the result of the input going through serialization and deserialization, so the new object's state can be checked for correctness.
+[source,java]
+.Check correctness of serialized object
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/SerializeDemo.java[tags=serialize,indent=0]
+----
 
 .Read String from Stream easily
 FlowLogix provides an easy way to read a String from any input stream:

@@ -270,10 +270,18 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/Ty
 .Transform java -> jakarta namespace at run-time (jakartify)
 FlowLogix provides a convenience method for converting strings from `javax` to `jakarta` namespace:
 [source,java]
+.Servlet example
 ----
-jakartify(Servlet.class.getName());
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/ui/JakartifyDemo.java[tags=jakartifyServlet,indent=0]
 ----
-FlowLogix automatically detects which environment it's in, and converts `javax`-based names into `jakarta`-based namespace accordingly. Keep in mind that the environment check occurs at compile time, and not runtime. This method works not only for classes, but also for error messages and other Strings.
+[source,java]
+.Jakarta Faces example
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/ui/JakartifyDemo.java[tags=jakartifyError,indent=0]
+----
+FlowLogix automatically detects which environment it's in, and converts `javax`-based names into `jakarta`-based namespace accordingly. Keep in mind that the environment check occurs at run-time, and not compile time. This method works not only for classes, but also for error messages and other strings.
+
+The `jakartify()` utility is particularly useful in scenarios where maven `shade` plugin is used to produce both `javax` and `jakarta`-based JAR artifacts. It allows to use same source code for both and dynamically produce correct strings without additional shade plugins or complex regular expressions.
 
 .Serialization Tester
 Generic `serializeAndDeserialize()` can be used to check the true ability to serialize a class. It returns the object passed after going through serialization and deserialization, so the new state can be checked for correctness.

@@ -16,24 +16,33 @@
 package com.flowlogix.demo.util;
 
 import com.flowlogix.util.TypeConverter;
+import com.flowlogix.util.TypeConverter.CheckedValue;
+import lombok.extern.slf4j.Slf4j;
 
 @SuppressWarnings("HideUtilityClassConstructor")
+@Slf4j
 public class TypeConverterDemo {
-    // @start region="typeConvert"
-    // tag::typeConvert[] // @replace regex='.*\n' replacement=""
     public static <TT> TT fromString(String input, Class<TT> cls) {
-        return TypeConverter.valueOf(input, cls);
+        // @start region="typeConvert"
+        // tag::typeConvert[] // @replace regex='.*\n' replacement=""
+        TT convertedValue = TypeConverter.valueOf(input, cls);
+        // end::typeConvert[] // @replace regex='.*\n' replacement=""
+        // @end
+        return convertedValue;
     }
-    // end::typeConvert[] // @replace regex='.*\n' replacement=""
-    // @end
 
-    // @start region="checkTypeConvert"
-    // tag::checkTypeConvert[] // @replace regex='.*\n' replacement=""
-    public static <TT> TypeConverter.CheckedValue<TT> checkFromString(String input, Class<TT> cls) {
-        return TypeConverter.checkAndConvert(input, cls);
+    public static <TT> CheckedValue<TT> checkFromString(String input, Class<TT> cls) {
+        // @start region="checkTypeConvert"
+        // tag::checkTypeConvert[] // @replace regex='.*\n' replacement=""
+        CheckedValue<TT> checkedValue = TypeConverter.checkAndConvert(input, cls);
+        if (checkedValue.isValid()) {
+            // get and operate on a value in a type-safe way
+            TT value = checkedValue.getValue();
+        }
+        // end::checkTypeConvert[] // @replace regex='.*\n' replacement=""
+        // @end
+        return checkedValue;
     }
-    // end::checkTypeConvert[] // @replace regex='.*\n' replacement=""
-    // @end
 
     public static int convertOne() {
         // @start region="typeConverterOne"

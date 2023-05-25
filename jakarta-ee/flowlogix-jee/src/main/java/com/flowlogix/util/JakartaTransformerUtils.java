@@ -22,19 +22,33 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- *
- * @author lprimak
+ * Transform strings that start with javax package into jakarta strings,
+ * if it's detected to be in jakarta environment
+ * <p>
+ * <em>Examples:</em>
+ * {@snippet class="com.flowlogix.demo.ui.JakartifyDemo" region="jakartifyServlet"}
+ * {@snippet class="com.flowlogix.demo.ui.JakartifyDemo" region="jakartifyError"}
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("HideUtilityClassConstructor")
 public class JakartaTransformerUtils {
+    /**
+     * Returns true is Jakarta environment is detected
+     */
     @Getter
     @SuppressWarnings("ConstantName")
     private static final boolean jakarta = HttpServletRequest.class.getPackageName().startsWith("jakarta");
     private static final Pattern REPLACE_JAVA_WITH_JAKARTA_PATTERN = Pattern.compile("javax\\.(\\w+)\\.");
 
-    public static String jakartify(String className) {
-        return REPLACE_JAVA_WITH_JAKARTA_PATTERN.matcher(className).replaceAll(
+    /**
+     * Transform javax string into jakarta string, if it's detected to be in jakarta environment,
+     * otherwise returns original string
+     *
+     * @param javaxString string that starts with javax package
+     * @return string optionally transformed into Jakarta namespace
+     */
+    public static String jakartify(String javaxString) {
+        return REPLACE_JAVA_WITH_JAKARTA_PATTERN.matcher(javaxString).replaceAll(
                 isJakarta() ? "jakarta.$1." : "javax.$1.");
     }
 }

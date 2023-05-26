@@ -17,9 +17,9 @@ package com.flowlogix.jeedao;
 
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.jeedao.querycriteria.CountQueryCriteria;
+import java.io.Serializable;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.omnifaces.util.Lazy.SerializableSupplier;
 
 /**
  * Lightweight wrapper around common JPA methods
@@ -50,11 +51,11 @@ import lombok.experimental.SuperBuilder;
  */
 @SuperBuilder
 @RequiredArgsConstructor
-public class DaoHelper<TT, KT> {
+public class DaoHelper<TT, KT> implements Serializable  {
     /**
      * Return entity manager to operate on
      */
-    private final @NonNull Supplier<EntityManager> entityManagerSupplier;
+    private final @NonNull SerializableSupplier<EntityManager> entityManagerSupplier;
     /**
      * entity class
      */

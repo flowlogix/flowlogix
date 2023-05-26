@@ -17,8 +17,6 @@ package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPAModelImpl.JPAModelImplBuilder;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +61,13 @@ import org.primefaces.model.SortMeta;
 @Dependent
 @Slf4j
 public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
+    /**
+     * Automatic field that's added to the JPA's root object
+     * and can be used with {@link #getResultField(String)} for result fields
+     */
     public static final String RESULT = "result";
-    private static final long serialVersionUID = 2L;
-    private transient JPAModelImpl<TT, KK> impl;
+    private static final long serialVersionUID = 3L;
+    private JPAModelImpl<TT, KK> impl;
     @SuppressWarnings("serial")
     private Function<JPAModelImplBuilder<TT, KK, ?, ?>, JPAModelImpl<TT, KK>> builder;
 
@@ -75,18 +77,19 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      *
      * @param <TT> Value Type
      * @param <KK> Key Type
-     * @param <FF> serializable lambda for creation
-     * @param builder
+     * @param builder serializable lambda for creation
      * @return newly-created data model
      */
-    public static <TT, KK, FF extends Function<JPAModelImplBuilder<TT, KK, ?, ?>,
-        JPAModelImpl<TT, KK>> & Serializable> JPALazyDataModel<TT, KK> create(FF builder) {
+    public static <TT, KK> JPALazyDataModel<TT, KK> create(BuilderFunction<TT, KK> builder) {
         @SuppressWarnings("unchecked")
         JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
-        model.builder = builder;
         model.impl = builder.apply(JPAModelImpl.builder());
+        model.impl.x_do_not_use_in_builder = builder;
         return model;
     }
+
+    public interface BuilderFunction<TT, KK> extends Function<JPAModelImplBuilder<TT, KK, ?, ?>,
+            JPAModelImpl<TT, KK>>, Serializable { }
 
     /**
      * Utility method for replacing a predicate in the filter list
@@ -140,10 +143,5 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     @Override
     public int count(Map<String, FilterMeta> map) {
         return impl.count(map);
-    }
-
-    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        impl = builder.apply(JPAModelImpl.builder());
     }
 }

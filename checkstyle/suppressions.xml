@@ -32,6 +32,5 @@
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]examples[\\/]*"/>
 
     <suppress checks="JavadocVariable" lines="49-52" files="com[\\/]flowlogix[\\/]util[\\/]ShrinkWrapManipulator"/>
-    <suppress checks="JavadocVariable" lines="53" files="com[\\/]flowlogix[\\/]jeedao[\\/]primefaces[\\/]JPALazyDataModel"/>
     <suppress checks="ConstantName" lines="58-61" files="com[\\/]flowlogix[\\/]util[\\/]TypeConverter"/>
 </suppressions>

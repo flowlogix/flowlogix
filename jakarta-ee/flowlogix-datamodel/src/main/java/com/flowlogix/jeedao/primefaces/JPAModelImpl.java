@@ -17,9 +17,12 @@ package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel.BuilderFunction;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.querycriteria.QueryCriteria;
 import com.flowlogix.util.TypeConverter;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,7 +68,8 @@ import org.primefaces.model.SortMeta;
  */
 @Builder
 @Slf4j
-public class JPAModelImpl<TT, KK> {
+public class JPAModelImpl<TT, KK> implements Serializable {
+    private static final long serialVersionUID = 3L;
     /**
      * Return entity manager to operate on
      */
@@ -83,26 +87,26 @@ public class JPAModelImpl<TT, KK> {
     /**
      * convert String key into {@link KK} object
      */
-    private final Function<String, KK> converter;
+    private final transient Function<String, KK> converter;
     /**
      * convert typed key to String
      */
-    private final Function<TT, String> keyConverter;
+    private final transient Function<TT, String> keyConverter;
     /**
      * adds {@link Filter} object
      */
     @Default
-    private final @Getter @NonNull Filter<TT> filter = (a, b, c) -> { };
+    private final transient @Getter @NonNull Filter<TT> filter = (a, b, c) -> { };
     /**
      * adds {@link Sorter} object
      */
     @Default
-    private final @Getter @NonNull Sorter<TT> sorter = (a, b, c) -> true;
+    private final transient @Getter @NonNull Sorter<TT> sorter = (a, b, c) -> true;
     /**
      * add optimizer hints here
      */
     @Default
-    private final @Getter @NonNull Function<TypedQuery<TT>, TypedQuery<TT>> optimizer = (a) -> a;
+    private final transient @Getter @NonNull Function<TypedQuery<TT>, TypedQuery<TT>> optimizer = a -> a;
 
     /**
      * whether string queries are case-sensitive
@@ -112,6 +116,13 @@ public class JPAModelImpl<TT, KK> {
 
     private final Lazy<Function<String, KK>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
+
+    /**
+     * @hidden
+     * Internal variable, do not use in builder
+     */
+    @SuppressWarnings({"DeclarationOrder", "MemberName"})
+    BuilderFunction<TT, KK> x_do_not_use_in_builder;
 
     int count(Map<String, FilterMeta> filters) {
         return daoHelper.get().count(builder -> builder
@@ -343,5 +354,11 @@ public class JPAModelImpl<TT, KK> {
     @SuppressWarnings("unchecked")
     private Class<KK> getPrimaryKeyClass() {
         return (Class<KK>) getPrimaryKey(Optional.empty()).getClass();
+    }
+
+    Object readResolve() throws ObjectStreamException {
+        var corrected = x_do_not_use_in_builder.apply(JPAModelImpl.builder());
+        corrected.x_do_not_use_in_builder = x_do_not_use_in_builder;
+        return corrected;
     }
 }

@@ -15,23 +15,19 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPAModelImpl.JPAModelImplBuilder;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.view.ViewScoped;
-import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import org.omnifaces.util.Beans;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
@@ -78,28 +74,6 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         model.builder = builder;
         model.impl = builder.apply(JPAModelImpl.builder());
         return model;
-    }
-
-    /**
-     * Utility method for replacing a predicate in the filter list
-     *
-     * @param <TT> type of value
-     * @param filters filter list
-     * @param element element to be replace
-     * @param fp lambda to get the new Filter predicate
-     */
-    @SuppressWarnings({"unchecked", "EmptyBlock"})
-    public static <TT> void replaceFilter(Map<String, FilterData> filters, String element,
-            BiFunction<Predicate, TT, Predicate> fp) {
-        FilterData elt = filters.get(element);
-        if (elt != null && elt.getFieldValue() != null) {
-            if (elt.getFieldValue() instanceof String && isBlank((String) elt.getFieldValue())) {
-                // do nothing if blank string
-            } else {
-                filters.replace(element, new FilterData(elt.getFieldValue(),
-                        fp.apply(elt.getPredicate(), (TT) elt.getFieldValue())));
-            }
-        }
     }
 
     /**

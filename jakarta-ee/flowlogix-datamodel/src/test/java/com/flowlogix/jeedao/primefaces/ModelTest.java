@@ -16,8 +16,11 @@
 package com.flowlogix.jeedao.primefaces;
 
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.RESULT;
-import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.replaceFilter;
 import static com.flowlogix.util.SerializeTester.serializeAndDeserialize;
+import com.flowlogix.jeedao.primefaces.Filter.FilterData;
+import com.flowlogix.jeedao.primefaces.Sorter.SortData;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Path;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -31,18 +34,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.primefaces.model.SortOrder.ASCENDING;
+import static org.primefaces.model.SortOrder.DESCENDING;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.quality.Strictness;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Faces;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.MatchMode;
+import org.primefaces.model.SortMeta;
 
 /**
  *
@@ -52,12 +62,14 @@ import org.primefaces.model.MatchMode;
 public class ModelTest implements Serializable {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS, serializable = true)
     EntityManager em;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     transient CriteriaBuilder cb;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     transient Root<Object> rootObject;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     transient Root<Integer> rootInteger;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    transient Path<Integer> integerPath;
 
     @Test
     void resultField() {
@@ -106,6 +118,85 @@ public class ModelTest implements Serializable {
         impl.getFilters(Map.of("column", fm), cb, rootInteger);
     }
 
+    private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {
+        filterData.replaceFilter("column",
+                (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value));
+    }
+
+    @Test
+    @SuppressWarnings("MagicNumber")
+    void sortAdding() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .sorter(ModelTest::addingSorter)
+                .converter(Long::valueOf)
+                .build();
+
+        var uiSortCriteria = Map.of(
+                "col1", SortMeta.builder().field("aaa").order(ASCENDING).priority(3).build(),
+                "col2", SortMeta.builder().field("bbb").order(DESCENDING).priority(4).build());
+        when(rootInteger.get(any(String.class))).thenAnswer(a -> integerPath);
+        var ascendingOrder = createOrder(true);
+        when(cb.asc(any())).thenReturn(ascendingOrder);
+        var descendingOrder = createOrder(false);
+        when(cb.desc(any())).thenReturn(descendingOrder);
+        var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger);
+        assertEquals(4, sortResult.size());
+        assertFalse(sortResult.get(0).isAscending());
+        assertTrue(sortResult.get(1).isAscending());
+        assertTrue(sortResult.get(3).isAscending());
+        assertFalse(sortResult.get(2).isAscending());
+    }
+
+    private static void addingSorter(SortData sortData, CriteriaBuilder cb, Root<Integer> root) {
+        sortData.applicationSort("col3", sortMeta -> {
+            assertTrue(sortMeta.isEmpty());
+            return cb.asc(root.get("zipcode"));
+        });
+        sortData.applicationSort("col4", true, sortMeta -> {
+            assertTrue(sortMeta.isEmpty());
+            return cb.desc(root.get("zipcode"));
+        });
+    }
+
+    @Test
+    @SuppressWarnings("MagicNumber")
+    void sortReplacing() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .sorter(ModelTest::replacingSorter)
+                .converter(Long::valueOf)
+                .build();
+
+        var uiSortCriteria = Map.of(
+                "col1", SortMeta.builder().field("xxx").order(ASCENDING).priority(3).build(),
+                "col2", SortMeta.builder().field("uuu").order(DESCENDING).priority(4).build());
+        when(rootInteger.get(any(String.class))).thenAnswer(a -> integerPath);
+        var ascendingOrder = createOrder(true);
+        when(cb.asc(any())).thenReturn(ascendingOrder);
+        var descendingOrder = createOrder(false);
+        when(cb.desc(any())).thenReturn(descendingOrder);
+        var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger);
+        assertEquals(2, sortResult.size());
+        assertTrue(sortResult.get(0).isAscending());
+        assertTrue(sortResult.get(1).isAscending());
+    }
+
+    private static void replacingSorter(SortData sortData, CriteriaBuilder cb, Root<Integer> root) {
+        sortData.applicationSort("col2", sortMeta -> {
+            assertFalse(sortMeta.isEmpty());
+            return cb.asc(root.get("zipcode"));
+        });
+    }
+
+    private static Order createOrder(boolean isAscending) {
+        var order = mock(Order.class, withSettings().strictness(Strictness.LENIENT));
+        when(order.isAscending()).thenReturn(isAscending);
+        return order;
+    }
+
     @Test
     void jsfConversionTest() {
         var impl = JPAModelImpl.<Integer, Long>builder()
@@ -141,11 +232,6 @@ public class ModelTest implements Serializable {
                 .thenAnswer(entry -> entry.<MyEntity>getArgument(0).id);
         assertEquals(5L, impl.getConverter().apply("5"));
         assertEquals("10", impl.getKeyConverter().apply(new MyEntity(10L)));
-    }
-
-    private static void filter(Map<String, Filter.FilterData> filters, CriteriaBuilder cb, Root<Object> root) {
-        replaceFilter(filters, "column",
-                (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value));
     }
 
     @Test

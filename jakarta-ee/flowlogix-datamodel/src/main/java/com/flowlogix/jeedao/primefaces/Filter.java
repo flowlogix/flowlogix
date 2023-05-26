@@ -19,8 +19,10 @@ import java.util.Map;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.util.function.BiFunction;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Filter Hook
@@ -30,15 +32,41 @@ import lombok.RequiredArgsConstructor;
 @FunctionalInterface
 public interface Filter<TT> {
     /**
+     * Interface that directly inherits from {@link Map} and adds
+     * {@link #replaceFilter(String, BiFunction)} method
+     */
+    interface FilterData extends Map<String, FilterColumnData> {
+        /**
+         * Replacing a predicate in the filter list by column name
+         *
+         * @param <TT> type of value
+         * @param element element to be replace
+         * @param fp lambda to get the new Filter predicate
+         */
+        @SuppressWarnings({"unchecked", "EmptyBlock"})
+        default <TT> void replaceFilter(String element, BiFunction<Predicate, TT, Predicate> fp) {
+            FilterColumnData elt = get(element);
+            if (elt != null && elt.getFilterValue() != null) {
+                if (elt.getFilterValue() instanceof String && isBlank((String) elt.getFilterValue())) {
+                    // do nothing if blank string
+                } else {
+                    replace(element, new FilterColumnData(elt.getFilterValue(),
+                            fp.apply(elt.getPredicate(), (TT) elt.getFilterValue())));
+                }
+            }
+        }
+    }
+
+    /**
      * filter data this is what you replace with your own filter
      */
     @RequiredArgsConstructor
     @Getter
-    class FilterData {
+    class FilterColumnData {
         /**
-         * filter field value
+         * filter column value
          */
-        private final Object fieldValue;
+        private final Object filterValue;
         /**
          * Existing or null predicate, can replace with custom
          */
@@ -48,9 +76,9 @@ public interface Filter<TT> {
     /**
      * hook to supply custom filter
      *
-     * @param filters user input
+     * @param filterData user input
      * @param cb
      * @param root
      */
-    void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<TT> root);
+    void filter(FilterData filterData, CriteriaBuilder cb, Root<TT> root);
 }

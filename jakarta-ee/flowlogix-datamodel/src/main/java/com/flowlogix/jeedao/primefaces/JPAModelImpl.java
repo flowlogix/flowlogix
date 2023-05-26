@@ -18,6 +18,8 @@ package com.flowlogix.jeedao.primefaces;
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.DaoHelper.QueryCriteria;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
+import com.flowlogix.jeedao.primefaces.Filter.FilterColumnData;
+import com.flowlogix.jeedao.primefaces.Sorter.MergedSortOrder;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.util.TypeConverter;
 import java.lang.annotation.Annotation;
@@ -98,7 +100,7 @@ public class JPAModelImpl<TT, KK> {
      * adds {@link Sorter} object
      */
     @Default
-    private final @Getter @NonNull Sorter<TT> sorter = (a, b, c) -> true;
+    private final @Getter @NonNull Sorter<TT> sorter = (a, b, c) -> { };
     /**
      * add optimizer hints here
      */
@@ -113,6 +115,8 @@ public class JPAModelImpl<TT, KK> {
 
     private final Lazy<Function<String, KK>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
+
+    private static class FilterDataMap extends HashMap<String, FilterColumnData> implements FilterData { }
 
     int count(Map<String, FilterMeta> filters) {
         return toIntExact(daoHelper.get().count(builder -> builder
@@ -162,50 +166,61 @@ public class JPAModelImpl<TT, KK> {
     }
 
     Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
-        Map<String, FilterData> predicates = new HashMap<>();
+        FilterData predicates = new FilterDataMap();
         filters.forEach((key, filterMeta) -> {
-            Predicate cond = null;
-            Object value = filterMeta.getFilterValue();
-            try {
-                Class<?> fieldType = root.get(key).getJavaType();
-                if (fieldType == String.class) {
-                    value = value.toString();
-                    cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
-                } else if (fieldType.isArray() || Collection.class.isAssignableFrom(fieldType)) {
-                    cond = predicateFromFilterOrComparable(cond, cb, root, key, filterMeta, value, fieldType);
-                } else {
-                    var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
-                    boolean valid = convertedValue.isValid();
-                    if (valid) {
-                        value = convertedValue.getValue();
-                    } else {
-                        try {
-                            Converter<?> valueConverter = Faces.getApplication().createConverter(fieldType);
-                            if (valueConverter != null) {
-                                value = valueConverter.getAsObject(Faces.getContext(),
-                                        UIComponent.getCurrentComponent(Faces.getContext()), value.toString());
-                                valid = true;
-                            }
-                        } catch (Throwable e) {
-                            log.debug("unable to convert via JSF", e);
-                        }
-                    }
-                    if (valid) {
-                        cond = predicateFromFilterOrComparable(cond, cb, root, key, filterMeta, value, fieldType);
-                    }
-                }
-            } catch (IllegalArgumentException e) { /* ignore possibly extra filter fields */ }
-            predicates.put(key, new FilterData(value, cond));
+            if (filterMeta.isGlobalFilter()) {
+                predicates.put(key, new FilterColumnData(filterMeta.getFilterValue(), null));
+            } else {
+                var filterMetas = processFilterMeta(cb, root, key, filterMeta);
+                predicates.put(key, new FilterColumnData(filterMetas.value(), filterMetas.cond()));
+            }
         });
         filter.filter(predicates, cb, root);
-        return cb.and(predicates.values().stream().map(FilterData::getPredicate)
+        return cb.and(predicates.values().stream().map(FilterColumnData::getPredicate)
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
 
+    private FilterMetaResult processFilterMeta(CriteriaBuilder cb, Root<TT> root, String key, FilterMeta filterMeta) {
+        Predicate cond = null;
+        Object value = filterMeta.getFilterValue();
+        try {
+            Class<?> fieldType = root.get(key).getJavaType();
+            if (fieldType == String.class) {
+                value = value.toString();
+                cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
+            } else if (fieldType.isArray() || Collection.class.isAssignableFrom(fieldType)) {
+                cond = predicateFromFilterOrComparable(cond, cb, root, key, filterMeta, value, fieldType);
+            } else {
+                var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
+                boolean valid = convertedValue.isValid();
+                if (valid) {
+                    value = convertedValue.getValue();
+                } else {
+                    try {
+                        Converter<?> valueConverter = Faces.getApplication().createConverter(fieldType);
+                        if (valueConverter != null) {
+                            value = valueConverter.getAsObject(Faces.getContext(),
+                                    UIComponent.getCurrentComponent(Faces.getContext()), value.toString());
+                            valid = true;
+                        }
+                    } catch (Throwable e) {
+                        log.debug("unable to convert via JSF", e);
+                    }
+                }
+                if (valid) {
+                    cond = predicateFromFilterOrComparable(cond, cb, root, key, filterMeta, value, fieldType);
+                }
+            }
+        } catch (IllegalArgumentException e) { /* ignore possibly extra filter columns */ }
+        return new FilterMetaResult(cond, value);
+    }
+
+    private record FilterMetaResult(Predicate cond, Object value) { }
+
     private Predicate predicateFromFilterOrComparable(Predicate cond, CriteriaBuilder cb, Root<TT> root,
-            String key, FilterMeta filterMeta, Object value, Class<?> fieldType) {
+            String key, FilterMeta filterMeta, Object value, Class<?> columnType) {
         cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
-        if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
+        if (cond == null && Comparable.class.isAssignableFrom(columnType)) {
             @SuppressWarnings({"unchecked", "rawtypes"})
                     Comparable<? super Comparable> cv = (Comparable) value;
             cond = predicateFromFilterComparable(cb, root.get(key), filterMeta, cv);
@@ -301,33 +316,33 @@ public class JPAModelImpl<TT, KK> {
                 cb.lessThanOrEqualTo(objectExpression, iterBetween.next()));
     }
 
-    private List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
+    List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
         var sortData = new SortData(sortCriteria);
-        boolean appendSortOder = sorter.sort(sortData, cb, root);
-
-        List<Order> sortMetaOrdering = processSortMeta(sortData.getSortMeta(), cb, root);
-        List<Order> rv = new ArrayList<>();
-        if (appendSortOder) {
-            rv.addAll(sortMetaOrdering);
-            rv.addAll(sortData.getSortOrder());
-        } else {
-            rv.addAll(sortData.getSortOrder());
-            rv.addAll(sortMetaOrdering);
-        }
-        return rv;
+        sorter.sort(sortData, cb, root);
+        return processSortMeta(sortData.getSortData(), cb, root);
     }
 
     @SuppressWarnings("MissingSwitchDefault")
-    private List<Order> processSortMeta(Map<String, SortMeta> sortMeta, CriteriaBuilder cb, Root<TT> root) {
+    private List<Order> processSortMeta(Map<String, MergedSortOrder> sortMeta, CriteriaBuilder cb, Root<TT> root) {
         List<Order> sortMetaOrdering = new ArrayList<>();
-        sortMeta.forEach((field, order) -> {
-            switch (order.getOrder()) {
-                case ASCENDING:
-                    sortMetaOrdering.add(cb.asc(root.get(order.getField())));
-                    break;
-                case DESCENDING:
-                    sortMetaOrdering.add(cb.desc(root.get(order.getField())));
-                    break;
+        sortMeta.forEach((column, order) -> {
+            if (order.getRequestedSortMeta() != null) {
+                switch (order.getRequestedSortMeta().getOrder()) {
+                    case ASCENDING:
+                        sortMetaOrdering.add(cb.asc(root.get(order.getRequestedSortMeta().getField())));
+                        break;
+                    case DESCENDING:
+                        sortMetaOrdering.add(cb.desc(root.get(order.getRequestedSortMeta().getField())));
+                        break;
+                }
+            } else if (order.applicationSort != null) {
+                if (order.highPriority) {
+                    sortMetaOrdering.add(0, order.applicationSort);
+                } else {
+                    sortMetaOrdering.add(order.applicationSort);
+                }
+            } else {
+                throw new IllegalStateException("Neither application sort request, nor UI sort request is available");
             }
         });
         return sortMetaOrdering;

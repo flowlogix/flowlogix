@@ -19,10 +19,8 @@ import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.replaceFilter;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import java.io.Serializable;
-import java.util.Map;
 import java.util.stream.Collectors;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
@@ -62,13 +60,12 @@ public class UserViewer implements Serializable {
                 .map(UserEntity::getFullName).collect(Collectors.joining(", "));
     }
 
-    private static boolean sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
-        sortData.getSortOrder().add(cb.asc(root.get(UserEntity_.address)));
-        return false;
+    private static void sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
+        sortData.applicationSort(UserEntity_.address.getName(), var -> cb.asc(root.get(UserEntity_.address)));
     }
 
-    private static void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<UserEntity> root) {
-        replaceFilter(filters, UserEntity_.zipCode.getName(),
+    private static void filter(FilterData filterData, CriteriaBuilder cb, Root<UserEntity> root) {
+        filterData.replaceFilter(UserEntity_.zipCode.getName(),
                 (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value));
     }
 }

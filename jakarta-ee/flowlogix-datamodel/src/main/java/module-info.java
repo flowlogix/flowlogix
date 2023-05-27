@@ -1,10 +1,10 @@
 /**
  * PrimeFaces JPA-backed {@link com.flowlogix.jeedao.primefaces.JPALazyDataModel}
  */
-module flowlogix.datamodel {
+module com.flowlogix.datamodel {
     exports com.flowlogix.jeedao.primefaces;
 
-    requires flowlogix.jee;
+    requires com.flowlogix.jee;
     requires lombok;
     requires org.slf4j;
     requires org.apache.commons.lang3;

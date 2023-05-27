@@ -43,7 +43,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>flowlogix.jee</Automatic-Module-Name>
+                            <Automatic-Module-Name>com.flowlogix.jee</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>

@@ -15,7 +15,8 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.JPAModelImpl.JPAModelImplBuilder;
+import com.flowlogix.jeedao.primefaces.impl.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.impl.JPAModelImpl.JPAModelImplBuilder;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         @SuppressWarnings("unchecked")
         JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
         model.impl = builder.apply(JPAModelImpl.builder());
-        model.impl.x_do_not_use_in_builder = builder;
+        model.impl.setX_do_not_use_in_builder(builder);
         return model;
     }
 
@@ -101,7 +102,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     @Override
     @Transactional
     public TT getRowData(String rowKey) {
-        return impl.getEntityManager().get().find(impl.getEntityClass(), impl.getConverter().apply(rowKey));
+        return impl.getEntityManager().get().find(impl.getEntityClass(), impl.getStringToKeyConverter().apply(rowKey));
     }
 
     /**

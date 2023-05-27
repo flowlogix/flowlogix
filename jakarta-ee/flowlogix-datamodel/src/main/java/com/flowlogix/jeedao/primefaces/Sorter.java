@@ -48,7 +48,7 @@ public interface Sorter<TT> {
         @Getter
         private final Map<String, MergedSortOrder> sortData;
 
-        SortData(Map<String, SortMeta> sm) {
+        public SortData(Map<String, SortMeta> sm) {
             sortData = sm.entrySet().stream()
                     .sorted(Map.Entry.comparingByValue())
                     .collect(Collectors.toMap(Map.Entry::getKey, value ->
@@ -96,13 +96,13 @@ public interface Sorter<TT> {
      * Sort order requested by the application lives in {@link #applicationSort}
      * Only one can exist, the other will always be null.
      */
+    @Getter
     @AllArgsConstructor(access = AccessLevel.PACKAGE)
     @SuppressWarnings("DeclarationOrder")
     class MergedSortOrder {
-        @Getter
         private final SortMeta requestedSortMeta;
-        final Order applicationSort;
-        final boolean highPriority;
+        private final Order applicationSort;
+        private final boolean highPriority;
     }
 
     /**

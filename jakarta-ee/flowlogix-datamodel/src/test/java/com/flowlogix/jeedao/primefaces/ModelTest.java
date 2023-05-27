@@ -19,6 +19,7 @@ import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.RESULT;
 import static com.flowlogix.util.SerializeTester.serializeAndDeserialize;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
+import com.flowlogix.jeedao.primefaces.impl.JPAModelImpl;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import java.io.IOException;
@@ -230,7 +231,7 @@ public class ModelTest implements Serializable {
                 .build();
         when(em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(any(MyEntity.class)))
                 .thenAnswer(entry -> entry.<MyEntity>getArgument(0).id);
-        assertEquals(5L, impl.getConverter().apply("5"));
+        assertEquals(5L, impl.getStringToKeyConverter().apply("5"));
         assertEquals("10", impl.getKeyConverter().apply(new MyEntity(10L)));
     }
 

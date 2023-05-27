@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces;
+package com.flowlogix.jeedao.primefaces.impl;
 
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.DaoHelper.QueryCriteria;
+import com.flowlogix.jeedao.primefaces.Filter;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Filter.FilterColumnData;
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel.BuilderFunction;
+import com.flowlogix.jeedao.primefaces.Sorter;
 import com.flowlogix.jeedao.primefaces.Sorter.MergedSortOrder;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.util.TypeConverter;
@@ -53,6 +56,7 @@ import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 import static java.lang.Math.toIntExact;
 import static lombok.Builder.Default;
 import lombok.Generated;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
@@ -125,17 +129,18 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      * Internal variable, do not use in builder
      */
     @SuppressWarnings({"DeclarationOrder", "MemberName"})
-    BuilderFunction<TT, KK> x_do_not_use_in_builder;
+    @Setter
+    private BuilderFunction<TT, KK> x_do_not_use_in_builder;
 
     private static class FilterDataMap extends HashMap<String, FilterColumnData> implements FilterData { }
 
-    int count(Map<String, FilterMeta> filters) {
+    public int count(Map<String, FilterMeta> filters) {
         return toIntExact(daoHelper.get().count(builder -> builder
                 .countQueryCriteria(cqc -> cqc.query().where(getFilters(filters, cqc.builder(), cqc.root())))
                 .build()));
     }
 
-    List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
+    public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
         return optimizer.apply(
                 daoHelper.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
                         builder -> builder.queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
@@ -146,11 +151,11 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         return daoHelper.get().getEntityManager();
     }
 
-    Function<String, KK> getConverter() {
+    public Function<String, KK> getStringToKeyConverter() {
         return converter != null ? converter : defaultConverter.get();
     }
 
-    Function<TT, String> getKeyConverter() {
+    public Function<TT, String> getKeyConverter() {
         return keyConverter != null ? keyConverter : defaultKeyConverter.get();
     }
 
@@ -176,7 +181,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         qc.root().alias(JPALazyDataModel.RESULT);
     }
 
-    Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
+    public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
         FilterData predicates = new FilterDataMap();
         filters.forEach((key, filterMeta) -> {
             if (filterMeta.isGlobalFilter()) {
@@ -327,7 +332,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
                 cb.lessThanOrEqualTo(objectExpression, iterBetween.next()));
     }
 
-    List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
+    public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
         var sortData = new SortData(sortCriteria);
         sorter.sort(sortData, cb, root);
         return processSortMeta(sortData.getSortData(), cb, root);
@@ -346,11 +351,11 @@ public class JPAModelImpl<TT, KK> implements Serializable {
                         sortMetaOrdering.add(cb.desc(root.get(order.getRequestedSortMeta().getField())));
                         break;
                 }
-            } else if (order.applicationSort != null) {
-                if (order.highPriority) {
-                    sortMetaOrdering.add(0, order.applicationSort);
+            } else if (order.getApplicationSort() != null) {
+                if (order.isHighPriority()) {
+                    sortMetaOrdering.add(0, order.getApplicationSort());
                 } else {
-                    sortMetaOrdering.add(order.applicationSort);
+                    sortMetaOrdering.add(order.getApplicationSort());
                 }
             } else {
                 throw new IllegalStateException("Neither application sort request, nor UI sort request is available");

@@ -71,7 +71,7 @@
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
                 <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-                <version>4.0.1</version>
+                <version>${eclipselink.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>

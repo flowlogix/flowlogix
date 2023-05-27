@@ -54,7 +54,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * and can be used with {@link #getResultField(String)} for result fields
      */
     public static final String RESULT = "result";
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
     @Delegate
     private JPAModelImpl<TT, KK> impl;
 

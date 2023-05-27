@@ -15,6 +15,7 @@
  */
 package com.flowlogix.jeedao;
 
+import java.io.Serializable;
 import lombok.experimental.Delegate;
 
 /**
@@ -27,7 +28,9 @@ import lombok.experimental.Delegate;
  * @see DaoHelper
  * @param <TT> Entity Type
  */
-public class InheritableDaoHelper<TT> {
+public class InheritableDaoHelper<TT> implements Serializable {
+    private static final long serialVersionUID = 4L;
+
     @Delegate
     protected DaoHelper<TT> daoHelper;
 }

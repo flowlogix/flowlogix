@@ -64,7 +64,7 @@ import static java.lang.Math.toIntExact;
  * @author lprimak
  */
 public final class DaoHelper<TT> implements Serializable {
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
 
     /**
      * QueryCriteria record contains {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}

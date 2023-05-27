@@ -76,7 +76,7 @@ import org.primefaces.model.SortMeta;
 @Builder
 @Slf4j
 public class JPAModelImpl<TT, KK> implements Serializable {
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
     /**
      * Return entity manager to operate on
      */

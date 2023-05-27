@@ -134,6 +134,13 @@ public class JPAModelImpl<TT, KK> implements Serializable {
 
     private static class FilterDataMap extends HashMap<String, FilterColumnData> implements FilterData { }
 
+    /**
+     * partial builder, just for javadoc
+     * @param <TT>
+     * @param <KK>
+     */
+    public static class JPAModelImplBuilder<TT, KK> { }
+
     public int count(Map<String, FilterMeta> filters) {
         return toIntExact(daoHelper.get().count(builder -> builder
                 .countQueryCriteria(cqc -> cqc.query().where(getFilters(filters, cqc.builder(), cqc.root())))

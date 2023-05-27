@@ -31,6 +31,7 @@
         <payara.start.skip>${skipITs}</payara.start.skip>
 
         <docs.phase>deploy</docs.phase>
+        <delombok.phase>none</delombok.phase>
         <javadoc.title>${project.name}</javadoc.title>
         <snippet.p1>${project.build.sourceDirectory}</snippet.p1>
         <snippet.p2>${project.build.testSourceDirectory}</snippet.p2>
@@ -333,11 +334,12 @@
                     <configuration>
                         <doclint>all,-reference</doclint>
                         <overview>${project.build.sourceDirectory}/overview.html</overview>
-                        <sourcepath>${project.build.directory}/generated-sources/delombok
+                        <sourcepath>${project.build.sourceDirectory}
                             :${project.build.directory}/generated-sources/annotations</sourcepath>
                         <additionalOptions>--snippet-path ${snippet.path}</additionalOptions>
                         <doctitle>${javadoc.title}</doctitle>
                         <bottom>Copyright © ${project.inceptionYear}-2023 Flow Logix, Inc. All Rights Reserved.</bottom>
+                        <excludePackageNames>*.impl</excludePackageNames>
                         <links>
                             <link>https://javadoc.io/doc/jakarta.platform/jakarta.jakartaee-api/latest/</link>
                             <link>https://javadoc.io/doc/org.jboss.shrinkwrap/shrinkwrap-api/latest/</link>
@@ -372,7 +374,7 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <phase>generate-sources</phase>
+                            <phase>${delombok.phase}</phase>
                             <goals>
                                 <goal>delombok</goal>
                             </goals>

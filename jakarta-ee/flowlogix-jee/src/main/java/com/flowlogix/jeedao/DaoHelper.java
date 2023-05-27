@@ -217,6 +217,13 @@ public final class DaoHelper<TT> implements Serializable {
         @Default
         @NonNull
         private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = c -> { };
+
+        /**
+         * @hidden
+         * just for javadoc
+         * @param <TT>
+         */
+        public static class ParametersBuilder<TT> { }
     }
 
     public TypedQuery<TT> findAll() {

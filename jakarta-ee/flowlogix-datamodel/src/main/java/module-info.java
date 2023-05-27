@@ -1,3 +1,6 @@
+/**
+ * PrimeFaces JPA-backed {@link com.flowlogix.jeedao.primefaces.JPALazyDataModel}
+ */
 module flowlogix.datamodel {
     exports com.flowlogix.jeedao.primefaces;
 

@@ -75,6 +75,11 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         return model;
     }
 
+    /**
+     * Serializable builder lambda to easily facilitate creation of {@link JPALazyDataModel}
+     * @param <TT> Entity Type
+     * @param <KK> Key Type
+     */
     public interface BuilderFunction<TT, KK> extends Function<JPAModelImplBuilder<TT, KK>,
             JPAModelImpl<TT, KK>>, Serializable { }
 

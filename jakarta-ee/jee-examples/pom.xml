@@ -25,6 +25,7 @@
         <arquillian.version>1.7.0.Final</arquillian.version>
         <flowlogix.version>${project.version}</flowlogix.version>
         <demo.entity.jar>lib/flowlogix-jee-${flowlogix.version}-tests.jar</demo.entity.jar>
+        <delombok.phase>generate-sources</delombok.phase>
     </properties>
 
     <!-- tag::dependenciesStart[] -->
@@ -207,6 +208,13 @@
             <plugin>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <sourcepath>${project.build.directory}/generated-sources/delombok
+                        :${project.build.directory}/generated-sources/annotations</sourcepath>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>

@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>5.x-SNAPSHOT</version>
+    <version>5.5</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Utility Library Root POM</description>
@@ -40,7 +40,7 @@
         <groovy.version>4.0.12</groovy.version>
         <lombok.version>1.18.28</lombok.version>
         <jacocoPort>52212</jacocoPort>
-        <jacocoAgent/>
+        <jacocoAgent />
         <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>
         <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
 
@@ -384,10 +384,10 @@
                         <createDependencyReducedPom>false</createDependencyReducedPom>
                         <minimizeJar>false</minimizeJar>
                         <transformers>
-                            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                             <transformer implementation="io.yupiik.maven.shade.transformer.RelocationTransformer">
                                 <delegates>
-                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"/>
+                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
                                     <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                         <resource>WEB-INF/faces-config.xml</resource>
                                     </transformer>
@@ -638,7 +638,7 @@
         <url>https://github.com/flowlogix/flowlogix</url>
         <connection>scm:git:git@github.com:flowlogix/flowlogix.git</connection>
         <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>Version-5.5</tag>
     </scm>
 
     <distributionManagement>

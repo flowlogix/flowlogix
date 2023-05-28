@@ -203,14 +203,15 @@ public class TypeConverter {
      * @return checked type
      */
     public static <TT> CheckedValue<TT> checkAndConvert(@NonNull String value, @NonNull Class<TT> type) {
+        TT cv = null;
         try {
-            TT cv = TypeConverter.valueOf(value, type);
+            cv = TypeConverter.valueOf(value, type);
             if (value.equals(cv.toString())) {
                 return new CheckedValue<>(true, cv);
             }
         } catch (IllegalArgumentException e) {
         }
-        return new CheckedValue<>(false, null);
+        return new CheckedValue<>(false, cv);
     }
 
     /**

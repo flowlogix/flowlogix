@@ -45,6 +45,24 @@ public class TypeConverterTest {
     }
 
     @Test
+    @SuppressWarnings("MagicNumber")
+    void checkDoubleValue() {
+        var value = 1.23456789123456d;
+        var converted = TypeConverter.checkAndConvert(Double.toString(value), double.class);
+        assertTrue(converted.isValid());
+        assertEquals(value, converted.getValue());
+    }
+
+    @Test
+    @SuppressWarnings("MagicNumber")
+    void checkFloatValue() {
+        var value = 1.2345678f;
+        var converted = TypeConverter.checkAndConvert(Float.toString(value), float.class);
+        assertTrue(converted.isValid());
+        assertEquals(value, converted.getValue());
+    }
+
+    @Test
     void cornerCases() {
         assertThrows(NullPointerException.class, () -> TypeConverter.valueOf(null, int.class));
         assertEquals(0, TypeConverter.valueOf("", Double.class));

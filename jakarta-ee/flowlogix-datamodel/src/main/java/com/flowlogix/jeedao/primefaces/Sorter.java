@@ -43,16 +43,15 @@ public interface Sorter<TT> {
      */
     class SortData {
         /**
-         * Sort based on columns
+         * Sort based on columns, the map key is equivalent to {@link SortMeta#getField()}
          */
         @Getter
         private final Map<String, MergedSortOrder> sortData;
 
         public SortData(Map<String, SortMeta> sm) {
-            sortData = sm.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue())
-                    .collect(Collectors.toMap(entry -> entry.getValue().getField(), value ->
-                                    new MergedSortOrder(value.getValue(), null, false),
+            sortData = sm.values().stream().sorted()
+                    .collect(Collectors.toMap(SortMeta::getField, value ->
+                                    new MergedSortOrder(value, null, false),
                             (v1, v2) -> v1, LinkedHashMap::new));
         }
 

@@ -20,6 +20,7 @@ import static com.flowlogix.util.SerializeTester.serializeAndDeserialize;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.primefaces.impl.JPAModelImpl;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import java.io.IOException;
@@ -43,6 +44,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.primefaces.model.SortOrder.ASCENDING;
@@ -71,6 +73,8 @@ public class ModelTest implements Serializable {
     transient Root<Integer> rootInteger;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     transient Path<Integer> integerPath;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    transient Join<Integer, Integer> integerJoin;
 
     @Test
     void resultField() {
@@ -88,6 +92,7 @@ public class ModelTest implements Serializable {
         when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
         var fm = FilterMeta.builder().field("aaa").filterValue("hello").build();
         impl.getFilters(Map.of("aaa", fm), cb, rootObject);
+        verify(rootObject).get("test");
     }
 
     @Test
@@ -101,6 +106,7 @@ public class ModelTest implements Serializable {
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
         var fm = FilterMeta.builder().field("aaa").filterValue(5).build();
         impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+        verify(rootInteger).get("aaa");
     }
 
     @Test
@@ -114,11 +120,13 @@ public class ModelTest implements Serializable {
         var fm = FilterMeta.builder().field("aaa")
                 .filterValue(List.of("one", "two")).matchMode(MatchMode.IN).build();
         impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+        verify(rootInteger).get("aaa");
     }
 
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {
-        filterData.replaceFilter("aaa",
-                (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value));
+        assertTrue(filterData.replaceFilter("aaa",
+                (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value)));
+        root.get("test");
     }
 
     @Test
@@ -196,6 +204,35 @@ public class ModelTest implements Serializable {
     }
 
     @Test
+    void resolveSimpleField() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        when(rootInteger.<Integer, Integer>join(any(String.class))).thenReturn(integerJoin);
+        when(rootInteger.<Integer>get("a")).thenReturn(integerPath);
+        assertEquals(integerPath, impl.resolveField(rootInteger, "a"));
+        verify(rootInteger).get("a");
+    }
+
+    @Test
+    void resolveJoinField() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        when(rootInteger.<Integer, Integer>join(any(String.class))).thenReturn(integerJoin);
+        when(integerJoin.<Integer, Integer>join(any(String.class))).thenReturn(integerJoin);
+        when(integerJoin.<Integer>get("c")).thenReturn(integerPath);
+        assertEquals(integerPath, impl.resolveField(rootInteger, "a.b.c"));
+        verify(rootInteger).join("a");
+        verify(integerJoin).join("b");
+        verify(integerJoin).get("c");
+    }
+
+    @Test
     void jsfConversionTest() {
         var impl = JPAModelImpl.<Integer, Long>builder()
                 .entityManager(() -> em)
@@ -207,6 +244,7 @@ public class ModelTest implements Serializable {
         try (var mockedStatic = mockStatic(Faces.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
             impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
         }
+        verify(rootInteger).get("aaa");
     }
 
     @RequiredArgsConstructor

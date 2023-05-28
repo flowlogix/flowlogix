@@ -42,18 +42,20 @@ public interface Filter<TT> {
          * @param <TT> type of value
          * @param element element to be replace
          * @param fp lambda to get the new Filter predicate
+         * @return true if succeeded
          */
         @SuppressWarnings({"unchecked", "EmptyBlock"})
-        default <TT> void replaceFilter(String element, BiFunction<Predicate, TT, Predicate> fp) {
+        default <TT> boolean replaceFilter(String element, BiFunction<Predicate, TT, Predicate> fp) {
             FilterColumnData elt = get(element);
             if (elt != null && elt.getFilterValue() != null) {
                 if (elt.getFilterValue() instanceof String && isBlank((String) elt.getFilterValue())) {
                     // do nothing if blank string
                 } else {
-                    replace(element, new FilterColumnData(elt.getFilterValue(),
-                            fp.apply(elt.getPredicate(), (TT) elt.getFilterValue())));
+                    return replace(element, new FilterColumnData(elt.getFilterValue(),
+                            fp.apply(elt.getPredicate(), (TT) elt.getFilterValue()))) != null;
                 }
             }
+            return false;
         }
     }
 

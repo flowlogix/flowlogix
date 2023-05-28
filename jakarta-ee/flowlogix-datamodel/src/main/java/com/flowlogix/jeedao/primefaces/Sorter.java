@@ -51,7 +51,7 @@ public interface Sorter<TT> {
         public SortData(Map<String, SortMeta> sm) {
             sortData = sm.entrySet().stream()
                     .sorted(Map.Entry.comparingByValue())
-                    .collect(Collectors.toMap(Map.Entry::getKey, value ->
+                    .collect(Collectors.toMap(entry -> entry.getValue().getField(), value ->
                                     new MergedSortOrder(value.getValue(), null, false),
                             (v1, v2) -> v1, LinkedHashMap::new));
         }

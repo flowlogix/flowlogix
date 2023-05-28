@@ -151,11 +151,11 @@ public class ModelTest implements Serializable {
     }
 
     private static void addingSorter(SortData sortData, CriteriaBuilder cb, Root<Integer> root) {
-        sortData.applicationSort("col3", sortMeta -> {
+        sortData.applicationSort("ccc", sortMeta -> {
             assertTrue(sortMeta.isEmpty());
             return cb.asc(root.get("zipcode"));
         });
-        sortData.applicationSort("col4", true, sortMeta -> {
+        sortData.applicationSort("ddd", true, sortMeta -> {
             assertTrue(sortMeta.isEmpty());
             return cb.desc(root.get("zipcode"));
         });
@@ -186,7 +186,7 @@ public class ModelTest implements Serializable {
     }
 
     private static void replacingSorter(SortData sortData, CriteriaBuilder cb, Root<Integer> root) {
-        sortData.applicationSort("col2", sortMeta -> {
+        sortData.applicationSort("uuu", sortMeta -> {
             assertFalse(sortMeta.isEmpty());
             return cb.asc(root.get("zipcode"));
         });

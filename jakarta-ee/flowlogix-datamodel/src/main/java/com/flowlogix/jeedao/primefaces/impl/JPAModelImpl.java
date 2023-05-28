@@ -190,12 +190,12 @@ public class JPAModelImpl<TT, KK> implements Serializable {
 
     public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
         FilterData predicates = new FilterDataMap();
-        filters.forEach((key, filterMeta) -> {
+        filters.values().forEach(filterMeta -> {
             if (filterMeta.isGlobalFilter()) {
-                predicates.put(key, new FilterColumnData(filterMeta.getFilterValue(), null));
+                predicates.put(filterMeta.getField(), new FilterColumnData(filterMeta.getFilterValue(), null));
             } else {
-                var filterMetas = processFilterMeta(cb, root, key, filterMeta);
-                predicates.put(key, new FilterColumnData(filterMetas.value(), filterMetas.cond()));
+                var filterMetas = processFilterMeta(cb, root, filterMeta.getField(), filterMeta);
+                predicates.put(filterMeta.getField(), new FilterColumnData(filterMetas.value(), filterMetas.cond()));
             }
         });
         filter.filter(predicates, cb, root);
@@ -348,7 +348,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     @SuppressWarnings("MissingSwitchDefault")
     private List<Order> processSortMeta(Map<String, MergedSortOrder> sortMeta, CriteriaBuilder cb, Root<TT> root) {
         List<Order> sortMetaOrdering = new ArrayList<>();
-        sortMeta.forEach((column, order) -> {
+        sortMeta.values().forEach(order -> {
             if (order.getRequestedSortMeta() != null) {
                 switch (order.getRequestedSortMeta().getOrder()) {
                     case ASCENDING:

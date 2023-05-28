@@ -16,30 +16,25 @@
 package com.flowlogix.demo.jeedao.primefaces;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity;
+import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import lombok.Getter;
 
-/*
-// @start region="basicUsageHtml"
-// tag::basicUsageHtml[] // @replace regex='.*\n' replacement=""
-<p:dataTable lazy="true" value="#{userViewer.userModel}" var="user">
-    ... specify columns as usual ...
-</p:dataTable>
-// end::basicUsageHtml[] // @replace regex='.*\n' replacement=""
-// @end
-*/
-// @start region="basicUsage"
-// tag::basicUsage[] // @replace regex='.*\n' replacement=""
+// @start region="sorting"
+// tag::sorting[] // @replace regex='.*\n' replacement=""
 @Named
 @ViewScoped
-@SuppressWarnings("TrailingComment") // @replace regex='.*\n' replacement=""
-public class BasicDataModel implements Serializable { // @replace regex='BasicDataModel' replacement="UserViewer"
+public class SortingDataModel implements Serializable {
     @Getter
     private final JPALazyDataModel<UserEntity, Long> userModel = JPALazyDataModel
-            .create(builder -> builder.entityClass(UserEntity.class).build());
+            .create(builder -> builder.entityClass(UserEntity.class)
+                    // add an ascending zip code-based sort order
+                    .sorter((sortData, cb, root) -> sortData.applicationSort(UserEntity_.zipCode.getName(),
+                            var -> cb.asc(root.get(UserEntity_.zipCode))))
+                    .build());
 }
-// end::basicUsage[] // @replace regex='.*\n' replacement=""
+// end::sorting[] // @replace regex='.*\n' replacement=""
 // @end

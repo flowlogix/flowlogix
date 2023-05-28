@@ -40,7 +40,10 @@ import org.primefaces.model.SortMeta;
  * The implementation is serializable and works with failover to a different server instances
  * <p>
  * <em>Simple Example:</em>
- * {@snippet class = "com.flowlogix.examples.data.UserViewer" region = "simpleLazyDataModelUsage"}
+ * <p>
+ * userviewer.xhtml:
+ * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.BasicDataModel" region = "basicUsageHtml"}
+ * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.BasicDataModel" region = "basicUsage"}
  *
  * @author lprimak
  * @param <TT> Data Type

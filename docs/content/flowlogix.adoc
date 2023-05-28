@@ -348,13 +348,11 @@ Developers can transform any XML file from the archive by using the generic `man
 [[section-jpa-lazymodel]]
 === FlowLogix PrimeFaces DataTable Lazy Data Model backed by JPA
 .An easier alternative to PrimeFaces JPA Lazy Data model
-PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a big "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier, with a lot less code, better design. It also does not require inheritance and problems associated with it.
+PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a big "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier, with a lot less code and better design. It also does not require inheritance and problems associated with it.
 [source,xhtml]
 .userviewer.xhtml
 ----
-<p:dataTable lazy="true" value="#{userViewer.lazyModel}" var="user">
-    ... specify columns as usual ...
-</p:dataTable>
+include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/BasicDataModel.java[tags=basicUsageHtml]
 ----
 [source,java]
 .UserViewer.java
@@ -380,12 +378,7 @@ Above we created a model with case-insensitive filtering using a builder pattern
 Let's use custom sort criteria to add address to the default sort criteria:
 [source,java]
 ----
-JPALazyDataModel.create(builder -> builder.sorter(UserViewer::sorter).entityXXX().build());
-
-private static boolean sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
-        sortData.getSortOrder().add(cb.asc(root.get(UserEntity_.address)));
-        return false;
-}
+include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[tags=sorting]
 ----
 Let's use custom filter criteria using `replaceFilter` convenience method. Here we make sure that only zip codes greater than that in the filter are returned:
 [source,java]

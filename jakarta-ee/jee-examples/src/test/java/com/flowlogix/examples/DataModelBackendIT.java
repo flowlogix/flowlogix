@@ -17,6 +17,7 @@ package com.flowlogix.examples;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import com.flowlogix.demo.jeedao.primefaces.BasicDataModel;
+import com.flowlogix.demo.jeedao.primefaces.SortingDataModel;
 import java.util.Map;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -42,6 +43,15 @@ public class DataModelBackendIT {
                 .build()), Map.of());
         assertEquals(1, rows.size());
         assertEquals("Lovely Lady", rows.get(0).getFullName());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    @SuppressWarnings("MagicNumber")
+    void sortingDataModel() {
+        var model = new SortingDataModel();
+        var rows = model.getUserModel().findRows(0, 1, Map.of(), Map.of());
+        assertEquals(10012, rows.get(0).getZipCode());
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

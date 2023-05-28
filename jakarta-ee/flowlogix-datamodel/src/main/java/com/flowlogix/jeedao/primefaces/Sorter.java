@@ -32,6 +32,9 @@ import org.primefaces.model.SortMeta;
 /**
  * Sorter Hook
  * @param <TT> Entity Type
+ * <p>
+ * <em>Example:</em>
+ * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.SortingDataModel" region = "sorting"}
  */
 @FunctionalInterface
 public interface Sorter<TT> {

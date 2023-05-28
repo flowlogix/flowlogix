@@ -5,6 +5,7 @@ module com.flowlogix.datamodel {
     exports com.flowlogix.jeedao.primefaces;
 
     requires com.flowlogix.jee;
+    requires com.flowlogix.jee.demo;
     requires lombok;
     requires org.slf4j;
     requires org.apache.commons.lang3;

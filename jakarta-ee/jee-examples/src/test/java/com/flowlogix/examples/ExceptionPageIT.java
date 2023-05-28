@@ -202,7 +202,8 @@ public class ExceptionPageIT {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class)
-                .addClass(DaoHelperIT.class);
+                .addClass(DaoHelperIT.class)
+                .addClass(DataModelBackendIT.class);
 
         filterPersistenceXML(archive);
         log.debug("Archive contents: {}", archive.toString(true));

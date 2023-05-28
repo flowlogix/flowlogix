@@ -18,7 +18,7 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Declares Jakarta Faces PROJECT_STAGE development mode automatically
 * Automatically uses minified versions of assets with Jakarta Faces
 * Provides easy and automatic initialization of OmniFaces' UnmappedResourceHandler
-* Easier-to-use JPA Lazy Data Model for PrimeFaces
+* Easier-to-use JPA Lazy Data Model for PrimeFaces DataTable
 * Automatically includes PrimeFaces font mime types in your web applications, preventing warnings and extra entries in your web.xml
 * Convert strings to arbitrary types on a best-effort basis
 * Transforms names between javax and jakarta namespaces
@@ -46,7 +46,7 @@ FlowLogix 6.x/7.x is compatible with Java 17+ and Jakarta EE 9 and later. No cla
 === Installation
 Artifacts are available in the Sonatype's
 link:https://central.sonatype.com/search?smo=true&q=com.flowlogix&sort=published[Maven Central repository^].
-Both 5.x and 6.x snapshots are available in the
+All snapshots are available in the
 link:https://s01.oss.sonatype.org/content/repositories/snapshots/com/flowlogix/[Maven Central snapshot^] repository
 [source,xml]
 .Maven Example (Jakarta EE Components)
@@ -346,9 +346,9 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/Sh
 Developers can transform any XML file from the archive by using the generic `manipulateXml()` method, which both `webXmlXPath()` and `persistenceXmlXPath()` methods utilize to do their job.
 
 [[section-jpa-lazymodel]]
-=== FlowLogix PrimeFaces Lazy Data Model backed by JPA
+=== FlowLogix PrimeFaces DataTable Lazy Data Model backed by JPA
 .An easier alternative to PrimeFaces JPA Lazy Data model
-PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier and with a lot less code.
+PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a big "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier, with a lot less code, better design. It also does not require inheritance and problems associated with it.
 [source,xhtml]
 .userviewer.xhtml
 ----
@@ -365,7 +365,7 @@ public class UserViewer implements Serializable {
 include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage,!simpleOptionalLazyDataModelUsage"]
 }
 ----
-Above we created a model with case-insensitive filtering.
+Above we created a model with case-insensitive filtering using a builder pattern.
 
 `JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
 

@@ -32,6 +32,10 @@
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 </project>

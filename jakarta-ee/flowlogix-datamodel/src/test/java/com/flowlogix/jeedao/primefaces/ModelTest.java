@@ -87,7 +87,7 @@ public class ModelTest implements Serializable {
                 .build();
         when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
         var fm = FilterMeta.builder().field("aaa").filterValue("hello").build();
-        impl.getFilters(Map.of("column", fm), cb, rootObject);
+        impl.getFilters(Map.of("aaa", fm), cb, rootObject);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class ModelTest implements Serializable {
                 .build();
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
         var fm = FilterMeta.builder().field("aaa").filterValue(5).build();
-        impl.getFilters(Map.of("column", fm), cb, rootInteger);
+        impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
     }
 
     @Test
@@ -113,11 +113,11 @@ public class ModelTest implements Serializable {
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> List.class);
         var fm = FilterMeta.builder().field("aaa")
                 .filterValue(List.of("one", "two")).matchMode(MatchMode.IN).build();
-        impl.getFilters(Map.of("column", fm), cb, rootInteger);
+        impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
     }
 
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {
-        filterData.replaceFilter("column",
+        filterData.replaceFilter("aaa",
                 (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value));
     }
 
@@ -205,7 +205,7 @@ public class ModelTest implements Serializable {
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
         var fm = FilterMeta.builder().field("aaa").filterValue("xxx").build();
         try (var mockedStatic = mockStatic(Faces.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
-            impl.getFilters(Map.of("column", fm), cb, rootInteger);
+            impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
         }
     }
 

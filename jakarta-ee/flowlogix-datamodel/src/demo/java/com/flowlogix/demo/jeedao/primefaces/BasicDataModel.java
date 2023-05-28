@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces;
+package com.flowlogix.demo.jeedao.primefaces;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity;
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import lombok.Getter;
 
 public class BasicDataModel {

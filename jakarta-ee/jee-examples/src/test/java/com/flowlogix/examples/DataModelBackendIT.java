@@ -16,7 +16,7 @@
 package com.flowlogix.examples;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
-import com.flowlogix.jeedao.primefaces.BasicDataModel;
+import com.flowlogix.demo.jeedao.primefaces.BasicDataModel;
 import java.util.Map;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;

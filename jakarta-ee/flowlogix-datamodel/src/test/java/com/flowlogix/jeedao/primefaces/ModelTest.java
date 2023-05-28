@@ -85,9 +85,8 @@ public class ModelTest implements Serializable {
                 .converter(s -> new Object())
                 .filter(ModelTest::filter)
                 .build();
-        var fm = new FilterMeta();
         when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
-        fm.setFilterValue("hello");
+        var fm = FilterMeta.builder().field("aaa").filterValue("hello").build();
         impl.getFilters(Map.of("column", fm), cb, rootObject);
     }
 
@@ -99,9 +98,8 @@ public class ModelTest implements Serializable {
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
                 .build();
-        var fm = new FilterMeta();
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
-        fm.setFilterValue(5);
+        var fm = FilterMeta.builder().field("aaa").filterValue(5).build();
         impl.getFilters(Map.of("column", fm), cb, rootInteger);
     }
 
@@ -112,10 +110,9 @@ public class ModelTest implements Serializable {
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
                 .build();
-        var fm = new FilterMeta();
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> List.class);
-        fm.setFilterValue(List.of("one", "two"));
-        fm.setMatchMode(MatchMode.IN);
+        var fm = FilterMeta.builder().field("aaa")
+                .filterValue(List.of("one", "two")).matchMode(MatchMode.IN).build();
         impl.getFilters(Map.of("column", fm), cb, rootInteger);
     }
 
@@ -205,9 +202,8 @@ public class ModelTest implements Serializable {
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
                 .build();
-        var fm = new FilterMeta();
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
-        fm.setFilterValue("xxx");
+        var fm = FilterMeta.builder().field("aaa").filterValue("xxx").build();
         try (var mockedStatic = mockStatic(Faces.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
             impl.getFilters(Map.of("column", fm), cb, rootInteger);
         }

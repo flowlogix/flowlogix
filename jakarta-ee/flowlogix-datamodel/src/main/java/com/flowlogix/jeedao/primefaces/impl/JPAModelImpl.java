@@ -26,6 +26,7 @@ import com.flowlogix.jeedao.primefaces.Sorter;
 import com.flowlogix.jeedao.primefaces.Sorter.MergedSortOrder;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.util.TypeConverter;
+import jakarta.persistence.criteria.Join;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -203,16 +204,47 @@ public class JPAModelImpl<TT, KK> implements Serializable {
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
 
+    public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
+        var sortData = new SortData(sortCriteria);
+        sorter.sort(sortData, cb, root);
+        return processSortMeta(sortData.getSortData(), cb, root);
+    }
+
+    /**
+     * Recursively resolve field name, possibly by joining other tables,
+     * based on a dotted notation of the field
+     *
+     * @param root Criteria root
+     * @param fieldName field name
+     * @return expression
+     * @param <YY> expression type
+     */
+    public <YY> Expression<YY> resolveField(Root<TT> root, String fieldName) {
+        Join<?, ?> join = null;
+        // recursively traverse all dotted fields, and join each
+        while (fieldName.contains(".")) {
+            String partial = fieldName.substring(0, fieldName.indexOf("."));
+            fieldName = fieldName.substring(partial.length() + 1);
+            if (join == null) {
+                join = root.join(partial);
+            } else {
+                join = join.join(partial);
+            }
+        }
+        return join == null ? root.get(fieldName) : join.get(fieldName);
+    }
+
     private FilterMetaResult processFilterMeta(CriteriaBuilder cb, Root<TT> root, String key, FilterMeta filterMeta) {
         Predicate cond = null;
         Object value = filterMeta.getFilterValue();
         try {
-            Class<?> fieldType = root.get(key).getJavaType();
+            var field = resolveField(root, key);
+            Class<?> fieldType = field.getJavaType();
             if (fieldType == String.class) {
                 value = value.toString();
-                cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
+                cond = predicateFromFilter(cb, field, filterMeta, value);
             } else if (fieldType.isArray() || Collection.class.isAssignableFrom(fieldType)) {
-                cond = predicateFromFilterOrComparable(cond, cb, root, key, filterMeta, value, fieldType);
+                cond = predicateFromFilterOrComparable(cond, cb, root, field, filterMeta, value, fieldType);
             } else {
                 var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
                 boolean valid = convertedValue.isValid();
@@ -231,7 +263,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
                     }
                 }
                 if (valid) {
-                    cond = predicateFromFilterOrComparable(cond, cb, root, key, filterMeta, value, fieldType);
+                    cond = predicateFromFilterOrComparable(cond, cb, root, field, filterMeta, value, fieldType);
                 }
             }
         } catch (IllegalArgumentException e) { /* ignore possibly extra filter columns */ }
@@ -240,13 +272,15 @@ public class JPAModelImpl<TT, KK> implements Serializable {
 
     private record FilterMetaResult(Predicate cond, Object value) { }
 
-    private Predicate predicateFromFilterOrComparable(Predicate cond, CriteriaBuilder cb, Root<TT> root,
-            String key, FilterMeta filterMeta, Object value, Class<?> columnType) {
-        cond = predicateFromFilter(cb, root.get(key), filterMeta, value);
-        if (cond == null && Comparable.class.isAssignableFrom(columnType)) {
+    private Predicate predicateFromFilterOrComparable(Predicate cond, CriteriaBuilder cb, Root<TT> root, Expression<?> field,
+                                                      FilterMeta filterMeta, Object value, Class<?> fieldType) {
+        cond = predicateFromFilter(cb, field, filterMeta, value);
+        if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
             @SuppressWarnings({"unchecked", "rawtypes"})
-                    Comparable<? super Comparable> cv = (Comparable) value;
-            cond = predicateFromFilterComparable(cb, root.get(key), filterMeta, cv);
+            Comparable<? super Comparable> cv = (Comparable) value;
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            Expression<Comparable<? super Comparable>> comparableField = (Expression<Comparable<? super Comparable>>) field;
+            cond = predicateFromFilterComparable(cb, comparableField, filterMeta, cv);
         }
         return cond;
     }
@@ -339,12 +373,6 @@ public class JPAModelImpl<TT, KK> implements Serializable {
                 cb.lessThanOrEqualTo(objectExpression, iterBetween.next()));
     }
 
-    public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
-        var sortData = new SortData(sortCriteria);
-        sorter.sort(sortData, cb, root);
-        return processSortMeta(sortData.getSortData(), cb, root);
-    }
-
     @SuppressWarnings("MissingSwitchDefault")
     private List<Order> processSortMeta(Map<String, MergedSortOrder> sortMeta, CriteriaBuilder cb, Root<TT> root) {
         List<Order> sortMetaOrdering = new ArrayList<>();
@@ -352,10 +380,10 @@ public class JPAModelImpl<TT, KK> implements Serializable {
             if (order.getRequestedSortMeta() != null) {
                 switch (order.getRequestedSortMeta().getOrder()) {
                     case ASCENDING:
-                        sortMetaOrdering.add(cb.asc(root.get(order.getRequestedSortMeta().getField())));
+                        sortMetaOrdering.add(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
                         break;
                     case DESCENDING:
-                        sortMetaOrdering.add(cb.desc(root.get(order.getRequestedSortMeta().getField())));
+                        sortMetaOrdering.add(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
                         break;
                 }
             } else if (order.getApplicationSort() != null) {

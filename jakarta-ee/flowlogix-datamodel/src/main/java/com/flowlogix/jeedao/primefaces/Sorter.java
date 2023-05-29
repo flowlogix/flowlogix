@@ -46,7 +46,7 @@ public interface Sorter<TT> {
      */
     class SortData {
         /**
-         * Sort based on columns, the map key is equivalent to {@link SortMeta#getField()}
+         * Sort based on fields, the map key is equivalent to {@link SortMeta#getField()}
          */
         @Getter
         private final Map<String, MergedSortOrder> sortData;
@@ -62,15 +62,11 @@ public interface Sorter<TT> {
          * Replaces, or adds application sort criteria to the existing UI sort criteria
          * If the sort criteria is new, it is placed at the lowest sort order
          *
-         * @param columnName element to be replace
+         * @param fieldName element to be replaced or added
          * @param fp        lambda to get the application sort criteria
          */
-        public void applicationSort(String columnName, Function<Optional<SortMeta>, Order> fp) {
-            int size = getSortData().size();
-            getSortData().compute(columnName, (key, value) -> new MergedSortOrder(null,
-                    Objects.requireNonNull(fp.apply(Optional.ofNullable(value != null
-                                    ? value.getRequestedSortMeta() : null)),
-                            "Sort Criteria cannot be null"), false));
+        public void applicationSort(String fieldName, Function<Optional<SortMeta>, Order> fp) {
+            applicationSort(fieldName, false, fp);
         }
 
         /**
@@ -78,15 +74,15 @@ public interface Sorter<TT> {
          * If the sort criteria is new, it is placed at either highest or lowest order,
          * depending on the highPriority parameter
          *
-         * @param columnName    element to be replace
+         * @param fieldName    field to be replaced or added
          * @param highPriority integer (starting with zero, highest priority)
          *                     where this sort directive is put into the array,
          *                     only if it's inserted, and not modified
          * @param fp           lambda to get the application sort criteria
          */
-        public void applicationSort(String columnName, boolean highPriority,
+        public void applicationSort(String fieldName, boolean highPriority,
                                     Function<Optional<SortMeta>, Order> fp) {
-            getSortData().compute(columnName, (key, value) -> new MergedSortOrder(null,
+            getSortData().compute(fieldName, (key, value) -> new MergedSortOrder(null,
                     Objects.requireNonNull(fp.apply(Optional.ofNullable(value != null
                                     ? value.getRequestedSortMeta() : null)),
                             "Sort Criteria cannot be null"), highPriority));

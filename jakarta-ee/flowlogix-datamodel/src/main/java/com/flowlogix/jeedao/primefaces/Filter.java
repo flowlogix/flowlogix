@@ -37,21 +37,21 @@ public interface Filter<TT> {
      */
     interface FilterData extends Map<String, FilterColumnData> {
         /**
-         * Replacing a predicate in the filter list by column name
+         * Replacing a predicate in the filter list by field name
          *
          * @param <TT> type of value
-         * @param element element to be replace
+         * @param fieldName element to be replace
          * @param fp lambda to get the new Filter predicate
          * @return true if succeeded
          */
         @SuppressWarnings({"unchecked", "EmptyBlock"})
-        default <TT> boolean replaceFilter(String element, BiFunction<Predicate, TT, Predicate> fp) {
-            FilterColumnData elt = get(element);
+        default <TT> boolean replaceFilter(String fieldName, BiFunction<Predicate, TT, Predicate> fp) {
+            FilterColumnData elt = get(fieldName);
             if (elt != null && elt.getFilterValue() != null) {
                 if (elt.getFilterValue() instanceof String && isBlank((String) elt.getFilterValue())) {
                     // do nothing if blank string
                 } else {
-                    return replace(element, new FilterColumnData(elt.getFilterValue(),
+                    return replace(fieldName, new FilterColumnData(elt.getFilterValue(),
                             fp.apply(elt.getPredicate(), (TT) elt.getFilterValue()))) != null;
                 }
             }
@@ -66,7 +66,7 @@ public interface Filter<TT> {
     @Getter
     class FilterColumnData {
         /**
-         * filter column value
+         * filter field value
          */
         private final Object filterValue;
         /**

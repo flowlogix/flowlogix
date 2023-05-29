@@ -117,10 +117,10 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     private final transient @Getter @NonNull Function<TypedQuery<TT>, TypedQuery<TT>> optimizer = a -> a;
 
     /**
-     * whether string queries are case-sensitive
+     * Specifies whether String filters are case-sensitive
      */
     @Default
-    private final @Getter boolean caseSensitiveQuery = true;
+    private final @Getter boolean caseSensitiveFilter = true;
 
     private final Lazy<Function<String, KK>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
@@ -290,7 +290,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         private final String value;
 
         ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
-            if (caseSensitiveQuery) {
+            if (caseSensitiveFilter) {
                 this.expression = expression.as(String.class);
                 this.value = value.toString();
             } else {

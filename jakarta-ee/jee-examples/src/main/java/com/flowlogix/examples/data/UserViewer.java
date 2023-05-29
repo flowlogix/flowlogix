@@ -44,7 +44,7 @@ public class UserViewer implements Serializable {
             JPALazyDataModel.create(builder -> builder
                     .entityClass(UserEntity.class)
                     // the line below is optional, default is case-sensitive (true)
-                    .caseSensitiveQuery(false)
+                    .caseSensitiveFilter(false)
                     // tag::simpleOptionalLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
                     // the following 2 lines are optional
 //                    .sorter(UserViewer::sorter) // @replace regex="^\/\/" replacement=""

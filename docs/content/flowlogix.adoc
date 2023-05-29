@@ -369,11 +369,12 @@ Above we created a model with case-insensitive filtering using a builder pattern
 
 * entityManager: Provide entity manager `Supplier`. Default is injected via CDI
 * entityManagerQualifiers: Provides a list of qualifier annotations to select the correct EntityManager for injection
-* sorter: Apply custom sort criteria
-* filter: Apply custom filter criteria
-* optimizer: Apply custom JPA hints, works with `DaoHelper`
-* converter: `Function` that converts String representation of a primary key into an primary key object. Needed only if the default is insufficient.
-* keyConverter: `Function` that converts an entity object into primary key in `String` form. Needed only if the default is insufficient.
+* caseSensitiveFilter: Specifies if filtering of String values are case-sensitive (boolean). Default is `true`.
+* sorter: Apply additional or replacement sort criteria
+* filter: Apply additional or replacement filter criteria
+* optimizer: Apply additional customizations to queries, such as JPA hints, works together with `DaoHelper`
+* converter: `Function` that converts String representation of a primary key into a primary key object. Needed only if the default is insufficient.
+* keyConverter: `Function` that converts an entity object into it's primary key in `String` form. Needed only if the default is insufficient.
 
 Let's use custom sort criteria to add address to the default sort criteria:
 [source,java]

@@ -376,7 +376,7 @@ Above we created a model with case-insensitive filtering using a builder pattern
 * converter: `Function` that converts String representation of a primary key into a primary key object. Needed only if the default is insufficient.
 * keyConverter: `Function` that converts an entity object into it's primary key in `String` form. Needed only if the default is insufficient.
 
-Let's use custom sort criteria to add address to the default sort criteria:
+Let's use custom criteria to add address to the default sort:
 [source,java]
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[tags=sorting]
@@ -384,12 +384,7 @@ include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/j
 Let's use custom filter criteria using `replaceFilter` convenience method. Here we make sure that only zip codes greater than that in the filter are returned:
 [source,java]
 ----
-JPALazyDataModel.create(builder -> builder.filter(UserViewer::filter).entityXXX().build());
-
-private static void filter(Map<String, FilterData> filters, CriteriaBuilder cb, Root<UserEntity> root) {
-        replaceFilter(filters, UserEntity_.zipCode.getName(),
-                (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value));
-}
+include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[tags=filtering]
 ----
 Optimizer hints can be used to batch fetch dependent entities. The `Function` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner.
 [source,java]

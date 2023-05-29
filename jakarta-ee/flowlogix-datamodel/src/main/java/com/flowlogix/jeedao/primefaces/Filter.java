@@ -26,6 +26,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Filter Hook
+ * <p>
+ * <em>Example:</em>
+ * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.FilteringDataModel" region = "filtering"}
  *
  * @param <TT> Entity Type
  */

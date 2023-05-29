@@ -41,6 +41,9 @@ public interface Sorter<TT> {
     /**
      * Manipulates sort criteria requested from the UI and possibly adds
      * or replaces it with application-based sort criteria
+     * <p>
+     * <em>Example:</em>
+     * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.SortingDataModel" region = "sorting"}
      *
      * @author lprimak
      */

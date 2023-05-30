@@ -414,6 +414,13 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         return (Class<KK>) getPrimaryKey(Optional.empty()).getClass();
     }
 
+    /**
+     * Unfortunately, CDI beans like {@link JPALazyDataModel} cannot contain serialization-related methods
+     * as Weld doesn't handle that well. We have to put all those methods here and make this class truly Serializable
+     *
+     * @return new, corrected object
+     * @throws ObjectStreamException
+     */
     Object readResolve() throws ObjectStreamException {
         var corrected = x_do_not_use_in_builder.apply(JPAModelImpl.builder());
         corrected.x_do_not_use_in_builder = x_do_not_use_in_builder;

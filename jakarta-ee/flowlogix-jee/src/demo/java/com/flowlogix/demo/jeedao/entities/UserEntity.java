@@ -15,25 +15,35 @@
  */
 package com.flowlogix.demo.jeedao.entities;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.PostPersist;
 import java.io.Serializable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * Example entity, representing user ID
  */
 @Entity
 @Data
+@EqualsAndHashCode(of = "id")
+@ToString(exclude = "alternateEmails")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     @Id
     @GeneratedValue
     private Long id;
@@ -42,4 +52,18 @@ public class UserEntity implements Serializable {
     private String fullName;
     private String address;
     private Integer zipCode;
+
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserSettings> userSettings;
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("email ASC")
+    private List<AlternateEmails> alternateEmails;
+
+    @PostPersist
+    void setRelationshipIDs() {
+        userSettings.forEach(setting -> setting.setUserId(id));
+        alternateEmails.forEach(email -> email.setUserId(id));
+    }
 }

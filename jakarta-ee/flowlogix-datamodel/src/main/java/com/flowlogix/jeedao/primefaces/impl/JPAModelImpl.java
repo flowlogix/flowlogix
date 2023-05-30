@@ -112,6 +112,9 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     private final transient @Getter @NonNull Sorter<TT> sorter = (a, b, c) -> { };
     /**
      * add optimizer hints here
+     * <p>
+     * <em>Example:</em>
+     * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.OptimizingDataModel" region = "optimizing"}
      */
     @Default
     private final transient @Getter @NonNull Function<TypedQuery<TT>, TypedQuery<TT>> optimizer = a -> a;

@@ -386,14 +386,10 @@ Let's use custom filter criteria using `replaceFilter` convenience method. Here 
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[tags=filtering]
 ----
-Optimizer hints can be used to batch fetch dependent entities. The `Function` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner.
+Optimizer hints can be used to fetch dependent entity relationships in batches. The `Function` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner.
 [source,java]
 ----
-private static TypedQuery<UserEntity> optimizer(TypedQuery<UserEntity> query) {
-    return query.setHint(QueryHints.BATCH, getResultField("userSettings"))
-        .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN)
-        .setHint(QueryHints.BATCH, getResultField("alternateEmails"));
-}
+include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[tags=optimized]
 ----
 
 == API Reference

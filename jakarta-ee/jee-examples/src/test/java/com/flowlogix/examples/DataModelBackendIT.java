@@ -18,6 +18,7 @@ package com.flowlogix.examples;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import com.flowlogix.demo.jeedao.primefaces.BasicDataModel;
 import com.flowlogix.demo.jeedao.primefaces.FilteringDataModel;
+import com.flowlogix.demo.jeedao.primefaces.OptimizedDataModel;
 import com.flowlogix.demo.jeedao.primefaces.SortingDataModel;
 import java.util.Map;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -65,6 +66,24 @@ public class DataModelBackendIT {
                         .filterValue(68501).build()), Map.of());
         assertEquals(4, rows.size());
         assertEquals(68502, rows.get(0).getZipCode());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    @SuppressWarnings("MagicNumber")
+    void optimizedDataModel() {
+        var model = new OptimizedDataModel();
+        var rows = model.getUserModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName()).filterValue("lprimak")
+                        .build()), Map.of());
+        assertEquals(1, rows.size());
+        assertEquals("Lenny Primak", rows.get(0).getFullName());
+        assertEquals(2, rows.get(0).getAlternateEmails().size());
+        assertEquals("two@two.com", rows.get(0).getAlternateEmails().get(1).getEmail());
+        assertEquals(2, rows.get(0).getUserSettings().size());
+        assertEquals("LennySettingOne", rows.get(0).getUserSettings().get(0).getSettingName());
+        assertEquals("Setting1Value", rows.get(0).getUserSettings().get(0).getSettingValue());
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

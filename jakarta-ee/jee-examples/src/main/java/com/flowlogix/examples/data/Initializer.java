@@ -15,6 +15,8 @@
  */
 package com.flowlogix.examples.data;
 
+import com.flowlogix.demo.jeedao.entities.AlternateEmails;
+import com.flowlogix.demo.jeedao.entities.UserSettings;
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.EntityManagerSelector;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
@@ -27,10 +29,10 @@ import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 
 /**
- *
  * @author lprimak
  */
-@Singleton @Startup
+@Singleton
+@Startup
 public class Initializer {
     @Inject
     @EntityManagerSelector(AnotherEntityManager.class)
@@ -42,7 +44,14 @@ public class Initializer {
         if (helper.count() == 0) {
             List<UserEntity> userList = Stream.of(
                     UserEntity.builder().userId("lprimak").fullName("Lenny Primak")
-                            .address("Tree-Lined Blvd").zipCode(68502).build(),
+                            .address("Tree-Lined Blvd").zipCode(68502)
+                            .userSettings(List.of(UserSettings.builder()
+                                            .settingName("LennySettingOne").settingValue("Setting1Value").build(),
+                                    UserSettings.builder().settingName("lennySettingTwo")
+                                            .settingValue("Setting1TwoValue").build()))
+                            .alternateEmails(List.of(AlternateEmails.builder().email("one@one.com").build(),
+                                    AlternateEmails.builder().email("two@two.com").build()))
+                            .build(),
                     UserEntity.builder().userId("jprimak").fullName("Lovely Lady")
                             .address("Tree-Lined Street").zipCode(68502).build(),
                     UserEntity.builder().userId("anya").fullName("Lovely Daughter")

@@ -62,6 +62,7 @@ import org.primefaces.model.SortMeta;
  * @author lprimak
  */
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("MagicNumber")
 public class ModelTest implements Serializable {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS, serializable = true)
     EntityManager em;
@@ -96,7 +97,6 @@ public class ModelTest implements Serializable {
     }
 
     @Test
-    @SuppressWarnings("MagicNumber")
     void integerFilter() {
         var impl = JPAModelImpl.<Integer, Long>builder()
                 .entityManager(() -> em)
@@ -130,7 +130,6 @@ public class ModelTest implements Serializable {
     }
 
     @Test
-    @SuppressWarnings("MagicNumber")
     void sortAdding() {
         var impl = JPAModelImpl.<Integer, Long>builder()
                 .entityManager(() -> em)
@@ -167,7 +166,6 @@ public class ModelTest implements Serializable {
     }
 
     @Test
-    @SuppressWarnings("MagicNumber")
     void sortReplacing() {
         var impl = JPAModelImpl.<Integer, Long>builder()
                 .entityManager(() -> em)
@@ -233,7 +231,22 @@ public class ModelTest implements Serializable {
     }
 
     @Test
-    void jsfConversionTest() {
+    void optimizer() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .optimizer(query -> {
+                    rootInteger.get("optimizer");
+                    return query;
+                })
+                .build();
+        impl.findRows(0, 10, Map.of(), Map.of());
+        verify(rootInteger).get("optimizer");
+    }
+
+    @Test
+    void jsfConversion() {
         var impl = JPAModelImpl.<Integer, Long>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
@@ -250,14 +263,12 @@ public class ModelTest implements Serializable {
     @RequiredArgsConstructor
     public static class MyEntity {
         final Long id;
-        @SuppressWarnings("MagicNumber")
         public MyEntity() {
             this.id = 1L;
         }
     }
 
     @Test
-    @SuppressWarnings("MagicNumber")
     void defaultConverters() {
         var impl = JPAModelImpl.<MyEntity, Long>builder()
                 .entityManager(() -> em)
@@ -270,7 +281,6 @@ public class ModelTest implements Serializable {
     }
 
     @Test
-    @SuppressWarnings("MagicNumber")
     void serialization() throws IOException, ClassNotFoundException {
         JPALazyDataModel<MyEntity, Long> model;
         try (var mockedStatic = mockStatic(Beans.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {

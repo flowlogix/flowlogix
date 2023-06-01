@@ -378,18 +378,37 @@ Above we created a model with case-insensitive filtering using a builder pattern
 
 Let's use custom criteria to add address to the default sort:
 [source,java]
+.Add sorting by zip code
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[tags=sorting]
 ----
 Let's use custom filter criteria using `replaceFilter` convenience method. Here we make sure that only zip codes greater than that in the filter are returned:
 [source,java]
+.Show only zip codes greater than filtered field
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[tags=filtering]
 ----
-Optimizer hints can be used to fetch dependent entity relationships in batches. The `Function` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner.
+Optimizer hints can be used to fetch dependent entity relationships in batches. The `Function` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner:
 [source,java]
+.Batch query of dependent entities using `IN` query
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[tags=optimized]
+----
+
+Let's select a specific entity manager for this particular data model, by using a CDI qualifier:
+[source,java]
+.Using `entityManagerQualifiers` to specific persistence unit
+----
+include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[tags=qualifier]
+----
+
+`JPALazyDataModel` needs to convert a String representation of the entity's primary key into the actual entity primary key object. This is a requirement for PrimeFaces' `LazyDataModel.getRowKey(String)` method. Default converter is provided. However, if it's insufficient, `converter` builder method is provided to override the default.
+
+`JPALazyDataModel` needs to convert an entity instance to a String that represents its primary key. This is a requirement for PrimeFaces' `LazyDataModel.getRowKey(TT)` method. Default converter is provided. However, if it's insufficient, `keyConverter` builder method is provided to override the default.
+[source,java]
+.Use binary value as a primary key representation, using converters
+----
+include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/ConverterDataModel.java[tags=converter]
 ----
 
 == API Reference

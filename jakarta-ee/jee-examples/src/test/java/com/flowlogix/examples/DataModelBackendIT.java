@@ -17,8 +17,10 @@ package com.flowlogix.examples;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import com.flowlogix.demo.jeedao.primefaces.BasicDataModel;
+import com.flowlogix.demo.jeedao.primefaces.ConverterDataModel;
 import com.flowlogix.demo.jeedao.primefaces.FilteringDataModel;
 import com.flowlogix.demo.jeedao.primefaces.OptimizedDataModel;
+import com.flowlogix.demo.jeedao.primefaces.QualifiedDataModel;
 import com.flowlogix.demo.jeedao.primefaces.SortingDataModel;
 import java.util.Map;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -45,6 +47,14 @@ public class DataModelBackendIT {
                 .build()), Map.of());
         assertEquals(1, rows.size());
         assertEquals("Lovely Lady", rows.get(0).getFullName());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    @SuppressWarnings("MagicNumber")
+    void qualifiedataModel() {
+        var model = new QualifiedDataModel();
+        assertEquals(5, model.getUserModel().count(Map.of()));
     }
 
     @Test
@@ -84,6 +94,18 @@ public class DataModelBackendIT {
         assertEquals(2, rows.get(0).getUserSettings().size());
         assertEquals("LennySettingOne", rows.get(0).getUserSettings().get(0).getSettingName());
         assertEquals("Setting1Value", rows.get(0).getUserSettings().get(0).getSettingValue());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    @SuppressWarnings("MagicNumber")
+    void converterModel() {
+        var model = new ConverterDataModel();
+        var rows = model.getUserModel().findRows(0, 100, Map.of(), Map.of());
+        String binaryKey = Long.toBinaryString(rows.get(3).getId());
+        var entity = model.getUserModel().getRowData(binaryKey);
+        assertEquals(rows.get(3), entity);
+        assertEquals(binaryKey, model.getUserModel().getRowKey(entity));
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

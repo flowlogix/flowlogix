@@ -30,6 +30,7 @@ and https://javadoc.flowlogix.com/datamodel-apidocs[PrimeFaces Lazy Data Model^]
 
 === News
 
+- 6/2/2023: Version 7.0 has been released
 - 5/4/2023: Version 6.0 has been released (Java 17, Jakarta EE 10)
 - 3/3/2023: Documentation is here!
 - 2/1/2023: Version 5.x is moved to maintenance mode

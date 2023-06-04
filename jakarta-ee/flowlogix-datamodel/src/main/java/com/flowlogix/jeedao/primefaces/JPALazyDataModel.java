@@ -87,8 +87,8 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
             JPAModelImpl<TT, KK>>, Serializable { }
 
     /**
-     * transforms JPA entity field to format suitable for hints
-     * Used with {@link JPAModelImplBuilder#optimizer(Function)} method
+     * Transforms JPA entity field to format suitable for hints.
+     * Used with {@code JPAModelImplBuilder#optimizer(Function)} method
      *
      * @param val
      * @return JPA field suitable for hints

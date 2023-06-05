@@ -475,6 +475,7 @@
                             <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
                         </includeOnlyProperties>
                         <commitIdGenerationMode>full</commitIdGenerationMode>
+                        <dateFormatTimeZone>UTC</dateFormatTimeZone>
                     </configuration>
                 </plugin>
             </plugins>

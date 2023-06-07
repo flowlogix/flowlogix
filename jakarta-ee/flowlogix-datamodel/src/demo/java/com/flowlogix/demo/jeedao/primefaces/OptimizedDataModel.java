@@ -35,10 +35,11 @@ public class OptimizedDataModel implements Serializable {
     private final JPALazyDataModel<UserEntity, Long> userModel = JPALazyDataModel
             .create(builder -> builder.entityClass(UserEntity.class)
                     // optimize query by batching relationship fetching
-                    .optimizer(query -> query.setHint(QueryHints.BATCH, getResultField(UserEntity_.userSettings.getName()))
+                    .optimizer(query -> query
+                            .setHint(QueryHints.BATCH, getResultField(UserEntity_.userSettings.getName()))
+                            .setHint(QueryHints.BATCH, getResultField(UserEntity_.alternateEmails.getName()))
                             .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN)
-                            .setHint(QueryHints.BATCH, getResultField(UserEntity_.alternateEmails.getName())))
-                    .build());
+                    ).build());
 }
 // end::optimized[] // @replace regex='.*\n' replacement=""
 // @end

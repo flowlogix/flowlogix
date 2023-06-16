@@ -57,13 +57,10 @@
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.platform</groupId>
@@ -166,7 +163,7 @@
             <dependency>
                 <groupId>com.flowlogix</groupId>
                 <artifactId>flowlogix-bom</artifactId>
-                <version>6.3</version>
+                <version>7.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

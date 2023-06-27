@@ -17,5 +17,13 @@ updates:
     schedule:
       interval: "daily"
     ignore:
-    - dependency-name: "omnifaces"
+    - dependency-name: "org.omnifaces:omnifaces"
+      update-types: ["version-update:semver-major"]
+    - dependency-name: "org.eclipse.persistence:org.eclipse.persistence.jpa.modelgen.processor"
+      update-types: ["version-update:semver-major"]
+    - dependency-name: "jakarta.platform:jakarta.jakartaee-api"
+      update-types: ["version-update:semver-major"]
+    - dependency-name: "jakarta.activation:jakarta.activation-api"
+      update-types: ["version-update:semver-major"]
+    - dependency-name: "jakarta.xml.bind:jakarta.xml.bind-api"
       update-types: ["version-update:semver-major"]

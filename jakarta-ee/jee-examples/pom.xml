@@ -21,6 +21,8 @@
         <!-- Unfortunately ShrinkWrap only understands the older compiler source / target flags -->
         <maven.compiler.source>${maven.compiler.release}</maven.compiler.source>
         <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
+        <!-- The below version can't be automated, needs to be the latest in maven central -->
+        <flowlogix.bom.version>7.0.2</flowlogix.bom.version>
         <jakarta.ee.version>10.0.0</jakarta.ee.version>
         <arquillian.version>1.7.0.Final</arquillian.version>
         <flowlogix.version>${project.version}</flowlogix.version>
@@ -163,7 +165,7 @@
             <dependency>
                 <groupId>com.flowlogix</groupId>
                 <artifactId>flowlogix-bom</artifactId>
-                <version>7.0.1</version>
+                <version>${flowlogix.bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

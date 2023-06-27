@@ -9,6 +9,7 @@ module com.flowlogix.datamodel {
     requires lombok;
     requires org.slf4j;
     requires org.apache.commons.lang3;
+    requires org.omnifaces;
     requires jakarta.persistence;
     requires jakarta.faces.api;
     requires jakarta.cdi;
@@ -16,5 +17,4 @@ module com.flowlogix.datamodel {
     requires jakarta.el;
     requires java.desktop;
     requires primefaces;
-    requires omnifaces;
 }

@@ -44,7 +44,7 @@
         <nexus.url>https://s01.oss.sonatype.org</nexus.url>
 
         <webdriver.browser>chromeheadless</webdriver.browser>
-        <payara.version>6.2023.4</payara.version>
+        <payara.version>6.2023.7</payara.version>
         <groovy.version>4.0.13</groovy.version>
         <lombok.version>1.18.28</lombok.version>
         <eclipselink.version>4.0.2</eclipselink.version>

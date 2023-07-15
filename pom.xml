@@ -284,6 +284,7 @@
                     <configuration>
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
+                        <runOrder>random</runOrder>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <argLine>@{jacocoAgent} @{jdk11SurefireOptions}</argLine>
                     </configuration>
@@ -303,6 +304,7 @@
                     <configuration>
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
+                        <runOrder>random</runOrder>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <argLine>@{jacocoAgent} @{jdk11FailsafeOptions}</argLine>
                         <systemPropertyVariables>

@@ -16,5 +16,5 @@ module com.flowlogix.datamodel {
     requires jakarta.transaction;
     requires jakarta.el;
     requires java.desktop;
-    requires primefaces;
+    requires org.primefaces;
 }

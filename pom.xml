@@ -44,10 +44,14 @@
         <nexus.url>https://s01.oss.sonatype.org</nexus.url>
 
         <webdriver.browser>chromeheadless</webdriver.browser>
+        <jakarta.ee.version>10.0.0</jakarta.ee.version>
         <payara.version>6.2023.7</payara.version>
         <groovy.version>4.0.13</groovy.version>
         <lombok.version>1.18.28</lombok.version>
         <eclipselink.version>4.0.2</eclipselink.version>
+        <shrinkwrap.api.version>1.2.6</shrinkwrap.api.version>
+        <omnifaces.version>4.2</omnifaces.version>
+        <primefaces.version>13.0.0</primefaces.version>
         <jacocoPort>52212</jacocoPort>
         <jacocoAgent/>
         <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>
@@ -343,11 +347,11 @@
                         <bottom>Copyright © ${project.inceptionYear}-2023 Flow Logix, Inc. All Rights Reserved.</bottom>
                         <excludePackageNames>*.impl</excludePackageNames>
                         <links>
-                            <link>https://javadoc.io/doc/jakarta.platform/jakarta.jakartaee-api/latest/</link>
-                            <link>https://javadoc.io/doc/org.jboss.shrinkwrap/shrinkwrap-api/latest/</link>
-                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/latest/</link>
-                            <link>https://javadoc.io/doc/org.primefaces/primefaces/latest/</link>
-                            <link>https://javadoc.io/doc/org.projectlombok/lombok/latest/</link>
+                            <link>https://javadoc.io/doc/jakarta.platform/jakarta.jakartaee-api/${jakarta.ee.version}</link>
+                            <link>https://javadoc.io/doc/org.jboss.shrinkwrap/shrinkwrap-api/${shrinkwrap.api.version}</link>
+                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/${omnifaces.version}</link>
+                            <link>https://javadoc.io/doc/org.primefaces/primefaces/${primefaces.version}</link>
+                            <link>https://javadoc.io/doc/org.projectlombok/lombok/${lombok.version}</link>
                         </links>
                         <notimestamp>true</notimestamp>
                     </configuration>

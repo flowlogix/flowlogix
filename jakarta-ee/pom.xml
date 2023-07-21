@@ -15,10 +15,6 @@
         <relativePath>../flowlogix-bom</relativePath>
     </parent>
 
-    <properties>
-        <jakarta.ee.version>10.0.0</jakarta.ee.version>
-    </properties>
-
     <modules>
         <module>flowlogix-jee</module>
         <module>flowlogix-datamodel</module>

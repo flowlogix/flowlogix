@@ -58,7 +58,7 @@ public class ShiroScopeContextTest {
     private MyBean bean;
     private ShiroScopeContext ctx;
 
-    private static class MyBean implements ViewScoped, Serializable {
+    private static final class MyBean implements ViewScoped, Serializable {
         private static final long serialVersionUID = 1L;
 
         @Override

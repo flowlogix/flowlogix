@@ -46,17 +46,17 @@ class AnnotatedTypeWrapperTest {
     @RequiresAuthentication
     @RequiresGuest
     @RequiresPermissions("hello")
-    private class Annotated { }
+    private final class Annotated { }
 
     @ShiroSecureAnnotation
-    private class ShiroSecureAnnotated { }
+    private final class ShiroSecureAnnotated { }
 
     @Stateless
-    private class StatelessAnnotated { }
+    private final class StatelessAnnotated { }
 
     @SessionScoped
     @SuppressWarnings("serial")
-    private static class SessionScopedAnnotated implements Serializable { }
+    privatestatic final class SessionScopedAnnotated implements Serializable { }
 
     @Test
     void noAnnotations() {

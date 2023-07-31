@@ -56,7 +56,7 @@ class AnnotatedTypeWrapperTest {
 
     @SessionScoped
     @SuppressWarnings("serial")
-    privatestatic final class SessionScopedAnnotated implements Serializable { }
+    private static final class SessionScopedAnnotated implements Serializable { }
 
     @Test
     void noAnnotations() {

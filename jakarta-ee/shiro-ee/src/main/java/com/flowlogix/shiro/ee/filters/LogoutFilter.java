@@ -37,7 +37,7 @@ public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter
     static final String LOGOUT_PREDICATE_ATTR_NAME = "com.flowlogix.shiro.ee.logout-predicate";
     private final @Delegate AuthenticationFilterDelegate delegate;
 
-    private class Methods implements MethodsFromFilter {
+    private final class Methods implements MethodsFromFilter {
         @Override
         public Subject getSubject(ServletRequest request, ServletResponse response) {
             return LogoutFilter.super.getSubject(request, response);

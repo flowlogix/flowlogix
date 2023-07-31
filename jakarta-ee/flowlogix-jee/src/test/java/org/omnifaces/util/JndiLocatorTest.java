@@ -124,10 +124,10 @@ public class JndiLocatorTest {
     }
 
     @Local
-    private class TestLocal { }
+    private final class TestLocal { }
 
     @Remote
-    private class TestRemote { }
+    private final class TestRemote { }
 
     @Test
     void dontCacheRemote() throws NamingException {

@@ -136,7 +136,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     @Setter
     private BuilderFunction<TT, KK> x_do_not_use_in_builder;
 
-    private static class FilterDataMap extends HashMap<String, FilterColumnData> implements FilterData { }
+    private final static class FilterDataMap extends HashMap<String, FilterColumnData> implements FilterData { }
 
     /**
      * partial builder, just for javadoc

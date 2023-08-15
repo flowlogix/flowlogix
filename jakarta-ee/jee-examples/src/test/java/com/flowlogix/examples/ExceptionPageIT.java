@@ -156,11 +156,15 @@ public class ExceptionPageIT {
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
         webDriver.get(baseURL + "lastException");
-        assertTrue(webDriver.findElement(By.tagName("body")).getText().matches(
-                jakartify("^WARNING: javax.faces.FacesException: "
+        String exceptionString = webDriver.findElement(By.tagName("body")).getText();
+        while (exceptionString.startsWith("java.io.IOException: Connection is closed")) {
+            webDriver.get(baseURL + "lastException");
+            exceptionString = webDriver.findElement(By.tagName("body")).getText();
+        }
+        assertTrue(exceptionString.matches(jakartify("^WARNING: javax.faces.FacesException: "
                         + "#\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*")
                 + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\.")),
-                "exceptionBean.throwExceptionFromMethod() - exception string doesn't match");
+                String.format("exceptionBean.throwExceptionFromMethod() - exception string %s doesn't match", exceptionString));
     }
 
     @Test

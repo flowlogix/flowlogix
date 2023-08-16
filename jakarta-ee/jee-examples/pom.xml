@@ -19,7 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- The below version can't be automated, needs to be the latest in maven central -->
         <flowlogix.bom.version>7.0.2</flowlogix.bom.version>
-        <arquillian.version>1.7.0.Final</arquillian.version>
+        <arquillian.version>1.7.1.Final</arquillian.version>
         <arquillian.drone.version>2.5.6</arquillian.drone.version>
         <arquillian.graphene.version>2.5.4</arquillian.graphene.version>
         <flowlogix.version>${project.version}</flowlogix.version>

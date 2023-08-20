@@ -30,7 +30,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class Deployments {
     @Deployment(name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
-        return ExceptionPageIT.createDeploymentDev("FlowLogixTest.war");
+        return ExceptionPageIT.createDeploymentDev();
     }
 
     @Deployment(name = DEPLOYMENT_PROD_MODE)

@@ -62,6 +62,6 @@ public class DaoHelperIT {
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
-        return ExceptionPageIT.createDeploymentDev("DaoHelperTest.war");
+        return ExceptionPageIT.createDeploymentDev();
     }
 }

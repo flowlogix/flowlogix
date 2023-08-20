@@ -18,18 +18,41 @@ package com.flowlogix.demo.util;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import java.util.List;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
+import lombok.extern.slf4j.Slf4j;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
 
 @SuppressWarnings("HideUtilityClassConstructor")
+@Slf4j
 public class ShrinkWrapDemo {
+    // @Deployment
+    // @start region="deployMaven"
+    // tag::deployMaven[] // @replace regex='.*\n' replacement=""
+    public static WebArchive deployMaven() {
+        WebArchive archive = ShrinkWrapManipulator.createDeployment(WebArchive.class);
+        log.info("Archive Contents: %s", archive.toString(true));
+        return archive;
+    }
+    // end::deployMaven[] // @replace regex='.*\n' replacement=""
+    // @end
+
+    // @Deployment
+    // @start region="deployMavenSuffix"
+    // tag::deployMavenSuffix[] // @replace regex='.*\n' replacement=""
+    public static WebArchive deployMavenSuffix() {
+        WebArchive archive = ShrinkWrapManipulator.createDeployment(WebArchive.class, name -> name + "-prod");
+        log.info("Archive Contents: %s", archive.toString(true));
+        return archive;
+    }
+    // end::deployMavenSuffix[] // @replace regex='.*\n' replacement=""
+    // @end
+
     // @Deployment
     // @start region="productionMode"
     // tag::productionMode[] // @replace regex='.*\n' replacement=""
     public static WebArchive deployProductionMode() {
-        var archive = ShrinkWrap.create(WebArchive.class);
+        var archive = ShrinkWrapManipulator.createDeployment(WebArchive.class);
         // add classes to the archive here
         var productionList = List.of(new Action(getContextParamValue(
                 jakartify("javax.faces.PROJECT_STAGE")),
@@ -39,11 +62,12 @@ public class ShrinkWrapDemo {
     }
     // end::productionMode[] // @replace regex='.*\n' replacement=""
     // @end
+
     // @Deployment
     // @start region="persistence"
     // tag::persistence[] // @replace regex='.*\n' replacement=""
     public static WebArchive deployPersistence() {
-        var archive = ShrinkWrap.create(WebArchive.class);
+        var archive = ShrinkWrapManipulator.createDeployment(WebArchive.class);
         // add classes to the archive here
         String version = System.getProperty("project.version");
         new ShrinkWrapManipulator().persistenceXmlXPath(archive,

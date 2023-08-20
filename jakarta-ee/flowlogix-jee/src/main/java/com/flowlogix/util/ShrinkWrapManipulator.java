@@ -19,7 +19,9 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -28,11 +30,16 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.container.ResourceContainer;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import org.omnifaces.util.Lazy;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -63,14 +70,55 @@ public class ShrinkWrapManipulator {
     private final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
 
     /**
+     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
+     *
+     * @param archiveType
+     * @return
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType) {
+        return createDeployment(archiveType, name -> name);
+    }
+
+    /**
+     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
+     *
+     * @param archiveType
+     * @param nameTransformer transforms the UUID to a more suitable name
+     * @return new archive
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>>
+    TT createDeployment(Class<TT> archiveType, Function<String, String> nameTransformer) {
+        char firstLetter = archiveType.getSimpleName().toLowerCase().charAt(0);
+        return createDeployment(archiveType, String.format("s%s.%car",
+                nameTransformer.apply(UUID.randomUUID().toString()), firstLetter));
+    }
+
+    /**
+     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file
+     *
+     * @param archiveType
+     * @param archiveName
+     * @return new archive
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType, @NonNull String archiveName) {
+        return ShrinkWrap.create(MavenImporter.class, archiveName)
+                .loadPomFromFile("pom.xml").importBuildOutput()
+                .as(archiveType);
+    }
+
+    /**
      * modifies web.xml according to xpath and method
      *
      * @param archive to modify
      * @param actions list of actions to perform
      */
-    public void webXmlXPath(WebArchive archive, List<Action> actions) {
+    public WebArchive webXmlXPath(WebArchive archive, List<Action> actions) {
         var asset = "WEB-INF/web.xml";
         archive.setWebXML(new StringAsset(manipulateXml(archive, actions, asset)));
+        return archive;
     }
 
     /**
@@ -79,9 +127,12 @@ public class ShrinkWrapManipulator {
      * @param archive to modify
      * @param actions list of actions to perform
      */
-    public void persistenceXmlXPath(WebArchive archive, List<Action> actions) {
+    @SuppressWarnings("unchecked")
+    public <TT extends Archive<TT>> Archive<TT> persistenceXmlXPath(Archive<TT> archive, List<Action> actions) {
         var asset = "META-INF/persistence.xml";
-        archive.addAsResource(new StringAsset(manipulateXml(archive, actions, "WEB-INF/classes/" + asset)), asset);
+        ((ResourceContainer<TT>) archive).addAsResource(new StringAsset(manipulateXml(archive, actions,
+                "WEB-INF/classes/" + asset)), asset);
+        return archive;
     }
 
     /**
@@ -134,7 +185,7 @@ public class ShrinkWrapManipulator {
      * @return string representation of the modified xml file
      */
     @SneakyThrows
-    public String manipulateXml(WebArchive archive, List<Action> actions, String xmlFileName) {
+    public <TT extends Archive<TT>> String manipulateXml(Archive<TT> archive, List<Action> actions, String xmlFileName) {
         Document xmlDocument;
         try (InputStream strm = archive.get(xmlFileName).getAsset().openStream()) {
             xmlDocument = builder.get().parse(strm);

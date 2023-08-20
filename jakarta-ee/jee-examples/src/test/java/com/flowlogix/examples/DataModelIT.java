@@ -88,6 +88,6 @@ public class DataModelIT {
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
-        return ExceptionPageIT.createDeploymentDev("DataModel.war");
+        return ExceptionPageIT.createDeploymentDev();
     }
 }

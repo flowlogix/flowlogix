@@ -52,6 +52,17 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+<!--        Security-related fixes, not actually used -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.23.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>32.1.1-jre</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

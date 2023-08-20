@@ -30,14 +30,13 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
@@ -199,13 +198,12 @@ public class ExceptionPageIT {
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeploymentDev() {
-        return createDeploymentDev("ExceptionPageTest.war");
+        return createDeployment("");
     }
 
-    static WebArchive createDeploymentDev(String archiveName) {
-        WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
-                .loadPomFromFile("pom.xml").importBuildOutput()
-                .as(WebArchive.class)
+    static WebArchive createDeployment(String suffix) {
+        WebArchive archive = ShrinkWrapManipulator.createDeployment(WebArchive.class,
+                        name -> isBlank(suffix) ? name : String.format("%s-%s", name, suffix))
                 .addClass(DaoHelperIT.class)
                 .addClass(DataModelBackendIT.class);
 
@@ -216,15 +214,9 @@ public class ExceptionPageIT {
 
     @Deployment(name = DEPLOYMENT_PROD_MODE)
     public static WebArchive createDeploymentProd() {
-        return createDeploymentProd("ExceptionPageTest-prod.war");
-    }
-
-    static WebArchive createDeploymentProd(String archiveName) {
-        WebArchive archive = createDeploymentDev(archiveName);
         var productionList = List.of(new Action(getContextParamValue("jakarta.faces.PROJECT_STAGE"),
                 node -> node.setTextContent("Production")));
-        new ShrinkWrapManipulator().webXmlXPath(archive, productionList);
-        return archive;
+        return new ShrinkWrapManipulator().webXmlXPath(createDeployment("prod"), productionList);
     }
 
     @SneakyThrows(IOException.class)

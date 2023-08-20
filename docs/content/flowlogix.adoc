@@ -24,7 +24,7 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Transforms names between javax and jakarta namespaces
 * Checks if objects are truly serializable by testing them
 * Easy Transform Streams to Strings
-* Simplify manipulation of ShrinkWrap archives including assets
+* Simplify creation and manipulation of ShrinkWrap and Arquillian test archives including assets
 
 [[section-architecture]]
 === Where does FlowLogix fit into your application architecture?
@@ -309,6 +309,18 @@ A more complete method `toHttpURL(url, sslPortPropertyName, defaultPort)` is ava
 [source,shell]
 ----
 $ mvn verify -DsslPort=8282
+----
+.Creating ShrinkWrap (Arquillian) tests easily from maven POM file
+[source,java]
+----
+@Deployment
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=deployMaven,indent=0]
+----
+.Creating ShrinkWrap (Arquillian) tests easily from maven POM file with prod suffix
+[source,java]
+----
+@Deployment
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=deployMavenSuffix,indent=0]
 ----
 
 .Configuring ShrinkWrap (Arquillian) test artifacts

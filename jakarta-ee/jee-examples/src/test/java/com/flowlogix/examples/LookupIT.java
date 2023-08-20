@@ -17,6 +17,7 @@ package com.flowlogix.examples;
 
 import com.flowlogix.examples.jndi.ejbs.AnotherEJB;
 import com.flowlogix.examples.jndi.ejbs.NumberGetter;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -104,7 +105,7 @@ public class LookupIT {
 
     @Deployment(name = DEPLOYMENT_NAME)
     public static WebArchive createDeployment() {
-        return ShrinkWrap.create(WebArchive.class, "LookupTest.war")
+        return ShrinkWrap.create(WebArchive.class, String.format("%s-%s", UUID.randomUUID(), "LookupTest.war"))
                 .addPackages(true, "org.omnifaces")
                 .addPackages(true, "com.flowlogix")
                 .deletePackages(true, "com.flowlogix.demo")

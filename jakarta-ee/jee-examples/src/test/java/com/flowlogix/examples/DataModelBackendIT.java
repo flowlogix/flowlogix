@@ -110,6 +110,6 @@ public class DataModelBackendIT {
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
-        return ExceptionPageIT.createDeploymentDev("DataModelBackend.war");
+        return ExceptionPageIT.createDeploymentDev();
     }
 }

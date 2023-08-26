@@ -7,7 +7,7 @@ image:https://img.shields.io/jenkins/tests?compact_message&failed_label=failed&j
 image:https://img.shields.io/github/commit-activity/m/flowlogix/flowlogix?style=plastic[GitHub commit activity]
 image:https://img.shields.io/github/license/flowlogix/flowlogix?style=plastic[link="http://www.apache.org/licenses/LICENSE-2.0"]
 
-=== Current Projects
+=== Current ProjectsXXX
 
 - Jakarta EE Lazy Data Model for PrimeFaces DataTable image:https://javadoc.io/badge2/com.flowlogix/flowlogix-datamodel/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel",window=_blank]
 - Apache Shiro Security / Jakarta EE integration - Now part of https://shiro.apache.org/jakarta-ee.html[Apache Shiro^]

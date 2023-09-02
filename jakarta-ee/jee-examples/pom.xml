@@ -20,28 +20,23 @@
         <arquillian.version>1.7.1.Final</arquillian.version>
         <arquillian.drone.version>2.5.6</arquillian.drone.version>
         <arquillian.graphene.version>2.5.4</arquillian.graphene.version>
-        <flowlogix.version>${project.version}</flowlogix.version>
-        <demo.entity.jar>lib/flowlogix-jee-${flowlogix.version}-tests.jar</demo.entity.jar>
+        <demo.entity.jar>lib/flowlogix-jee-${project.version}-tests.jar</demo.entity.jar>
         <delombok.phase>generate-sources</delombok.phase>
     </properties>
 
     <!-- tag::dependenciesStart[] -->
     <dependencies>
-        <!-- end::dependenciesStart[] -->
-        <!-- tag::jeeDependency[] -->
         <dependency>
-            <groupId>com.flowlogix</groupId>
+            <!-- end::dependenciesStart[] -->
+            <groupId>${project.groupId}</groupId>
             <artifactId>flowlogix-jee</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- end::jeeDependency[] -->
-        <!-- tag::datamodelDependency[] -->
         <dependency>
-            <groupId>com.flowlogix</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>flowlogix-datamodel</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- end::datamodelDependency[] -->
         <dependency>
             <groupId>org.omnifaces</groupId>
             <artifactId>omnifaces</artifactId>
@@ -147,8 +142,8 @@
             <version>${arquillian.graphene.version}</version>
             <scope>test</scope>
             <type>pom</type>
+            <!-- tag::dependenciesEnd[] -->
         </dependency>
-        <!-- tag::dependenciesEnd[] -->
     </dependencies>
     <!-- end::dependenciesEnd[] -->
 
@@ -156,11 +151,11 @@
     <dependencyManagement>
         <dependencies>
         <!-- end::depManagementStart[] -->
+            <!-- The below BOM version can't be automated, or be a variable, needs to be the latest in maven central -->
             <!-- tag::bomUsage[] // @replace regex='.*\n' replacement="" -->
             <dependency>
                 <groupId>com.flowlogix</groupId>
                 <artifactId>flowlogix-bom</artifactId>
-                <!-- The below version can't be automated, or be a variable, needs to be the latest in maven central -->
                 <version>7.0.3</version>
                 <type>pom</type>
                 <scope>import</scope>

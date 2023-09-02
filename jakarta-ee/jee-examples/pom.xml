@@ -161,13 +161,6 @@
                 <scope>import</scope>
             </dependency>
             <!-- end::bomUsage[] // @replace regex='.*\n' replacement="" -->
-<!--        Temporary downgrade to PF 12 to work around https://github.com/primefaces/primefaces/issues/10587 -->
-            <dependency>
-                <groupId>org.primefaces</groupId>
-                <artifactId>primefaces</artifactId>
-                <classifier>jakarta</classifier>
-                <version>12.0.0</version>
-            </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>

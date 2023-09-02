@@ -161,7 +161,7 @@
                 <groupId>com.flowlogix</groupId>
                 <artifactId>flowlogix-bom</artifactId>
                 <!-- The below version can't be automated, or be a variable, needs to be the latest in maven central -->
-                <version>7.0.2</version>
+                <version>7.0.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

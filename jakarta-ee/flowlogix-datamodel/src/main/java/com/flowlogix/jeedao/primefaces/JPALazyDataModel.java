@@ -15,8 +15,8 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
-import com.flowlogix.jeedao.primefaces.impl.JPAModelImpl;
-import com.flowlogix.jeedao.primefaces.impl.JPAModelImpl.JPAModelImplBuilder;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;

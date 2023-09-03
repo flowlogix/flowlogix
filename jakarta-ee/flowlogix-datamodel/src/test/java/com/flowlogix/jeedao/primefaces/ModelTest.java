@@ -19,7 +19,7 @@ import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.RESULT;
 import static com.flowlogix.util.SerializeTester.serializeAndDeserialize;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
-import com.flowlogix.jeedao.primefaces.impl.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;

@@ -16,8 +16,8 @@
 package com.flowlogix.demo.jeedao.primefaces;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity;
+import com.flowlogix.demo.viewscoped.ViewScoped;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.math.BigInteger;

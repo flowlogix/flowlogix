@@ -19,13 +19,8 @@ import com.flowlogix.demo.jeedao.NonDefault;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import java.util.Map;
-import com.flowlogix.demo.jeedao.primefaces.BasicDataModel;
-import com.flowlogix.demo.jeedao.primefaces.ConverterDataModel;
-import com.flowlogix.demo.jeedao.primefaces.FilteringDataModel;
+import com.flowlogix.demo.jeedao.primefaces.DataModelWrapper;
 import com.flowlogix.demo.jeedao.primefaces.InjectedDataModel;
-import com.flowlogix.demo.jeedao.primefaces.OptimizedDataModel;
-import com.flowlogix.demo.jeedao.primefaces.QualifiedDataModel;
-import com.flowlogix.demo.jeedao.primefaces.SortingDataModel;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import jakarta.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -43,13 +38,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(ArquillianExtension.class)
 public class DataModelBackendIT {
     @Inject
+    DataModelWrapper models;
+    @Inject
     InjectedDataModel injectedModel;
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void basicDataModel() {
-        var model = new BasicDataModel();
-        basicDataModel(model.getUserModel());
+        basicDataModel(models.getBasic().getUserModel());
     }
 
     @SuppressWarnings("MagicNumber")
@@ -66,17 +62,15 @@ public class DataModelBackendIT {
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     @SuppressWarnings("MagicNumber")
-    void qualifiedataModel() {
-        var model = new QualifiedDataModel();
-        assertEquals(5, model.getUserModel().count(Map.of()));
+    void qualifiedDataModel() {
+        assertEquals(5, models.getQualified().getUserModel().count(Map.of()));
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     @SuppressWarnings("MagicNumber")
     void sortingDataModel() {
-        var model = new SortingDataModel();
-        var rows = model.getUserModel().findRows(0, 1, Map.of(), Map.of());
+        var rows = models.getSorting().getUserModel().findRows(0, 1, Map.of(), Map.of());
         assertEquals(10012, rows.get(0).getZipCode());
     }
 
@@ -84,8 +78,7 @@ public class DataModelBackendIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     @SuppressWarnings("MagicNumber")
     void filteringDataModel() {
-        var model = new FilteringDataModel();
-        var rows = model.getUserModel().findRows(0, 10,
+        var rows = models.getFiltering().getUserModel().findRows(0, 10,
                 Map.of(UserEntity_.zipCode.getName(), FilterMeta.builder().field(UserEntity_.zipCode.getName())
                         .filterValue(68501).build()), Map.of());
         assertEquals(4, rows.size());
@@ -96,8 +89,7 @@ public class DataModelBackendIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     @SuppressWarnings("MagicNumber")
     void optimizedDataModel() {
-        var model = new OptimizedDataModel();
-        var rows = model.getUserModel().findRows(0, 3,
+        var rows = models.getOptimized().getUserModel().findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("lprimak")
                         .build()), Map.of());
@@ -114,12 +106,11 @@ public class DataModelBackendIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     @SuppressWarnings("MagicNumber")
     void converterModel() {
-        var model = new ConverterDataModel();
-        var rows = model.getUserModel().findRows(0, 100, Map.of(), Map.of());
+        var rows = models.getConverter().getUserModel().findRows(0, 100, Map.of(), Map.of());
         String binaryKey = Long.toBinaryString(rows.get(3).getId());
-        var entity = model.getUserModel().getRowData(binaryKey);
+        var entity = models.getConverter().getUserModel().getRowData(binaryKey);
         assertEquals(rows.get(3), entity);
-        assertEquals(binaryKey, model.getUserModel().getRowKey(entity));
+        assertEquals(binaryKey, models.getConverter().getUserModel().getRowKey(entity));
     }
 
     @Test

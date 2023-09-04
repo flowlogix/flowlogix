@@ -19,9 +19,10 @@ import com.flowlogix.demo.jeedao.NonDefault;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.viewscoped.ViewScoped;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import com.flowlogix.jeedao.primefaces.LazyModelConfig;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.util.List;
 import lombok.Getter;
 
 // @start region="qualifier"
@@ -29,12 +30,10 @@ import lombok.Getter;
 @Named
 @ViewScoped
 public class QualifiedDataModel implements Serializable {
+    @Inject
     @Getter
-    private final JPALazyDataModel<UserEntity, Long> userModel = JPALazyDataModel
-            .create(builder -> builder
-                    .entityManagerQualifiers(List.of(NonDefault.class))
-                    .entityClass(UserEntity.class)
-                    .build());
+    @LazyModelConfig(entityManagerSelector = NonDefault.class)
+    JPALazyDataModel<UserEntity, Long> userModel;
 }
 // end::qualifier[] // @replace regex='.*\n' replacement=""
 // @end

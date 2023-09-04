@@ -18,6 +18,8 @@ package com.flowlogix.demo.jeedao.primefaces;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.viewscoped.ViewScoped;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -28,14 +30,18 @@ import lombok.Getter;
 @Named
 @ViewScoped
 public class ConverterDataModel implements Serializable {
+    @Inject
     @Getter
-    private final JPALazyDataModel<UserEntity, Long> userModel = JPALazyDataModel
-            .create(builder -> builder
-                    // key is stored as binary string
-                    .converter(binaryString -> new BigInteger(binaryString, 2).longValue())
-                    .keyConverter(entity -> Long.toBinaryString(entity.getId()))
-                    .entityClass(UserEntity.class)
-                    .build());
+    JPALazyDataModel<UserEntity, Long> userModel;
+
+    @PostConstruct
+    void initialize() {
+        userModel.initialize(builder -> builder
+                // key is stored as binary string
+                .converter(binaryString -> new BigInteger(binaryString, 2).longValue())
+                .keyConverter(entity -> Long.toBinaryString(entity.getId()))
+                .build());
+    }
 }
 // end::converter[] // @replace regex='.*\n' replacement=""
 // @end

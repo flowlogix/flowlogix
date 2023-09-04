@@ -19,6 +19,8 @@ import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import com.flowlogix.demo.viewscoped.ViewScoped;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.persistence.criteria.Predicate;
 import java.io.Serializable;
@@ -29,13 +31,18 @@ import lombok.Getter;
 @Named
 @ViewScoped
 public class FilteringDataModel implements Serializable {
+    @Inject
     @Getter
-    private final JPALazyDataModel<UserEntity, Long> userModel = JPALazyDataModel
-            .create(builder -> builder.entityClass(UserEntity.class)
-                    // display only zip codes greater than the filter field
-                    .filter((filters, cb, root) -> filters.replaceFilter(UserEntity_.zipCode.getName(),
-                            (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value)))
-                    .build());
+    JPALazyDataModel<UserEntity, Long> userModel;
+
+    @PostConstruct
+    void initialize() {
+        // display only zip codes greater than the filter field
+        userModel.initialize(builder -> builder.filter((filters, cb, root) ->
+                        filters.replaceFilter(UserEntity_.zipCode.getName(),
+                        (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value)))
+                .build());
+    }
 }
 // end::filtering[] // @replace regex='.*\n' replacement=""
 // @end

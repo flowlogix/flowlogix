@@ -376,10 +376,10 @@ include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/j
 @Named
 @ViewScoped
 public class UserViewer implements Serializable {
-include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage,!simpleOptionalLazyDataModelUsage"]
+include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage"]
 }
 ----
-Above we created a model with case-insensitive filtering using a builder pattern.
+Above we created a model with case-insensitive filtering.
 
 `JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
 

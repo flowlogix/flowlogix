@@ -19,10 +19,12 @@ import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import com.flowlogix.jeedao.primefaces.LazyModelConfig;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import java.io.Serializable;
 import java.util.stream.Collectors;
 import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -40,19 +42,19 @@ public class UserViewer implements Serializable {
 
     // @start region="simpleLazyDataModelUsage"
     // tag::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
-    private @Getter final JPALazyDataModel<UserEntity, Long> lazyModel =
-            JPALazyDataModel.create(builder -> builder
-                    .entityClass(UserEntity.class)
-                    // the line below is optional, default is case-sensitive (true)
-                    .caseSensitiveFilter(false)
-                    // tag::simpleOptionalLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
-                    // the following 2 lines are optional
-//                    .sorter(UserViewer::sorter) // @replace regex="^\/\/" replacement=""
-//                    .filter(UserViewer::filter) // @replace regex="^\/\/" replacement=""
-                    // end::simpleOptionalLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
-                    .build());
+    @Inject
+    @Getter
+    @LazyModelConfig(caseInsensitive = true)
+    JPALazyDataModel<UserEntity, Long> lazyModel;
     // end::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
     // @end
+
+    /**
+     * Enable sort and filter with {@link jakarta.annotation.PostConstruct} annotation
+     */
+    void initialize() {
+        lazyModel.initialize(builder -> builder.sorter(UserViewer::sorter).filter(UserViewer::filter).build());
+    }
 
     public String getUsers() {
         return lazyModel.getEntityManager().get()

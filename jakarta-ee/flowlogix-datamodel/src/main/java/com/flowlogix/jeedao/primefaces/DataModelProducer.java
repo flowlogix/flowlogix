@@ -24,6 +24,7 @@ import java.util.List;
 
 /**
  * CDI Injection Support, Do not use directly
+ * @hidden
  */
 @Dependent
 @SuppressWarnings("HideUtilityClassConstructor")
@@ -38,13 +39,12 @@ public class DataModelProducer {
         var config = injectionPoint.getQualifiers().stream()
                 .filter(c -> c.annotationType().isAssignableFrom(LazyModelConfig.class))
                 .map(LazyModelConfig.class::cast).findFirst().orElse(null);
-        return new JPALazyDataModel<TT, KK>().initialize(builder -> {
+        return new JPALazyDataModel<TT, KK>().partialInitialize(builder -> {
             builder.entityClass(entityClass);
             if (config != null) {
                 builder.caseSensitiveFilter(!config.caseInsensitive());
                 builder.entityManagerQualifiers(List.of(config.entityManagerSelector()));
             }
-            return builder.build();
         });
     }
 }

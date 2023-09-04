@@ -54,6 +54,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Builder;
 import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
+import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.PartialBuilderConsumer;
 import static java.lang.Math.toIntExact;
 import static lombok.Builder.Default;
 import lombok.Generated;
@@ -74,7 +75,7 @@ import org.primefaces.model.SortMeta;
  * @param <TT>
  * @param <KK>
  */
-@Builder(toBuilder = true)
+@Builder
 @Slf4j
 public class JPAModelImpl<TT, KK> implements Serializable {
     private static final long serialVersionUID = 4L;
@@ -131,16 +132,45 @@ public class JPAModelImpl<TT, KK> implements Serializable {
 
     /**
      * @hidden
+     * Internal record, do not use
+     * @param builder
+     * @param partialBuilder
+     * @param <TT>
+     * @param <KK>
+     */
+    public record BuilderInitializer<TT, KK>(@NonNull BuilderFunction<TT, KK> builder,
+                                             PartialBuilderConsumer<TT, KK> partialBuilder) implements Serializable { }
+
+    /**
+     * @hidden
      * Internal variable, do not use in builder
      */
     @SuppressWarnings({"DeclarationOrder", "MemberName"})
     @Setter
-    private BuilderFunction<TT, KK> x_do_not_use_in_builder;
+    private BuilderInitializer<TT, KK> x_do_not_use_in_builder;
 
     private static final class FilterDataMap extends HashMap<String, FilterColumnData> implements FilterData { }
 
     /**
+     * Private - do not use
+     *
+     * @hidden
+     * @param initializer
+     * @return
+     * @param <TT>
+     * @param <KK>
+     */
+    public static <TT, KK> JPAModelImpl<TT, KK> create(@NonNull BuilderInitializer<TT, KK> initializer) {
+        var builderInstance = JPAModelImpl.<TT, KK>builder();
+        if (initializer.partialBuilder != null) {
+            initializer.partialBuilder.accept(builderInstance);
+        }
+        return initializer.builder.apply(builderInstance);
+    }
+
+    /**
      * partial builder, just for javadoc
+     * @hidden
      * @param <TT>
      * @param <KK>
      */
@@ -423,7 +453,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      * @throws ObjectStreamException
      */
     Object readResolve() throws ObjectStreamException {
-        var corrected = x_do_not_use_in_builder.apply(JPAModelImpl.builder());
+        var corrected = create(x_do_not_use_in_builder);
         corrected.x_do_not_use_in_builder = x_do_not_use_in_builder;
         return corrected;
     }

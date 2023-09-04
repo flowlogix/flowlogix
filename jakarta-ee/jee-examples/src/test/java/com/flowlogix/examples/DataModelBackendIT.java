@@ -18,10 +18,12 @@ package com.flowlogix.examples;
 import com.flowlogix.demo.jeedao.NonDefault;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
+import java.io.IOException;
 import java.util.Map;
 import com.flowlogix.demo.jeedao.primefaces.DataModelWrapper;
 import com.flowlogix.demo.jeedao.primefaces.InjectedDataModel;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import com.flowlogix.util.SerializeTester;
 import jakarta.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -62,24 +64,36 @@ public class DataModelBackendIT {
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    @SuppressWarnings("MagicNumber")
     void qualifiedDataModel() {
-        assertEquals(5, models.getQualified().getUserModel().count(Map.of()));
+        doQualifiedDataModel(models.getQualified().getUserModel());
+    }
+
+    @SuppressWarnings("MagicNumber")
+    void doQualifiedDataModel(JPALazyDataModel<UserEntity, Long> model) {
+        assertEquals(5, model.count(Map.of()));
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    @SuppressWarnings("MagicNumber")
     void sortingDataModel() {
-        var rows = models.getSorting().getUserModel().findRows(0, 1, Map.of(), Map.of());
+        doSortingDataModel(models.getSorting().getUserModel());
+    }
+
+    @SuppressWarnings("MagicNumber")
+    void doSortingDataModel(JPALazyDataModel<UserEntity, Long>  model) {
+        var rows = model.findRows(0, 1, Map.of(), Map.of());
         assertEquals(10012, rows.get(0).getZipCode());
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    @SuppressWarnings("MagicNumber")
     void filteringDataModel() {
-        var rows = models.getFiltering().getUserModel().findRows(0, 10,
+        doFilteringDataModel(models.getFiltering().getUserModel());
+    }
+
+    @SuppressWarnings("MagicNumber")
+    void doFilteringDataModel(JPALazyDataModel<UserEntity, Long>  model) {
+        var rows = model.findRows(0, 10,
                 Map.of(UserEntity_.zipCode.getName(), FilterMeta.builder().field(UserEntity_.zipCode.getName())
                         .filterValue(68501).build()), Map.of());
         assertEquals(4, rows.size());
@@ -149,6 +163,19 @@ public class DataModelBackendIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void directModel() {
         basicDataModel(models.getDirect().getUserModel());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void serialization() throws IOException, ClassNotFoundException {
+        var qualified = SerializeTester.serializeAndDeserialize(models.getQualified().getUserModel());
+        doQualifiedDataModel(qualified);
+
+        var sorting = SerializeTester.serializeAndDeserialize(models.getSorting().getUserModel());
+        doSortingDataModel(sorting);
+
+        var filtering = SerializeTester.serializeAndDeserialize(models.getFiltering().getUserModel());
+        doFilteringDataModel(filtering);
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

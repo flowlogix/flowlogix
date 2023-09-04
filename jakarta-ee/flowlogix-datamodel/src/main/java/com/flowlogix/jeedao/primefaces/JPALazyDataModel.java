@@ -16,16 +16,19 @@
 package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.BuilderInitializer;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
 import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.view.ViewScoped;
 import jakarta.transaction.Transactional;
+import lombok.NonNull;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.Beans;
@@ -66,6 +69,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     private static final long serialVersionUID = 4L;
     @Delegate
     private JPAModelImpl<TT, KK> impl;
+    private transient PartialBuilderConsumer<TT, KK> partialBuilder;
 
     /**
      * Prevent direct creation
@@ -81,10 +85,18 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param builder serializable lambda for creation
      * @return newly-created data model
      */
-    public static <TT, KK> JPALazyDataModel<TT, KK> create(BuilderFunction<TT, KK> builder) {
+    public static <TT, KK> JPALazyDataModel<TT, KK> create(@NonNull BuilderFunction<TT, KK> builder) {
         @SuppressWarnings("unchecked")
         JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class, InternalQualifierJPALazyModel.LITERAL);
         return model.initialize(builder);
+    }
+
+    JPALazyDataModel<TT, KK> partialInitialize(@NonNull PartialBuilderConsumer<TT, KK> builder) {
+        if (partialBuilder != null) {
+            throw new IllegalStateException("partial builder already initialized");
+        }
+        partialBuilder = builder;
+        return initialize(JPAModelImplBuilder::build, false);
     }
 
     /**
@@ -93,10 +105,8 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param builder serializable lambda for creation
      * @return current instance for fluent operations
      */
-    public JPALazyDataModel<TT, KK> initialize(BuilderFunction<TT, KK> builder) {
-        impl = builder.apply(impl == null ? JPAModelImpl.builder() : impl.toBuilder());
-        impl.setX_do_not_use_in_builder(builder);
-        return this;
+    public JPALazyDataModel<TT, KK> initialize(@NonNull BuilderFunction<TT, KK> builder) {
+        return initialize(builder, true);
     }
 
     /**
@@ -106,6 +116,15 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      */
     public interface BuilderFunction<TT, KK> extends Function<JPAModelImplBuilder<TT, KK>,
             JPAModelImpl<TT, KK>>, Serializable { }
+
+    /**
+     * Internal - do not use
+     *
+     * @hidden
+     * @param <TT>
+     * @param <KK>
+     */
+    public interface PartialBuilderConsumer<TT, KK> extends Consumer<JPAModelImplBuilder<TT, KK>>, Serializable { }
 
     /**
      * Transforms JPA entity field to format suitable for hints.
@@ -150,5 +169,14 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     @Override
     public int count(Map<String, FilterMeta> map) {
         return impl.count(map);
+    }
+
+    private JPALazyDataModel<TT, KK> initialize(BuilderFunction<TT, KK> builder, boolean resetPartialBuilder) {
+        impl = JPAModelImpl.create(new BuilderInitializer<>(builder, partialBuilder));
+        impl.setX_do_not_use_in_builder(new BuilderInitializer<>(builder, partialBuilder));
+        if (resetPartialBuilder) {
+            partialBuilder = null;
+        }
+        return this;
     }
 }

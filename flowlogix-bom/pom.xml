@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <slf4j.version>2.0.7</slf4j.version>
+        <slf4j.version>2.0.9</slf4j.version>
         <junit.version>5.10.0</junit.version>
         <mockito.version>5.2.0</mockito.version>
     </properties>

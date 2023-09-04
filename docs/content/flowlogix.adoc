@@ -423,7 +423,7 @@ include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/j
 
 Let's select a specific entity manager for this particular data model, by using a CDI qualifier:
 [source,java]
-.Using `entityManagerQualifiers` to specific persistence unit
+.Using `@LazyModelConfig(entityManagerSelector)` to use a specific persistence unit
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[tags=qualifier]
 ----

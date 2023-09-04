@@ -20,6 +20,7 @@ import static com.flowlogix.util.SerializeTester.serializeAndDeserialize;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.internal.LazyModelQualifier;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
@@ -285,7 +286,7 @@ public class ModelTest implements Serializable {
     void serialization() throws IOException, ClassNotFoundException {
         JPALazyDataModel<MyEntity, Long> model;
         try (var mockedStatic = mockStatic(Beans.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
-            mockedStatic.when(() -> Beans.getReference(eq(JPALazyDataModel.class), any()))
+            mockedStatic.when(() -> Beans.getReference(eq(JPALazyDataModel.class), eq(LazyModelQualifier.LITERAL)))
                     .thenReturn(new JPALazyDataModel<>());
             model = JPALazyDataModel.create(builder -> builder
                     .entityManager(() -> em).entityClass(MyEntity.class)

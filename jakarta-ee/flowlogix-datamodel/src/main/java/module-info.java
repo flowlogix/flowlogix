@@ -3,6 +3,7 @@
  */
 module com.flowlogix.datamodel {
     exports com.flowlogix.jeedao.primefaces;
+    exports com.flowlogix.jeedao.primefaces.internal;
 
     requires com.flowlogix.jee;
     requires com.flowlogix.jee.demo;

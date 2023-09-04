@@ -17,7 +17,7 @@ package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
-import com.flowlogix.jeedao.primefaces.internal.LazyModelQualifier;
+import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +52,7 @@ import org.primefaces.model.SortMeta;
  */
 @Dependent
 @Slf4j
-@LazyModelQualifier
+@InternalQualifierJPALazyModel
 public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     /**
      * Automatic field that's added to the JPA's root object
@@ -79,7 +79,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      */
     public static <TT, KK> JPALazyDataModel<TT, KK> create(BuilderFunction<TT, KK> builder) {
         @SuppressWarnings("unchecked")
-        JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class, LazyModelQualifier.LITERAL);
+        JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class, InternalQualifierJPALazyModel.LITERAL);
         return model.initialize(builder);
     }
 

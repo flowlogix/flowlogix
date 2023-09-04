@@ -26,9 +26,9 @@ import java.lang.annotation.RetentionPolicy;
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface LazyModelQualifier {
+public @interface InternalQualifierJPALazyModel {
     /**
      * Instance of self
      */
-    AnnotationLiteral<LazyModelQualifier> LITERAL = new AnnotationLiteral<>() { };
+    AnnotationLiteral<InternalQualifierJPALazyModel> LITERAL = new AnnotationLiteral<>() { };
 }

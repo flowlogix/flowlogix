@@ -19,6 +19,7 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 @Dependent
 @SuppressWarnings("HideUtilityClassConstructor")
@@ -34,6 +35,16 @@ public class DataModelProducer {
         var parameterizedType = (ParameterizedType) injectionPoint.getType();
         @SuppressWarnings("unchecked")
         var entityClass = (Class<TT>) parameterizedType.getActualTypeArguments()[0];
-        return new JPALazyDataModel<TT, KK>().initialize(builder -> builder.entityClass(entityClass).build());
+        var optionalConfig = injectionPoint.getQualifiers().stream()
+                .filter(c -> c.annotationType().isAssignableFrom(LazyModelConfig.class))
+                .map(LazyModelConfig.class::cast).findFirst();
+        return new JPALazyDataModel<TT, KK>().initialize(builder -> {
+            builder.entityClass(entityClass);
+            optionalConfig.ifPresent(config -> {
+                builder.caseSensitiveFilter(!config.caseInsensitive());
+                builder.entityManagerQualifiers(List.of(config.entityManagerSelector()));
+            });
+            return builder.build();
+        });
     }
 }

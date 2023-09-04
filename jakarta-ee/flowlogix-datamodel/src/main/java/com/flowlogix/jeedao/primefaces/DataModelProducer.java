@@ -35,15 +35,15 @@ public class DataModelProducer {
         var parameterizedType = (ParameterizedType) injectionPoint.getType();
         @SuppressWarnings("unchecked")
         var entityClass = (Class<TT>) parameterizedType.getActualTypeArguments()[0];
-        var optionalConfig = injectionPoint.getQualifiers().stream()
+        var config = injectionPoint.getQualifiers().stream()
                 .filter(c -> c.annotationType().isAssignableFrom(LazyModelConfig.class))
-                .map(LazyModelConfig.class::cast).findFirst();
+                .map(LazyModelConfig.class::cast).findFirst().orElse(null);
         return new JPALazyDataModel<TT, KK>().initialize(builder -> {
             builder.entityClass(entityClass);
-            optionalConfig.ifPresent(config -> {
+            if (config != null) {
                 builder.caseSensitiveFilter(!config.caseInsensitive());
                 builder.entityManagerQualifiers(List.of(config.entityManagerSelector()));
-            });
+            }
             return builder.build();
         });
     }

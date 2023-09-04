@@ -86,6 +86,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      * List of qualifiers to use when finding {@link EntityManager via CDI} (optional)
      */
     @Default
+    @Getter
     private final List<Class<? extends Annotation>> entityManagerQualifiers = List.of();
     /**
      * entity class

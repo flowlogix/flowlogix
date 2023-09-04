@@ -15,14 +15,19 @@
  */
 package com.flowlogix.examples;
 
+import com.flowlogix.demo.jeedao.NonDefault;
+import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
+import java.util.Map;
 import com.flowlogix.demo.jeedao.primefaces.BasicDataModel;
 import com.flowlogix.demo.jeedao.primefaces.ConverterDataModel;
 import com.flowlogix.demo.jeedao.primefaces.FilteringDataModel;
+import com.flowlogix.demo.jeedao.primefaces.InjectedDataModel;
 import com.flowlogix.demo.jeedao.primefaces.OptimizedDataModel;
 import com.flowlogix.demo.jeedao.primefaces.QualifiedDataModel;
 import com.flowlogix.demo.jeedao.primefaces.SortingDataModel;
-import java.util.Map;
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import jakarta.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit5.ArquillianExtension;
@@ -32,19 +37,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.primefaces.model.FilterMeta;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ArquillianExtension.class)
 public class DataModelBackendIT {
+    @Inject
+    InjectedDataModel injectedModel;
+
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    @SuppressWarnings("MagicNumber")
     void basicDataModel() {
         var model = new BasicDataModel();
-        assertEquals(5, model.getUserModel().count(Map.of()));
-        var rows = model.getUserModel().findRows(0, 3,
+        basicDataModel(model.getUserModel());
+    }
+
+    @SuppressWarnings("MagicNumber")
+    private void basicDataModel(JPALazyDataModel<UserEntity, Long> model) {
+        assertEquals(5, model.count(Map.of()));
+        var rows = model.findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
-                .field(UserEntity_.userId.getName()).filterValue("jprimak")
-                .build()), Map.of());
+                        .field(UserEntity_.userId.getName()).filterValue("jprimak")
+                        .build()), Map.of());
         assertEquals(1, rows.size());
         assertEquals("Lovely Lady", rows.get(0).getFullName());
     }
@@ -106,6 +120,31 @@ public class DataModelBackendIT {
         var entity = model.getUserModel().getRowData(binaryKey);
         assertEquals(rows.get(3), entity);
         assertEquals(binaryKey, model.getUserModel().getRowKey(entity));
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void basicInjectedModel() {
+        basicDataModel(injectedModel.getInjectedModel());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void overriddenInjectedModel() {
+        assertEquals(UserEntity.class, injectedModel.getInjectedOverriddenModel().getEntityClass());
+        assertFalse(injectedModel.getInjectedOverriddenModel().isCaseSensitiveFilter());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void caseInsensitiveInjectedModel() {
+        assertFalse(injectedModel.getInjectedCaseInsensitiveModel().isCaseSensitiveFilter());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void nonDefaultInjectedModel() {
+        assertTrue(injectedModel.getInjectedNonDefaultModel().getEntityManagerQualifiers().contains(NonDefault.class));
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

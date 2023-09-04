@@ -17,6 +17,7 @@ package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
+import com.flowlogix.jeedao.primefaces.internal.LazyModelQualifier;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ import org.primefaces.model.SortMeta;
  */
 @Dependent
 @Slf4j
+@LazyModelQualifier
 public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     /**
      * Automatic field that's added to the JPA's root object
@@ -60,6 +62,11 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     private static final long serialVersionUID = 4L;
     @Delegate
     private JPAModelImpl<TT, KK> impl;
+
+    /**
+     * Prevent direct creation
+     */
+    JPALazyDataModel() { }
 
     /**
      * Set up this particular instance of the data model
@@ -72,10 +79,20 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      */
     public static <TT, KK> JPALazyDataModel<TT, KK> create(BuilderFunction<TT, KK> builder) {
         @SuppressWarnings("unchecked")
-        JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class);
-        model.impl = builder.apply(JPAModelImpl.builder());
-        model.impl.setX_do_not_use_in_builder(builder);
-        return model;
+        JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class, LazyModelQualifier.LITERAL);
+        return model.initialize(builder);
+    }
+
+    /**
+     * Initialize JPA Lazy Data model. Used to set parameters to already-injected instance
+     *
+     * @param builder serializable lambda for creation
+     * @return current instance for fluent operations
+     */
+    public JPALazyDataModel<TT, KK> initialize(BuilderFunction<TT, KK> builder) {
+        impl = builder.apply(JPAModelImpl.builder());
+        impl.setX_do_not_use_in_builder(builder);
+        return this;
     }
 
     /**

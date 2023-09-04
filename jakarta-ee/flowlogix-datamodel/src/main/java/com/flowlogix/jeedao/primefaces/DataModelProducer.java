@@ -16,6 +16,7 @@
 package com.flowlogix.jeedao.primefaces;
 
 import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import java.lang.reflect.ParameterizedType;
@@ -25,11 +26,7 @@ import java.util.List;
 @SuppressWarnings("HideUtilityClassConstructor")
 public class DataModelProducer {
     @Produces
-    public static <TT, KK> JPALazyDataModel<TT, KK> produceDataModel(InjectionPoint injectionPoint) {
-        return produceDataModelWithConfig(injectionPoint);
-    }
-
-    @Produces
+    @Default
     @LazyModelConfig
     public static <TT, KK> JPALazyDataModel<TT, KK> produceDataModelWithConfig(InjectionPoint injectionPoint) {
         var parameterizedType = (ParameterizedType) injectionPoint.getType();

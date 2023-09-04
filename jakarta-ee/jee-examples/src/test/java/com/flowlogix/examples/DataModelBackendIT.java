@@ -145,6 +145,12 @@ public class DataModelBackendIT {
         assertThrows(IllegalArgumentException.class, () -> basicDataModel(models.getInvalid().getModel()));
     }
 
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void directModel() {
+        basicDataModel(models.getDirect().getUserModel());
+    }
+
     @Deployment(name = DEPLOYMENT_DEV_MODE)
     public static WebArchive createDeployment() {
         return ExceptionPageIT.createDeploymentDev();

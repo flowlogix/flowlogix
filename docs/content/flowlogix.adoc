@@ -379,9 +379,19 @@ public class UserViewer implements Serializable {
 include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage"]
 }
 ----
-Above we created a model with case-insensitive filtering.
+Above we created a model with case-insensitive filtering. Model can be optionally initialized further inside `@PostConstruct` using `initialize()` method and builder pattern (see below)
 
-`JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
+[source,java]
+.UserViewer.java - Direct model creation
+----
+@Named
+@ViewScoped
+public class UserViewer implements Serializable {
+include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/DirectCreationDataModel.java[tags=basicUsage]
+}
+----
+Above, we create the model without injection.
+During direct creation, `JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
 
 * entityManager: Provide entity manager `Supplier`. Default is injected via CDI
 * entityManagerQualifiers: Provides a list of qualifier annotations to select the correct EntityManager for injection

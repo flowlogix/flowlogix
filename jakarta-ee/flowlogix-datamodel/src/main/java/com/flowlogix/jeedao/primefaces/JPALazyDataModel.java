@@ -46,6 +46,10 @@ import org.primefaces.model.SortMeta;
  * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.BasicDataModel" region = "basicUsageHtml"}
  * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.BasicDataModel" region = "basicUsage"}
  *
+ * <p>
+ * <em>Direct Creation Example:</em>
+ * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.DirectCreationDataModel" region = "basicUsage"}
+
  * @author lprimak
  * @param <TT> Data Type
  * @param <KK> Key Type

@@ -29,6 +29,9 @@ public class DataModelWrapper implements Serializable {
     BasicDataModel basic;
 
     @Inject
+    DirectCreationDataModel direct;
+
+    @Inject
     ConverterDataModel converter;
 
     @Inject

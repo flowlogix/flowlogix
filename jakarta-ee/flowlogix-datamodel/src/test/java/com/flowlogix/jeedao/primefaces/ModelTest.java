@@ -19,7 +19,8 @@ import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.RESULT;
 import static com.flowlogix.util.SerializeTester.serializeAndDeserialize;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
-import com.flowlogix.jeedao.primefaces.impl.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
@@ -41,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -284,7 +286,7 @@ public class ModelTest implements Serializable {
     void serialization() throws IOException, ClassNotFoundException {
         JPALazyDataModel<MyEntity, Long> model;
         try (var mockedStatic = mockStatic(Beans.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
-            mockedStatic.when(() -> Beans.getReference(JPALazyDataModel.class))
+            mockedStatic.when(() -> Beans.getReference(eq(JPALazyDataModel.class), eq(InternalQualifierJPALazyModel.LITERAL)))
                     .thenReturn(new JPALazyDataModel<>());
             model = JPALazyDataModel.create(builder -> builder
                     .entityManager(() -> em).entityClass(MyEntity.class)

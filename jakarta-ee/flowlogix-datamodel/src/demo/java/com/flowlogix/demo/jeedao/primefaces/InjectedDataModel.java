@@ -15,32 +15,37 @@
  */
 package com.flowlogix.demo.jeedao.primefaces;
 
+import com.flowlogix.demo.jeedao.NonDefault;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
-import com.flowlogix.demo.viewscoped.ViewScoped;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import com.flowlogix.jeedao.primefaces.LazyModelConfig;
+import com.flowlogix.demo.viewscoped.ViewScoped;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import java.io.Serializable;
 import lombok.Getter;
+import java.io.Serializable;
 
-/*
-// @start region="basicUsageHtml"
-// tag::basicUsageHtml[] // @replace regex='.*\n' replacement=""
-<p:dataTable lazy="true" value="#{userViewer.userModel}" var="user">
-    ... specify columns as usual ...
-</p:dataTable>
-// end::basicUsageHtml[] // @replace regex='.*\n' replacement=""
-// @end
-*/
-// @start region="basicUsage"
-// tag::basicUsage[] // @replace regex='.*\n' replacement=""
 @Named
 @ViewScoped
-@SuppressWarnings("TrailingComment") // @replace regex='.*\n' replacement=""
-public class BasicDataModel implements Serializable { // @replace regex='BasicDataModel' replacement="UserViewer"
+@Getter
+public class InjectedDataModel implements Serializable {
     @Inject
-    @Getter
-    JPALazyDataModel<UserEntity, Long> userModel;
+    JPALazyDataModel<UserEntity, Long> injectedModel;
+
+    @Inject
+    JPALazyDataModel<UserEntity, Long> injectedOverriddenModel;
+
+    @Inject
+    @LazyModelConfig(caseInsensitive = true)
+    JPALazyDataModel<UserEntity, Long> injectedCaseInsensitiveModel;
+
+    @Inject
+    @LazyModelConfig(entityManagerSelector = NonDefault.class)
+    JPALazyDataModel<UserEntity, Long> injectedNonDefaultModel;
+
+    @PostConstruct
+    void postConstruct() {
+        injectedOverriddenModel.initialize(builder -> builder.caseSensitiveFilter(false).build());
+    }
 }
-// end::basicUsage[] // @replace regex='.*\n' replacement=""
-// @end

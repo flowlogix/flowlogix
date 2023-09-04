@@ -18,10 +18,10 @@ package com.flowlogix.demo.jeedao.primefaces;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.viewscoped.ViewScoped;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import java.io.Serializable;
 import lombok.Getter;
+
+import java.io.Serializable;
 
 /*
 // @start region="basicUsageHtml"
@@ -33,14 +33,13 @@ import lombok.Getter;
 // @end
 */
 // @start region="basicUsage"
-// tag::basicUsage[] // @replace regex='.*\n' replacement=""
 @Named
 @ViewScoped
-@SuppressWarnings("TrailingComment") // @replace regex='.*\n' replacement=""
-public class BasicDataModel implements Serializable { // @replace regex='BasicDataModel' replacement="UserViewer"
-    @Inject
-    @Getter
-    JPALazyDataModel<UserEntity, Long> userModel;
-}
+@SuppressWarnings({"TrailingComment", "LineLength"}) // @replace regex='.*\n' replacement=""
+public class DirectCreationDataModel implements Serializable { // @replace regex='DirectCreationDataModel' replacement="UserViewer"
+    // tag::basicUsage[] // @replace regex='.*\n' replacement=""
+    private final @Getter JPALazyDataModel<UserEntity, Long> userModel =
+            JPALazyDataModel.create(builder -> builder.entityClass(UserEntity.class).build());
 // end::basicUsage[] // @replace regex='.*\n' replacement=""
+}
 // @end

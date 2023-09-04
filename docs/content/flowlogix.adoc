@@ -364,7 +364,7 @@ Developers can transform any XML file from the archive by using the generic `man
 [[section-jpa-lazymodel]]
 === FlowLogix PrimeFaces DataTable Lazy Data Model backed by JPA
 .An easier alternative to PrimeFaces JPA Lazy Data model
-PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a big "head start" in features, compactness and ease of use. It also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier, with a lot less code and better design. It also does not require inheritance and problems associated with it.
+PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a big "head start" in features, compactness and ease of use. Biggest advantage is ability to easily `@Inject` the model via CDI. The model also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier, with a lot less code and better design. It also does not require inheritance and problems associated with it.
 [source,xhtml]
 .userviewer.xhtml
 ----
@@ -376,12 +376,22 @@ include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/j
 @Named
 @ViewScoped
 public class UserViewer implements Serializable {
-include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage,!simpleOptionalLazyDataModelUsage"]
+include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage"]
 }
 ----
-Above we created a model with case-insensitive filtering using a builder pattern.
+Above we created a model with case-insensitive filtering. Model can be optionally initialized further inside `@PostConstruct` using `initialize()` method and builder pattern (see below)
 
-`JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
+[source,java]
+.UserViewer.java - Direct model creation
+----
+@Named
+@ViewScoped
+public class UserViewer implements Serializable {
+include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/DirectCreationDataModel.java[tags=basicUsage]
+}
+----
+Above, we create the model without injection.
+During direct creation, `JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
 
 * entityManager: Provide entity manager `Supplier`. Default is injected via CDI
 * entityManagerQualifiers: Provides a list of qualifier annotations to select the correct EntityManager for injection
@@ -413,7 +423,7 @@ include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/j
 
 Let's select a specific entity manager for this particular data model, by using a CDI qualifier:
 [source,java]
-.Using `entityManagerQualifiers` to specific persistence unit
+.Using `@LazyModelConfig(entityManagerSelector)` to use a specific persistence unit
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[tags=qualifier]
 ----

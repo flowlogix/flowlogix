@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.jeedao.primefaces;
 
 import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Qualifier;
@@ -24,13 +24,22 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Qualifier specify annotation that inject a particular {@link jakarta.persistence.EntityManager}
+ * Configuration annotation to make {@link JPALazyDataModel} queries case-insensitive
  */
 @Qualifier
-@Documented
 @Inherited
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EntityManagerSelector {
+public @interface LazyModelConfig {
+    /**
+     * case-sensitivity of queries
+     */
     @Nonbinding
-    Class<? extends Annotation> [] value();
+    boolean caseInsensitive() default false;
+
+    /**
+     * Override entity manager for the data model
+     */
+    @Nonbinding
+    Class<? extends Annotation> [] entityManagerSelector() default { };
 }

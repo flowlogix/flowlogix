@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.jeedao.primefaces.internal;
 
-import jakarta.enterprise.util.Nonbinding;
+import jakarta.enterprise.util.AnnotationLiteral;
 import jakarta.inject.Qualifier;
-import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Qualifier specify annotation that inject a particular {@link jakarta.persistence.EntityManager}
+ * @hidden
  */
 @Qualifier
-@Documented
 @Inherited
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EntityManagerSelector {
-    @Nonbinding
-    Class<? extends Annotation> [] value();
+public @interface InternalQualifierJPALazyModel {
+    /**
+     * Instance of self
+     */
+    AnnotationLiteral<InternalQualifierJPALazyModel> LITERAL = new AnnotationLiteral<>() { };
 }

@@ -17,8 +17,10 @@ package com.flowlogix.demo.jeedao.primefaces;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
+import com.flowlogix.demo.viewscoped.ViewScoped;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import jakarta.faces.view.ViewScoped;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import lombok.Getter;
@@ -31,15 +33,19 @@ import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.getResultField;
 @Named
 @ViewScoped
 public class OptimizedDataModel implements Serializable {
+    @Inject
     @Getter
-    private final JPALazyDataModel<UserEntity, Long> userModel = JPALazyDataModel
-            .create(builder -> builder.entityClass(UserEntity.class)
-                    // optimize query by batching relationship fetching
-                    .optimizer(query -> query
-                            .setHint(QueryHints.BATCH, getResultField(UserEntity_.userSettings.getName()))
-                            .setHint(QueryHints.BATCH, getResultField(UserEntity_.alternateEmails.getName()))
-                            .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN)
-                    ).build());
+    JPALazyDataModel<UserEntity, Long> userModel;
+
+    @PostConstruct
+    void initialize() {
+        // optimize query by batching relationship fetching
+        userModel.initialize(builder -> builder.optimizer(query -> query
+                        .setHint(QueryHints.BATCH, getResultField(UserEntity_.userSettings.getName()))
+                        .setHint(QueryHints.BATCH, getResultField(UserEntity_.alternateEmails.getName()))
+                        .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN))
+                .build());
+    }
 }
 // end::optimized[] // @replace regex='.*\n' replacement=""
 // @end

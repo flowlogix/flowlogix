@@ -18,29 +18,18 @@ package com.flowlogix.demo.jeedao.primefaces;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.viewscoped.ViewScoped;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import com.flowlogix.jeedao.primefaces.LazyModelConfig;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import java.io.Serializable;
 import lombok.Getter;
+import java.io.Serializable;
 
-/*
-// @start region="basicUsageHtml"
-// tag::basicUsageHtml[] // @replace regex='.*\n' replacement=""
-<p:dataTable lazy="true" value="#{userViewer.userModel}" var="user">
-    ... specify columns as usual ...
-</p:dataTable>
-// end::basicUsageHtml[] // @replace regex='.*\n' replacement=""
-// @end
-*/
-// @start region="basicUsage"
-// tag::basicUsage[] // @replace regex='.*\n' replacement=""
 @Named
 @ViewScoped
-@SuppressWarnings("TrailingComment") // @replace regex='.*\n' replacement=""
-public class BasicDataModel implements Serializable { // @replace regex='BasicDataModel' replacement="UserViewer"
+public class InvalidDataModel implements Serializable {
     @Inject
     @Getter
-    JPALazyDataModel<UserEntity, Long> userModel;
+    @LazyModelConfig(entityManagerSelector = ApplicationScoped.class)
+    JPALazyDataModel<UserEntity, Long> model;
 }
-// end::basicUsage[] // @replace regex='.*\n' replacement=""
-// @end

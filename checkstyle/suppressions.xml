@@ -29,6 +29,7 @@
     <suppress checks="JavadocPackage" files="org[\\/]omnifaces[\\/]util[\\/]*"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]jeedao[\\/]primefaces[\\/]JPALazyDataModel"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]logcapture[\\/]*"/>
+    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]viewscoped[\\/]*"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]examples[\\/]*"/>
 
     <suppress checks="JavadocVariable" lines="49-52" files="com[\\/]flowlogix[\\/]util[\\/]ShrinkWrapManipulator"/>

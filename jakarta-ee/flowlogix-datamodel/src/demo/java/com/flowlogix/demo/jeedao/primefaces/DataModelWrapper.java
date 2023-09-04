@@ -15,25 +15,37 @@
  */
 package com.flowlogix.demo.jeedao.primefaces;
 
-import com.flowlogix.demo.jeedao.NonDefault;
-import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.viewscoped.ViewScoped;
-import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import com.flowlogix.jeedao.primefaces.LazyModelConfig;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import java.io.Serializable;
 import lombok.Getter;
+import java.io.Serializable;
 
-// @start region="qualifier"
-// tag::qualifier[] // @replace regex='.*\n' replacement=""
 @Named
 @ViewScoped
-public class QualifiedDataModel implements Serializable {
+@Getter
+public class DataModelWrapper implements Serializable {
     @Inject
-    @Getter
-    @LazyModelConfig(entityManagerSelector = NonDefault.class)
-    JPALazyDataModel<UserEntity, Long> userModel;
+    BasicDataModel basic;
+
+    @Inject
+    DirectCreationDataModel direct;
+
+    @Inject
+    ConverterDataModel converter;
+
+    @Inject
+    FilteringDataModel filtering;
+
+    @Inject
+    OptimizedDataModel optimized;
+
+    @Inject
+    QualifiedDataModel qualified;
+
+    @Inject
+    SortingDataModel sorting;
+
+    @Inject
+    InvalidDataModel invalid;
 }
-// end::qualifier[] // @replace regex='.*\n' replacement=""
-// @end

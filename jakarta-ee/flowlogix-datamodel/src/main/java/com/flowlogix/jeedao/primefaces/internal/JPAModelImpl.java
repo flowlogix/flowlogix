@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao.primefaces.impl;
+package com.flowlogix.jeedao.primefaces.internal;
 
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.DaoHelper.QueryCriteria;
@@ -74,7 +74,7 @@ import org.primefaces.model.SortMeta;
  * @param <TT>
  * @param <KK>
  */
-@Builder
+@Builder(toBuilder = true)
 @Slf4j
 public class JPAModelImpl<TT, KK> implements Serializable {
     private static final long serialVersionUID = 4L;
@@ -86,6 +86,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      * List of qualifiers to use when finding {@link EntityManager via CDI} (optional)
      */
     @Default
+    @Getter
     private final List<Class<? extends Annotation>> entityManagerQualifiers = List.of();
     /**
      * entity class

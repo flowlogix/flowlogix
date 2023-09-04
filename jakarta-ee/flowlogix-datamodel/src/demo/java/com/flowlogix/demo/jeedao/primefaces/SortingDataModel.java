@@ -17,8 +17,10 @@ package com.flowlogix.demo.jeedao.primefaces;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
+import com.flowlogix.demo.viewscoped.ViewScoped;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import jakarta.faces.view.ViewScoped;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import lombok.Getter;
@@ -28,13 +30,18 @@ import lombok.Getter;
 @Named
 @ViewScoped
 public class SortingDataModel implements Serializable {
+    @Inject
     @Getter
-    private final JPALazyDataModel<UserEntity, Long> userModel = JPALazyDataModel
-            .create(builder -> builder.entityClass(UserEntity.class)
-                    // add an ascending zip code-based sort order
-                    .sorter((sortData, cb, root) -> sortData.applicationSort(UserEntity_.zipCode.getName(),
-                            var -> cb.asc(root.get(UserEntity_.zipCode))))
-                    .build());
+    JPALazyDataModel<UserEntity, Long> userModel;
+
+    @PostConstruct
+    void initialize() {
+        // add an ascending zip code-based sort order
+        userModel.initialize(builder -> builder.sorter((sortData, cb, root) ->
+                        sortData.applicationSort(UserEntity_.zipCode.getName(),
+                        var -> cb.asc(root.get(UserEntity_.zipCode))))
+                .build());
+    }
 }
 // end::sorting[] // @replace regex='.*\n' replacement=""
 // @end

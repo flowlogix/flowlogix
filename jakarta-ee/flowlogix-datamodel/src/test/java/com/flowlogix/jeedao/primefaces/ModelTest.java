@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -284,7 +285,7 @@ public class ModelTest implements Serializable {
     void serialization() throws IOException, ClassNotFoundException {
         JPALazyDataModel<MyEntity, Long> model;
         try (var mockedStatic = mockStatic(Beans.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
-            mockedStatic.when(() -> Beans.getReference(JPALazyDataModel.class))
+            mockedStatic.when(() -> Beans.getReference(eq(JPALazyDataModel.class), any()))
                     .thenReturn(new JPALazyDataModel<>());
             model = JPALazyDataModel.create(builder -> builder
                     .entityManager(() -> em).entityClass(MyEntity.class)

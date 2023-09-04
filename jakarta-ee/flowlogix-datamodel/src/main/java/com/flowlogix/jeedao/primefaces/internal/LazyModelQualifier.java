@@ -18,10 +18,12 @@ package com.flowlogix.jeedao.primefaces.internal;
 import jakarta.enterprise.util.AnnotationLiteral;
 import jakarta.inject.Qualifier;
 import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Qualifier
+@Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LazyModelQualifier {

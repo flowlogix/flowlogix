@@ -19,16 +19,17 @@ import com.flowlogix.demo.jeedao.NonDefault;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.LazyModelConfig;
+import com.flowlogix.demo.viewscoped.ViewScoped;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import lombok.Getter;
+import java.io.Serializable;
 
 @Named
-@ApplicationScoped
+@ViewScoped
 @Getter
-public class InjectedDataModel {
+public class InjectedDataModel implements Serializable {
     @Inject
     JPALazyDataModel<UserEntity, Long> injectedModel;
 

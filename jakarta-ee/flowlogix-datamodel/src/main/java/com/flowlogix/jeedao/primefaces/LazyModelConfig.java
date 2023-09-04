@@ -19,6 +19,7 @@ import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -26,6 +27,7 @@ import java.lang.annotation.RetentionPolicy;
  * Configuration annotation to make {@link JPALazyDataModel} queries case-insensitive
  */
 @Qualifier
+@Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LazyModelConfig {

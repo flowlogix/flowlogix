@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.jeedao;
+package com.flowlogix.demo.viewscoped;
 
-import jakarta.enterprise.util.Nonbinding;
-import jakarta.inject.Qualifier;
-import java.lang.annotation.Annotation;
+import jakarta.enterprise.context.NormalScope;
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * Qualifier specify annotation that inject a particular {@link jakarta.persistence.EntityManager}
- */
-@Qualifier
-@Documented
+@NormalScope(passivating = true)
 @Inherited
-@Retention(RetentionPolicy.RUNTIME)
-public @interface EntityManagerSelector {
-    @Nonbinding
-    Class<? extends Annotation> [] value();
+@Documented
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
+@Retention(value = RetentionPolicy.RUNTIME)
+public @interface ViewScoped {
 }

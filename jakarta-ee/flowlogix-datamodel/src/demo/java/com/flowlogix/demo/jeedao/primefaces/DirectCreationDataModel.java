@@ -35,7 +35,7 @@ import java.io.Serializable;
 // @start region="basicUsage"
 @Named
 @ViewScoped
-@SuppressWarnings("TrailingComment") // @replace regex='.*\n' replacement=""
+@SuppressWarnings({"TrailingComment", "LineLength"}) // @replace regex='.*\n' replacement=""
 public class DirectCreationDataModel implements Serializable { // @replace regex='DirectCreationDataModel' replacement="UserViewer"
     // tag::basicUsage[] // @replace regex='.*\n' replacement=""
     private final @Getter JPALazyDataModel<UserEntity, Long> userModel =

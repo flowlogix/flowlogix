@@ -15,7 +15,11 @@
  */
 package com.flowlogix.demo.jeedao.primefaces;
 
+import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.viewscoped.ViewScoped;
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import com.flowlogix.jeedao.primefaces.LazyModelConfig;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import lombok.Getter;
@@ -23,26 +27,9 @@ import java.io.Serializable;
 
 @Named
 @ViewScoped
-@Getter
-public class DataModelWrapper implements Serializable {
+public class InvalidDataModel implements Serializable {
     @Inject
-    BasicDataModel basic;
-
-    @Inject
-    ConverterDataModel converter;
-
-    @Inject
-    FilteringDataModel filtering;
-
-    @Inject
-    OptimizedDataModel optimized;
-
-    @Inject
-    QualifiedDataModel qualified;
-
-    @Inject
-    SortingDataModel sorting;
-
-    @Inject
-    InvalidDataModel invalid;
+    @Getter
+    @LazyModelConfig(entityManagerSelector = ApplicationScoped.class)
+    JPALazyDataModel<UserEntity, Long> model;
 }

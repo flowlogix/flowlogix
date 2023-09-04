@@ -33,6 +33,7 @@ import org.primefaces.model.FilterMeta;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ArquillianExtension.class)
@@ -136,6 +137,12 @@ public class DataModelBackendIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void nonDefaultInjectedModel() {
         assertTrue(injectedModel.getInjectedNonDefaultModel().getEntityManagerQualifiers().contains(NonDefault.class));
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void invalidInjectedModel() {
+        assertThrows(IllegalArgumentException.class, () -> basicDataModel(models.getInvalid().getModel()));
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

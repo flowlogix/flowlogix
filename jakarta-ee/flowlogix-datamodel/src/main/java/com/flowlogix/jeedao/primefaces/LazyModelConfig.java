@@ -24,7 +24,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Configuration annotation to make {@link JPALazyDataModel} queries case-insensitive
+ * Optional Configuration annotation for {@link JPALazyDataModel}
+ * Use to make queries case-insensitive and pick an {@link jakarta.persistence.EntityManager}
  */
 @Qualifier
 @Inherited

@@ -22,6 +22,9 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
+/**
+ * CDI Injection Support, Do not use directly
+ */
 @Dependent
 @SuppressWarnings("HideUtilityClassConstructor")
 public class DataModelProducer {

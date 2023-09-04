@@ -90,7 +90,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @return current instance for fluent operations
      */
     public JPALazyDataModel<TT, KK> initialize(BuilderFunction<TT, KK> builder) {
-        impl = builder.apply(JPAModelImpl.builder());
+        impl = builder.apply(impl == null ? JPAModelImpl.builder() : impl.toBuilder());
         impl.setX_do_not_use_in_builder(builder);
         return this;
     }

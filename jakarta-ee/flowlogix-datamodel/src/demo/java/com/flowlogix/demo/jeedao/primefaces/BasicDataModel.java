@@ -26,7 +26,7 @@ import lombok.Getter;
 /*
 // @start region="basicUsageHtml"
 // tag::basicUsageHtml[] // @replace regex='.*\n' replacement=""
-<p:dataTable lazy="true" value="#{userViewer.userModel}" var="user">
+<p:dataTable lazy="true" value="#{userViewer.lazyModel}" var="user">
     ... specify columns as usual ...
 </p:dataTable>
 // end::basicUsageHtml[] // @replace regex='.*\n' replacement=""
@@ -40,7 +40,7 @@ import lombok.Getter;
 public class BasicDataModel implements Serializable { // @replace regex='BasicDataModel' replacement="UserViewer"
     @Inject
     @Getter
-    JPALazyDataModel<UserEntity, Long> userModel;
+    JPALazyDataModel<UserEntity, Long> lazyModel;
 }
 // end::basicUsage[] // @replace regex='.*\n' replacement=""
 // @end

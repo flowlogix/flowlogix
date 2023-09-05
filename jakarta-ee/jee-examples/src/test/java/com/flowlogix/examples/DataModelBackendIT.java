@@ -48,7 +48,7 @@ public class DataModelBackendIT {
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void basicDataModel() {
-        basicDataModel(models.getBasic().getUserModel());
+        basicDataModel(models.getBasic().getLazyModel());
     }
 
     @SuppressWarnings("MagicNumber")

@@ -44,6 +44,7 @@ public class UserViewer implements Serializable {
     // tag::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
     @Inject
     @Getter
+    // optional configuration annotation
     @LazyModelConfig(caseInsensitive = true)
     JPALazyDataModel<UserEntity, Long> lazyModel;
     // end::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""

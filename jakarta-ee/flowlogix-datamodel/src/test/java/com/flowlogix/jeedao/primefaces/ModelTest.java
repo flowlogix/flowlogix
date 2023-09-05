@@ -33,11 +33,12 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -296,5 +297,13 @@ public class ModelTest implements Serializable {
                 .getIdentifier(any(MyEntity.class))).thenReturn(5L);
         var deserialized = serializeAndDeserialize(model);
         assertEquals("5", deserialized.getRowKey(new MyEntity()));
+    }
+
+    @Test
+    void partialInitialization() {
+        var model = new JPALazyDataModel<Integer, Long>()
+                .partialInitialize(builder -> builder.entityClass(Integer.class).build());
+        assertThrows(IllegalStateException.class, () -> model.partialInitialize(builder -> builder.build()));
+        assertEquals(Integer.class, model.getEntityClass());
     }
 }

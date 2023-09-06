@@ -115,15 +115,41 @@ public class ModelTest implements Serializable {
     }
 
     @Test
-    void collectionFilter() {
+    void typedCollectionFilter() {
+        collectionFilter(List.of(1, 2));
+    }
+
+    @Test
+    void typedArrayFilter() {
+        collectionFilter(new Integer[] {1, 2});
+    }
+
+    @Test
+    void typedCollectionFilterConversion() {
+        collectionFilter(List.of("1", "2"));
+    }
+
+    @Test
+    void typedArrayFilterConversion() {
+        collectionFilter(new String[] {"1", "2"});
+    }
+
+    private <TT> void collectionFilter(Object valueList) {
         var impl = JPAModelImpl.<Integer, Long>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
                 .build();
-        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> List.class);
+        when(rootInteger.get(any(String.class))).thenAnswer(a -> integerPath);
+        when(integerPath.getJavaType()).thenAnswer(a -> Integer.class);
+        when(integerPath.in(any(List.class))).then(a -> {
+            List<?> list = a.getArgument(0);
+            assertEquals(Integer.class, list.get(0).getClass());
+            assertEquals(Integer.class, list.get(1).getClass());
+            return null;
+        });
         var fm = FilterMeta.builder().field("aaa")
-                .filterValue(List.of("one", "two")).matchMode(MatchMode.IN).build();
+                .filterValue(valueList).matchMode(MatchMode.IN).build();
         impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
         verify(rootInteger).get("aaa");
     }

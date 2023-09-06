@@ -278,43 +278,56 @@ public class JPAModelImpl<TT, KK> implements Serializable {
             var field = resolveField(root, key);
             Class<?> fieldType = field.getJavaType();
             Class<?> filterType = value.getClass();
+            boolean compositeFilterType = filterType.isArray() || Collection.class.isAssignableFrom(filterType);
             if (fieldType == String.class) {
                 value = value.toString();
                 cond = predicateFromFilter(cb, field, filterMeta, value);
-            } else if (fieldType.equals(filterType)
-                    || filterType.isArray() || Collection.class.isAssignableFrom(filterType)) {
-                cond = predicateFromFilterOrComparable(cb, field, filterMeta, value, fieldType);
+            } else if (fieldType.equals(filterType) || compositeFilterType) {
+                cond = predicateFromFilterOrComparable(cb, field, filterMeta, value, fieldType, compositeFilterType);
             } else {
-                var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
-                boolean valid = convertedValue.isValid();
-                if (valid) {
-                    value = convertedValue.getValue();
-                } else {
-                    try {
-                        Converter<?> valueConverter = Faces.getApplication().createConverter(fieldType);
-                        if (valueConverter != null) {
-                            value = valueConverter.getAsObject(Faces.getContext(),
-                                    UIComponent.getCurrentComponent(Faces.getContext()), value.toString());
-                            valid = true;
-                        }
-                    } catch (Throwable e) {
-                        log.debug("unable to convert via Faces", e);
-                    }
-                }
-                if (valid) {
-                    cond = predicateFromFilterOrComparable(cb, field, filterMeta, value, fieldType);
+                value = convert(value, fieldType);
+                if (value != null) {
+                    cond = predicateFromFilterOrComparable(cb, field, filterMeta, value, fieldType, false);
                 }
             }
         } catch (IllegalArgumentException e) { /* ignore possibly extra filter columns */ }
         return new FilterMetaResult(cond, value);
     }
 
+    private Object convert(Object value, Class<?> fieldType) {
+        Object convertedValue = null;
+        var checkedConvertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
+        if (checkedConvertedValue.isValid()) {
+            convertedValue = checkedConvertedValue.getValue();
+        } else {
+            try {
+                Converter<?> valueConverter = Faces.getApplication().createConverter(fieldType);
+                if (valueConverter != null) {
+                    convertedValue = valueConverter.getAsObject(Faces.getContext(),
+                            UIComponent.getCurrentComponent(Faces.getContext()), value.toString());
+                }
+            } catch (Throwable e) {
+                log.debug("unable to convert via Faces", e);
+            }
+        }
+        return convertedValue;
+    }
+
     private record FilterMetaResult(Predicate cond, Object value) { }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private Predicate predicateFromFilterOrComparable(CriteriaBuilder cb, Expression<?> field,
-                                                      FilterMeta filterMeta, Object value, Class<?> fieldType) {
+                                                      FilterMeta filterMeta, Object value, Class<?> fieldType,
+                                                      boolean compositeFilterType) {
         Predicate cond;
+        if (compositeFilterType) {
+            if (value.getClass().isArray()) {
+                value = Arrays.asList((Object[]) value);
+            }
+            List<?> listValue = (List<?>) value;
+            value = listValue.stream().map(raw -> fieldType.isAssignableFrom(raw.getClass())
+                    ? raw : convert(raw, fieldType)).toList();
+        }
         cond = predicateFromFilter(cb, field, filterMeta, value);
         if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
             Comparable<? super Comparable> cv = null;
@@ -347,9 +360,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     private Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
             FilterMeta filter, Object filterValue) {
         var stringExpression = new Lazy<>(() -> new ExpressionEvaluator(cb, expression, filterValue));
-        Lazy<Collection<?>> filterValueAsCollection = new Lazy<>(
-                () -> filterValue.getClass().isArray() ? Arrays.asList(filterValue)
-                        : (Collection<?>) filterValue);
+        Lazy<Collection<?>> filterValueAsCollection = new Lazy<>(() -> (Collection<?>) filterValue);
         switch (filter.getMatchMode()) {
             case STARTS_WITH:
                 return cb.like(stringExpression.get().expression, stringExpression.get().value + "%");
@@ -388,9 +399,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
             Expression<TC> objectExpression, FilterMeta filter, TC filterValue, Object filterValueCollection) {
         @SuppressWarnings("unchecked")
-        Lazy<Collection<TC>> filterValueAsCollection = new Lazy<>(
-                () -> filterValueCollection.getClass().isArray() ? Arrays.asList((TC[]) filterValueCollection)
-                        : (Collection<TC>) filterValueCollection);
+        Lazy<Collection<TC>> filterValueAsCollection = new Lazy<>(() -> (Collection<TC>) filterValueCollection);
         switch (filter.getMatchMode()) {
             case LESS_THAN:
                 return cb.lessThan(objectExpression, filterValue);

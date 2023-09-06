@@ -66,6 +66,9 @@ public class ShrinkWrapManipulator {
         }
     }
 
+    static final String DEFAULT_SSL_PROPERTY = "sslPort";
+    static final int DEFAULT_SSL_PORT = 8181;
+
     private final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
     private final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
 
@@ -144,7 +147,7 @@ public class ShrinkWrapManipulator {
      */
     @SuppressWarnings("MagicNumber")
     public static URL toHttpsURL(URL httpUrl) {
-        return toHttpsURL(httpUrl, "sslPort", 8181);
+        return toHttpsURL(httpUrl, DEFAULT_SSL_PROPERTY, DEFAULT_SSL_PORT);
     }
 
     /**

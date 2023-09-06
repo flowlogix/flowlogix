@@ -150,7 +150,7 @@ public class ModelTest implements Serializable {
                 .converter(Long::valueOf)
                 .build();
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
-        var fm = FilterMeta.builder().field("aaa").filterValue(5L).build();
+        var fm = FilterMeta.builder().field("aaa").matchMode(MatchMode.GREATER_THAN).filterValue(5L).build();
         impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
         verify(rootInteger).get("aaa");
     }

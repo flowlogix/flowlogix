@@ -13,12 +13,12 @@ FlowLogix provides a few remaining missing pieces in what is covered by Jakarta 
 .What are the features provided?
 FlowLogix Jakarta EE library fills in the last few gaps that are left over in PrimeFaces, OmniFaces and Jakarta EE itself, including:
 
-* Provides automatic DAO functionality with delegation and without inheritance
+* Provides automatic Data Access for JPA with delegation and without inheritance
 * Adds Type-safe Native SQL query with JPA via generics
 * Declares Jakarta Faces PROJECT_STAGE development mode automatically
 * Automatically uses minified versions of assets with Jakarta Faces
 * Provides easy and automatic initialization of OmniFaces' UnmappedResourceHandler
-* Easier-to-use JPA Lazy Data Model for PrimeFaces DataTable
+* Easier-to-use, Injected JPA Lazy Data Model for PrimeFaces DataTable
 * Automatically includes PrimeFaces font mime types in your web applications, preventing warnings and extra entries in your web.xml
 * Convert strings to arbitrary types on a best-effort basis
 * Transforms names between javax and jakarta namespaces

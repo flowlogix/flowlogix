@@ -326,7 +326,9 @@ public class JPAModelImpl<TT, KK> implements Serializable {
             }
             List<?> listValue = (List<?>) value;
             value = listValue.stream().map(raw -> fieldType.isAssignableFrom(raw.getClass())
-                    ? raw : convert(raw, fieldType)).toList();
+                    ? raw : Optional.ofNullable(convert(raw, fieldType)).orElseThrow(() ->
+                    new IllegalArgumentException(String.format("Can't convert filter: %s to %s",
+                            raw, fieldType)))).toList();
         }
         cond = predicateFromFilter(cb, field, filterMeta, value);
         if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {

@@ -142,6 +142,19 @@ public class ModelTest implements Serializable {
         verify(rootInteger).get("aaa");
     }
 
+    @Test
+    void similarConversionFilter() {
+        var impl = JPAModelImpl.<Integer, Long>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
+        var fm = FilterMeta.builder().field("aaa").filterValue(5L).build();
+        impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+        verify(rootInteger).get("aaa");
+    }
+
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {
         assertTrue(filterData.replaceFilter("aaa",
                 (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value)));

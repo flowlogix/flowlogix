@@ -230,8 +230,10 @@ public class JPAModelImpl<TT, KK> implements Serializable {
             if (filterMeta.isGlobalFilter()) {
                 predicates.put(filterMeta.getField(), new FilterColumnData(filterMeta.getFilterValue(), null));
             } else {
-                var filterMetas = processFilterMeta(cb, root, filterMeta.getField(), filterMeta);
-                predicates.put(filterMeta.getField(), new FilterColumnData(filterMetas.value(), filterMetas.cond()));
+                if (filterMeta.getFilterValue() != null) {
+                    var filterMetas = processFilterMeta(cb, root, filterMeta.getField(), filterMeta);
+                    predicates.put(filterMeta.getField(), new FilterColumnData(filterMetas.value(), filterMetas.cond()));
+                }
             }
         });
         filter.filter(predicates, cb, root);
@@ -271,11 +273,11 @@ public class JPAModelImpl<TT, KK> implements Serializable {
 
     private FilterMetaResult processFilterMeta(CriteriaBuilder cb, Root<TT> root, String key, FilterMeta filterMeta) {
         Predicate cond = null;
-        Object value = filterMeta.getFilterValue();
+        Object value = Objects.requireNonNull(filterMeta.getFilterValue(), "Filter Value cannot be null");
         try {
             var field = resolveField(root, key);
             Class<?> fieldType = field.getJavaType();
-            Class<?> filterType = filterMeta.getFilterValue().getClass();
+            Class<?> filterType = value.getClass();
             if (fieldType == String.class) {
                 value = value.toString();
                 cond = predicateFromFilter(cb, field, filterMeta, value);

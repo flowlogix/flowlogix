@@ -49,6 +49,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -116,25 +117,30 @@ public class ModelTest implements Serializable {
 
     @Test
     void typedCollectionFilter() {
-        collectionFilter(List.of(1, 2));
+        collectionFilter(List.of(1, 2), false);
     }
 
     @Test
     void typedArrayFilter() {
-        collectionFilter(new Integer[] {1, 2});
+        collectionFilter(new Integer[] {1, 2}, false);
     }
 
     @Test
     void typedCollectionFilterConversion() {
-        collectionFilter(List.of("1", "2"));
+        collectionFilter(List.of("1", "2"), false);
     }
 
     @Test
     void typedArrayFilterConversion() {
-        collectionFilter(new String[] {"1", "2"});
+        collectionFilter(new String[] {"1", "2"}, false);
     }
 
-    private <TT> void collectionFilter(Object valueList) {
+    @Test
+    void typedCollectionInvalidFilterConversion() {
+        collectionFilter(List.of("abc", "def"), true);
+    }
+
+    private <TT> void collectionFilter(Object valueList, boolean checkAbsence) {
         var impl = JPAModelImpl.<Integer, Long>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
@@ -152,6 +158,11 @@ public class ModelTest implements Serializable {
                 .filterValue(valueList).matchMode(MatchMode.IN).build();
         impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
         verify(rootInteger).get("aaa");
+        if (checkAbsence) {
+            verify(integerPath, never()).in(any(List.class));
+        } else {
+            verify(integerPath).in(any(List.class));
+        }
     }
 
     @Test

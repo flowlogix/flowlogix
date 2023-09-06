@@ -274,11 +274,13 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         try {
             var field = resolveField(root, key);
             Class<?> fieldType = field.getJavaType();
+            Class<?> filterType = filterMeta.getFilterValue().getClass();
             if (fieldType == String.class) {
                 value = value.toString();
                 cond = predicateFromFilter(cb, field, filterMeta, value);
-            } else if (fieldType.isArray() || Collection.class.isAssignableFrom(fieldType)) {
-                cond = predicateFromFilterOrComparable(cond, cb, root, field, filterMeta, value, fieldType);
+            } else if (fieldType.equals(filterType)
+                    || filterType.isArray() || Collection.class.isAssignableFrom(filterType)) {
+                cond = predicateFromFilterOrComparable(cb, field, filterMeta, value, fieldType);
             } else {
                 var convertedValue = TypeConverter.checkAndConvert(value.toString(), fieldType);
                 boolean valid = convertedValue.isValid();
@@ -297,7 +299,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
                     }
                 }
                 if (valid) {
-                    cond = predicateFromFilterOrComparable(cond, cb, root, field, filterMeta, value, fieldType);
+                    cond = predicateFromFilterOrComparable(cb, field, filterMeta, value, fieldType);
                 }
             }
         } catch (IllegalArgumentException e) { /* ignore possibly extra filter columns */ }
@@ -306,15 +308,18 @@ public class JPAModelImpl<TT, KK> implements Serializable {
 
     private record FilterMetaResult(Predicate cond, Object value) { }
 
-    private Predicate predicateFromFilterOrComparable(Predicate cond, CriteriaBuilder cb, Root<TT> root, Expression<?> field,
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private Predicate predicateFromFilterOrComparable(CriteriaBuilder cb, Expression<?> field,
                                                       FilterMeta filterMeta, Object value, Class<?> fieldType) {
+        Predicate cond;
         cond = predicateFromFilter(cb, field, filterMeta, value);
         if (cond == null && Comparable.class.isAssignableFrom(fieldType)) {
-            @SuppressWarnings({"unchecked", "rawtypes"})
-            Comparable<? super Comparable> cv = (Comparable) value;
-            @SuppressWarnings({"unchecked", "rawtypes"})
+            Comparable<? super Comparable> cv = null;
+            if (value instanceof Comparable<?>) {
+                cv = (Comparable) value;
+            }
             Expression<Comparable<? super Comparable>> comparableField = (Expression<Comparable<? super Comparable>>) field;
-            cond = predicateFromFilterComparable(cb, comparableField, filterMeta, cv);
+            cond = predicateFromFilterComparable(cb, comparableField, filterMeta, cv, value);
         }
         return cond;
     }
@@ -378,11 +383,11 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     @SuppressWarnings("MissingSwitchDefault")
     @Generated
     private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
-            Expression<TC> objectExpression, FilterMeta filter, TC filterValue) {
+            Expression<TC> objectExpression, FilterMeta filter, TC filterValue, Object filterValueCollection) {
         @SuppressWarnings("unchecked")
         Lazy<Collection<TC>> filterValueAsCollection = new Lazy<>(
-                () -> filterValue.getClass().isArray() ? Arrays.asList(filterValue)
-                        : (Collection<TC>) filterValue);
+                () -> filterValueCollection.getClass().isArray() ? Arrays.asList((TC[]) filterValueCollection)
+                        : (Collection<TC>) filterValueCollection);
         switch (filter.getMatchMode()) {
             case LESS_THAN:
                 return cb.lessThan(objectExpression, filterValue);

@@ -21,6 +21,8 @@ import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.convert.Converter;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
@@ -257,10 +259,18 @@ public class ModelTest implements Serializable {
                 .build();
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
         var fm = FilterMeta.builder().field("aaa").filterValue("xxx").build();
+        @SuppressWarnings("unchecked")
+        Converter<String> converter = mock(Converter.class);
         try (var mockedStatic = mockStatic(Faces.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
-            impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+            try (var mockedUIComponent = mockStatic(UIComponent.class)) {
+                when(UIComponent.getCurrentComponent(any())).thenReturn(null);
+                when(Faces.getApplication().createConverter(Integer.class)).thenReturn(converter);
+                when(converter.getAsObject(any(), any(), eq("xxx"))).thenReturn("aaa");
+                impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+            }
         }
         verify(rootInteger).get("aaa");
+        verify(converter).getAsObject(any(), any(), eq("xxx"));
     }
 
     @RequiredArgsConstructor

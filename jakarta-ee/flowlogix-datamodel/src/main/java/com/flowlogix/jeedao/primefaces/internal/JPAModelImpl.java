@@ -30,9 +30,10 @@ import jakarta.persistence.criteria.Join;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -255,7 +256,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      */
     public <YY> Expression<YY> resolveField(Root<TT> root, String fieldName) {
         Join<?, ?> join = null;
-        // recursively traverse all dotted fields, and join each
+        // traverse all dotted fields, and join each
         while (fieldName.contains(".")) {
             String partial = fieldName.substring(0, fieldName.indexOf("."));
             fieldName = fieldName.substring(partial.length() + 1);
@@ -295,7 +296,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
                             valid = true;
                         }
                     } catch (Throwable e) {
-                        log.debug("unable to convert via JSF", e);
+                        log.debug("unable to convert via Faces", e);
                     }
                 }
                 if (valid) {
@@ -414,7 +415,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
 
     @SuppressWarnings("MissingSwitchDefault")
     private List<Order> processSortMeta(Map<String, MergedSortOrder> sortMeta, CriteriaBuilder cb, Root<TT> root) {
-        List<Order> sortMetaOrdering = new ArrayList<>();
+        Deque<Order> sortMetaOrdering = new ArrayDeque<>();
         sortMeta.values().forEach(order -> {
             if (order.getRequestedSortMeta() != null) {
                 switch (order.getRequestedSortMeta().getOrder()) {
@@ -427,7 +428,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
                 }
             } else if (order.getApplicationSort() != null) {
                 if (order.isHighPriority()) {
-                    sortMetaOrdering.add(0, order.getApplicationSort());
+                    sortMetaOrdering.addFirst(order.getApplicationSort());
                 } else {
                     sortMetaOrdering.add(order.getApplicationSort());
                 }
@@ -435,7 +436,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
                 throw new IllegalStateException("Neither application sort request, nor UI sort request is available");
             }
         });
-        return sortMetaOrdering;
+        return sortMetaOrdering.stream().toList();
     }
 
     @SuppressWarnings("unchecked")

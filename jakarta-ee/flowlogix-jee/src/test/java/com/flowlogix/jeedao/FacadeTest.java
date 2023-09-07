@@ -31,10 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
+import org.omnifaces.util.Beans;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
@@ -84,7 +86,9 @@ public class FacadeTest implements Serializable {
 
     @Test
     void findEntityManager() {
-        assertNotNull(DaoHelper.findEntityManager());
+        try (var mock = mockStatic(Beans.class)) {
+            assertThrows(IllegalStateException.class, () -> DaoHelper.findEntityManager().get());
+        }
     }
 
     @Test
@@ -92,11 +96,15 @@ public class FacadeTest implements Serializable {
     void nativeQuery() {
         var query = mock(Query.class);
         when(em.createNativeQuery(any(String.class), eq(Long.class))).thenReturn(query);
+        when(em.createNativeQuery(any(String.class), any(String.class))).thenReturn(query);
         when(query.getSingleResult()).thenReturn(5L);
-        when(query.getResultStream()).thenReturn(Stream.of(3L));
+        when(query.getResultStream()).thenAnswer(a -> Stream.of(3L));
         var tnq = new MyControl().createNativeQuery("hello", Long.class);
         assertEquals(5L, tnq.<Long>getSingleResult());
         assertEquals(3L, tnq.getResultStream().findFirst().get());
+        var tnq2 = new MyControl().createNativeQuery("hello", "mapping");
+        assertEquals(5L, tnq2.<Long>getSingleResult());
+        assertEquals(3L, tnq2.getResultStream().findFirst().get());
     }
 
     @Test

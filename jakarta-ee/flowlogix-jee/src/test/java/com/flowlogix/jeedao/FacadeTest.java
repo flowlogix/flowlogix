@@ -19,7 +19,11 @@ import com.flowlogix.util.SerializeTester;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaQuery;
 import lombok.experimental.Delegate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -66,6 +71,32 @@ public class FacadeTest implements Serializable {
 
         when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(2L);
         assertEquals(2, new MyControl().count());
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "MagicNumber"})
+    void findAll() {
+        var query = mock(TypedQuery.class);
+        when(em.createQuery(any(CriteriaQuery.class))).thenReturn(query);
+        when(query.getResultList()).thenReturn(List.of(10L));
+        assertEquals(List.of(10L), new MyControl().findAll().getResultList());
+    }
+
+    @Test
+    void findEntityManager() {
+        assertNotNull(DaoHelper.findEntityManager());
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "MagicNumber"})
+    void nativeQuery() {
+        var query = mock(Query.class);
+        when(em.createNativeQuery(any(String.class), eq(Long.class))).thenReturn(query);
+        when(query.getSingleResult()).thenReturn(5L);
+        when(query.getResultStream()).thenReturn(Stream.of(3L));
+        var tnq = new MyControl().createNativeQuery("hello", Long.class);
+        assertEquals(5L, tnq.<Long>getSingleResult());
+        assertEquals(3L, tnq.getResultStream().findFirst().get());
     }
 
     @Test

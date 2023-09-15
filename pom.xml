@@ -46,7 +46,7 @@
         <webdriver.browser>chromeheadless</webdriver.browser>
         <jakarta.ee.version>10.0.0</jakarta.ee.version>
         <payara.version>6.2023.8</payara.version>
-        <groovy.version>4.0.14</groovy.version>
+        <groovy.version>4.0.15</groovy.version>
         <lombok.version>1.18.28</lombok.version>
         <eclipselink.version>4.0.2</eclipselink.version>
         <shrinkwrap.api.version>1.2.6</shrinkwrap.api.version>

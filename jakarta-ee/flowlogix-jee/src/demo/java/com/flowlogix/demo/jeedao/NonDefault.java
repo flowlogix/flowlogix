@@ -17,6 +17,7 @@ package com.flowlogix.demo.jeedao;
 
 import jakarta.inject.Qualifier;
 import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -24,6 +25,7 @@ import java.lang.annotation.RetentionPolicy;
 // tag::nonDefault[] // @replace regex='.*\n' replacement=""
 @Qualifier
 @Documented
+@Inherited
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NonDefault {
 }

@@ -15,20 +15,19 @@
  */
 package com.flowlogix.logcapture;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import jakarta.ejb.Singleton;
-import jakarta.ejb.Startup;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.event.Startup;
 
 /**
  *
  * @author lprimak
  */
-@Singleton @Startup
+@ApplicationScoped
 @SuppressWarnings("MagicNumber")
 public class LogCaptureSingleton {
-    @PostConstruct
-    void init() {
+    void init(@Observes Startup startup) {
         LogCapture.get().setupLogging(50);
     }
 

@@ -15,19 +15,17 @@
  */
 package com.flowlogix.examples.data;
 
-import jakarta.ejb.Stateless;
-import jakarta.ejb.TransactionAttribute;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.Getter;
-import static jakarta.ejb.TransactionAttributeType.SUPPORTS;
 
-@Stateless
-@TransactionAttribute(SUPPORTS)
+@RequestScoped
 public class EntityManagerProducer {
-    @Getter(onMethod = @__({@Produces, @Default, @AnotherEntityManager}))
+    @Produces
+    @Default
+    @AnotherEntityManager
     @PersistenceContext(unitName = "pu")
     EntityManager entityManager;
 }

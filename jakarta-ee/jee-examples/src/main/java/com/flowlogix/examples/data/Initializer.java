@@ -20,29 +20,30 @@ import com.flowlogix.demo.jeedao.entities.UserSettings;
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.EntityManagerSelector;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.control.ActivateRequestContext;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.event.Startup;
 import jakarta.inject.Inject;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import jakarta.annotation.PostConstruct;
-import jakarta.ejb.Singleton;
-import jakarta.ejb.Startup;
+import jakarta.transaction.Transactional;
 
 /**
  * @author lprimak
  */
-@Singleton
-@Startup
+@ApplicationScoped
+@ActivateRequestContext
+@Transactional
 public class Initializer {
     @Inject
     @EntityManagerSelector(AnotherEntityManager.class)
     DaoHelper<UserEntity> helper;
 
-    @PostConstruct
     @SuppressWarnings("MagicNumber")
-    void init() {
+    void init(@Observes Startup init) {
         if (helper.count() == 0) {
-            List<UserEntity> userList = Stream.of(
+            Stream.of(
                     UserEntity.builder().userId("lprimak").fullName("Lenny Primak")
                             .address("Tree-Lined Blvd").zipCode(68502)
                             .userSettings(List.of(UserSettings.builder()
@@ -60,8 +61,7 @@ public class Initializer {
                             .address("NY, Somewhere").zipCode(10012).build(),
                     UserEntity.builder().userId("cousin").fullName("Cool Cousin")
                             .address("Beastly Court").zipCode(68502).build()
-            ).collect(Collectors.toList());
-            userList.forEach(helper.getEntityManager().get()::merge);
+            ).forEach(helper.getEntityManager().get()::merge);
         }
     }
 }

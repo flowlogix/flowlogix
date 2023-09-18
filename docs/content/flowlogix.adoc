@@ -18,7 +18,7 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Declares Jakarta Faces PROJECT_STAGE development mode automatically
 * Automatically uses minified versions of assets with Jakarta Faces
 * Provides easy and automatic initialization of OmniFaces' UnmappedResourceHandler
-* Easier-to-use, Injected JPA Lazy Data Model for PrimeFaces DataTable
+* Easier-to-use, Injected JPA Lazy Data Model for PrimeFaces DataTable that supports clustered sessions
 * Automatically includes PrimeFaces font mime types in your web applications, preventing warnings and extra entries in your web.xml
 * Convert strings to arbitrary types on a best-effort basis
 * Transforms names between javax and jakarta namespaces
@@ -364,7 +364,7 @@ Developers can transform any XML file from the archive by using the generic `man
 [[section-jpa-lazymodel]]
 === FlowLogix PrimeFaces DataTable Lazy Data Model backed by JPA
 .An easier alternative to PrimeFaces JPA Lazy Data model
-PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a big "head start" in features, compactness and ease of use. Biggest advantage is ability to easily `@Inject` the model via CDI. The model also utilizes `DaoHelper` classes and methodology to make JPA lazy data model even easier, with a lot less code and better design. It also does not require inheritance and problems associated with it.
+PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a big "head start" in ease of use, features and compactness. Biggest advantage is ability to `@Inject` the model via CDI. The model utilizes `DaoHelper` classes and methodology to make JPA lazy data model easier to use, with a lot less code and better design. It does not require inheritance and problems associated with it. Besides ease of use advantages, `JPALazyDataModel` is fully serializable, making its use trivial in clustered sessions, like the ones in Payara and Hazelcast.
 [source,xhtml]
 .userviewer.xhtml
 ----

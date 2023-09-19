@@ -32,14 +32,14 @@ public class DataModelProducer {
     @Produces
     @Default
     @LazyModelConfig
-    public static <TT, KK> JPALazyDataModel<TT, KK> produceDataModelWithConfig(InjectionPoint injectionPoint) {
+    public static <TT> JPALazyDataModel<TT> produceDataModelWithConfig(InjectionPoint injectionPoint) {
         var parameterizedType = (ParameterizedType) injectionPoint.getType();
         @SuppressWarnings("unchecked")
         var entityClass = (Class<TT>) parameterizedType.getActualTypeArguments()[0];
         var config = injectionPoint.getQualifiers().stream()
                 .filter(c -> c.annotationType().isAssignableFrom(LazyModelConfig.class))
                 .map(LazyModelConfig.class::cast).findFirst().orElse(null);
-        return new JPALazyDataModel<TT, KK>().partialInitialize(builder -> {
+        return new JPALazyDataModel<TT>().partialInitialize(builder -> {
             builder.entityClass(entityClass);
             if (config != null) {
                 builder.caseSensitiveFilter(!config.caseInsensitive());

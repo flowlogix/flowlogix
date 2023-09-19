@@ -38,7 +38,7 @@ import java.io.Serializable;
 @SuppressWarnings({"TrailingComment", "LineLength"}) // @replace regex='.*\n' replacement=""
 public class DirectCreationDataModel implements Serializable { // @replace regex='DirectCreationDataModel' replacement="UserViewer"
     // tag::basicUsage[] // @replace regex='.*\n' replacement=""
-    private final @Getter JPALazyDataModel<UserEntity, Long> userModel =
+    private final @Getter JPALazyDataModel<UserEntity> userModel =
             JPALazyDataModel.create(builder -> builder.entityClass(UserEntity.class).build());
 // end::basicUsage[] // @replace regex='.*\n' replacement=""
 }

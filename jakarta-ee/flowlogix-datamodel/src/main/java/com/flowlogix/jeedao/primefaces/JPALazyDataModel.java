@@ -55,12 +55,11 @@ import org.primefaces.model.SortMeta;
 
  * @author lprimak
  * @param <TT> Data Type
- * @param <KK> Key Type
  */
 @Dependent
 @Slf4j
 @InternalQualifierJPALazyModel
-public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
+public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     /**
      * Automatic field that's added to the JPA's root object
      * and can be used with {@link #getResultField(String)} for result fields
@@ -68,8 +67,8 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
     public static final String RESULT = "result";
     private static final long serialVersionUID = 4L;
     @Delegate
-    private JPAModelImpl<TT, KK> impl;
-    private transient PartialBuilderConsumer<TT, KK> partialBuilder;
+    private JPAModelImpl<TT> impl;
+    private transient PartialBuilderConsumer<TT> partialBuilder;
 
     /**
      * Prevent direct creation
@@ -81,17 +80,16 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * with entity manager, class and key converter
      *
      * @param <TT> Value Type
-     * @param <KK> Key Type
      * @param builder serializable lambda for creation
      * @return newly-created data model
      */
-    public static <TT, KK> JPALazyDataModel<TT, KK> create(@NonNull BuilderFunction<TT, KK> builder) {
+    public static <TT> JPALazyDataModel<TT> create(@NonNull BuilderFunction<TT> builder) {
         @SuppressWarnings("unchecked")
-        JPALazyDataModel<TT, KK> model = Beans.getReference(JPALazyDataModel.class, InternalQualifierJPALazyModel.LITERAL);
+        JPALazyDataModel<TT> model = Beans.getReference(JPALazyDataModel.class, InternalQualifierJPALazyModel.LITERAL);
         return model.initialize(builder);
     }
 
-    JPALazyDataModel<TT, KK> partialInitialize(@NonNull PartialBuilderConsumer<TT, KK> builder) {
+    JPALazyDataModel<TT> partialInitialize(@NonNull PartialBuilderConsumer<TT> builder) {
         if (partialBuilder != null) {
             throw new IllegalStateException("partial builder already initialized");
         }
@@ -105,26 +103,24 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
      * @param builder serializable lambda for creation
      * @return current instance for fluent operations
      */
-    public JPALazyDataModel<TT, KK> initialize(@NonNull BuilderFunction<TT, KK> builder) {
+    public JPALazyDataModel<TT> initialize(@NonNull BuilderFunction<TT> builder) {
         return initialize(builder, true);
     }
 
     /**
      * Serializable builder lambda to easily facilitate creation of {@link JPALazyDataModel}
      * @param <TT> Entity Type
-     * @param <KK> Key Type
      */
-    public interface BuilderFunction<TT, KK> extends Function<JPAModelImplBuilder<TT, KK>,
-            JPAModelImpl<TT, KK>>, Serializable { }
+    public interface BuilderFunction<TT> extends Function<JPAModelImplBuilder<TT>,
+            JPAModelImpl<TT>>, Serializable { }
 
     /**
      * Internal - do not use
      *
      * @hidden
      * @param <TT>
-     * @param <KK>
      */
-    public interface PartialBuilderConsumer<TT, KK> extends Consumer<JPAModelImplBuilder<TT, KK>>, Serializable { }
+    public interface PartialBuilderConsumer<TT> extends Consumer<JPAModelImplBuilder<TT>>, Serializable { }
 
     /**
      * Transforms JPA entity field to format suitable for hints.
@@ -171,7 +167,7 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         return impl.count(map);
     }
 
-    private JPALazyDataModel<TT, KK> initialize(BuilderFunction<TT, KK> builder, boolean resetPartialBuilder) {
+    private JPALazyDataModel<TT> initialize(BuilderFunction<TT> builder, boolean resetPartialBuilder) {
         impl = JPAModelImpl.create(new BuilderInitializer<>(builder, partialBuilder));
         impl.setX_do_not_use_in_builder(new BuilderInitializer<>(builder, partialBuilder));
         if (resetPartialBuilder) {

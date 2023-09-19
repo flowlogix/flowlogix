@@ -32,7 +32,7 @@ import lombok.Getter;
 public class ConverterDataModel implements Serializable {
     @Inject
     @Getter
-    JPALazyDataModel<UserEntity, Long> userModel;
+    JPALazyDataModel<UserEntity> userModel;
 
     @PostConstruct
     void initialize() {

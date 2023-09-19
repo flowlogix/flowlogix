@@ -34,7 +34,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -104,7 +103,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void integerFilter() {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
@@ -141,7 +140,7 @@ public class ModelTest implements Serializable {
     }
 
     private <TT> void collectionFilter(Object valueList, boolean checkAbsence) {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
@@ -167,7 +166,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void betweenFilter() {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
@@ -181,7 +180,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void similarConversionFilter() {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
@@ -200,7 +199,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void sortAdding() {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .sorter(ModelTest::addingSorter)
@@ -236,7 +235,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void sortReplacing() {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .sorter(ModelTest::replacingSorter)
@@ -272,7 +271,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void resolveSimpleField() {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
@@ -285,7 +284,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void resolveJoinField() {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
@@ -301,7 +300,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void optimizer() {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
@@ -316,7 +315,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void jsfConversion() {
-        var impl = JPAModelImpl.<Integer, Long>builder()
+        var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
@@ -337,17 +336,19 @@ public class ModelTest implements Serializable {
         verify(converter).getAsObject(any(), any(), eq("xxx"));
     }
 
-    @RequiredArgsConstructor
     public static class MyEntity {
         final Long id;
         public MyEntity() {
             this.id = 1L;
         }
+        public MyEntity(long id) {
+            this.id = id;
+        }
     }
 
     @Test
     void defaultConverters() {
-        var impl = JPAModelImpl.<MyEntity, Long>builder()
+        var impl = JPAModelImpl.<MyEntity>builder()
                 .entityManager(() -> em)
                 .entityClass(MyEntity.class)
                 .build();
@@ -359,7 +360,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void serialization() throws IOException, ClassNotFoundException {
-        JPALazyDataModel<MyEntity, Long> model;
+        JPALazyDataModel<MyEntity> model;
         try (var mockedStatic = mockStatic(Beans.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
             mockedStatic.when(() -> Beans.getReference(eq(JPALazyDataModel.class), eq(InternalQualifierJPALazyModel.LITERAL)))
                     .thenReturn(new JPALazyDataModel<>());
@@ -375,7 +376,7 @@ public class ModelTest implements Serializable {
 
     @Test
     void partialInitialization() {
-        var model = new JPALazyDataModel<Integer, Long>()
+        var model = new JPALazyDataModel<Integer>()
                 .partialInitialize(builder -> builder.entityClass(Integer.class).build());
         assertThrows(IllegalStateException.class, () -> model.partialInitialize(builder -> builder.build()));
         assertEquals(Integer.class, model.getEntityClass());

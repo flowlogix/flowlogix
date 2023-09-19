@@ -43,6 +43,7 @@ public class DataModelProducer {
             builder.entityClass(entityClass);
             if (config != null) {
                 builder.caseSensitiveFilter(!config.caseInsensitive());
+                builder.filterCaseConversion(config.filterCaseConversion());
                 builder.entityManagerQualifiers(List.of(config.entityManagerSelector()));
             }
         });

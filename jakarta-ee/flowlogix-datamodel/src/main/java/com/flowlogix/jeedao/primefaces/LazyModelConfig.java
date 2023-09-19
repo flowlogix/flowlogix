@@ -15,6 +15,7 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel.FilterCaseConversion;
 import jakarta.enterprise.util.Nonbinding;
 import jakarta.inject.Qualifier;
 import java.lang.annotation.Annotation;
@@ -33,10 +34,16 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LazyModelConfig {
     /**
-     * case-sensitivity of filter queries
+     * case-sensitivity of queries
      */
     @Nonbinding
     boolean caseInsensitive() default false;
+
+    /**
+     * to which case (upper / lower) to convert during case-insensitive query
+     */
+    @Nonbinding
+    FilterCaseConversion filterCaseConversion() default FilterCaseConversion.UPPER;
 
     /**
      * wildcard support for filter queries

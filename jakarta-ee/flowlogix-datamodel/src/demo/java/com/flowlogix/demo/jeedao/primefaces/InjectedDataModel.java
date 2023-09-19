@@ -25,24 +25,34 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import lombok.Getter;
 import java.io.Serializable;
+import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.FilterCaseConversion.LOWER;
+import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.FilterCaseConversion.UPPER;
 
 @Named
 @ViewScoped
 @Getter
 public class InjectedDataModel implements Serializable {
     @Inject
-    JPALazyDataModel<UserEntity, Long> injectedModel;
+    JPALazyDataModel<UserEntity> injectedModel;
 
     @Inject
-    JPALazyDataModel<UserEntity, Long> injectedOverriddenModel;
+    JPALazyDataModel<UserEntity> injectedOverriddenModel;
 
     @Inject
     @LazyModelConfig(caseInsensitive = true)
-    JPALazyDataModel<UserEntity, Long> injectedCaseInsensitiveModel;
+    JPALazyDataModel<UserEntity> injectedCaseInsensitiveModel;
+
+    @Inject
+    @LazyModelConfig(caseInsensitive = true, filterCaseConversion = LOWER)
+    JPALazyDataModel<UserEntity> injectedCaseInsensitiveLowerModel;
+
+    @Inject
+    @LazyModelConfig(caseInsensitive = true, filterCaseConversion = UPPER)
+    JPALazyDataModel<UserEntity> injectedCaseInsensitiveUpperModel;
 
     @Inject
     @LazyModelConfig(entityManagerSelector = NonDefault.class)
-    JPALazyDataModel<UserEntity, Long> injectedNonDefaultModel;
+    JPALazyDataModel<UserEntity> injectedNonDefaultModel;
 
     @PostConstruct
     void postConstruct() {

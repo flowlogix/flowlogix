@@ -40,7 +40,7 @@ import lombok.Getter;
 public class BasicDataModel implements Serializable { // @replace regex='BasicDataModel' replacement="UserViewer"
     @Inject
     @Getter
-    JPALazyDataModel<UserEntity, Long> lazyModel;
+    JPALazyDataModel<UserEntity> lazyModel;
 }
 // end::basicUsage[] // @replace regex='.*\n' replacement=""
 // @end

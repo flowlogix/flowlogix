@@ -52,7 +52,7 @@ public class DataModelBackendIT {
     }
 
     @SuppressWarnings("MagicNumber")
-    private void basicDataModel(JPALazyDataModel<UserEntity, Long> model) {
+    private void basicDataModel(JPALazyDataModel<UserEntity> model) {
         assertEquals(5, model.count(Map.of()));
         var rows = model.findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
@@ -69,7 +69,7 @@ public class DataModelBackendIT {
     }
 
     @SuppressWarnings("MagicNumber")
-    void doQualifiedDataModel(JPALazyDataModel<UserEntity, Long> model) {
+    void doQualifiedDataModel(JPALazyDataModel<UserEntity> model) {
         assertEquals(5, model.count(Map.of()));
     }
 
@@ -80,7 +80,7 @@ public class DataModelBackendIT {
     }
 
     @SuppressWarnings("MagicNumber")
-    void doSortingDataModel(JPALazyDataModel<UserEntity, Long>  model) {
+    void doSortingDataModel(JPALazyDataModel<UserEntity>  model) {
         var rows = model.findRows(0, 1, Map.of(), Map.of());
         assertEquals(10012, rows.get(0).getZipCode());
     }
@@ -92,7 +92,7 @@ public class DataModelBackendIT {
     }
 
     @SuppressWarnings("MagicNumber")
-    void doFilteringDataModel(JPALazyDataModel<UserEntity, Long>  model) {
+    void doFilteringDataModel(JPALazyDataModel<UserEntity>  model) {
         var rows = model.findRows(0, 10,
                 Map.of(UserEntity_.zipCode.getName(), FilterMeta.builder().field(UserEntity_.zipCode.getName())
                         .filterValue(68501).build()), Map.of());
@@ -163,6 +163,53 @@ public class DataModelBackendIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void directModel() {
         basicDataModel(models.getDirect().getUserModel());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void caseSensitiveFilter() {
+        var rows = injectedModel.getInjectedModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName()).filterValue("jpRimak")
+                        .build()), Map.of());
+        assertEquals(0, rows.size());
+
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void caseInSensitiveFilter() {
+        var rows = injectedModel.getInjectedCaseInsensitiveModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName()).filterValue("jpRimak")
+                        .build()), Map.of());
+        assertEquals(1, rows.size());
+        assertEquals("Lovely Lady", rows.get(0).getFullName());
+
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void caseInSensitiveUpperFilter() {
+        var rows = injectedModel.getInjectedCaseInsensitiveUpperModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName()).filterValue("jpRimak")
+                        .build()), Map.of());
+        assertEquals(1, rows.size());
+        assertEquals("Lovely Lady", rows.get(0).getFullName());
+
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void caseInSensitiveLowerFilter() {
+        var rows = injectedModel.getInjectedCaseInsensitiveLowerModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName()).filterValue("jpRimak")
+                        .build()), Map.of());
+        assertEquals(1, rows.size());
+        assertEquals("Lovely Lady", rows.get(0).getFullName());
+
     }
 
     @Test

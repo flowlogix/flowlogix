@@ -22,6 +22,7 @@ import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Filter.FilterColumnData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel.BuilderFunction;
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel.FilterCaseConversion;
 import com.flowlogix.jeedao.primefaces.Sorter;
 import com.flowlogix.jeedao.primefaces.Sorter.MergedSortOrder;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
@@ -74,11 +75,10 @@ import org.primefaces.model.SortMeta;
  * @author lprimak
  * @hidden
  * @param <TT>
- * @param <KK>
  */
 @Builder
 @Slf4j
-public class JPAModelImpl<TT, KK> implements Serializable {
+public class JPAModelImpl<TT> implements Serializable {
     private static final long serialVersionUID = 4L;
     /**
      * Return entity manager to operate on
@@ -96,9 +96,9 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     private final @NonNull @Getter Class<TT> entityClass;
     private final Lazy<DaoHelper<TT>> daoHelper = new Lazy<>(this::createDaoHelper);
     /**
-     * convert String key into {@link KK} object
+     * convert String key into key object
      */
-    private final transient Function<String, KK> converter;
+    private final transient Function<String, ?> converter;
     /**
      * convert typed key to String
      */
@@ -129,12 +129,18 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     private final @Getter boolean caseSensitiveFilter = true;
 
     /**
+     * to which case (upper / lower) to convert during case-insensitive query
+     */
+    @Default
+    private final @Getter FilterCaseConversion filterCaseConversion = FilterCaseConversion.UPPER;
+
+    /**
      * Specifies whether wild cards are supported in string filters
      */
     @Default
     private final @Getter boolean wildcardSupport = false;
 
-    private final Lazy<Function<String, KK>> defaultConverter = new Lazy<>(this::createConverter);
+    private final Lazy<Function<String, ?>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
 
     /**
@@ -143,10 +149,9 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      * @param builder
      * @param partialBuilder
      * @param <TT>
-     * @param <KK>
      */
-    public record BuilderInitializer<TT, KK>(@NonNull BuilderFunction<TT, KK> builder,
-                                             PartialBuilderConsumer<TT, KK> partialBuilder) implements Serializable { }
+    public record BuilderInitializer<TT>(@NonNull BuilderFunction<TT> builder,
+                                             PartialBuilderConsumer<TT> partialBuilder) implements Serializable { }
 
     /**
      * @hidden
@@ -154,7 +159,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      */
     @SuppressWarnings({"DeclarationOrder", "MemberName"})
     @Setter
-    private BuilderInitializer<TT, KK> x_do_not_use_in_builder;
+    private BuilderInitializer<TT> x_do_not_use_in_builder;
 
     private static final class FilterDataMap extends HashMap<String, FilterColumnData> implements FilterData { }
 
@@ -167,8 +172,8 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      * @param <TT>
      * @param <KK>
      */
-    public static <TT, KK> JPAModelImpl<TT, KK> create(@NonNull BuilderInitializer<TT, KK> initializer) {
-        var builderInstance = JPAModelImpl.<TT, KK>builder();
+    public static <TT, KK> JPAModelImpl<TT> create(@NonNull BuilderInitializer<TT> initializer) {
+        var builderInstance = JPAModelImpl.<TT>builder();
         if (initializer.partialBuilder != null) {
             initializer.partialBuilder.accept(builderInstance);
         }
@@ -179,9 +184,8 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      * partial builder, just for javadoc
      * @hidden
      * @param <TT>
-     * @param <KK>
      */
-    public static class JPAModelImplBuilder<TT, KK> { }
+    public static class JPAModelImplBuilder<TT> { }
 
     public int count(Map<String, FilterMeta> filters) {
         return toIntExact(daoHelper.get().count(builder -> builder
@@ -200,8 +204,9 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         return daoHelper.get().getEntityManager();
     }
 
-    public Function<String, KK> getStringToKeyConverter() {
-        return converter != null ? converter : defaultConverter.get();
+    @SuppressWarnings("unchecked")
+    public <KK> Function<String, KK> getStringToKeyConverter() {
+        return (Function<String, KK>) (converter != null ? converter : defaultConverter.get());
     }
 
     public Function<TT, String> getKeyConverter() {
@@ -216,7 +221,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         }
     }
 
-    private Function<String, KK> createConverter() {
+    private Function<String, ?> createConverter() {
         return keyValue -> TypeConverter.valueOf(keyValue, getPrimaryKeyClass());
     }
 
@@ -353,12 +358,28 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         private final String value;
 
         ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
+            String stringValue = value.toString();
+            Expression<String> stringExpression = expression.as(String.class);
             if (caseSensitiveFilter) {
+<<<<<<< HEAD
                 this.expression = expression.as(String.class);
                 this.value = replaceWildcards(wildcardSupport, value.toString());
             } else {
                 this.expression = cb.lower(expression.as(String.class));
                 this.value = replaceWildcards(wildcardSupport, value.toString().toLowerCase());
+=======
+                this.expression = stringExpression;
+                this.value = stringValue;
+            } else {
+                this.expression = switch (filterCaseConversion) {
+                    case LOWER -> cb.lower(stringExpression);
+                    case UPPER -> cb.upper(stringExpression);
+                };
+                this.value = switch (filterCaseConversion) {
+                    case LOWER -> stringValue.toLowerCase();
+                    case UPPER -> stringValue.toUpperCase();
+                };
+>>>>>>> main
             }
         }
 
@@ -464,16 +485,14 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         return sortMetaOrdering.stream().toList();
     }
 
-    @SuppressWarnings("unchecked")
     @SneakyThrows(ReflectiveOperationException.class)
-    private KK getPrimaryKey(Optional<TT> entry) {
-        return (KK) daoHelper.get().getEntityManager().get().getEntityManagerFactory().getPersistenceUnitUtil()
+    private Object getPrimaryKey(Optional<TT> entry) {
+        return daoHelper.get().getEntityManager().get().getEntityManagerFactory().getPersistenceUnitUtil()
                 .getIdentifier(entry.orElse(ConstructorUtils.invokeConstructor(getEntityClass())));
     }
 
-    @SuppressWarnings("unchecked")
-    private Class<KK> getPrimaryKeyClass() {
-        return (Class<KK>) getPrimaryKey(Optional.empty()).getClass();
+    private Class<?> getPrimaryKeyClass() {
+        return getPrimaryKey(Optional.empty()).getClass();
     }
 
     /**

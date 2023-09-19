@@ -132,7 +132,7 @@ public class JPAModelImpl<TT> implements Serializable {
      * to which case (upper / lower) to convert during case-insensitive query
      */
     @Default
-    private final @Getter FilterCaseConversion filterCaseConversion = FilterCaseConversion.LOWER;
+    private final @Getter FilterCaseConversion filterCaseConversion = FilterCaseConversion.UPPER;
 
     private final Lazy<Function<String, ?>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);

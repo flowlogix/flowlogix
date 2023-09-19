@@ -43,7 +43,7 @@ public @interface LazyModelConfig {
      * to which case (upper / lower) to convert during case-insensitive query
      */
     @Nonbinding
-    FilterCaseConversion filterCaseConversion() default FilterCaseConversion.LOWER;
+    FilterCaseConversion filterCaseConversion() default FilterCaseConversion.UPPER;
 
     /**
      * Override entity manager for the data model

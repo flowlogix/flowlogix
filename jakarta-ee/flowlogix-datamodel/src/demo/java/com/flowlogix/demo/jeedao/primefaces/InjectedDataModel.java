@@ -31,18 +31,18 @@ import java.io.Serializable;
 @Getter
 public class InjectedDataModel implements Serializable {
     @Inject
-    JPALazyDataModel<UserEntity, Long> injectedModel;
+    JPALazyDataModel<UserEntity> injectedModel;
 
     @Inject
-    JPALazyDataModel<UserEntity, Long> injectedOverriddenModel;
+    JPALazyDataModel<UserEntity> injectedOverriddenModel;
 
     @Inject
     @LazyModelConfig(caseInsensitive = true)
-    JPALazyDataModel<UserEntity, Long> injectedCaseInsensitiveModel;
+    JPALazyDataModel<UserEntity> injectedCaseInsensitiveModel;
 
     @Inject
     @LazyModelConfig(entityManagerSelector = NonDefault.class)
-    JPALazyDataModel<UserEntity, Long> injectedNonDefaultModel;
+    JPALazyDataModel<UserEntity> injectedNonDefaultModel;
 
     @PostConstruct
     void postConstruct() {

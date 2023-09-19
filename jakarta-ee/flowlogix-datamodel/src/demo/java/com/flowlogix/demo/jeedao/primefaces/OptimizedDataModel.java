@@ -35,7 +35,7 @@ import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.getResultField;
 public class OptimizedDataModel implements Serializable {
     @Inject
     @Getter
-    JPALazyDataModel<UserEntity, Long> userModel;
+    JPALazyDataModel<UserEntity> userModel;
 
     @PostConstruct
     void initialize() {

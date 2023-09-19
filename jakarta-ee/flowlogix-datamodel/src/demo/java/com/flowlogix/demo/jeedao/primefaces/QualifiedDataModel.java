@@ -33,7 +33,7 @@ public class QualifiedDataModel implements Serializable {
     @Inject
     @Getter
     @LazyModelConfig(entityManagerSelector = NonDefault.class)
-    JPALazyDataModel<UserEntity, Long> userModel;
+    JPALazyDataModel<UserEntity> userModel;
 }
 // end::qualifier[] // @replace regex='.*\n' replacement=""
 // @end

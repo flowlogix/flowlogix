@@ -33,7 +33,7 @@ import lombok.Getter;
 public class FilteringDataModel implements Serializable {
     @Inject
     @Getter
-    JPALazyDataModel<UserEntity, Long> userModel;
+    JPALazyDataModel<UserEntity> userModel;
 
     @PostConstruct
     void initialize() {

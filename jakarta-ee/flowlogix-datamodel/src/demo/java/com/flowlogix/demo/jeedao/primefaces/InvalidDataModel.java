@@ -31,5 +31,5 @@ public class InvalidDataModel implements Serializable {
     @Inject
     @Getter
     @LazyModelConfig(entityManagerSelector = ApplicationScoped.class)
-    JPALazyDataModel<UserEntity, Long> model;
+    JPALazyDataModel<UserEntity> model;
 }

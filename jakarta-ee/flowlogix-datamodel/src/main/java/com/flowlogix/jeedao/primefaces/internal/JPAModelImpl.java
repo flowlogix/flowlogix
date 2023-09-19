@@ -69,6 +69,7 @@ import org.omnifaces.util.Lazy;
 import org.omnifaces.util.Lazy.SerializableSupplier;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
+import org.primefaces.util.Constants;
 
 /**
  * JPA DAO facade implementation for the PrimeFaces lazy table model
@@ -280,7 +281,7 @@ public class JPAModelImpl<TT, KK> implements Serializable {
 
     private FilterMetaResult processFilterMeta(CriteriaBuilder cb, Root<TT> root, String key, FilterMeta filterMeta) {
         Predicate cond = null;
-        Object value = Objects.requireNonNull(filterMeta.getFilterValue(), "Filter Value cannot be null");
+        Object value = Objects.requireNonNullElse(filterMeta.getFilterValue(), Constants.EMPTY_STRING);
         try {
             var field = resolveField(root, key);
             Class<?> fieldType = field.getJavaType();

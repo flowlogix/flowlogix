@@ -173,43 +173,39 @@ public class DataModelBackendIT {
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
         assertEquals(0, rows.size());
-
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    void caseInSensitiveFilter() {
+    void caseInsensitiveFilter() {
         var rows = injectedModel.getInjectedCaseInsensitiveModel().findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
         assertEquals(1, rows.size());
         assertEquals("Lovely Lady", rows.get(0).getFullName());
-
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    void caseInSensitiveUpperFilter() {
+    void caseInsensitiveUpperFilter() {
         var rows = injectedModel.getInjectedCaseInsensitiveUpperModel().findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
         assertEquals(1, rows.size());
         assertEquals("Lovely Lady", rows.get(0).getFullName());
-
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    void caseInSensitiveLowerFilter() {
+    void caseInsensitiveLowerFilter() {
         var rows = injectedModel.getInjectedCaseInsensitiveLowerModel().findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
         assertEquals(1, rows.size());
         assertEquals("Lovely Lady", rows.get(0).getFullName());
-
     }
 
     @Test

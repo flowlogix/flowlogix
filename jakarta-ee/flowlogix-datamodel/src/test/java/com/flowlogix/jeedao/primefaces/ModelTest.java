@@ -34,7 +34,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -337,11 +336,14 @@ public class ModelTest implements Serializable {
         verify(converter).getAsObject(any(), any(), eq("xxx"));
     }
 
-    @RequiredArgsConstructor
     public static class MyEntity {
         final Long id;
         public MyEntity() {
             this.id = 1L;
+        }
+
+        public MyEntity(long id) {
+            this.id = id;
         }
     }
 

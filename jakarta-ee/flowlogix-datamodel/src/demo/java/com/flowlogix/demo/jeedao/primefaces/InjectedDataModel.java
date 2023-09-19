@@ -44,11 +44,11 @@ public class InjectedDataModel implements Serializable {
 
     @Inject
     @LazyModelConfig(caseInsensitive = true, filterCaseConversion = LOWER)
-    JPALazyDataModel<UserEntity> injectedCaseInsensitiveLowerModel;
+    JPALazyDataModel<UserEntity, Long> injectedCaseInsensitiveLowerModel;
 
     @Inject
     @LazyModelConfig(caseInsensitive = true, filterCaseConversion = UPPER)
-    JPALazyDataModel<UserEntity> injectedCaseInsensitiveUpperModel;
+    JPALazyDataModel<UserEntity, Long> injectedCaseInsensitiveUpperModel;
 
     @Inject
     @LazyModelConfig(entityManagerSelector = NonDefault.class)

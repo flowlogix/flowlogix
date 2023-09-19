@@ -30,7 +30,7 @@ import lombok.Getter;
 // tag::filtering[] // @replace regex='.*\n' replacement=""
 @Named
 @ViewScoped
-public class FilteringDataModel implements Serializable {
+public class  FilteringDataModel implements Serializable {
     @Inject
     @Getter
     JPALazyDataModel<UserEntity> userModel;

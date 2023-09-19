@@ -32,6 +32,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.primefaces.model.FilterMeta;
+import org.primefaces.model.MatchMode;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -173,43 +174,94 @@ public class DataModelBackendIT {
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
         assertEquals(0, rows.size());
-
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    void caseInSensitiveFilter() {
+    void caseInsensitiveFilter() {
         var rows = injectedModel.getInjectedCaseInsensitiveModel().findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
         assertEquals(1, rows.size());
         assertEquals("Lovely Lady", rows.get(0).getFullName());
-
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    void caseInSensitiveUpperFilter() {
+    void caseInsensitiveUpperFilter() {
         var rows = injectedModel.getInjectedCaseInsensitiveUpperModel().findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
         assertEquals(1, rows.size());
         assertEquals("Lovely Lady", rows.get(0).getFullName());
-
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
-    void caseInSensitiveLowerFilter() {
+    void caseInsensitiveLowerFilter() {
         var rows = injectedModel.getInjectedCaseInsensitiveLowerModel().findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
         assertEquals(1, rows.size());
         assertEquals("Lovely Lady", rows.get(0).getFullName());
+    }
 
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void wildcardFilter() {
+        var rows = injectedModel.getInjectedWildcardModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName())
+                        .filterValue("jpr*a").build()), Map.of());
+        assertEquals(1, rows.size());
+        assertEquals("Lovely Lady", rows.get(0).getFullName());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void wildcardFilterExact() {
+        var rows = injectedModel.getInjectedWildcardModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName()).matchMode(MatchMode.EXACT)
+                        .filterValue("jpr?mak").build()), Map.of());
+        assertEquals(1, rows.size());
+        assertEquals("Lovely Lady", rows.get(0).getFullName());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void wildcardFilterExactStar() {
+        var rows = injectedModel.getInjectedWildcardModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName()).matchMode(MatchMode.EXACT)
+                        .filterValue("jpr*ak").build()), Map.of());
+        assertEquals(1, rows.size());
+        assertEquals("Lovely Lady", rows.get(0).getFullName());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void wildcardFilterNotFound() {
+        var rows = injectedModel.getInjectedWildcardModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName()).matchMode(MatchMode.EXACT)
+                        .filterValue("pr?mak")
+                        .build()), Map.of());
+        assertEquals(0, rows.size());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void wildcardEquals() {
+        var rows = injectedModel.getInjectedWildcardModel().findRows(0, 3,
+                Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
+                        .field(UserEntity_.userId.getName()).matchMode(MatchMode.EQUALS)
+                        .filterValue("jprimak").build()), Map.of());
+        assertEquals(1, rows.size());
+        assertEquals("Lovely Lady", rows.get(0).getFullName());
     }
 
     @Test

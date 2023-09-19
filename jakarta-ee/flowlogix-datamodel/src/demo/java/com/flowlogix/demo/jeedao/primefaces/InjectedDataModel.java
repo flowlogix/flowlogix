@@ -54,6 +54,10 @@ public class InjectedDataModel implements Serializable {
     @LazyModelConfig(entityManagerSelector = NonDefault.class)
     JPALazyDataModel<UserEntity> injectedNonDefaultModel;
 
+    @Inject
+    @LazyModelConfig(wildcardSupport = true)
+    JPALazyDataModel<UserEntity> injectedWildcardModel;
+
     @PostConstruct
     void postConstruct() {
         injectedOverriddenModel.initialize(builder -> builder.caseSensitiveFilter(false).build());

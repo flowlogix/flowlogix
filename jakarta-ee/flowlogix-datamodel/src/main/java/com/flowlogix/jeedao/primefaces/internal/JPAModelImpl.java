@@ -191,8 +191,9 @@ public class JPAModelImpl<TT> implements Serializable {
         return daoHelper.get().getEntityManager();
     }
 
-    public Function<String, ?> getStringToKeyConverter() {
-        return converter != null ? converter : defaultConverter.get();
+    @SuppressWarnings("unchecked")
+    public <KK> Function<String, KK> getStringToKeyConverter() {
+        return (Function<String, KK>) (converter != null ? converter : defaultConverter.get());
     }
 
     public Function<TT, String> getKeyConverter() {

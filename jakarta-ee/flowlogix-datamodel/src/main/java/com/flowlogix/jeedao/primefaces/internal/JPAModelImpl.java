@@ -358,16 +358,9 @@ public class JPAModelImpl<TT> implements Serializable {
         private final String value;
 
         ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
-            String stringValue = value.toString();
+            String stringValue = replaceWildcards(wildcardSupport, value.toString());
             Expression<String> stringExpression = expression.as(String.class);
             if (caseSensitiveFilter) {
-<<<<<<< HEAD
-                this.expression = expression.as(String.class);
-                this.value = replaceWildcards(wildcardSupport, value.toString());
-            } else {
-                this.expression = cb.lower(expression.as(String.class));
-                this.value = replaceWildcards(wildcardSupport, value.toString().toLowerCase());
-=======
                 this.expression = stringExpression;
                 this.value = stringValue;
             } else {
@@ -379,7 +372,6 @@ public class JPAModelImpl<TT> implements Serializable {
                     case LOWER -> stringValue.toLowerCase();
                     case UPPER -> stringValue.toUpperCase();
                 };
->>>>>>> main
             }
         }
 

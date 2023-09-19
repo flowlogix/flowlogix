@@ -69,6 +69,7 @@ import org.omnifaces.util.Lazy;
 import org.omnifaces.util.Lazy.SerializableSupplier;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
+import org.primefaces.util.Constants;
 
 /**
  * JPA DAO facade implementation for the PrimeFaces lazy table model
@@ -284,7 +285,7 @@ public class JPAModelImpl<TT> implements Serializable {
 
     private FilterMetaResult processFilterMeta(CriteriaBuilder cb, Root<TT> root, String key, FilterMeta filterMeta) {
         Predicate cond = null;
-        Object value = Objects.requireNonNull(filterMeta.getFilterValue(), "Filter Value cannot be null");
+        Object value = Objects.requireNonNullElse(filterMeta.getFilterValue(), Constants.EMPTY_STRING);
         try {
             var field = resolveField(root, key);
             Class<?> fieldType = field.getJavaType();
@@ -356,29 +357,33 @@ public class JPAModelImpl<TT> implements Serializable {
     private class ExpressionEvaluator {
         private final Expression<String> expression;
         private final String value;
+        private final boolean hasWildcards;
+
+        private record WildcardValue(boolean hasWildcards, String value) { };
 
         ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
-            String stringValue = replaceWildcards(wildcardSupport, value.toString());
+            WildcardValue wildcardValue = replaceWildcards(wildcardSupport, value.toString());
+            hasWildcards = wildcardValue.hasWildcards;
             Expression<String> stringExpression = expression.as(String.class);
             if (caseSensitiveFilter) {
                 this.expression = stringExpression;
-                this.value = stringValue;
+                this.value = wildcardValue.value;
             } else {
                 this.expression = switch (filterCaseConversion) {
                     case LOWER -> cb.lower(stringExpression);
                     case UPPER -> cb.upper(stringExpression);
                 };
                 this.value = switch (filterCaseConversion) {
-                    case LOWER -> stringValue.toLowerCase();
-                    case UPPER -> stringValue.toUpperCase();
+                    case LOWER -> wildcardValue.value.toLowerCase();
+                    case UPPER -> wildcardValue.value.toUpperCase();
                 };
             }
         }
 
-        private static String replaceWildcards(boolean wildcardSupport, String value) {
-            return wildcardSupport ? value.replace("*", "%")
-                    .replace("?", "_")
-                    : value;
+        private static WildcardValue replaceWildcards(boolean wildcardSupport, String value) {
+            return wildcardSupport ? new WildcardValue(value.contains("*") || value.contains("?"),
+                    value.replace("*", "%").replace("?", "_"))
+                    : new WildcardValue(false, value);
         }
     }
 
@@ -402,6 +407,11 @@ public class JPAModelImpl<TT> implements Serializable {
             case NOT_CONTAINS:
                 return cb.notLike(stringExpression.get().expression, "%" + stringExpression.get().value + "%");
             case EXACT:
+                if (wildcardSupport && stringExpression.get().hasWildcards) {
+                    return cb.like(stringExpression.get().expression, stringExpression.get().value);
+                } else {
+                    return cb.equal(expression, filterValue);
+                }
             case EQUALS:
                 return cb.equal(expression, filterValue);
             case NOT_EXACT:

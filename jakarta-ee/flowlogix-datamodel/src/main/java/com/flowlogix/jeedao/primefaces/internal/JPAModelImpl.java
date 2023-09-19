@@ -22,6 +22,7 @@ import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Filter.FilterColumnData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel.BuilderFunction;
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel.FilterCaseConversion;
 import com.flowlogix.jeedao.primefaces.Sorter;
 import com.flowlogix.jeedao.primefaces.Sorter.MergedSortOrder;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
@@ -127,6 +128,12 @@ public class JPAModelImpl<TT, KK> implements Serializable {
      */
     @Default
     private final @Getter boolean caseSensitiveFilter = true;
+
+    /**
+     * to which case (upper / lower) to convert during case-insensitive query
+     */
+    @Default
+    private final @Getter FilterCaseConversion filterCaseConversion = FilterCaseConversion.UPPER;
 
     private final Lazy<Function<String, KK>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
@@ -347,12 +354,20 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         private final String value;
 
         ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
+            String stringValue = value.toString();
+            Expression<String> stringExpression = expression.as(String.class);
             if (caseSensitiveFilter) {
-                this.expression = expression.as(String.class);
-                this.value = value.toString();
+                this.expression = stringExpression;
+                this.value = stringValue;
             } else {
-                this.expression = cb.lower(expression.as(String.class));
-                this.value = value.toString().toLowerCase();
+                this.expression = switch (filterCaseConversion) {
+                    case LOWER -> cb.lower(stringExpression);
+                    case UPPER -> cb.upper(stringExpression);
+                };
+                this.value = switch (filterCaseConversion) {
+                    case LOWER -> stringValue.toLowerCase();
+                    case UPPER -> stringValue.toUpperCase();
+                };
             }
         }
     }

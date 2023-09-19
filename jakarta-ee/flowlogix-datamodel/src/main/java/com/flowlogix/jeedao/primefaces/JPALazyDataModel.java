@@ -91,6 +91,14 @@ public class JPALazyDataModel<TT, KK> extends LazyDataModel<TT> {
         return model.initialize(builder);
     }
 
+    /**
+     * used in case-insensitive queries to convert case to lower / upper case
+     */
+    @SuppressWarnings("checkstyle:JavadocVariable")
+    public enum FilterCaseConversion {
+        UPPER, LOWER
+    };
+
     JPALazyDataModel<TT, KK> partialInitialize(@NonNull PartialBuilderConsumer<TT, KK> builder) {
         if (partialBuilder != null) {
             throw new IllegalStateException("partial builder already initialized");

@@ -128,6 +128,12 @@ public class JPAModelImpl<TT, KK> implements Serializable {
     @Default
     private final @Getter boolean caseSensitiveFilter = true;
 
+    /**
+     * Specifies whether wild cards are supported in string filters
+     */
+    @Default
+    private final @Getter boolean wildcardSupport = false;
+
     private final Lazy<Function<String, KK>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
 
@@ -349,11 +355,17 @@ public class JPAModelImpl<TT, KK> implements Serializable {
         ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
             if (caseSensitiveFilter) {
                 this.expression = expression.as(String.class);
-                this.value = value.toString();
+                this.value = replaceWildcards(wildcardSupport, value.toString());
             } else {
                 this.expression = cb.lower(expression.as(String.class));
-                this.value = value.toString().toLowerCase();
+                this.value = replaceWildcards(wildcardSupport, value.toString().toLowerCase());
             }
+        }
+
+        private static String replaceWildcards(boolean wildcardSupport, String value) {
+            return wildcardSupport ? value.replace("*", "%")
+                    .replace("?", "_")
+                    : value;
         }
     }
 

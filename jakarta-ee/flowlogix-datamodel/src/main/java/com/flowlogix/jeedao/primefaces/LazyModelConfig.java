@@ -33,10 +33,16 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LazyModelConfig {
     /**
-     * case-sensitivity of queries
+     * case-sensitivity of filter queries
      */
     @Nonbinding
     boolean caseInsensitive() default false;
+
+    /**
+     * wildcard support for filter queries
+     */
+    @Nonbinding
+    boolean wildcardSupport() default false;
 
     /**
      * Override entity manager for the data model

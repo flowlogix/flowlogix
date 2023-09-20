@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>7.x-SNAPSHOT</version>
+    <version>8.x-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
@@ -63,7 +63,7 @@
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <checkstyle.headerLocation>${flowlogix.basedir}/checkstyle/header.txt</checkstyle.headerLocation>
 
-        <project.build.outputTimestamp>2023-05-19T07:18:43Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-09-20T00:03:03Z</project.build.outputTimestamp>
     </properties>
 
     <modules>

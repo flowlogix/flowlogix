@@ -38,7 +38,7 @@
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>5.2022.5</payara.version>
         <groovy.version>4.0.15</groovy.version>
-        <lombok.version>1.18.28</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <jacocoPort>52212</jacocoPort>
         <jacocoAgent/>
         <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>

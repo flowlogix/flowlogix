@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>7.x-SNAPSHOT</version>
+    <version>8.x-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
@@ -47,7 +47,7 @@
         <jakarta.ee.version>10.0.0</jakarta.ee.version>
         <payara.version>6.2023.8</payara.version>
         <groovy.version>4.0.15</groovy.version>
-        <lombok.version>1.18.28</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <eclipselink.version>4.0.2</eclipselink.version>
         <shrinkwrap.api.version>1.2.6</shrinkwrap.api.version>
         <shrinkwrap.resolver.version>3.2.1</shrinkwrap.resolver.version>
@@ -63,7 +63,7 @@
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <checkstyle.headerLocation>${flowlogix.basedir}/checkstyle/header.txt</checkstyle.headerLocation>
 
-        <project.build.outputTimestamp>2023-05-19T07:18:43Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-09-20T00:03:03Z</project.build.outputTimestamp>
     </properties>
 
     <modules>

@@ -396,6 +396,7 @@ During direct creation, `JPALazyDataModel` only requires `entityClass` to work, 
 * entityManager: Provide entity manager `Supplier`. Default is injected via CDI
 * entityManagerQualifiers: Provides a list of qualifier annotations to select the correct EntityManager for injection
 * caseSensitiveFilter: Specifies if filtering of String values are case-sensitive (boolean). Default is `true`.
+* filterCaseConversion: either `UPPER` or `LOWER`. Specifies whether to convert queries to upper or lower case during case-insensitive filter queries. Default is `UPPER`
 * wildcardSupport: Specifies whether wildcards are supported in `EXACT` and other String queries (boolean). Default is false.
 * sorter: Apply additional or replacement sort criteria
 * filter: Apply additional or replacement filter criteria

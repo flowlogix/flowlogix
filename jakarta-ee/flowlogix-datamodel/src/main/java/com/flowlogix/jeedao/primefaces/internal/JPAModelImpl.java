@@ -135,6 +135,12 @@ public class JPAModelImpl<TT> implements Serializable {
     @Default
     private final @Getter FilterCaseConversion filterCaseConversion = FilterCaseConversion.UPPER;
 
+    /**
+     * Specifies whether wild cards are supported in string filters
+     */
+    @Default
+    private final @Getter boolean wildcardSupport = false;
+
     private final Lazy<Function<String, ?>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
 
@@ -351,23 +357,33 @@ public class JPAModelImpl<TT> implements Serializable {
     private class ExpressionEvaluator {
         private final Expression<String> expression;
         private final String value;
+        private final boolean hasWildcards;
+
+        private record WildcardValue(boolean hasWildcards, String value) { };
 
         ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
-            String stringValue = value.toString();
+            WildcardValue wildcardValue = replaceWildcards(wildcardSupport, value.toString());
+            hasWildcards = wildcardValue.hasWildcards;
             Expression<String> stringExpression = expression.as(String.class);
             if (caseSensitiveFilter) {
                 this.expression = stringExpression;
-                this.value = stringValue;
+                this.value = wildcardValue.value;
             } else {
                 this.expression = switch (filterCaseConversion) {
                     case LOWER -> cb.lower(stringExpression);
                     case UPPER -> cb.upper(stringExpression);
                 };
                 this.value = switch (filterCaseConversion) {
-                    case LOWER -> stringValue.toLowerCase();
-                    case UPPER -> stringValue.toUpperCase();
+                    case LOWER -> wildcardValue.value.toLowerCase();
+                    case UPPER -> wildcardValue.value.toUpperCase();
                 };
             }
+        }
+
+        private static WildcardValue replaceWildcards(boolean wildcardSupport, String value) {
+            return wildcardSupport ? new WildcardValue(value.contains("*") || value.contains("?"),
+                    value.replace("*", "%").replace("?", "_"))
+                    : new WildcardValue(false, value);
         }
     }
 
@@ -391,6 +407,11 @@ public class JPAModelImpl<TT> implements Serializable {
             case NOT_CONTAINS:
                 return cb.notLike(stringExpression.get().expression, "%" + stringExpression.get().value + "%");
             case EXACT:
+                if (wildcardSupport && stringExpression.get().hasWildcards) {
+                    return cb.like(stringExpression.get().expression, stringExpression.get().value);
+                } else {
+                    return cb.equal(expression, filterValue);
+                }
             case EQUALS:
                 return cb.equal(expression, filterValue);
             case NOT_EXACT:

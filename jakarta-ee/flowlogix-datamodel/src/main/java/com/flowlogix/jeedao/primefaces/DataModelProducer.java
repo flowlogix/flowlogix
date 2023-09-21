@@ -45,6 +45,7 @@ public class DataModelProducer {
                 builder.caseSensitiveFilter(!config.caseInsensitive());
                 builder.filterCaseConversion(config.filterCaseConversion());
                 builder.entityManagerQualifiers(List.of(config.entityManagerSelector()));
+                builder.wildcardSupport(config.wildcardSupport());
             }
         });
     }

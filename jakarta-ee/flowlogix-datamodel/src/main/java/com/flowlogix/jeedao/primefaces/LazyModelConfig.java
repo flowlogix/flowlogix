@@ -46,6 +46,12 @@ public @interface LazyModelConfig {
     FilterCaseConversion filterCaseConversion() default FilterCaseConversion.UPPER;
 
     /**
+     * wildcard support for filter queries
+     */
+    @Nonbinding
+    boolean wildcardSupport() default false;
+
+    /**
      * Override entity manager for the data model
      */
     @Nonbinding

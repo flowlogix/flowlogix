@@ -39,6 +39,7 @@
         <payara.version>5.2022.5</payara.version>
         <groovy.version>4.0.15</groovy.version>
         <lombok.version>1.18.30</lombok.version>
+        <eclipselink.version>2.7.13</eclipselink.version>
         <jacocoPort>52212</jacocoPort>
         <jacocoAgent/>
         <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>
@@ -222,6 +223,18 @@
                             <arg>-Xlint:deprecation</arg>
                             <arg>-Xlint:unchecked</arg>
                         </compilerArgs>
+                        <annotationProcessorPaths>
+                            <annotationProcessorPath>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </annotationProcessorPath>
+                            <annotationProcessorPath>
+                                <groupId>org.eclipse.persistence</groupId>
+                                <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+                                <version>${eclipselink.version}</version>
+                            </annotationProcessorPath>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
                 <plugin>

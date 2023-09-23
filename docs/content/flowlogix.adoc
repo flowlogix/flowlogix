@@ -234,7 +234,7 @@ The above example changes resolution from `mycss.css` -> `mycss.min.css` to `myc
 
 [[section-omnifaces]]
 ==== OmniFaces: Automatic initialization of _UnmappedResourceHandler_
-In order to initialize https://showcase.omnifaces.org/resourcehandlers/UnmappedResourceHandler[OmniFaces' UnmappedResourceHandler], both `web.xml` `servlet-mapping` and `faces.xml` entries are ordinarily required. FlowLogix automates more complicated `web.xml` requirements by configuring the servlet container to include all unmapped resources. This alleviates requirement to specify `Faces Servlet` mapping in your `web.xml` file at all. In order to enable this, add the below context parameter in `web.xml`:
+In order to initialize https://showcase.omnifaces.org/resourcehandlers/UnmappedResourceHandler[OmniFaces' UnmappedResourceHandler], both `web.xml` `servlet-mapping` and `faces-config.xml` entries are ordinarily required. FlowLogix automates more complicated `web.xml` requirements by configuring the servlet container to include all unmapped resources. This alleviates requirement to specify `Faces Servlet` mapping in your `web.xml` file at all. In order to enable this, add the below context parameter in `web.xml`:
 [source,xml]
 ----
 <context-param>
@@ -364,7 +364,7 @@ Developers can transform any XML file from the archive by using the generic `man
 [[section-jpa-lazymodel]]
 === FlowLogix PrimeFaces DataTable Lazy Data Model backed by JPA
 .An easier alternative to PrimeFaces JPA Lazy Data model
-PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and thus has a big "head start" in ease of use, features and compactness. Biggest advantage is ability to `@Inject` the model via CDI. The model utilizes `DaoHelper` classes and methodology to make JPA lazy data model easier to use, with a lot less code and better design. It does not require inheritance and problems associated with it. Besides ease of use advantages, `JPALazyDataModel` is fully serializable, making its use trivial in clustered sessions, like the ones in Payara and Hazelcast.
+PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and therefore has a big "head start" in ease of use, features and compactness. Biggest advantage is ability to `@Inject` the model via CDI. The model utilizes `DaoHelper` classes and methodology to make JPA lazy data model easier to use, with a lot less code and better design. The model not require inheritance and problems associated with it. In addition to its ease of use advantages, `JPALazyDataModel` is fully serializable, making its use trivial in clustered sessions, like the ones in Payara and Hazelcast. To make it even easier to use and configure, model's initialization lambdas do not have to be serializable and 'just work' out-of-the-box without paying any special attention to their context.
 [source,xhtml]
 .userviewer.xhtml
 ----

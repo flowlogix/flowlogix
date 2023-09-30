@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
-    <version>8.x-SNAPSHOT</version>
+    <version>8.0</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
@@ -54,7 +54,7 @@
         <omnifaces.version>4.3</omnifaces.version>
         <primefaces.version>13.0.1</primefaces.version>
         <jacocoPort>52212</jacocoPort>
-        <jacocoAgent/>
+        <jacocoAgent />
         <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>
         <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
 
@@ -63,7 +63,7 @@
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <checkstyle.headerLocation>${flowlogix.basedir}/checkstyle/header.txt</checkstyle.headerLocation>
 
-        <project.build.outputTimestamp>2023-09-20T00:03:03Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-09-30T05:41:39Z</project.build.outputTimestamp>
     </properties>
 
     <modules>
@@ -618,7 +618,7 @@
         <url>https://github.com/flowlogix/flowlogix</url>
         <connection>scm:git:git@github.com:flowlogix/flowlogix.git</connection>
         <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>Version-8.0</tag>
     </scm>
 
     <distributionManagement>

@@ -373,9 +373,10 @@ public class JPAModelImpl<TT> implements Serializable {
                     case LOWER -> cb.lower(stringExpression);
                     case UPPER -> cb.upper(stringExpression);
                 };
+                var locale = Faces.getLocale();
                 this.value = switch (filterCaseConversion) {
-                    case LOWER -> wildcardValue.value.toLowerCase();
-                    case UPPER -> wildcardValue.value.toUpperCase();
+                    case LOWER -> wildcardValue.value.toLowerCase(locale);
+                    case UPPER -> wildcardValue.value.toUpperCase(locale);
                 };
             }
         }

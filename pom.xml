@@ -346,7 +346,7 @@
                         <additionalOptions>--snippet-path ${snippet.path}</additionalOptions>
                         <doctitle>${javadoc.title}</doctitle>
                         <bottom>Copyright © ${project.inceptionYear}-2023 Flow Logix, Inc. All Rights Reserved.</bottom>
-                        <excludePackageNames>*.impl</excludePackageNames>
+                        <excludePackageNames>*.internal</excludePackageNames>
                         <links>
                             <link>https://javadoc.io/doc/jakarta.platform/jakarta.jakartaee-api/${jakarta.ee.version}</link>
                             <link>https://javadoc.io/doc/org.jboss.shrinkwrap/shrinkwrap-api/${shrinkwrap.api.version}</link>

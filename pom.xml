@@ -42,6 +42,8 @@
         <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
         <staging.server>flowlogix-maven-central-s01</staging.server>
         <nexus.url>https://s01.oss.sonatype.org</nexus.url>
+        <jboss.unzip.url>https://repository.jboss.org/nexus/content/repositories/unzip/org/jboss</jboss.unzip.url>
+        <central.archive.url>https://oss.sonatype.org/service/local/repositories/releases/archive</central.archive.url>
 
         <webdriver.browser>chromeheadless</webdriver.browser>
         <jakarta.ee.version>10.0.0</jakarta.ee.version>
@@ -115,15 +117,18 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>add-demos</id>
+                        <id>add-demos-parse-version</id>
                         <configuration>
                             <sources>
                                 <source>src/demo/java</source>
                             </sources>
+                            <versionString>${jakarta.ee.version}</versionString>
+                            <propertyPrefix>jakarta.ee.parsed</propertyPrefix>
                         </configuration>
                         <phase>validate</phase>
                         <goals>
                             <goal>add-test-source</goal>
+                            <goal>parse-version</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -348,11 +353,11 @@
                         <bottom>Copyright © ${project.inceptionYear}-2023 Flow Logix, Inc. All Rights Reserved.</bottom>
                         <excludePackageNames>*.internal</excludePackageNames>
                         <links>
-                            <link>https://javadoc.io/doc/jakarta.platform/jakarta.jakartaee-api/${jakarta.ee.version}</link>
-                            <link>https://javadoc.io/doc/org.jboss.shrinkwrap/shrinkwrap-api/${shrinkwrap.api.version}</link>
-                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/${omnifaces.version}</link>
-                            <link>https://javadoc.io/doc/org.primefaces/primefaces/${primefaces.version}</link>
-                            <link>https://javadoc.io/doc/org.projectlombok/lombok/${lombok.version}</link>
+                            <link>https://jakarta.ee/specifications/platform/${jakarta.ee.parsed.majorVersion}/apidocs</link>
+                            <link>${jboss.unzip.url}/shrinkwrap/shrinkwrap-api/${shrinkwrap.api.version}/shrinkwrap-api-${shrinkwrap.api.version}-javadoc.jar-unzip</link>
+                            <link>https://omnifaces.org/docs/javadoc/${omnifaces.version}</link>
+                            <link>${central.archive.url}/org/primefaces/primefaces/${primefaces.version}/primefaces-${primefaces.version}-javadoc.jar/!</link>
+                            <link>https://projectlombok.org/api/</link>
                         </links>
                         <notimestamp>true</notimestamp>
                     </configuration>

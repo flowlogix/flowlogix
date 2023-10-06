@@ -355,9 +355,9 @@
                         <links>
                             <link>https://jakarta.ee/specifications/platform/${jakarta.ee.parsed.majorVersion}/apidocs</link>
                             <link>${jboss.unzip.url}/shrinkwrap/shrinkwrap-api/${shrinkwrap.api.version}/shrinkwrap-api-${shrinkwrap.api.version}-javadoc.jar-unzip</link>
-                            <link>https://omnifaces.org/docs/javadoc/${omnifaces.version}</link>
                             <link>${central.archive.url}/org/primefaces/primefaces/${primefaces.version}/primefaces-${primefaces.version}-javadoc.jar/!</link>
-                            <link>https://projectlombok.org/api/</link>
+                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/${omnifaces.version}</link>
+                            <link>https://javadoc.io/doc/org.projectlombok/lombok/${lombok.version}</link>
                         </links>
                         <notimestamp>true</notimestamp>
                     </configuration>

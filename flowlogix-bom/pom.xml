@@ -12,7 +12,7 @@
     <properties>
         <slf4j.version>2.0.9</slf4j.version>
         <junit.version>5.10.0</junit.version>
-        <bytebuddy.version>1.14.8</bytebuddy.version>
+        <bytebuddy.version>1.14.9</bytebuddy.version>
     </properties>
 
     <parent>

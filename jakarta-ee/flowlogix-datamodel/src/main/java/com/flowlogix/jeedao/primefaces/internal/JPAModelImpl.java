@@ -80,11 +80,11 @@ import org.primefaces.util.Constants;
 @Builder
 @Slf4j
 public class JPAModelImpl<TT> implements Serializable {
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
     /**
      * Return entity manager to operate on
      */
-    private final SerializableSupplier<EntityManager> entityManager;
+    private final transient SerializableSupplier<EntityManager> entityManager;
     /**
      * List of qualifiers to use when finding {@link EntityManager via CDI} (optional)
      */

@@ -23,6 +23,7 @@ import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.convert.Converter;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -372,6 +374,42 @@ public class ModelTest implements Serializable {
                 .getIdentifier(any(MyEntity.class))).thenReturn(5L);
         var deserialized = serializeAndDeserialize(model);
         assertEquals("5", deserialized.getRowKey(new MyEntity()));
+    }
+
+    @Test
+    void serializeWithNonSerializedOptimizer() throws IOException, ClassNotFoundException {
+        try (var ns = new NonSerializableRequestScopedMock(rootInteger)) {
+            var model = new JPALazyDataModel<Integer>().initialize(builder ->
+                    builder.entityClass(Integer.class).entityManager(() -> em)
+                            .optimizer(optimize()).build());
+            var deserialized = serializeAndDeserialize(model);
+            deserialized.findRows(0, 10, Map.of(), Map.of());
+        }
+        verify(rootInteger).get("optimizer");
+    }
+
+    Function<TypedQuery<Integer>, TypedQuery<Integer>> optimize() {
+        return NonSerializableRequestScopedMock.INSTANCE.get()::optimizeQuery;
+    }
+
+    static class NonSerializableRequestScopedMock implements AutoCloseable {
+        static final ThreadLocal<NonSerializableRequestScopedMock> INSTANCE = new ThreadLocal<>();
+        private final Root<Integer> rootInteger;
+
+        NonSerializableRequestScopedMock(Root<Integer> rootInteger) {
+            this.rootInteger = rootInteger;
+            INSTANCE.set(this);
+        }
+
+        TypedQuery<Integer> optimizeQuery(TypedQuery<Integer> query) {
+            rootInteger.get("optimizer");
+            return query;
+        }
+
+        @Override
+        public void close() {
+            INSTANCE.remove();
+        }
     }
 
     @Test

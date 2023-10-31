@@ -362,6 +362,7 @@
                         <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
                         <preparationGoals>validate</preparationGoals>
+                        <preparationProfiles>skip-checkstyle</preparationProfiles>
                         <releaseProfiles>${release.profile}</releaseProfiles>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>
                     </configuration>

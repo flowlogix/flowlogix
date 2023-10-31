@@ -432,6 +432,7 @@
                         <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
                         <preparationGoals>validate</preparationGoals>
+                        <preparationProfiles>skip-checkstyle</preparationProfiles>
                         <releaseProfiles>${release.profile},docs,javadoc-release</releaseProfiles>
                         <tagNameFormat>Version-@{project.version}</tagNameFormat>
                     </configuration>

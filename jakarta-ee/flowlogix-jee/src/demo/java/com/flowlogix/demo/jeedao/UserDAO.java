@@ -39,7 +39,7 @@ public class UserDAO {
     // tag::daoParameters[] // @replace regex='.*\n' replacement=""
     public record CountAndList(long count, List<UserEntity> list) { };
     public CountAndList countAndList(String userName) {
-        // add "where userName = 'userName'" clause
+        // add "where fullName = 'userName'" clause
         QueryEnhancement<UserEntity> enhancement = (partial, criteria) -> criteria
                 .where(partial.builder().equal(partial.root()
                         .get(UserEntity_.fullName), userName));
@@ -54,7 +54,7 @@ public class UserDAO {
     // @start region="daoExtractedParameters"
     // tag::daoExtractedParameters[] // @replace regex='.*\n' replacement=""
     public CountAndList extractedCountAndList(String userName) {
-        // add "where userName = 'userName'" clause
+        // add "where fullName = 'userName'" clause
         QueryEnhancement<UserEntity> enhancement = (partial, criteria) -> criteria
                 .where(partial.builder().equal(partial.root()
                         .get(UserEntity_.fullName), userName));

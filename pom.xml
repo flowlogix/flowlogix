@@ -431,6 +431,7 @@
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
+                        <mavenExecutorId>forked-path</mavenExecutorId>
                         <preparationGoals>validate</preparationGoals>
                         <preparationProfiles>skip-checkstyle</preparationProfiles>
                         <releaseProfiles>${release.profile},docs,javadoc-release</releaseProfiles>

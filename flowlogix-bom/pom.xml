@@ -13,7 +13,7 @@
         <slf4j.version>2.0.9</slf4j.version>
         <junit.version>5.10.0</junit.version>
         <omnifaces.version>3.14.4</omnifaces.version>
-        <shiro.version>1.12.0</shiro.version>
+        <shiro.version>1.13.0</shiro.version>
         <bytebuddy.version>1.14.9</bytebuddy.version>
     </properties>
 

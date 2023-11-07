@@ -289,7 +289,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.2</version>
                     <configuration>
                         <doclint>all,-reference</doclint>
                         <overview>${project.basedir}/src/main/java/overview.html</overview>

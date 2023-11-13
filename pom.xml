@@ -54,7 +54,7 @@
         <shrinkwrap.api.version>1.2.6</shrinkwrap.api.version>
         <shrinkwrap.resolver.version>3.2.1</shrinkwrap.resolver.version>
         <omnifaces.version>4.3</omnifaces.version>
-        <primefaces.version>13.0.2</primefaces.version>
+        <primefaces.version>13.0.3</primefaces.version>
         <jacocoPort>52212</jacocoPort>
         <jacocoAgent/>
         <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>

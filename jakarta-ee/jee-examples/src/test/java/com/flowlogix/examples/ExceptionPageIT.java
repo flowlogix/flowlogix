@@ -112,8 +112,7 @@ public class ExceptionPageIT {
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
-        webDriver.get(baseURL + "lastException");
-        assertEquals("", webDriver.findElement(By.tagName("body")).getText());
+        assertEquals("", getLastException());
     }
 
     @Test
@@ -144,16 +143,19 @@ public class ExceptionPageIT {
         guardAjax(methodSqlThrow).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
-        webDriver.get(baseURL + "lastException");
-        String exceptionString = webDriver.findElement(By.tagName("body")).getText();
-        while (exceptionString.startsWith("java.io.IOException: Connection is closed")) {
-            webDriver.get(baseURL + "lastException");
-            exceptionString = webDriver.findElement(By.tagName("body")).getText();
+        String exceptionString = getLastException();
+        while (exceptionString.startsWith("WARNING: java.io.IOException: Connection is closed")) {
+            exceptionString = exceptionString.lines().skip(1).findFirst().orElseGet(this::getLastException);
         }
-        assertTrue(exceptionString.matches(jakartify("^WARNING: javax.faces.FacesException: "
-                        + "#\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*")
+        assertTrue(exceptionString.matches(jakartify("""
+                ^WARNING: javax.faces.FacesException: #\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*""")
                 + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\.")),
-                String.format("exceptionBean.throwExceptionFromMethod() - exception string %s doesn't match", exceptionString));
+                String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match", exceptionString));
+    }
+
+    private String getLastException() {
+        webDriver.get(baseURL + "lastException");
+        return webDriver.findElement(By.tagName("body")).getText();
     }
 
     @Test

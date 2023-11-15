@@ -45,11 +45,9 @@
 -->
 
 <module name="Checker">
-    <property name="basedir" value="${flowlogix.basedir}"/>
-
     <!-- Activation here is needed for IntelliJ CheckstyleIDEA plugin -->
     <module name="SuppressionFilter">
-        <property name="file" value="checkstyle/suppressions.xml"/>
+        <property name="file" value="${flowlogix.basedir}/checkstyle/suppressions.xml"/>
     </module>
 
     <!-- Enable suppression of file contents using //CHECKSTYLE:[ON|OFF] comments -->

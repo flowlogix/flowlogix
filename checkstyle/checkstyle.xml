@@ -45,14 +45,6 @@
 -->
 
 <module name="Checker">
-    <!--
-        If you set the basedir property below, then all reported file
-        names will be relative to the specified directory. See
-        http://checkstyle.sourceforge.net/5.x/config.html#Checker
-
-        <property name="basedir" value="${basedir}"/>
-    -->
-
     <!-- Activation here is needed for IntelliJ CheckstyleIDEA plugin -->
     <module name="SuppressionFilter">
         <property name="file" value="${flowlogix.basedir}/checkstyle/suppressions.xml"/>

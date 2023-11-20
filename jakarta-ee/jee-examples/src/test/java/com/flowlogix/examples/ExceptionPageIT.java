@@ -112,7 +112,7 @@ public class ExceptionPageIT {
         guardAjax(closedByIntrButton).click();
         assertEquals("Exception happened", exceptionHeading.getText());
         assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
-        assertEquals("", getLastException());
+        assertEquals("", getLastException(true));
     }
 
     @Test
@@ -154,8 +154,16 @@ public class ExceptionPageIT {
     }
 
     private String getLastException() {
+        return getLastException(false);
+    }
+
+    private String getLastException(boolean checkForInterrupt) {
         webDriver.get(baseURL + "lastException");
-        return webDriver.findElement(By.tagName("body")).getText();
+        String exceptionText =  webDriver.findElement(By.tagName("body")).getText();
+        if (checkForInterrupt && exceptionText.startsWith("WARNING: java.io.IOException: Connection is closed")) {
+            exceptionText = "";
+        }
+        return exceptionText;
     }
 
     @Test

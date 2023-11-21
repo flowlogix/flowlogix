@@ -14,7 +14,7 @@
         <junit.version>5.10.1</junit.version>
         <omnifaces.version>3.14.4</omnifaces.version>
         <shiro.version>1.13.0</shiro.version>
-        <bytebuddy.version>1.14.9</bytebuddy.version>
+        <bytebuddy.version>1.14.10</bytebuddy.version>
     </properties>
 
     <parent>

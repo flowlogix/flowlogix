@@ -38,19 +38,19 @@ public class ExceptionBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public void throwClosedByInterruptException(boolean responseComplete) {
-        Runnable before = () -> ExceptionUtils.rethrow(new ClosedByInterruptException());
+        Runnable before = () -> ExceptionUtils.asRuntimeException(new ClosedByInterruptException());
         Faces.setRequestAttribute(RUN_BEFORE_RESPONSE, before);
         Faces.setRequestAttribute(CALL_RESPONSE_COMPLETE, responseComplete);
     }
 
     public void throwSqlBeforeResponse() {
-        Runnable before = () -> ExceptionUtils.rethrow(new SQLException("sql"));
+        Runnable before = () -> ExceptionUtils.asRuntimeException(new SQLException("sql"));
         Faces.setRequestAttribute(RUN_BEFORE_RESPONSE, before);
     }
 
     public void throwExceptionFromMethod() {
         log.info("*=*=*=*= The next WARNING is legit, it's expected");
-        ExceptionUtils.rethrow(new SQLException("sql-from-method"));
+        ExceptionUtils.asRuntimeException(new SQLException("sql-from-method"));
     }
 
     public void success() {

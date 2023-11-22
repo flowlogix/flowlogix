@@ -39,7 +39,7 @@ public class EnvironmentInfo {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream("git.properties")) {
             props.load(new BufferedInputStream(is));
         } catch (IOException ex) {
-            ExceptionUtils.rethrow(ex);
+            ExceptionUtils.asRuntimeException(ex);
         }
 
         version = props.getProperty("git.build.version");

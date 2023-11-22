@@ -58,7 +58,7 @@ class CryptoSupport {
                 MethodType getDecryptMT = MethodType.methodType(ByteSource.class, byte[].class, byte[].class);
                 decryptMH = publicLookup.in(CipherService.class).findVirtual(CipherService.class, "decrypt", getDecryptMT);
             } catch (ReflectiveOperationException ex1) {
-                ExceptionUtils.rethrow(ex1);
+                ExceptionUtils.asRuntimeException(ex1);
             }
         } finally {
             getClonedBytesHandle = getClonedMH;

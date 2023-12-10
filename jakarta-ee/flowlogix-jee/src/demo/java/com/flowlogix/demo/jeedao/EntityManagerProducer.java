@@ -25,8 +25,7 @@ import lombok.Getter;
 // tag::nonDefaultEntityProducer[] // @replace regex='.*\n' replacement=""
 @RequestScoped
 public class EntityManagerProducer {
-    @Getter(onMethod = @__(@Produces))
-    @NotDefault
+    @Getter(onMethod = @__({@Produces, @NotDefault}))
     @PersistenceContext(unitName = "nonDefault")
     EntityManager entityManager;
 }

@@ -24,9 +24,7 @@ import lombok.Getter;
 
 @RequestScoped
 public class EntityManagerProducer {
-    @Getter(onMethod = @__(@Produces))
-    @Default
-    @AnotherEntityManager
+    @Getter(onMethod = @__({@Produces, @Default, @AnotherEntityManager}))
     @PersistenceContext(unitName = "pu")
     EntityManager entityManager;
 }

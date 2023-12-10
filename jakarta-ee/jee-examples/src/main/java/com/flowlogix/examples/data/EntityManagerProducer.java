@@ -20,10 +20,11 @@ import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.Getter;
 
 @RequestScoped
 public class EntityManagerProducer {
-    @Produces
+    @Getter(onMethod = @__(@Produces))
     @Default
     @AnotherEntityManager
     @PersistenceContext(unitName = "pu")

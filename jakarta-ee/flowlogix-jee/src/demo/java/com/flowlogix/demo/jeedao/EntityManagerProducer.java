@@ -19,12 +19,13 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.Getter;
 
 // @start region="nonDefaultEntityProducer"
 // tag::nonDefaultEntityProducer[] // @replace regex='.*\n' replacement=""
 @RequestScoped
 public class EntityManagerProducer {
-    @Produces
+    @Getter(onMethod = @__(@Produces))
     @NotDefault
     @PersistenceContext(unitName = "nonDefault")
     EntityManager entityManager;

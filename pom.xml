@@ -37,7 +37,7 @@
 
         <webdriver.browser>chromeheadless</webdriver.browser>
         <payara.version>5.2022.5</payara.version>
-        <groovy.version>4.0.16</groovy.version>
+        <groovy.version>4.0.17</groovy.version>
         <lombok.version>1.18.30</lombok.version>
         <eclipselink.version>2.7.14</eclipselink.version>
         <jacocoPort>52212</jacocoPort>

@@ -528,6 +528,10 @@
                         <skipIfEmpty>true</skipIfEmpty>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>

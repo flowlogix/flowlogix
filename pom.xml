@@ -269,7 +269,6 @@
                             <integration.test.mode>${integration.test.mode}</integration.test.mode>
                             <webdriver.browser>${webdriver.browser}</webdriver.browser>
                             <webdriver.chrome.binary>${webdriver.chrome.binary}</webdriver.chrome.binary>
-                            <webdriver.gecko.driver>${webdriver.gecko.driver}</webdriver.gecko.driver>
                             <webdriver.firefox.binary>${webdriver.firefox.binary}</webdriver.firefox.binary>
                         </systemPropertyVariables>
                     </configuration>

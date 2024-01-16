@@ -52,7 +52,7 @@
         <lombok.version>1.18.30</lombok.version>
         <eclipselink.version>4.0.2</eclipselink.version>
         <shrinkwrap.api.version>1.2.6</shrinkwrap.api.version>
-        <shrinkwrap.resolver.version>3.2.1</shrinkwrap.resolver.version>
+        <shrinkwrap.resolver.version>3.3.0</shrinkwrap.resolver.version>
         <omnifaces.version>4.3</omnifaces.version>
         <primefaces.version>13.0.4</primefaces.version>
         <jacocoPort>52212</jacocoPort>

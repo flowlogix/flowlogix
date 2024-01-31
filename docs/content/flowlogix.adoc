@@ -49,21 +49,21 @@ link:https://central.sonatype.com/search?smo=true&q=com.flowlogix&sort=published
 All snapshots are available in the
 link:https://s01.oss.sonatype.org/content/repositories/snapshots/com/flowlogix/[Maven Central snapshot^] repository
 [source,xml]
-.Jakarta EE Components - Maven Example - replace LATEST with actual version number
+.Jakarta EE Components - Maven Example
 ----
 include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesStart,indent=0]
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix-jee</artifactId>
-        <version>LATEST</version>
+        <version><<LATEST>></version>
 include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesEnd,indent=0]
 ----
 [source,xml]
-.PrimeFaces JPA LazyDataModel - Maven Example - replace LATEST with actual version number
+.PrimeFaces JPA LazyDataModel - Maven Example
 ----
 include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesStart,indent=0]
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix-datamodel</artifactId>
-        <version>LATEST</version>
+        <version><<LATEST>></version>
 include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesEnd,indent=0]
 ----
 

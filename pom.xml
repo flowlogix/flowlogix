@@ -8,26 +8,15 @@
     <description>Flow Logix Jakarta EE Components Root POM</description>
     <inceptionYear>2011</inceptionYear>
 
-    <url>https://github.com/flowlogix/flowlogix</url>
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+    <parent>
+        <groupId>com.flowlogix</groupId>
+        <artifactId>base-pom</artifactId>
+        <version>1</version>
+    </parent>
 
-    <developers>
-        <developer>
-            <id>lprimak</id>
-            <name>Lenny Primak</name>
-            <email>lenny@flowlogix.com</email>
-        </developer>
-    </developers>
+    <url>https://docs.flowlogix.com</url>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
         <payara.start.skip>${skipITs}</payara.start.skip>
 
         <docs.phase>deploy</docs.phase>
@@ -78,7 +67,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.4.1</version>
                 <executions>
                     <execution>
                         <id>enforce-maven</id>
@@ -267,7 +255,6 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.12.1</version>
                     <configuration>
                         <showWarnings>true</showWarnings>
                         <compilerArgs>
@@ -290,7 +277,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
                     <configuration>
                         <parallel>all</parallel>
                         <threadCount>10</threadCount>
@@ -301,7 +287,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.5</version>
                     <executions>
                         <execution>
                             <id>integration-test</id>
@@ -328,7 +313,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -341,7 +325,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.6.3</version>
                     <configuration>
                         <doclint>all,-reference</doclint>
                         <overview>${project.build.sourceDirectory}/overview.html</overview>
@@ -401,7 +384,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.6.1</version>
                     <configuration>
                         <overWriteIfNewer>false</overWriteIfNewer>
                         <artifactItems>
@@ -417,7 +399,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.1</version>
                     <configuration>
                         <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
                         <deployAtEnd>true</deployAtEnd>
@@ -425,7 +406,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.1</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <pushChanges>false</pushChanges>
@@ -456,22 +436,18 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.3.2</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.3.0</version>
                     <configuration>
                         <skipIfEmpty>true</skipIfEmpty>
                     </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
@@ -503,7 +479,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>3.3.2</version>
             </plugin>
         </plugins>
     </reporting>

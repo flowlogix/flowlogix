@@ -31,7 +31,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import lombok.Generated;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -144,45 +143,10 @@ public class ShrinkWrapManipulator {
      * Transform http to https URL using {@code sslPort} system property,
      * and default port 8181 if system property is not defined
      *
-     * @param httpUri http URI
-     * @return https URI
-     */
-    @SuppressWarnings("MagicNumber")
-    public static URI toHttpsURI(URI httpUri) {
-        return toHttpsURI(httpUri, DEFAULT_SSL_PROPERTY, DEFAULT_SSL_PORT);
-    }
-
-    /**
-     * Transform http to https URL using the specified system property and default port,
-     * if the system property is not defined
-     *
-     * @param httpUri http URI
-     * @param sslPortPropertyName
-     * @param defaultPort
-     * @return https URI
-     */
-    @SneakyThrows
-    public static URI toHttpsURI(URI httpUri, String sslPortPropertyName, int defaultPort) {
-        if (httpUri.getScheme().endsWith("s")) {
-            return httpUri;
-        }
-        int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
-        return new URI(httpUri.getScheme() + "s", null, httpUri.getHost(), sslPort,
-                httpUri.getPath(), null, null);
-    }
-
-    /**
-     * Transform http to https URL using {@code sslPort} system property,
-     * and default port 8181 if system property is not defined
-     *
-     * @deprecated Use {@link #toHttpsURI(URI)} instead
-     *
      * @param httpUrl http URL
      * @return https URL
      */
     @SuppressWarnings("MagicNumber")
-    @Deprecated(since = "8.0.2", forRemoval = true)
-    @Generated
     public static URL toHttpsURL(URL httpUrl) {
         return toHttpsURL(httpUrl, DEFAULT_SSL_PROPERTY, DEFAULT_SSL_PORT);
     }
@@ -191,18 +155,19 @@ public class ShrinkWrapManipulator {
      * Transform http to https URL using the specified system property and default port,
      * if the system property is not defined
      *
-     * @deprecated Use {@link #toHttpsURI(URI, String, int)} instead
-
      * @param httpUrl http URL
      * @param sslPortPropertyName
      * @param defaultPort
      * @return https URL
      */
-    @Deprecated(since = "8.0.2", forRemoval = true)
-    @Generated
     @SneakyThrows
     public static URL toHttpsURL(URL httpUrl, String sslPortPropertyName, int defaultPort) {
-        return toHttpsURI(httpUrl.toURI(), sslPortPropertyName, defaultPort).toURL();
+        if (httpUrl.getProtocol().endsWith("s")) {
+            return httpUrl;
+        }
+        int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
+        return new URI(httpUrl.getProtocol() + "s", null, httpUrl.getHost(), sslPort,
+                httpUrl.getPath(), null, null).toURL();
     }
 
     /**

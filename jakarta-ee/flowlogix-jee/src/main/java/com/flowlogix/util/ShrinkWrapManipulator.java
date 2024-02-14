@@ -199,12 +199,7 @@ public class ShrinkWrapManipulator {
     @SneakyThrows
     @Deprecated(since = "8.0.2", forRemoval = true)
     public static URL toHttpsURL(URL httpUrl, String sslPortPropertyName, int defaultPort) {
-        if (httpUrl.getProtocol().endsWith("//")) {
-            return httpUrl;
-        }
-        int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
-        return new URI(httpUrl.getProtocol() + "s", null, httpUrl.getHost(), sslPort,
-                httpUrl.getFile(), null, null).toURL();
+        return toHttpsURI(httpUrl.toURI(), sslPortPropertyName, defaultPort).toURL();
     }
 
     /**

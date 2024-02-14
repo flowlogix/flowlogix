@@ -274,7 +274,18 @@
                             <arg>-Xlint:deprecation</arg>
                             <arg>-Xlint:unchecked</arg>
                         </compilerArgs>
-                        <proc>full</proc>
+                        <annotationProcessorPaths>
+                            <annotationProcessorPath>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </annotationProcessorPath>
+                            <annotationProcessorPath>
+                                <groupId>org.eclipse.persistence</groupId>
+                                <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+                                <version>${eclipselink.version}</version>
+                            </annotationProcessorPath>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
                 <plugin>

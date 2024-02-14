@@ -18,6 +18,7 @@ package com.flowlogix.util;
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.function.Consumer;
@@ -62,6 +63,9 @@ public class ShrinkWrapManipulator {
         }
     }
 
+    static final String DEFAULT_SSL_PROPERTY = "sslPort";
+    static final int DEFAULT_SSL_PORT = 8181;
+
     @SuppressWarnings("ConstantName")
     private static final @Getter List<Action> standardActions = initializeStandardActions();
 
@@ -104,14 +108,26 @@ public class ShrinkWrapManipulator {
         return SHIRO_NATIVE_SESSIONS.equals(System.getProperty(INTEGRATION_TEST_MODE_PROPERTY));
     }
 
-    @SneakyThrows
+    /**
+     * Transform http to https URL using {@code sslPort} system property,
+     * and default port 8181 if system property is not defined
+     *
+     * @param httpUrl http URL
+     * @return https URL
+     */
+    @SuppressWarnings("MagicNumber")
     public static URL toHttpsURL(URL httpUrl) {
-        if (httpUrl.getProtocol().endsWith("//")) {
+        return toHttpsURL(httpUrl, DEFAULT_SSL_PROPERTY, DEFAULT_SSL_PORT);
+    }
+
+    @SneakyThrows
+    public static URL toHttpsURL(URL httpUrl, String sslPortPropertyName, int defaultPort) {
+        if (httpUrl.getProtocol().endsWith("s")) {
             return httpUrl;
         }
-        @SuppressWarnings("MagicNumber")
-        int sslPort = Integer.getInteger("sslPort", 8181);
-        return new URL(httpUrl.getProtocol() + "s", httpUrl.getHost(), sslPort, httpUrl.getFile());
+        int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
+        return new URI(httpUrl.getProtocol() + "s", null, httpUrl.getHost(), sslPort,
+                httpUrl.getPath(), null, null).toURL();
     }
 
     public static String getContextParamValue(String paramName) {

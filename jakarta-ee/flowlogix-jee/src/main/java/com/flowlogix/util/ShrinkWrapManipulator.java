@@ -166,7 +166,7 @@ public class ShrinkWrapManipulator {
             return httpUri;
         }
         int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
-        return new URI(httpUri.toURL().getProtocol() + "s",null, httpUri.getHost(), sslPort,
+        return new URI(httpUri.toURL().getProtocol() + "s", null, httpUri.getHost(), sslPort,
                 httpUri.getPath(), null, null);
     }
 

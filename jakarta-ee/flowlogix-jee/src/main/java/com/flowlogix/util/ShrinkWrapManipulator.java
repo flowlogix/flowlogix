@@ -17,6 +17,7 @@ package com.flowlogix.util;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
@@ -161,11 +162,12 @@ public class ShrinkWrapManipulator {
      */
     @SneakyThrows
     public static URL toHttpsURL(URL httpUrl, String sslPortPropertyName, int defaultPort) {
-        if (httpUrl.getProtocol().endsWith("//")) {
+        if (httpUrl.getProtocol().endsWith("s")) {
             return httpUrl;
         }
         int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
-        return new URL(httpUrl.getProtocol() + "s", httpUrl.getHost(), sslPort, httpUrl.getFile());
+        return new URI(httpUrl.getProtocol() + "s", null, httpUrl.getHost(), sslPort,
+                httpUrl.getPath(), null, null).toURL();
     }
 
     /**

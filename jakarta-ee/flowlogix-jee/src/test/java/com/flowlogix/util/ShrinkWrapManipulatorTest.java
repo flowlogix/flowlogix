@@ -17,16 +17,40 @@ package com.flowlogix.util;
 
 import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PORT;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class ShrinkWrapManipulatorTest {
     @Test
     void httpsUrl() throws MalformedURLException {
-        String port = System.getProperty(DEFAULT_SSL_PROPERTY, String.valueOf(DEFAULT_SSL_PORT));
-        var httpsUrl = ShrinkWrapManipulator.toHttpsURL(new URL("http://localhost:1234"));
-        assertEquals(new URL(String.format("https://localhost:%s", port)), httpsUrl);
+        var httpsUrl = ShrinkWrapManipulator.toHttpsURL(URI.create("http://localhost:1234").toURL());
+        assertEquals(URI.create(String.format("https://localhost:%s", getPortFromProperty())).toURL(), httpsUrl);
+    }
+
+    @Test
+    void alreadyHttpsUrl() throws MalformedURLException {
+        var url = URI.create("https://localhost:1234").toURL();
+        var httpsUrl = ShrinkWrapManipulator.toHttpsURL(url);
+        assertSame(url, httpsUrl);
+    }
+
+    @Test
+    void withoutPort() throws MalformedURLException {
+        var httpsUrl = ShrinkWrapManipulator.toHttpsURL(URI.create("http://localhost").toURL());
+        assertEquals(URI.create(String.format("https://localhost:%s", getPortFromProperty())).toURL(), httpsUrl);
+    }
+
+    @Test
+    void alreadyHttpsWithoutPort() throws MalformedURLException {
+        var url = URI.create("https://localhost").toURL();
+        var httpsUrl = ShrinkWrapManipulator.toHttpsURL(url);
+        assertSame(url, httpsUrl);
+    }
+
+    private static int getPortFromProperty() {
+        return Integer.parseInt(System.getProperty(DEFAULT_SSL_PROPERTY, String.valueOf(DEFAULT_SSL_PORT)));
     }
 }

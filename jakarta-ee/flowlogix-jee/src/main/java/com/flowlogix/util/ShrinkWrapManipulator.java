@@ -17,6 +17,7 @@ package com.flowlogix.util;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
@@ -142,10 +143,44 @@ public class ShrinkWrapManipulator {
      * Transform http to https URL using {@code sslPort} system property,
      * and default port 8181 if system property is not defined
      *
+     * @param httpUri http URI
+     * @return https URI
+     */
+    @SuppressWarnings("MagicNumber")
+    public static URI toHttpsURI(URI httpUri) {
+        return toHttpsURI(httpUri, DEFAULT_SSL_PROPERTY, DEFAULT_SSL_PORT);
+    }
+
+    /**
+     * Transform http to https URL using the specified system property and default port,
+     * if the system property is not defined
+     *
+     * @param httpUri http URI
+     * @param sslPortPropertyName
+     * @param defaultPort
+     * @return https URI
+     */
+    @SneakyThrows
+    public static URI toHttpsURI(URI httpUri, String sslPortPropertyName, int defaultPort) {
+        if (httpUri.getScheme().endsWith("//")) {
+            return httpUri;
+        }
+        int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
+        return new URI(httpUri.toURL().getProtocol() + "s",null, httpUri.getHost(), sslPort,
+                httpUri.getPath(), null, null);
+    }
+
+    /**
+     * Transform http to https URL using {@code sslPort} system property,
+     * and default port 8181 if system property is not defined
+     *
+     * @deprecated Use {@link #toHttpsURI(URI)} instead
+     *
      * @param httpUrl http URL
      * @return https URL
      */
     @SuppressWarnings("MagicNumber")
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static URL toHttpsURL(URL httpUrl) {
         return toHttpsURL(httpUrl, DEFAULT_SSL_PROPERTY, DEFAULT_SSL_PORT);
     }
@@ -154,18 +189,22 @@ public class ShrinkWrapManipulator {
      * Transform http to https URL using the specified system property and default port,
      * if the system property is not defined
      *
+     * @deprecated Use {@link #toHttpsURI(URI, String, int)} instead
+
      * @param httpUrl http URL
      * @param sslPortPropertyName
      * @param defaultPort
      * @return https URL
      */
     @SneakyThrows
+    @Deprecated(since = "8.0.2", forRemoval = true)
     public static URL toHttpsURL(URL httpUrl, String sslPortPropertyName, int defaultPort) {
         if (httpUrl.getProtocol().endsWith("//")) {
             return httpUrl;
         }
         int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
-        return new URL(httpUrl.getProtocol() + "s", httpUrl.getHost(), sslPort, httpUrl.getFile());
+        return new URI(httpUrl.getProtocol() + "s", null, httpUrl.getHost(), sslPort,
+                httpUrl.getFile(), null, null).toURL();
     }
 
     /**

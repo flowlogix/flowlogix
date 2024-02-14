@@ -269,7 +269,7 @@ public class JndiLocatorTest {
         if (!isShutdownCompleted) {
             System.out.printf("Unfinished threads: %d\n", runningThreads.size());
             for (Thread thr : runningThreads) {
-                System.out.printf("\nStack Dump for Thread %d\n", thr.getId());
+                System.out.printf("\nStack Dump for Thread %d\n", thr.threadId());
                 Stream.of(thr.getStackTrace()).forEach(System.out::println);
             }
         }

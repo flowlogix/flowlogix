@@ -16,17 +16,16 @@
 package com.flowlogix.util;
 
 import org.junit.jupiter.api.Test;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PORT;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ShrinkWrapManipulatorTest {
     @Test
-    void httpsUrl() throws MalformedURLException {
+    void httpsUrl() {
         String port = System.getProperty(DEFAULT_SSL_PROPERTY, String.valueOf(DEFAULT_SSL_PORT));
-        var httpsUrl = ShrinkWrapManipulator.toHttpsURL(new URL("http://localhost:1234"));
-        assertEquals(new URL(String.format("https://localhost:%s", port)), httpsUrl);
+        var httpsUri = ShrinkWrapManipulator.toHttpsURI(URI.create("http://localhost:1234"));
+        assertEquals(URI.create(String.format("https://localhost:%s", port)), httpsUri);
     }
 }

@@ -163,7 +163,7 @@ public class ShrinkWrapManipulator {
      */
     @SneakyThrows
     public static URI toHttpsURI(URI httpUri, String sslPortPropertyName, int defaultPort) {
-        if (httpUri.getScheme().endsWith("//")) {
+        if (httpUri.getScheme().endsWith("s")) {
             return httpUri;
         }
         int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);

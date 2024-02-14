@@ -20,6 +20,7 @@ import java.net.URI;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PORT;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class ShrinkWrapManipulatorTest {
     @Test
@@ -27,5 +28,25 @@ public class ShrinkWrapManipulatorTest {
         String port = System.getProperty(DEFAULT_SSL_PROPERTY, String.valueOf(DEFAULT_SSL_PORT));
         var httpsUri = ShrinkWrapManipulator.toHttpsURI(URI.create("http://localhost:1234"));
         assertEquals(URI.create(String.format("https://localhost:%s", port)), httpsUri);
+    }
+
+    @Test
+    void alreadyHttpsUrl() {
+        var uri = URI.create("https://localhost:1234");
+        var httpsUri = ShrinkWrapManipulator.toHttpsURI(uri);
+        assertSame(uri, httpsUri);
+    }
+
+    @Test
+    void withoutPort() {
+        var httpsUri = ShrinkWrapManipulator.toHttpsURI(URI.create("http://localhost"));
+        assertEquals(URI.create(String.format("https://localhost:%s", DEFAULT_SSL_PORT)), httpsUri);
+    }
+
+    @Test
+    void alreadyHttpsWithoutPort() {
+        var uri = URI.create("https://localhost");
+        var httpsUri = ShrinkWrapManipulator.toHttpsURI(uri);
+        assertSame(uri, httpsUri);
     }
 }

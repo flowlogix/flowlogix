@@ -218,9 +218,7 @@ public class JndiLocatorTest {
 
     @Test
     @Tag("StressTest")
-    // deprecated suppression is used to suppress the warning about using Thread.getId()
-    // since Java 19, Thread.getId() is replaced with Thread.threadId()
-    @SuppressWarnings({"checkstyle:MagicNumber", "deprecated"})
+    @SuppressWarnings("checkstyle:MagicNumber")
     void stressTest() throws InterruptedException, NamingException {
         int numThreads = 50 * Runtime.getRuntime().availableProcessors();
         int numIterations = 10000;

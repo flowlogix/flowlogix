@@ -31,6 +31,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import lombok.Generated;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -166,7 +167,7 @@ public class ShrinkWrapManipulator {
             return httpUri;
         }
         int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
-        return new URI(httpUri.toURL().getProtocol() + "s", null, httpUri.getHost(), sslPort,
+        return new URI(httpUri.getScheme() + "s", null, httpUri.getHost(), sslPort,
                 httpUri.getPath(), null, null);
     }
 
@@ -181,6 +182,7 @@ public class ShrinkWrapManipulator {
      */
     @SuppressWarnings("MagicNumber")
     @Deprecated(since = "8.0.2", forRemoval = true)
+    @Generated
     public static URL toHttpsURL(URL httpUrl) {
         return toHttpsURL(httpUrl, DEFAULT_SSL_PROPERTY, DEFAULT_SSL_PORT);
     }
@@ -196,8 +198,9 @@ public class ShrinkWrapManipulator {
      * @param defaultPort
      * @return https URL
      */
-    @SneakyThrows
     @Deprecated(since = "8.0.2", forRemoval = true)
+    @Generated
+    @SneakyThrows
     public static URL toHttpsURL(URL httpUrl, String sslPortPropertyName, int defaultPort) {
         return toHttpsURI(httpUrl.toURI(), sslPortPropertyName, defaultPort).toURL();
     }

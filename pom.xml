@@ -6,6 +6,7 @@
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
+    <url>https://docs.flowlogix.com</url>
     <inceptionYear>2011</inceptionYear>
 
     <parent>
@@ -14,9 +15,8 @@
         <version>1</version>
     </parent>
 
-    <url>https://docs.flowlogix.com</url>
-
     <properties>
+        <maven.compiler.release>17</maven.compiler.release>
         <payara.start.skip>${skipITs}</payara.start.skip>
 
         <docs.phase>deploy</docs.phase>
@@ -56,6 +56,19 @@
 
         <project.build.outputTimestamp>2023-09-20T00:03:03Z</project.build.outputTimestamp>
     </properties>
+
+    <scm>
+        <url>https://github.com/flowlogix/flowlogix</url>
+        <connection>scm:git:git://github.com:flowlogix/flowlogix.git</connection>
+        <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>${staging.server}</id>
+            <url>${nexus.url}/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <modules>
         <module>flowlogix-bom</module>
@@ -261,18 +274,7 @@
                             <arg>-Xlint:deprecation</arg>
                             <arg>-Xlint:unchecked</arg>
                         </compilerArgs>
-                        <annotationProcessorPaths>
-                            <annotationProcessorPath>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                                <version>${lombok.version}</version>
-                            </annotationProcessorPath>
-                            <annotationProcessorPath>
-                                <groupId>org.eclipse.persistence</groupId>
-                                <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-                                <version>${eclipselink.version}</version>
-                            </annotationProcessorPath>
-                        </annotationProcessorPaths>
+                        <proc>full</proc>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -598,20 +600,6 @@
             </build>
         </profile>
     </profiles>
-
-    <scm>
-        <url>https://github.com/flowlogix/flowlogix</url>
-        <connection>scm:git:git@github.com:flowlogix/flowlogix.git</connection>
-        <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>${staging.server}</id>
-            <url>${nexus.url}/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <dependencyManagement>
         <dependencies>

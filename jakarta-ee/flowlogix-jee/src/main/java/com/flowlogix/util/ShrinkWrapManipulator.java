@@ -62,6 +62,7 @@ public class ShrinkWrapManipulator {
             this(path, func, false);
         }
     }
+
     static final String DEFAULT_SSL_PROPERTY = "sslPort";
     static final int DEFAULT_SSL_PORT = 8181;
 

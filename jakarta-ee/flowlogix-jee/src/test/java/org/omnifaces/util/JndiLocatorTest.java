@@ -218,7 +218,9 @@ public class JndiLocatorTest {
 
     @Test
     @Tag("StressTest")
-    @SuppressWarnings("checkstyle:MagicNumber")
+    // deprecated suppression is used to suppress the warning about using Thread.getId()
+    // since Java 19, Thread.getId() is replaced with Thread.threadId()
+    @SuppressWarnings({"checkstyle:MagicNumber", "deprecated"})
     void stressTest() throws InterruptedException, NamingException {
         int numThreads = 50 * Runtime.getRuntime().availableProcessors();
         int numIterations = 10000;
@@ -269,7 +271,7 @@ public class JndiLocatorTest {
         if (!isShutdownCompleted) {
             System.out.printf("Unfinished threads: %d\n", runningThreads.size());
             for (Thread thr : runningThreads) {
-                System.out.printf("\nStack Dump for Thread %d\n", thr.threadId());
+                System.out.printf("\nStack Dump for Thread %d\n", thr.getId());
                 Stream.of(thr.getStackTrace()).forEach(System.out::println);
             }
         }

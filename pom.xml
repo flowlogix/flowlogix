@@ -1,6 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix</artifactId>
     <version>8.x-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -11,50 +10,24 @@
 
     <parent>
         <groupId>com.flowlogix</groupId>
-        <artifactId>base-pom</artifactId>
-        <version>1</version>
+        <artifactId>payara-pom</artifactId>
+        <version>x-SNAPSHOT</version>
     </parent>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
-        <payara.start.skip>${skipITs}</payara.start.skip>
+        <!-- Below is only until Graphene ByteBuddy PR is merged -->
+        <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
+        <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
 
-        <docs.phase>deploy</docs.phase>
-        <delombok.phase>none</delombok.phase>
+        <release.profiles>${release.profile},javadoc-release</release.profiles>
         <javadoc.title>${project.name}</javadoc.title>
-        <snippet.p1>${project.build.sourceDirectory}</snippet.p1>
-        <snippet.p2>${project.build.testSourceDirectory}</snippet.p2>
-        <snippet.p3>${project.basedir}/src/demo/java</snippet.p3>
-        <snippet.p4>${flowlogix.basedir}/jakarta-ee/jee-examples/src/main/java</snippet.p4>
-        <snippet.path>${snippet.p1}:${snippet.p2}:${snippet.p3}:${snippet.p4}</snippet.path>
-        <release.profile>release-flowlogix-to-central</release.profile>
-        <gpg.keyname>Flow Logix, Inc.</gpg.keyname>
-        <staging.server>flowlogix-maven-central-s01</staging.server>
-        <nexus.url>https://s01.oss.sonatype.org</nexus.url>
-        <jboss.unzip.url>https://repository.jboss.org/nexus/content/repositories/unzip/org/jboss</jboss.unzip.url>
-        <central.archive.url>https://oss.sonatype.org/service/local/repositories/releases/archive</central.archive.url>
+        <javadoc.snippet.path>${snippet.path}:${flowlogix.basedir}/jakarta-ee/jee-examples/src/main/java</javadoc.snippet.path>
+        <payara.start.disable>true</payara.start.disable>
 
-        <webdriver.browser>chromeheadless</webdriver.browser>
-        <jakarta.ee.version>10.0.0</jakarta.ee.version>
-        <payara.version>6.2023.12</payara.version>
-        <groovy.version>4.0.18</groovy.version>
-        <lombok.version>1.18.30</lombok.version>
         <eclipselink.version>4.0.2</eclipselink.version>
-        <shrinkwrap.api.version>1.2.6</shrinkwrap.api.version>
-        <shrinkwrap.resolver.version>3.3.0</shrinkwrap.resolver.version>
         <omnifaces.version>4.3</omnifaces.version>
         <primefaces.version>13.0.5</primefaces.version>
-        <jacocoPort>52212</jacocoPort>
-        <jacocoAgent/>
-        <jdk11SurefireOptions>-Xshare:off</jdk11SurefireOptions>
-        <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
-
-        <!-- checkstyle -->
-        <checkstyle.configLocation>${flowlogix.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
-        <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
-        <checkstyle.headerLocation>${flowlogix.basedir}/checkstyle/header.txt</checkstyle.headerLocation>
-
-        <project.build.outputTimestamp>2023-09-20T00:03:03Z</project.build.outputTimestamp>
     </properties>
 
     <scm>
@@ -62,13 +35,6 @@
         <connection>scm:git:git://github.com:flowlogix/flowlogix.git</connection>
         <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
     </scm>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>${staging.server}</id>
-            <url>${nexus.url}/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <modules>
         <module>flowlogix-bom</module>
@@ -78,58 +44,12 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>enforce-maven</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>3.6</version>
-                                </requireMavenVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>test-jar</id>
                         <goals>
                             <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-demos-parse-version</id>
-                        <configuration>
-                            <sources>
-                                <source>src/demo/java</source>
-                            </sources>
-                            <versionString>${jakarta.ee.version}</versionString>
-                            <propertyPrefix>jakarta.ee.parsed</propertyPrefix>
-                        </configuration>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                            <goal>parse-version</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -206,40 +126,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.3.1</version>
                 <configuration>
-                    <configLocation>${checkstyle.configLocation}</configLocation>
                     <suppressionsLocation>${checkstyle.supressionsLocation}</suppressionsLocation>
-                    <headerLocation>${checkstyle.headerLocation}</headerLocation>
-                    <linkXRef>true</linkXRef>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>true</failsOnError>
-                    <failOnViolation>true</failOnViolation>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <enableRulesSummary>true</enableRulesSummary>
-                    <propertyExpansion>flowlogix.basedir=${flowlogix.basedir}</propertyExpansion>
-                    <excludes>**/module-info.java</excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>checkstyle</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>10.13.0</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
                 <configuration>
                     <includes>
                         <include>com/flowlogix/**</include>
@@ -256,10 +149,6 @@
                         <exclude>com/flowlogix/logcapture/**</exclude>
                     </excludes>
                     <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
-                    <address>localhost</address>
-                    <port>${jacocoPort}</port>
-                    <reset>true</reset>
-                    <propertyName>jacocoAgent</propertyName>
                 </configuration>
             </plugin>
         </plugins>
@@ -269,11 +158,6 @@
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
-                        <showWarnings>true</showWarnings>
-                        <compilerArgs>
-                            <arg>-Xlint:deprecation</arg>
-                            <arg>-Xlint:unchecked</arg>
-                        </compilerArgs>
                         <annotationProcessorPaths>
                             <annotationProcessorPath>
                                 <groupId>org.projectlombok</groupId>
@@ -289,178 +173,28 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <parallel>all</parallel>
-                        <threadCount>10</threadCount>
-                        <runOrder>random</runOrder>
-                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <argLine>@{jacocoAgent} @{jdk11SurefireOptions}</argLine>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>integration-test</id>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
-                        <parallel>all</parallel>
-                        <threadCount>10</threadCount>
-                        <runOrder>random</runOrder>
-                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <argLine>@{jacocoAgent} @{jdk11FailsafeOptions}</argLine>
                         <systemPropertyVariables>
                             <arquillian.launch>${arquillian.launch}</arquillian.launch>
                             <integration.test.mode>${integration.test.mode}</integration.test.mode>
-                            <webdriver.browser>${webdriver.browser}</webdriver.browser>
                             <webdriver.chrome.binary>${webdriver.chrome.binary}</webdriver.chrome.binary>
                             <webdriver.firefox.binary>${webdriver.firefox.binary}</webdriver.firefox.binary>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <phase>${docs.phase}</phase>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <configuration>
-                        <doclint>all,-reference</doclint>
                         <overview>${project.build.sourceDirectory}/overview.html</overview>
-                        <sourcepath>${project.build.sourceDirectory}
-                            :${project.build.directory}/generated-sources/annotations</sourcepath>
-                        <additionalOptions>--snippet-path ${snippet.path}</additionalOptions>
                         <doctitle>${javadoc.title}</doctitle>
                         <bottom>Copyright © ${project.inceptionYear}-2023 Flow Logix, Inc. All Rights Reserved.</bottom>
                         <excludePackageNames>*.internal</excludePackageNames>
                         <links>
-                            <link>https://jakarta.ee/specifications/platform/${jakarta.ee.parsed.majorVersion}/apidocs</link>
-                            <link>${jboss.unzip.url}/shrinkwrap/shrinkwrap-api/${shrinkwrap.api.version}/shrinkwrap-api-${shrinkwrap.api.version}-javadoc.jar-unzip</link>
                             <link>${central.archive.url}/org/primefaces/primefaces/${primefaces.version}/primefaces-${primefaces.version}-javadoc.jar/!</link>
                             <link>https://javadoc.io/doc/org.omnifaces/omnifaces/${omnifaces.version}</link>
-                            <link>https://javadoc.io/doc/org.projectlombok/lombok/${lombok.version}</link>
                         </links>
-                        <notimestamp>true</notimestamp>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <phase>${docs.phase}</phase>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.5.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.projectlombok</groupId>
-                    <artifactId>lombok-maven-plugin</artifactId>
-                    <version>1.18.20.0</version>
-                    <configuration>
-                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-                        <addOutputDirectory>false</addOutputDirectory>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <phase>${delombok.phase}</phase>
-                            <goals>
-                                <goal>delombok</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <configuration>
-                        <overWriteIfNewer>false</overWriteIfNewer>
-                        <artifactItems>
-                            <artifactItem>
-                                <groupId>fish.payara.distributions</groupId>
-                                <artifactId>payara</artifactId>
-                                <version>${payara.version}</version>
-                                <type>zip</type>
-                            </artifactItem>
-                        </artifactItems>
-                        <skip>${payara.start.skip}</skip>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <configuration>
-                        <retryFailedDeploymentCount>5</retryFailedDeploymentCount>
-                        <deployAtEnd>true</deployAtEnd>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <configuration>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <pushChanges>false</pushChanges>
-                        <localCheckout>true</localCheckout>
-                        <mavenExecutorId>forked-path</mavenExecutorId>
-                        <preparationGoals>validate</preparationGoals>
-                        <preparationProfiles>skip-checkstyle</preparationProfiles>
-                        <releaseProfiles>${release.profile},docs,javadoc-release</releaseProfiles>
-                        <tagNameFormat>Version-@{project.version}</tagNameFormat>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.simplify4u.plugins</groupId>
-                    <artifactId>sign-maven-plugin</artifactId>
-                    <version>1.0.1</version>
-                    <configuration>
-                        <serverId>${gpg.keyname}</serverId>
-                        <skipNoKey>false</skipNoKey>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>sign-artifacts</id>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-clean-plugin</artifactId>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-resources-plugin</artifactId>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <configuration>
-                        <skipIfEmpty>true</skipIfEmpty>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-install-plugin</artifactId>
                 </plugin>
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
@@ -488,28 +222,7 @@
         </pluginManagement>
     </build>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <artifactId>maven-jxr-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </reporting>
-
     <profiles>
-        <profile>
-            <id>payara-server-remote</id>
-            <properties>
-                <payara.start.skip>true</payara.start.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>payara-docker</id>
-            <properties>
-                <payara.start.skip>true</payara.start.skip>
-                <arquillian.launch>payara-docker</arquillian.launch>
-            </properties>
-        </profile>
         <profile>
             <id>stress-test</id>
             <properties>
@@ -529,86 +242,10 @@
             </properties>
         </profile>
         <profile>
-            <id>release-flowlogix-to-central</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.simplify4u.plugins</groupId>
-                        <artifactId>sign-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-            <distributionManagement>
-                <repository>
-                    <id>${staging.server}</id>
-                    <url>${nexus.url}/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
-        </profile>
-        <profile>
-            <id>release-flowlogix-to-hope</id>
-            <properties>
-                <staging.server>hope-nexus-artifacts</staging.server>
-                <nexus.url>https://nexus.hope.nyc.ny.us</nexus.url>
-            </properties>
-            <distributionManagement>
-                <repository>
-                    <id>${staging.server}</id>
-                    <url>${nexus.url}/repository/maven-releases/</url>
-                </repository>
-            </distributionManagement>
-        </profile>
-        <profile>
-            <id>docs</id>
-            <properties>
-                <docs.phase>package</docs.phase>
-            </properties>
-        </profile>
-        <profile>
             <id>javadoc-release</id>
             <properties>
                 <javadoc.title>${project.name} ${project.version}</javadoc.title>
             </properties>
-        </profile>
-        <profile>
-            <id>skip-checkstyle</id>
-            <activation>
-                <property>
-                    <name>checkstyle.skip</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>coverage</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                    <goal>dump</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 

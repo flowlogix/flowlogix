@@ -16,12 +16,12 @@
     </parent>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <arquillian.version>1.8.0.Final</arquillian.version>
-        <arquillian.drone.version>2.5.6</arquillian.drone.version>
-        <arquillian.graphene.version>2.5.4</arquillian.graphene.version>
+        <root.basedir>${flowlogix.basedir}</root.basedir>
         <demo.entity.jar>lib/flowlogix-jee-${project.version}-tests.jar</demo.entity.jar>
         <delombok.phase>generate-sources</delombok.phase>
+        <javadoc.sourcepath>${project.build.directory}/generated-sources/annotations
+            :${project.build.directory}/generated-sources/delombok</javadoc.sourcepath>
+        <payara.start.disable>${skipITs}</payara.start.disable>
     </properties>
 
     <!-- tag::dependenciesStart[] -->
@@ -116,7 +116,7 @@
         <dependency>
             <groupId>fish.payara.arquillian</groupId>
             <artifactId>arquillian-payara-server-remote</artifactId>
-            <version>3.0.alpha8</version>
+            <version>${arquillian.payara.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -193,67 +193,8 @@
         </resources>
         <plugins>
             <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <sourcepath>${project.build.directory}/generated-sources/delombok
-                        :${project.build.directory}/generated-sources/annotations</sourcepath>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <outputDirectory>${flowlogix.basedir}/target/dependency</outputDirectory>
-                    <markersDirectory>${flowlogix.basedir}/target/dependency-maven-plugin-markers</markersDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>start-domain</id>
-                        <phase>pre-integration-test</phase>
-                        <configuration>
-                            <arguments>
-                                <argument>start-domain</argument>
-                            </arguments>
-                        </configuration>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>stop-domain</id>
-                        <phase>post-integration-test</phase>
-                        <configuration>
-                            <arguments>
-                                <argument>stop-domain</argument>
-                            </arguments>
-                        </configuration>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
@@ -268,19 +209,5 @@
                 </executions>
             </plugin>
         </plugins>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.1.1</version>
-                    <configuration>
-                        <executable>${flowlogix.basedir}/target/dependency/payara6/bin/asadmin</executable>
-                        <skip>${payara.start.skip}</skip>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 </project>

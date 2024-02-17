@@ -15,6 +15,12 @@
         <version>5.x-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <delombok.phase>generate-sources</delombok.phase>
+        <javadoc.sourcepath>${project.build.directory}/generated-sources/annotations
+            :${project.build.directory}/generated-sources/delombok</javadoc.sourcepath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.primefaces</groupId>

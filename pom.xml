@@ -166,8 +166,6 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <configuration>
                         <overview>${project.basedir}/src/main/java/overview.html</overview>
-                        <sourcepath>${project.build.directory}/generated-sources/delombok
-                            :${project.build.directory}/generated-sources/annotations</sourcepath>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -296,18 +294,6 @@
                             <version>0.0.4</version>
                         </dependency>
                     </dependencies>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-clean-plugin</artifactId>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-resources-plugin</artifactId>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <configuration>
-                        <skipIfEmpty>true</skipIfEmpty>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>

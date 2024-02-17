@@ -183,7 +183,7 @@
                     <configuration>
                         <overview>${project.build.sourceDirectory}/overview.html</overview>
                         <doctitle>${javadoc.title}</doctitle>
-                        <bottom>Copyright © ${project.inceptionYear}-2023 Flow Logix, Inc. All Rights Reserved.</bottom>
+                        <bottom>Copyright © ${project.inceptionYear}-2024 Flow Logix, Inc. All Rights Reserved.</bottom>
                         <excludePackageNames>*.internal</excludePackageNames>
                         <links>
                             <link>${central.archive.url}/org/primefaces/primefaces/${primefaces.version}/primefaces-${primefaces.version}-javadoc.jar/!</link>

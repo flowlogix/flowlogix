@@ -16,12 +16,11 @@
     </parent>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <maven.compiler.release>11</maven.compiler.release>
-        <arquillian.version>1.8.0.Final</arquillian.version>
-        <arquillian.drone.version>2.5.6</arquillian.drone.version>
-        <arquillian.graphene.version>2.5.4</arquillian.graphene.version>
+        <root.basedir>${flowlogix.basedir}</root.basedir>
+        <delombok.phase>generate-sources</delombok.phase>
+        <javadoc.sourcepath>${project.build.directory}/generated-sources/annotations
+            :${project.build.directory}/generated-sources/delombok</javadoc.sourcepath>
+        <payara.start.disable>${skipITs}</payara.start.disable>
     </properties>
 
     <dependencies>
@@ -188,65 +187,12 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <outputDirectory>${flowlogix.basedir}/target/dependency</outputDirectory>
-                    <markersDirectory>${flowlogix.basedir}/target/dependency-maven-plugin-markers</markersDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>start-domain</id>
-                        <phase>pre-integration-test</phase>
-                        <configuration>
-                            <arguments>
-                                <argument>start-domain</argument>
-                            </arguments>
-                        </configuration>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>stop-domain</id>
-                        <phase>post-integration-test</phase>
-                        <configuration>
-                            <arguments>
-                                <argument>stop-domain</argument>
-                            </arguments>
-                        </configuration>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>7.0.0</version>
                 <executions>
                     <execution>
                         <id>get-the-git-infos</id>
@@ -255,22 +201,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <useNativeGit>false</useNativeGit>
-                    <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
-                    <abbrevLength>7</abbrevLength>
-                    <gitDescribe>
-                        <skip>true</skip>
-                    </gitDescribe>
-                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
-                    <includeOnlyProperties>
-                        <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
-                        <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
-                    </includeOnlyProperties>
-                    <commitIdGenerationMode>full</commitIdGenerationMode>
-                </configuration>
             </plugin>
         </plugins>
 
@@ -279,10 +209,8 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.1.1</version>
                     <configuration>
                         <executable>${flowlogix.basedir}/target/dependency/payara5/bin/asadmin</executable>
-                        <skip>${payara.start.skip}</skip>
                     </configuration>
                 </plugin>
             </plugins>

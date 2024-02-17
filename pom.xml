@@ -123,8 +123,9 @@
                         <exclude>com/flowlogix/**/*IT$*</exclude>
                         <exclude>com/flowlogix/**/__EJB31_Generated*</exclude>
                         <!-- cause too many coverage misses -->
-                        <exclude>com.flowlogix/examples/entities/*</exclude>
-                        <exclude>com.flowlogix/examples/Deployments</exclude>
+                        <exclude>com/flowlogix/examples/entities/*</exclude>
+                        <exclude>com/flowlogix/examples/Deployments</exclude>
+                        <exclude>com/flowlogix/examples/JndiExample</exclude>
                     </excludes>
                     <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
                 </configuration>

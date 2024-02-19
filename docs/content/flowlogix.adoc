@@ -84,6 +84,19 @@ See the link:https://maven.apache.org/guides/introduction/introduction-to-depend
 === FlowLogix Jakarta EE Components
 [[section-daohelper]]
 ==== `DaoHelper` for JPA: Delegation-based Helper for Data Access Objects and business logic
+.Enhanced Finder and count methods
+`findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can specify JPA `queryCriteria`. This takes a form of `builder -> builder.queryCriteria().countQueryCriteria().build()`. There are also `build` and `accept` convenience methods in  `QueryEnhancement` interface that can be passed via a method reference instead of a builder. `ParameterFunction` interface can be used to extract common parameters for both `count()` and `find()` methods, or customize individual methods as required.
+[source,java]
+.Enhanced query and hints example
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoParameters,indent=0]
+----
+[source,java]
+.Enhanced query with customized parameters
+----
+include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoExtractedParameters,indent=0]
+----
+
 There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to implement an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `daoHelper` protected field in your `@PostConstruct` method.
 
 You can leverage Project Lombok @Delegate annotation to transparently implement Data Access Objects without any specific requirements. Alternatively, developers can write manual forwarder methods, dynamic proxies, or
@@ -149,19 +162,6 @@ The example above works well if `@RequestScope` is unavailable and may work bett
 .Inherited DaoHelper example (not recommeded)
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InheritedDAO.java[tags=inheritedDAO]
-----
-
-.Enhanced Finder and count methods
-`findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can specify JPA `queryCriteria`. This takes a form of `builder -> builder.queryCriteria().countQueryCriteria().build()`. There are also `build` and `accept` convenience methods in  `QueryEnhancement` interface that can be passed via a method reference instead of a builder. `ParameterFunction` interface can be used to extract common parameters for both `count()` and `find()` methods, or customize individual methods as required.
-[source,java]
-.Enhanced query and hints example
-----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoParameters,indent=0]
-----
-[source,java]
-.Enhanced query with customized parameters
-----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoExtractedParameters,indent=0]
 ----
 
 [[section-nativequery]]

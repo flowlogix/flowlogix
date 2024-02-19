@@ -91,11 +91,13 @@ See the link:https://maven.apache.org/guides/introduction/introduction-to-depend
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoParameters,indent=0]
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[Full Demo on GitHub^]
 [source,java]
 .Enhanced query with customized parameters
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoExtractedParameters,indent=0]
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[Full Demo on GitHub^]
 
 There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to implement an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `daoHelper` protected field in your `@PostConstruct` method.
 
@@ -115,6 +117,8 @@ That's Because `EntityManager` is not initialized when the object is created. `S
 
 .Where are `find()` and related methods?
 These methods are built into the EntityManager and can be accessed that way (see the "more complete" example below). There is no need for DaoHelper to provide them. If more functionality related to `find()` is desired, https://deltaspike.apache.org[Apache DeltaSpike^] project is a wonderful addition to your architecture and will satisfy those needs.
+
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao[Full Demos on GitHub^]
 
 [source,java]
 .Simple DAO Example
@@ -336,6 +340,8 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/Sh
 @Deployment
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=productionMode,indent=0]
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java#L54[Full Demo on GitHub^]
+
 `getContextParamValue()` is a shorthand to produce XPath for `web.xml` context parameter (`<context-param>`) element:
 [source]
 ----
@@ -358,6 +364,7 @@ Above, we also combine `web.xml` manipulation with `jakartify` to be compatible 
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=persistence,indent=0]
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java#L69[Full Demo on GitHub^]
 
 Developers can transform any XML file from the archive by using the generic `manipulateXml()` method, which both `webXmlXPath()` and `persistenceXmlXPath()` methods utilize to do their job.
 
@@ -379,6 +386,8 @@ public class UserViewer implements Serializable {
 include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage"]
 }
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
+
 Above we created a model with case-insensitive filtering. Model can be optionally initialized further inside `@PostConstruct` using `initialize()` method and builder pattern (see below)
 
 [source,java]
@@ -390,6 +399,8 @@ public class UserViewer implements Serializable {
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/DirectCreationDataModel.java[tags=basicUsage]
 }
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
+
 Above, we create the model without injection.
 During direct creation, `JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
 
@@ -410,18 +421,23 @@ Let's use custom criteria to add address to the default sort:
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[tags=sorting]
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[Full Demo on GitHub^]
+
 Let's use custom filter criteria using `replaceFilter` convenience method. Here we make sure that only zip codes greater than that in the filter are returned:
 [source,java]
 .Show only zip codes greater than filtered field
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[tags=filtering]
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[Full Demo on GitHub^]
+
 Optimizer hints can be used to fetch dependent entity relationships in batches. The `Function` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner:
 [source,java]
 .Batch query of dependent entities using `IN` query
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[tags=optimized]
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[Full Demo on GitHub^]
 
 Let's select a specific entity manager for this particular data model, by using a CDI qualifier:
 [source,java]
@@ -429,6 +445,7 @@ Let's select a specific entity manager for this particular data model, by using 
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[tags=qualifier]
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[Full Demo on GitHub^]
 
 `JPALazyDataModel` needs to convert a String representation of the entity's primary key into the actual entity primary key object. This is a requirement for PrimeFaces' `LazyDataModel.getRowKey(String)` method. Default converter is provided. However, if it's insufficient, `converter` builder method is provided to override the default.
 
@@ -438,6 +455,7 @@ include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/j
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/ConverterDataModel.java[tags=converter]
 ----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/ConverterDataModel.java[Full Demo on GitHub^]
 
 == API Reference
 FlowLogix features a full API references:

@@ -34,7 +34,7 @@ import java.util.List;
 public class UserDAO {
     @Inject
     @Delegate
-    DaoHelper<UserEntity> helper;
+    DaoHelper<UserEntity> daoHelper;
     // @start region="daoParameters"
     // tag::daoParameters[] // @replace regex='.*\n' replacement=""
     public record CountAndList(long count, List<UserEntity> list) { };
@@ -44,7 +44,7 @@ public class UserDAO {
                 .where(partial.builder().equal(partial.root()
                         .get(UserEntity_.fullName), userName));
 
-        return new CountAndList(helper.count(enhancement::build), helper.findAll(enhancement::build)
+        return new CountAndList(daoHelper.count(enhancement::build), daoHelper.findAll(enhancement::build)
                 .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN)
                 .getResultList());
     }
@@ -67,7 +67,7 @@ public class UserDAO {
                 .queryCriteria(enhancement.andThen(orderBy)::accept)
                 .build();
 
-        return new CountAndList(helper.count(params), helper.findAll(params)
+        return new CountAndList(daoHelper.count(params), daoHelper.findAll(params)
                 .getResultList());
     }
     // end::daoExtractedParameters[] // @replace regex='.*\n' replacement=""
@@ -76,7 +76,7 @@ public class UserDAO {
     // @start region="nativeQuery"
     // tag::nativeQuery[] // @replace regex='.*\n' replacement=""
     public List<UserEntity> findByNative(String sql) {
-        return helper.createNativeQuery(sql, helper.getEntityClass()).getResultList();
+        return daoHelper.createNativeQuery(sql, daoHelper.getEntityClass()).getResultList();
     }
     // end::nativeQuery[] // @replace regex='.*\n' replacement=""
     // @end

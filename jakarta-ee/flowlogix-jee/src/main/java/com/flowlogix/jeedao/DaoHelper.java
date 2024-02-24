@@ -19,11 +19,9 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import com.flowlogix.jeedao.DaoHelper.Parameters.ParametersBuilder;
+import com.flowlogix.api.dao.DaoHelper.Parameters.ParametersBuilder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -31,7 +29,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Delegate;
@@ -42,73 +39,12 @@ import static java.lang.Math.toIntExact;
 /**
  * Lightweight wrapper around common JPA methods
  * This is the primary class in the {@link com.flowlogix.jeedao} package
- * <p>
- * Main value-add is ability to easily query enhancement criteria to
- * {@link #findAll()} and {@link #findRange(long, long)} methods,
- * as well as {@link #count()} methods
- * <p>
- * Another differentiator is that this class doesn't require inheritance,
- * although some use cases could inherit from {@link InheritableDaoHelper} class.
- * <p>
- * <em>Simple Example:</em>
- * {@snippet class="com.flowlogix.demo.jeedao.ExampleDAO" region="simpleExampleDAO"}
- * <p>
- * <em>Injected Example:</em>
- * {@snippet class="com.flowlogix.demo.jeedao.InjectedDAO" region="injectedExampleDAO"}
- * <p>
- * <em>Injected Example with non-default EntityManager:</em>
- * {@snippet class="com.flowlogix.demo.jeedao.InjectedNonDefaultDAO" region="injectedNonDefaultExampleDAO"}
+ * Implementation of {@link com.flowlogix.api.dao.DaoHelper} interface
  *
- * @param <TT> Entity Type
- *
- * @author lprimak
+ * @param <TT>
  */
-public final class DaoHelper<TT> implements Serializable {
-    private static final long serialVersionUID = 4L;
-
-    /**
-     * QueryCriteria record contains {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
-     * @param <TT> Entity Type of Criteria
-     * @param builder
-     * @param root
-     * @param query
-     */
-    public record QueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<TT> query) {
-        /**
-         * @return partial query criteria, without the JPA {@link CriteriaQuery} object
-         */
-        public PartialQueryCriteria<TT> partial() {
-            return new PartialQueryCriteria<>(builder, root);
-        }
-    }
-    /**
-     * Specialized <b>Count</b>QueryCriteria record contains
-     * {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}{@code <Long>}
-     * @param <TT> Entity Type of Criteria
-     * @param builder
-     * @param root
-     * @param query
-     */
-    public record CountQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<Long> query) {
-        /**
-         * @return partial query criteria, without the JPA {@link CriteriaQuery} object
-         */
-        public PartialQueryCriteria<TT> partial() {
-            return new PartialQueryCriteria<>(builder, root);
-        }
-    }
-
-    /**
-     * Partial query criteria, only {@link CriteriaBuilder} and {@link Root}
-     * Used for common enhancing query methods / lambdas
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
-     *
-     * @param builder
-     * @param root
-     * @param <TT>
-     */
-    public record PartialQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root) { }
+public final class DaoHelper<TT> implements com.flowlogix.api.dao.DaoHelper<TT>, Serializable {
+    private static final long serialVersionUID = 5L;
 
     /**
      * Convenience interface for use with {@link Delegate} when forwarding methods
@@ -120,64 +56,6 @@ public final class DaoHelper<TT> implements Serializable {
         Query createNativeQuery(String sql, Class resultClass);
         Query createNativeQuery(String sql, String resultMapping);
     }
-
-    /**
-     * Convenience interface for use with {@link PartialQueryCriteria}
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
-
-     * @param <TT> Entity Type
-     */
-    public interface QueryEnhancement<TT> extends BiConsumer<PartialQueryCriteria<TT>, CriteriaQuery<?>> {
-        /**
-         * Convenience method for creating parameters to
-         * {@link #count(Function)} and {@link #findAll(Function)} methods and friends.
-         * Useful when the same enhanced queries are used for both count() and find() methods.
-         *
-         * @param builder
-         * @return
-         */
-        default Parameters<TT> build(ParametersBuilder<TT> builder) {
-            return builder.queryCriteria(this::accept).countQueryCriteria(this::accept)
-                    .build();
-        }
-
-        /**
-         * Convenience method for using {@link Parameters#queryCriteria} parameters
-         * @param criteria
-         */
-        default void accept(QueryCriteria<TT> criteria) {
-            accept(criteria.partial(), criteria.query());
-        }
-
-        /**
-         * Convenience method for using {@link Parameters#countQueryCriteria} parameters
-         * @param criteria
-         */
-        default void accept(CountQueryCriteria<TT> criteria) {
-            accept(criteria.partial(), criteria.query());
-        }
-
-        /**
-         * Allows for combinations of enhancements via method references
-         * @see BiConsumer#andThen(BiConsumer)
-         *
-         * @param after
-         * @return combination lambda
-         */
-        default QueryEnhancement<TT> andThen(QueryEnhancement<TT> after) {
-            return (l, r) -> BiConsumer.super.andThen(after).accept(l, r);
-        }
-    }
-
-    /**
-     * Convenience interface to extract parameter builder into a lambda
-     * @param <TT> Entity Type
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
-     */
-    @FunctionalInterface
-    public interface ParameterFunction<TT> extends Function<ParametersBuilder<TT>, Parameters<TT>> { }
 
     /**
      * Return entity manager to operate on
@@ -194,38 +72,7 @@ public final class DaoHelper<TT> implements Serializable {
         this.entityClass = entityClass;
     }
 
-    /**
-     * Parameters for enriching
-     * {@link #count(Function)}, {@link #findAll(Function)} and {@link #findRange(long, long, Function)}
-     * methods with additional criteria
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
-     *
-     * @param <TT> Entity Type
-     */
-    @Builder
-    public static class Parameters<TT> {
-        /**
-         * query criteria enhancement
-         */
-        @Default
-        @NonNull
-        private final Consumer<QueryCriteria<TT>> queryCriteria = c -> { };
-        /**
-         * query criteria enhancement for count operation here
-         */
-        @Default
-        @NonNull
-        private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = c -> { };
-
-        /**
-         * @hidden
-         * just for javadoc
-         * @param <TT>
-         */
-        public static class ParametersBuilder<TT> { }
-    }
-
+    @Override
     public TypedQuery<TT> findAll() {
         return findAll(builder -> builder.build());
     }
@@ -242,12 +89,14 @@ public final class DaoHelper<TT> implements Serializable {
      * @param paramsBuilder
      * @return query
      */
+    @Override
     public <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>> TypedQuery<TT>
     findAll(FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
         return createFindQuery(params);
     }
 
+    @Override
     public TypedQuery<TT> findRange(long min, long max) {
         return findRange(min, max, builder -> builder.build());
     }
@@ -260,6 +109,7 @@ public final class DaoHelper<TT> implements Serializable {
      * @param paramsBuilder
      * @return query
      */
+    @Override
     public <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>>
     TypedQuery<TT> findRange(long min, long max, FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
@@ -273,6 +123,7 @@ public final class DaoHelper<TT> implements Serializable {
      * count rows
      * @return row count
      */
+    @Override
     public long count() {
         return count(builder -> builder.build());
     }
@@ -282,6 +133,7 @@ public final class DaoHelper<TT> implements Serializable {
      * @param paramsBuilder
      * @return row count
      */
+    @Override
     public <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>>
     long count(FF paramsBuilder) {
         var params = paramsBuilder.apply(Parameters.builder());
@@ -289,7 +141,7 @@ public final class DaoHelper<TT> implements Serializable {
         CriteriaQuery<Long> cq = criteriaBuilder.createQuery(Long.class);
         Root<TT> rt = cq.from(entityClass);
         cq.select(criteriaBuilder.count(rt));
-        params.countQueryCriteria.accept(new CountQueryCriteria<>(criteriaBuilder, rt, cq));
+        params.getCountQueryCriteria().accept(new CountQueryCriteria<>(criteriaBuilder, rt, cq));
         TypedQuery<Long> q = em().createQuery(cq);
         return q.getSingleResult();
     }
@@ -318,6 +170,7 @@ public final class DaoHelper<TT> implements Serializable {
      *
      * @return QueryCriteria of Entity Type
      */
+    @Override
     public QueryCriteria<TT> buildQueryCriteria() {
         return buildQueryCriteria(entityClass);
     }
@@ -329,6 +182,7 @@ public final class DaoHelper<TT> implements Serializable {
      * @param  cls Type of Query Criteria
      * @return QueryCriteria of the same Entity Type as the parameter
      */
+    @Override
     public <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls) {
         CriteriaBuilder cb = em().getCriteriaBuilder();
         CriteriaQuery<RR> cq = cb.createQuery(cls);
@@ -391,7 +245,7 @@ public final class DaoHelper<TT> implements Serializable {
     private TypedQuery<TT> createFindQuery(Parameters<TT> params) {
         var qc = buildQueryCriteria();
         qc.query().select(qc.root());
-        params.queryCriteria.accept(new QueryCriteria<>(qc.builder(), qc.root(), qc.query()));
+        params.getQueryCriteria().accept(new QueryCriteria<>(qc.builder(), qc.root(), qc.query()));
         return em().createQuery(qc.query());
     }
 }

@@ -16,8 +16,8 @@
 package com.flowlogix.demo.jeedao;
 
 import com.flowlogix.jeedao.DaoHelper;
-import com.flowlogix.jeedao.DaoHelper.ParameterFunction;
-import com.flowlogix.jeedao.DaoHelper.QueryEnhancement;
+import com.flowlogix.api.dao.DaoHelper.ParameterFunction;
+import com.flowlogix.api.dao.DaoHelper.QueryEnhancement;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import jakarta.ejb.Stateless;

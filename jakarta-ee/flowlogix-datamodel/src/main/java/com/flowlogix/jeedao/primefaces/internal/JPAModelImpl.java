@@ -15,8 +15,8 @@
  */
 package com.flowlogix.jeedao.primefaces.internal;
 
+import com.flowlogix.api.dao.DaoHelper.QueryCriteria;
 import com.flowlogix.jeedao.DaoHelper;
-import com.flowlogix.jeedao.DaoHelper.QueryCriteria;
 import com.flowlogix.jeedao.primefaces.Filter;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Filter.FilterColumnData;

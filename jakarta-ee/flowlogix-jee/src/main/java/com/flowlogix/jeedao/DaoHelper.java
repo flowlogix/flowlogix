@@ -66,7 +66,7 @@ public final class DaoHelper<TT> implements JPAFinderNative<TT>, Serializable {
     /**
      * entity class
      */
-    private final @NonNull @Getter Class<TT> entityClass;
+    private final @NonNull @Getter(onMethod = @__(@Override)) Class<TT> entityClass;
 
     @Builder
     public DaoHelper(@NonNull SerializableSupplier<EntityManager> entityManager, @NonNull Class<TT> entityClass) {

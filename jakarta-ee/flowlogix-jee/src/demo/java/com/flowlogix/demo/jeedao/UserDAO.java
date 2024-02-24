@@ -15,7 +15,7 @@
  */
 package com.flowlogix.demo.jeedao;
 
-import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.api.dao.JPAFinderNative;
 import com.flowlogix.api.dao.JPAFinder.ParameterFunction;
 import com.flowlogix.api.dao.JPAFinder.QueryEnhancement;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
@@ -34,7 +34,7 @@ import java.util.List;
 public class UserDAO {
     @Inject
     @Delegate
-    DaoHelper<UserEntity> daoHelper;
+    JPAFinderNative<UserEntity> daoHelper;
     // @start region="daoParameters"
     // tag::daoParameters[] // @replace regex='.*\n' replacement=""
     public record CountAndList(long count, List<UserEntity> list) { };

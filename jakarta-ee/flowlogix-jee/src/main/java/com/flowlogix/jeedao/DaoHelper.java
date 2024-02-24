@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import com.flowlogix.api.dao.DaoHelper.Parameters.ParametersBuilder;
+import com.flowlogix.api.dao.JPAFinder;
+import com.flowlogix.api.dao.JPAFinder.Parameters.ParametersBuilder;
+import com.flowlogix.api.dao.JPAFinderNative;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -39,11 +41,11 @@ import static java.lang.Math.toIntExact;
 /**
  * Lightweight wrapper around common JPA methods
  * This is the primary class in the {@link com.flowlogix.jeedao} package
- * Implementation of {@link com.flowlogix.api.dao.DaoHelper} interface
+ * Implementation of {@link JPAFinder} interface
  *
  * @param <TT>
  */
-public final class DaoHelper<TT> implements com.flowlogix.api.dao.DaoHelper<TT>, Serializable {
+public final class DaoHelper<TT> implements JPAFinderNative<TT>, Serializable {
     private static final long serialVersionUID = 5L;
 
     /**
@@ -151,6 +153,7 @@ public final class DaoHelper<TT> implements com.flowlogix.api.dao.DaoHelper<TT>,
      *
      * @return {@link Supplier} of {@link EntityManager}
      */
+    @Override
     public Supplier<EntityManager> getEntityManager() {
         return entityManager;
     }
@@ -198,6 +201,7 @@ public final class DaoHelper<TT> implements com.flowlogix.api.dao.DaoHelper<TT>,
      * @param resultClass {@link EntityManager#createNativeQuery(String, Class)}
      * @return {@link TypedNativeQuery}
      */
+    @Override
     public TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass) {
         Query q = em().createNativeQuery(sql, resultClass);
         return new TypedNativeQuery(q);
@@ -212,6 +216,7 @@ public final class DaoHelper<TT> implements com.flowlogix.api.dao.DaoHelper<TT>,
      * @param resultMapping {@link EntityManager#createNativeQuery(String, String)}
      * @return {@link TypedNativeQuery}
      */
+    @Override
     public TypedNativeQuery createNativeQuery(String sql, String resultMapping) {
         Query q = em().createNativeQuery(sql, resultMapping);
         return new TypedNativeQuery(q);

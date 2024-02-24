@@ -15,7 +15,7 @@
  */
 package com.flowlogix.api.dao;
 
-import com.flowlogix.api.dao.DaoHelper.Parameters.ParametersBuilder;
+import com.flowlogix.api.dao.JPAFinder.Parameters.ParametersBuilder;
 import com.flowlogix.jeedao.InheritableDaoHelper;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -49,7 +49,7 @@ import java.util.function.Function;
  *
  * @author lprimak
  */
-public interface DaoHelper<TT> {
+public interface JPAFinder<TT> {
     /**
      * QueryCriteria record contains {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
      * @param <TT> Entity Type of Criteria
@@ -195,5 +195,4 @@ public interface DaoHelper<TT> {
     <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>> long count(FF paramsBuilder);
     QueryCriteria<TT> buildQueryCriteria();
     <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls);
-
 }

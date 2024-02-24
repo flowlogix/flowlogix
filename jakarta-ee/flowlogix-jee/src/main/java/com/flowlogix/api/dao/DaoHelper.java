@@ -111,13 +111,13 @@ public interface DaoHelper<TT> {
          * @param builder
          * @return
          */
-        default com.flowlogix.jeedao.DaoHelper.Parameters<TT> build(ParametersBuilder<TT> builder) {
+        default Parameters<TT> build(ParametersBuilder<TT> builder) {
             return builder.queryCriteria(this::accept).countQueryCriteria(this::accept)
                     .build();
         }
 
         /**
-         * Convenience method for using {@link com.flowlogix.jeedao.DaoHelper.Parameters#queryCriteria} parameters
+         * Convenience method for using {@link Parameters#queryCriteria} parameters
          * @param criteria
          */
         default void accept(QueryCriteria<TT> criteria) {
@@ -125,7 +125,7 @@ public interface DaoHelper<TT> {
         }
 
         /**
-         * Convenience method for using {@link com.flowlogix.jeedao.DaoHelper.Parameters#countQueryCriteria} parameters
+         * Convenience method for using {@link Parameters#countQueryCriteria} parameters
          * @param criteria
          */
         default void accept(CountQueryCriteria<TT> criteria) {
@@ -151,7 +151,7 @@ public interface DaoHelper<TT> {
      * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
      */
     @FunctionalInterface
-    interface ParameterFunction<TT> extends Function<ParametersBuilder<TT>, com.flowlogix.jeedao.DaoHelper.Parameters<TT>> { }
+    interface ParameterFunction<TT> extends Function<ParametersBuilder<TT>, Parameters<TT>> { }
 
     /**
      * Parameters for enriching

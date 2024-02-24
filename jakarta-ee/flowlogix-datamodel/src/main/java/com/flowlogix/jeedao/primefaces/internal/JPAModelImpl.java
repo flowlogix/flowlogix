@@ -190,16 +190,13 @@ public class JPAModelImpl<TT> implements Serializable {
     public static class JPAModelImplBuilder<TT> { }
 
     public int count(Map<String, FilterMeta> filters) {
-        return toIntExact(jpaFinder.get().count(builder -> builder
-                .countQueryCriteria(cqc -> cqc.query().where(getFilters(filters, cqc.builder(), cqc.root())))
-                .build()));
+        return toIntExact(jpaFinder.get().count(cqc -> cqc.query().where(getFilters(filters, cqc.builder(), cqc.root()))));
     }
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
         return optimizer.apply(
                 jpaFinder.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
-                        builder -> builder.queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
-                                .build())).getResultList();
+                        qc -> addToCriteria(qc, filters, sortMeta))).getResultList();
     }
 
     public Supplier<EntityManager> getEntityManager() {

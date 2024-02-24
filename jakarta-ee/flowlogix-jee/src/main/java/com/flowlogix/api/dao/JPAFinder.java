@@ -15,18 +15,13 @@
  */
 package com.flowlogix.api.dao;
 
-import com.flowlogix.api.dao.JPAFinder.Parameters.ParametersBuilder;
 import com.flowlogix.jeedao.InheritableDaoHelper;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Main value-add is ability to easily query enhancement criteria to
@@ -50,6 +45,14 @@ import java.util.function.Function;
  * @author lprimak
  */
 public interface JPAFinder<TT> {
+    TypedQuery<TT> findAll();
+    TypedQuery<TT> findAll(Consumer<QueryCriteria<TT>> queryCriteria);
+    TypedQuery<TT> findRange(long min, long max);
+    TypedQuery<TT> findRange(long min, long max, Consumer<QueryCriteria<TT>> queryCriteria);
+
+    long count();
+    long count(Consumer<CountQueryCriteria<TT>> countQueryCriteria);
+
     /**
      * QueryCriteria record contains {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
      * @param <TT> Entity Type of Criteria
@@ -104,19 +107,6 @@ public interface JPAFinder<TT> {
      */
     interface QueryEnhancement<TT> extends BiConsumer<PartialQueryCriteria<TT>, CriteriaQuery<?>> {
         /**
-         * Convenience method for creating parameters to
-         * {@link #count(Function)} and {@link #findAll(Function)} methods and friends.
-         * Useful when the same enhanced queries are used for both count() and find() methods.
-         *
-         * @param builder
-         * @return
-         */
-        default Parameters<TT> build(ParametersBuilder<TT> builder) {
-            return builder.queryCriteria(this::accept).countQueryCriteria(this::accept)
-                    .build();
-        }
-
-        /**
          * Convenience method for using {@link Parameters#queryCriteria} parameters
          * @param criteria
          */
@@ -144,55 +134,6 @@ public interface JPAFinder<TT> {
         }
     }
 
-    /**
-     * Convenience interface to extract parameter builder into a lambda
-     * @param <TT> Entity Type
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
-     */
-    @FunctionalInterface
-    interface ParameterFunction<TT> extends Function<ParametersBuilder<TT>, Parameters<TT>> { }
-
-    /**
-     * Parameters for enriching
-     * {@link #count(Function)}, {@link #findAll(Function)} and {@link #findRange(long, long, Function)}
-     * methods with additional criteria
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
-     *
-     * @param <TT> Entity Type
-     */
-    @Builder
-    @Getter
-    class Parameters<TT> {
-        /**
-         * query criteria enhancement
-         */
-        @Builder.Default
-        @NonNull
-        private final Consumer<QueryCriteria<TT>> queryCriteria = c -> { };
-        /**
-         * query criteria enhancement for count operation here
-         */
-        @Builder.Default
-        @NonNull
-        private final Consumer<CountQueryCriteria<TT>> countQueryCriteria = c -> { };
-
-        /**
-         * @hidden
-         * just for javadoc
-         * @param <TT>
-         */
-        public static class ParametersBuilder<TT> { }
-    }
-
-    TypedQuery<TT> findAll();
-    <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>> TypedQuery<TT> findAll(FF paramsBuilder);
-    TypedQuery<TT> findRange(long min, long max);
-    <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>> TypedQuery<TT> findRange(long min, long max, FF paramsBuilder);
-
-    long count();
-    <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>> long count(FF paramsBuilder);
     QueryCriteria<TT> buildQueryCriteria();
     <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls);
 }

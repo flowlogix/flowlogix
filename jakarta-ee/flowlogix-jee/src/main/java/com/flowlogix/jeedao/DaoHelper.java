@@ -18,11 +18,11 @@ package com.flowlogix.jeedao;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import com.flowlogix.api.dao.JPAFinder;
-import com.flowlogix.api.dao.JPAFinder.Parameters.ParametersBuilder;
 import com.flowlogix.api.dao.JPAFinderNative;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -76,7 +76,7 @@ public final class DaoHelper<TT> implements JPAFinderNative<TT>, Serializable {
 
     @Override
     public TypedQuery<TT> findAll() {
-        return findAll(builder -> builder.build());
+        return findAll(null);
     }
 
     /**
@@ -88,19 +88,17 @@ public final class DaoHelper<TT> implements JPAFinderNative<TT>, Serializable {
      * <p>
      * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
      *
-     * @param paramsBuilder
+     * @param queryCriteria
      * @return query
      */
     @Override
-    public <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>> TypedQuery<TT>
-    findAll(FF paramsBuilder) {
-        var params = paramsBuilder.apply(Parameters.builder());
-        return createFindQuery(params);
+    public TypedQuery<TT> findAll(Consumer<QueryCriteria<TT>> queryCriteria) {
+        return createFindQuery(queryCriteria);
     }
 
     @Override
     public TypedQuery<TT> findRange(long min, long max) {
-        return findRange(min, max, builder -> builder.build());
+        return findRange(min, max, null);
     }
 
     /**
@@ -108,14 +106,12 @@ public final class DaoHelper<TT> implements JPAFinderNative<TT>, Serializable {
      *
      * @param min
      * @param max
-     * @param paramsBuilder
+     * @param queryCriteria
      * @return query
      */
     @Override
-    public <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>>
-    TypedQuery<TT> findRange(long min, long max, FF paramsBuilder) {
-        var params = paramsBuilder.apply(Parameters.builder());
-        TypedQuery<TT> tq = createFindQuery(params);
+    public TypedQuery<TT> findRange(long min, long max, Consumer<QueryCriteria<TT>> queryCriteria) {
+        TypedQuery<TT> tq = createFindQuery(queryCriteria);
         tq.setMaxResults(toIntExact(max - min));
         tq.setFirstResult(toIntExact(min));
         return tq;
@@ -127,23 +123,21 @@ public final class DaoHelper<TT> implements JPAFinderNative<TT>, Serializable {
      */
     @Override
     public long count() {
-        return count(builder -> builder.build());
+        return count(null);
     }
 
     /**
      * count with enriched criteria
-     * @param paramsBuilder
+     * @param countQueryCriteria
      * @return row count
      */
     @Override
-    public <FF extends Function<ParametersBuilder<TT>, Parameters<TT>>>
-    long count(FF paramsBuilder) {
-        var params = paramsBuilder.apply(Parameters.builder());
+    public long count(Consumer<CountQueryCriteria<TT>> countQueryCriteria) {
         var criteriaBuilder = em().getCriteriaBuilder();
         CriteriaQuery<Long> cq = criteriaBuilder.createQuery(Long.class);
         Root<TT> rt = cq.from(entityClass);
         cq.select(criteriaBuilder.count(rt));
-        params.getCountQueryCriteria().accept(new CountQueryCriteria<>(criteriaBuilder, rt, cq));
+        Objects.requireNonNullElse(countQueryCriteria, c -> { }).accept(new CountQueryCriteria<>(criteriaBuilder, rt, cq));
         TypedQuery<Long> q = em().createQuery(cq);
         return q.getSingleResult();
     }
@@ -247,10 +241,10 @@ public final class DaoHelper<TT> implements JPAFinderNative<TT>, Serializable {
     }
 
 
-    private TypedQuery<TT> createFindQuery(Parameters<TT> params) {
+    private TypedQuery<TT> createFindQuery(Consumer<QueryCriteria<TT>> queryCriteria) {
         var qc = buildQueryCriteria();
         qc.query().select(qc.root());
-        params.getQueryCriteria().accept(new QueryCriteria<>(qc.builder(), qc.root(), qc.query()));
+        Objects.requireNonNullElse(queryCriteria, c -> { }).accept(new QueryCriteria<>(qc.builder(), qc.root(), qc.query()));
         return em().createQuery(qc.query());
     }
 }

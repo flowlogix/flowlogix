@@ -43,7 +43,8 @@ public class UserDAO {
                 .where(partial.builder().equal(partial.root()
                         .get(UserEntity_.fullName), userName));
 
-        return new CountAndList(jpaFinder.count(enhancement::accept), jpaFinder.findAll(enhancement::accept)
+        return new CountAndList(jpaFinder.count(enhancement::accept),
+                jpaFinder.findAll(enhancement::accept)
                 .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN)
                 .getResultList());
     }

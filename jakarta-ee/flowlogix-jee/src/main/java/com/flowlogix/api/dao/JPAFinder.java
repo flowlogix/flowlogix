@@ -133,7 +133,4 @@ public interface JPAFinder<TT> {
             return (l, r) -> BiConsumer.super.andThen(after).accept(l, r);
         }
     }
-
-    QueryCriteria<TT> buildQueryCriteria();
-    <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls);
 }

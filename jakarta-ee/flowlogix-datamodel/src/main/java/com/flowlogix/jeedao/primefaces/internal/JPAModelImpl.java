@@ -316,7 +316,7 @@ public class JPAModelImpl<TT> implements Serializable {
                     convertedValue = valueConverter.getAsObject(Faces.getContext(),
                             UIComponent.getCurrentComponent(Faces.getContext()), value.toString());
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.debug("unable to convert via Faces", e);
             }
         }

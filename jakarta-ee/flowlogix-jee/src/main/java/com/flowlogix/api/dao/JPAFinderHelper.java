@@ -21,4 +21,7 @@ import java.util.function.Supplier;
 public interface JPAFinderHelper<TT> extends JPAFinder<TT> {
     Supplier<EntityManager> getEntityManager();
     Class<TT> getEntityClass();
+
+    QueryCriteria<TT> buildQueryCriteria();
+    <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls);
 }

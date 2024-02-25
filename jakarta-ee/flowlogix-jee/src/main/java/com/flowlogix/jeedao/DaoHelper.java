@@ -30,7 +30,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NonNull;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Lazy.SerializableSupplier;
@@ -53,7 +52,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     /**
      * entity class
      */
-    private final @NonNull @Getter(onMethod = @__(@Override)) Class<TT> entityClass;
+    private final @NonNull Class<TT> entityClass;
 
     @Builder
     public DaoHelper(@NonNull SerializableSupplier<EntityManager> entityManager, @NonNull Class<TT> entityClass) {
@@ -132,13 +131,19 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * Entity Manager cannot be saved because it's not thread-safe
-     *
-     * @return {@link Supplier} of {@link EntityManager}
+     * {@inheritDoc}
      */
     @Override
     public Supplier<EntityManager> getEntityManager() {
         return entityManager;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Class<TT> getEntityClass() {
+        return entityClass;
     }
 
     /**
@@ -151,10 +156,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * Convenience method for building {@link QueryCriteria} record, which contains
-     * {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
-     *
-     * @return QueryCriteria of Entity Type
+     * {@inheritDoc}
      */
     @Override
     public QueryCriteria<TT> buildQueryCriteria() {
@@ -162,11 +164,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * Convenience method for building {@link QueryCriteria} record, which contains
-     * {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
-     *
-     * @param  cls Type of Query Criteria
-     * @return QueryCriteria of the same Entity Type as the parameter
+     * {@inheritDoc}
      */
     @Override
     public <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls) {

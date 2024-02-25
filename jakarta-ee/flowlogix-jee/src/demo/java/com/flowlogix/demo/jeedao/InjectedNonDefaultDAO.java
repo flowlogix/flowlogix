@@ -33,7 +33,7 @@ public class InjectedNonDefaultDAO {
     @Inject
     @Delegate
     @EntityManagerSelector(NonDefault.class)
-    JPAFinder<UserEntity> helper;
+    JPAFinder<UserEntity> jpaFinder;
 }
 // end::injectedNonDefaultExampleDAO[] // @replace regex='.*\n' replacement=""
 // @end

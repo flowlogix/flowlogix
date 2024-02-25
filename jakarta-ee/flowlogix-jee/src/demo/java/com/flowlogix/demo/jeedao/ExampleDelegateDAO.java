@@ -32,7 +32,7 @@ public class ExampleDelegateDAO {
     EntityManager entityManager;
     @Inject
     @Delegate
-    JPAFinderHelper<UserEntity> helper;
+    JPAFinderHelper<UserEntity> jpaFinder;
 }
 // end::delegateDAO[] // @replace regex='.*\n' replacement=""
 // @end

@@ -118,8 +118,8 @@ public class FacadeTest implements Serializable {
     @SuppressWarnings("unchecked")
     void inheritableDao() {
         InheritableDaoHelper<Integer> helper = new InheritableDaoHelper<>();
-        assertNull(helper.daoHelper);
-        helper.daoHelper = DaoHelper.<Integer>builder()
+        assertNull(helper.jpaFinder);
+        helper.jpaFinder = DaoHelper.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .build();

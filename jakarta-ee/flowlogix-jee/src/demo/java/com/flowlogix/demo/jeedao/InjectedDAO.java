@@ -31,7 +31,7 @@ import lombok.experimental.Delegate;
 public class InjectedDAO {
     @Inject
     @Delegate
-    JPAFinder<UserEntity> helper;
+    JPAFinder<UserEntity> jpaFinder;
 }
 // end::injectedExampleDAO[] // @replace regex='.*\n' replacement=""
 // @end

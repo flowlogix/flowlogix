@@ -30,7 +30,7 @@ public class ExampleDAO {
     @PersistenceContext(unitName = "demo-pu")
     EntityManager em;
     @Delegate
-    JPAFinder<UserEntity> helper = new DaoHelper<>(() -> em, UserEntity.class);
+    JPAFinder<UserEntity> jpaFinder = new DaoHelper<>(() -> em, UserEntity.class);
 }
 // end::simpleExampleDAO[] // @replace regex='.*\n' replacement=""
 // @end

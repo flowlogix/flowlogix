@@ -15,8 +15,8 @@
  */
 package com.flowlogix.demo.jeedao;
 
+import com.flowlogix.api.dao.JPAFinderHelper.EntityManagerExclusions;
 import com.flowlogix.jeedao.DaoHelper;
-import com.flowlogix.jeedao.DaoHelper.EntityManagerExclusions;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;

@@ -23,10 +23,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
+import com.flowlogix.api.dao.JPAFinder;
 import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 
 /**
- * Enables CDI Injection of DaoHelper
+ * Enables CDI Injection of {@link JPAFinder} instances
  */
 @Dependent
 @SuppressWarnings("HideUtilityClassConstructor")

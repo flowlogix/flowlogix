@@ -18,7 +18,6 @@ package com.flowlogix.jeedao;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -33,7 +32,6 @@ import jakarta.persistence.criteria.Root;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.experimental.Delegate;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Lazy.SerializableSupplier;
 import static java.lang.Math.toIntExact;
@@ -47,17 +45,6 @@ import static java.lang.Math.toIntExact;
  */
 public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     private static final long serialVersionUID = 5L;
-
-    /**
-     * Convenience interface for use with {@link Delegate} when forwarding methods
-     * of {@link EntityManager} so DaoHelper's own methods get exposed correctly
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.ExampleDelegateDAO" region = "delegateDAO"}
-     */
-    public interface EntityManagerExclusions {
-        Query createNativeQuery(String sql, Class resultClass);
-        Query createNativeQuery(String sql, String resultMapping);
-    }
 
     /**
      * Return entity manager to operate on
@@ -137,7 +124,9 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
         CriteriaQuery<Long> cq = criteriaBuilder.createQuery(Long.class);
         Root<TT> rt = cq.from(entityClass);
         cq.select(criteriaBuilder.count(rt));
-        Objects.requireNonNullElse(countQueryCriteria, c -> { }).accept(new CountQueryCriteria<>(criteriaBuilder, rt, cq));
+        if (countQueryCriteria != null) {
+            countQueryCriteria.accept(new CountQueryCriteria<>(criteriaBuilder, rt, cq));
+        }
         TypedQuery<Long> q = em().createQuery(cq);
         return q.getSingleResult();
     }
@@ -244,7 +233,9 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     private TypedQuery<TT> createFindQuery(Consumer<QueryCriteria<TT>> queryCriteria) {
         var qc = buildQueryCriteria();
         qc.query().select(qc.root());
-        Objects.requireNonNullElse(queryCriteria, c -> { }).accept(new QueryCriteria<>(qc.builder(), qc.root(), qc.query()));
+        if (queryCriteria != null) {
+            queryCriteria.accept(new QueryCriteria<>(qc.builder(), qc.root(), qc.query()));
+        }
         return em().createQuery(qc.query());
     }
 }

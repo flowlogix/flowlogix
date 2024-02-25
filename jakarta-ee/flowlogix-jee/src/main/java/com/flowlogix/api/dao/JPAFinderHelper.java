@@ -16,6 +16,7 @@
 package com.flowlogix.api.dao;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import java.util.function.Supplier;
 
 public interface JPAFinderHelper<TT> extends JPAFinder<TT> {
@@ -24,4 +25,15 @@ public interface JPAFinderHelper<TT> extends JPAFinder<TT> {
 
     QueryCriteria<TT> buildQueryCriteria();
     <RR> QueryCriteria<RR> buildQueryCriteria(Class<RR> cls);
+
+    /**
+     * Convenience interface for use with {@link lombok.experimental.Delegate} when forwarding methods
+     * of {@link EntityManager} so DaoHelper's own methods get exposed correctly
+     * <p>
+     * {@snippet class = "com.flowlogix.demo.jeedao.ExampleDelegateDAO" region = "delegateDAO"}
+     */
+     interface EntityManagerExclusions {
+        Query createNativeQuery(String sql, Class<?> resultClass);
+        Query createNativeQuery(String sql, String resultMapping);
+    }
 }

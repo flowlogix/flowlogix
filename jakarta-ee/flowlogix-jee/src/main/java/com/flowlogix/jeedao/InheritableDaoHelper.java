@@ -27,7 +27,7 @@ import lombok.experimental.Delegate;
  * <p>
  * {@snippet class="com.flowlogix.demo.jeedao.InheritedDAO" region="inheritedDAO"}
  *
- * @see DaoHelper
+ * @see JPAFinder
  * @param <TT> Entity Type
  */
 public class InheritableDaoHelper<TT> implements Serializable {

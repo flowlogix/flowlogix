@@ -60,40 +60,32 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
         this.entityClass = entityClass;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TypedQuery<TT> findAll() {
         return findAll(null);
     }
 
     /**
-     * find all with enriched criteria
-     * <p>
-     * Example:
-     * <p>
-     * {@code findAll(builder -> builder.build())}
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
-     *
-     * @param queryCriteria
-     * @return query
+     * {@inheritDoc}
      */
     @Override
     public TypedQuery<TT> findAll(Consumer<QueryCriteria<TT>> queryCriteria) {
         return createFindQuery(queryCriteria);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TypedQuery<TT> findRange(long min, long max) {
         return findRange(min, max, null);
     }
 
     /**
-     * find range with enriched criteria
-     *
-     * @param min
-     * @param max
-     * @param queryCriteria
-     * @return query
+     * {@inheritDoc}
      */
     @Override
     public TypedQuery<TT> findRange(long min, long max, Consumer<QueryCriteria<TT>> queryCriteria) {
@@ -104,8 +96,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * count rows
-     * @return row count
+     * {@inheritDoc}
      */
     @Override
     public long count() {
@@ -113,9 +104,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * count with enriched criteria
-     * @param countQueryCriteria
-     * @return row count
+     * {@inheritDoc}
      */
     @Override
     public long count(Consumer<CountQueryCriteria<TT>> countQueryCriteria) {

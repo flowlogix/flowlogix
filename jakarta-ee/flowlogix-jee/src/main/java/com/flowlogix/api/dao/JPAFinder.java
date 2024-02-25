@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * Main value-add is ability to easily query enhancement criteria to
+ * Easily add query enhancement criteria to
  * {@link #findAll()} and {@link #findRange(long, long)} methods,
  * as well as {@link #count()} methods
  * <p>
@@ -45,12 +45,58 @@ import java.util.function.Consumer;
  * @author lprimak
  */
 public interface JPAFinder<TT> {
+    /**
+     * finds all entities
+     *
+     * @return query
+     */
     TypedQuery<TT> findAll();
+
+    /**
+     * find all entities with enriched criteria
+     * <p>
+     * Example:
+     * <p>
+     * {@code findAll(enhancement::accept)}
+     * <p>
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
+     *
+     * @param queryCriteria
+     * @return query
+     */
     TypedQuery<TT> findAll(Consumer<QueryCriteria<TT>> queryCriteria);
+
+    /**
+     * find entities given a specified range
+     *
+     * @param min minimum index, starting with zero
+     * @param max maximum index
+     * @return query
+     */
     TypedQuery<TT> findRange(long min, long max);
+
+    /**
+     * find entities with enriched criteria given a specified range
+     *
+     * @param min minimum index, starting with zero
+     * @param max maximum index
+     * @param queryCriteria
+     * @return query
+     */
     TypedQuery<TT> findRange(long min, long max, Consumer<QueryCriteria<TT>> queryCriteria);
 
+    /**
+     * count rows
+     * @return row count
+     */
     long count();
+
+    /**
+     * count with enriched criteria
+     *
+     * @param countQueryCriteria
+     * @return row count
+     */
     long count(Consumer<CountQueryCriteria<TT>> countQueryCriteria);
 
     /**
@@ -88,7 +134,7 @@ public interface JPAFinder<TT> {
 
     /**
      * Partial query criteria, only {@link CriteriaBuilder} and {@link Root}
-     * Used for common enhancing query methods / lambdas
+     * Used for common enriched query methods / lambdas
      * <p>
      * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
      *
@@ -99,7 +145,7 @@ public interface JPAFinder<TT> {
     record PartialQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root) { }
 
     /**
-     * Convenience interface for use with {@link PartialQueryCriteria}
+     * Convenience interface for use with {@link PartialQueryCriteria} and {@link QueryCriteria}
      * <p>
      * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
 
@@ -107,7 +153,9 @@ public interface JPAFinder<TT> {
      */
     interface QueryEnhancement<TT> extends BiConsumer<PartialQueryCriteria<TT>, CriteriaQuery<?>> {
         /**
-         * Convenience method for using {@link Parameters#queryCriteria} parameters
+         * Convenience method reference for use in {@link JPAFinder#findAll(Consumer)}
+         * and {@link JPAFinder#findRange(long, long, Consumer)} parameters
+         *
          * @param criteria
          */
         default void accept(QueryCriteria<TT> criteria) {
@@ -115,7 +163,7 @@ public interface JPAFinder<TT> {
         }
 
         /**
-         * Convenience method for using {@link Parameters#countQueryCriteria} parameters
+         * Convenience method reference for use in {@link JPAFinder#count(Consumer)} parameters
          * @param criteria
          */
         default void accept(CountQueryCriteria<TT> criteria) {

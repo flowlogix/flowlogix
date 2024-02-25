@@ -16,8 +16,33 @@
 package com.flowlogix.api.dao;
 
 import com.flowlogix.jeedao.TypedNativeQuery;
+import jakarta.persistence.EntityManager;
 
+/**
+ * Interface for creating type-safe JPA native queries
+ *
+ * @param <TT> entity type
+ */
 public interface JPANativeQuery<TT> extends JPAFinderHelper<TT> {
+    /**
+     * Creates a type-safe JPA native query
+     * <p>
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "nativeQuery"}
+     *
+     * @param sql
+     * @param resultClass {@link EntityManager#createNativeQuery(String, Class)}
+     * @return {@link TypedNativeQuery}
+     */
+
     TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass);
+    /**
+     * Creates a type-safe JPA native query
+     * <p>
+     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "nativeQuery"}
+     *
+     * @param sql
+     * @param resultMapping {@link EntityManager#createNativeQuery(String, String)}
+     * @return {@link TypedNativeQuery}
+     */
     TypedNativeQuery createNativeQuery(String sql, String resultMapping);
 }

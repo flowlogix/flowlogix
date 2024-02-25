@@ -176,13 +176,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * Creates a type-safe JPA native query
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "nativeQuery"}
-     *
-     * @param sql
-     * @param resultClass {@link EntityManager#createNativeQuery(String, Class)}
-     * @return {@link TypedNativeQuery}
+     * {@inheritDoc}
      */
     @Override
     public TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass) {
@@ -191,13 +185,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * Creates a type-safe JPA native query
-     * <p>
-     * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "nativeQuery"}
-     *
-     * @param sql
-     * @param resultMapping {@link EntityManager#createNativeQuery(String, String)}
-     * @return {@link TypedNativeQuery}
+     * {@inheritDoc}
      */
     @Override
     public TypedNativeQuery createNativeQuery(String sql, String resultMapping) {

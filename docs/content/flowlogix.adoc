@@ -99,16 +99,16 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/
 ----
 https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[Full Demo on GitHub^]
 
-There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to implement an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `daoHelper` protected field in your `@PostConstruct` method.
+There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to implement an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `jpaFinder` protected field in your `@PostConstruct` method.
 
 You can leverage Project Lombok @Delegate annotation to transparently implement Data Access Objects without any specific requirements. Alternatively, developers can write manual forwarder methods, dynamic proxies, or
-other bytecode generators to delegate to `DaoHelper` from an interface.
+other bytecode generators to delegate to `JPAFinder` from an interface.
 
 Recommended approach is to use Lombok's `@Delegate` annotation. This introduces the fewest amount of magic, results in the least amount of code, and absolute minimum (if any) boilerplate.
 
-`DaoHelper` can also be `@Inject` ed and it will infer the `EntityManager` via CDI. If default CDI producer for the EntityManager is insufficient, `@EntityManagerSelector` annotation can be used to specify qualifiers for non-default `EntityManager` producer
+`JPAFinder` can also be `@Inject` ed and it will infer the `EntityManager` via CDI. If default CDI producer for the EntityManager is insufficient, `@EntityManagerSelector` annotation can be used to specify qualifiers for non-default `EntityManager` producer
 
-`DaoHelper` is Serializable and thus can be used inside `@ViewScoped` beans, for example.
+`JPAFinder` is Serializable and thus can be used inside `@ViewScoped` beans, for example.
 
 _Fluent Builder_ pattern can be used to create `DaoHelper` object, which requires EntityManager `Supplier` and entity `Class`.
 

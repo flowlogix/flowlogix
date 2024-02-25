@@ -15,7 +15,7 @@
  */
 package com.flowlogix.demo.jeedao;
 
-import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.api.dao.JPAFinder;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -23,7 +23,7 @@ import jakarta.persistence.EntityManager;
 import lombok.experimental.Delegate;
 
 /**
- * Demonstrates injecting {@link DaoHelper} using default {@link EntityManager}
+ * Demonstrates injecting {@link JPAFinder} using default {@link EntityManager}
  */
 // @start region="injectedExampleDAO"
 // tag::injectedExampleDAO[] // @replace regex='.*\n' replacement=""
@@ -31,7 +31,7 @@ import lombok.experimental.Delegate;
 public class InjectedDAO {
     @Inject
     @Delegate
-    DaoHelper<UserEntity> helper;
+    JPAFinder<UserEntity> helper;
 }
 // end::injectedExampleDAO[] // @replace regex='.*\n' replacement=""
 // @end

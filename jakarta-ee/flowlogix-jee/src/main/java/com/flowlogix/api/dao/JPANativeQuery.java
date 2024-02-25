@@ -17,7 +17,7 @@ package com.flowlogix.api.dao;
 
 import com.flowlogix.jeedao.TypedNativeQuery;
 
-public interface JPAFinderNative<TT> extends JPAFinderHelper<TT> {
+public interface JPANativeQuery<TT> extends JPAFinderHelper<TT> {
     TypedNativeQuery createNativeQuery(String sql, Class<?> resultClass);
     TypedNativeQuery createNativeQuery(String sql, String resultMapping);
 }

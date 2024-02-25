@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import com.flowlogix.api.dao.JPAFinder;
-import com.flowlogix.api.dao.JPAFinderNative;
+import com.flowlogix.api.dao.JPANativeQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -45,7 +45,7 @@ import static java.lang.Math.toIntExact;
  *
  * @param <TT>
  */
-public final class DaoHelper<TT> implements JPAFinderNative<TT>, Serializable {
+public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     private static final long serialVersionUID = 5L;
 
     /**

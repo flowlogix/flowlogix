@@ -15,8 +15,9 @@
  */
 package com.flowlogix.jeedao.primefaces.internal;
 
+import com.flowlogix.api.dao.JPAFinder.QueryCriteria;
+import com.flowlogix.api.dao.JPAFinderHelper;
 import com.flowlogix.jeedao.DaoHelper;
-import com.flowlogix.jeedao.DaoHelper.QueryCriteria;
 import com.flowlogix.jeedao.primefaces.Filter;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Filter.FilterColumnData;
@@ -95,7 +96,7 @@ public class JPAModelImpl<TT> implements Serializable {
      * entity class
      */
     private final @NonNull @Getter Class<TT> entityClass;
-    private final Lazy<DaoHelper<TT>> daoHelper = new Lazy<>(this::createDaoHelper);
+    private final Lazy<JPAFinderHelper<TT>> jpaFinder = new Lazy<>(this::createJPAFinder);
     /**
      * convert String key into key object
      */
@@ -189,20 +190,17 @@ public class JPAModelImpl<TT> implements Serializable {
     public static class JPAModelImplBuilder<TT> { }
 
     public int count(Map<String, FilterMeta> filters) {
-        return toIntExact(daoHelper.get().count(builder -> builder
-                .countQueryCriteria(cqc -> cqc.query().where(getFilters(filters, cqc.builder(), cqc.root())))
-                .build()));
+        return toIntExact(jpaFinder.get().count(cqc -> cqc.query().where(getFilters(filters, cqc.builder(), cqc.root()))));
     }
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
         return optimizer.apply(
-                daoHelper.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
-                        builder -> builder.queryCriteria(qc -> addToCriteria(qc, filters, sortMeta))
-                                .build())).getResultList();
+                jpaFinder.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
+                        qc -> addToCriteria(qc, filters, sortMeta))).getResultList();
     }
 
     public Supplier<EntityManager> getEntityManager() {
-        return daoHelper.get().getEntityManager();
+        return jpaFinder.get().getEntityManager();
     }
 
     @SuppressWarnings("unchecked")
@@ -214,7 +212,7 @@ public class JPAModelImpl<TT> implements Serializable {
         return keyConverter != null ? keyConverter : defaultKeyConverter.get();
     }
 
-    private DaoHelper<TT> createDaoHelper() {
+    private JPAFinderHelper<TT> createJPAFinder() {
         if (entityManager != null) {
             return new DaoHelper<>(entityManager, entityClass);
         } else {
@@ -318,7 +316,7 @@ public class JPAModelImpl<TT> implements Serializable {
                     convertedValue = valueConverter.getAsObject(Faces.getContext(),
                             UIComponent.getCurrentComponent(Faces.getContext()), value.toString());
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.debug("unable to convert via Faces", e);
             }
         }
@@ -490,7 +488,7 @@ public class JPAModelImpl<TT> implements Serializable {
 
     @SneakyThrows(ReflectiveOperationException.class)
     private Object getPrimaryKey(Optional<TT> entry) {
-        return daoHelper.get().getEntityManager().get().getEntityManagerFactory().getPersistenceUnitUtil()
+        return jpaFinder.get().getEntityManager().get().getEntityManagerFactory().getPersistenceUnitUtil()
                 .getIdentifier(entry.orElse(ConstructorUtils.invokeConstructor(getEntityClass())));
     }
 

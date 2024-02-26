@@ -13,25 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.demo.jeedao;
-
-import com.flowlogix.api.dao.JPAFinder;
-import com.flowlogix.demo.jeedao.entities.UserEntity;
-import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import lombok.experimental.Delegate;
-
 /**
- * Demonstrates injecting {@link JPAFinder} using default {@link EntityManager}
+ * This package contains the main API classes for the Flow Logix JPA DAO framework
  */
-// @start region="injectedExampleDAO"
-// tag::injectedExampleDAO[] // @replace regex='.*\n' replacement=""
-@Stateless
-public class InjectedDAO {
-    @Inject
-    @Delegate
-    JPAFinder<UserEntity> jpaFinder;
-}
-// end::injectedExampleDAO[] // @replace regex='.*\n' replacement=""
-// @end
+package com.flowlogix.api.dao;

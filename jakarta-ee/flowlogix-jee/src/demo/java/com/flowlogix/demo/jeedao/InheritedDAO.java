@@ -32,7 +32,7 @@ public class InheritedDAO extends InheritableDaoHelper<UserEntity> {
 
     @PostConstruct
     void init() {
-        daoHelper = new DaoHelper<>(() -> entityManager, UserEntity.class);
+        jpaFinder = new DaoHelper<>(() -> entityManager, UserEntity.class);
     }
 }
 // end::inheritedDAO[] // @replace regex='.*\n' replacement=""

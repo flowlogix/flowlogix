@@ -15,6 +15,7 @@
  */
 package com.flowlogix.demo.jeedao;
 
+import com.flowlogix.api.dao.JPAFinder;
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import jakarta.ejb.Stateless;
@@ -29,7 +30,7 @@ public class ExampleDAO {
     @PersistenceContext(unitName = "demo-pu")
     EntityManager em;
     @Delegate
-    DaoHelper<UserEntity> helper = new DaoHelper<>(() -> em, UserEntity.class);
+    JPAFinder<UserEntity> jpaFinder = new DaoHelper<>(() -> em, UserEntity.class);
 }
 // end::simpleExampleDAO[] // @replace regex='.*\n' replacement=""
 // @end

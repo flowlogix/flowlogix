@@ -15,9 +15,8 @@
  */
 package com.flowlogix.demo.jeedao;
 
-import com.flowlogix.jeedao.DaoHelper;
-import com.flowlogix.jeedao.DaoHelper.ParameterFunction;
-import com.flowlogix.jeedao.DaoHelper.QueryEnhancement;
+import com.flowlogix.api.dao.JPANativeQuery;
+import com.flowlogix.api.dao.JPAFinder.QueryEnhancement;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import jakarta.ejb.Stateless;
@@ -34,7 +33,7 @@ import java.util.List;
 public class UserDAO {
     @Inject
     @Delegate
-    DaoHelper<UserEntity> daoHelper;
+    JPANativeQuery<UserEntity> jpaFinder;
     // @start region="daoParameters"
     // tag::daoParameters[] // @replace regex='.*\n' replacement=""
     public record CountAndList(long count, List<UserEntity> list) { };
@@ -44,7 +43,8 @@ public class UserDAO {
                 .where(partial.builder().equal(partial.root()
                         .get(UserEntity_.fullName), userName));
 
-        return new CountAndList(daoHelper.count(enhancement::build), daoHelper.findAll(enhancement::build)
+        return new CountAndList(jpaFinder.count(enhancement::accept),
+                jpaFinder.findAll(enhancement::accept)
                 .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN)
                 .getResultList());
     }
@@ -62,12 +62,8 @@ public class UserDAO {
         QueryEnhancement<UserEntity> orderBy = (partial, criteria) -> criteria
                 .orderBy(partial.builder().desc(partial.root().get(UserEntity_.fullName)));
 
-        ParameterFunction<UserEntity> params = builder -> builder
-                .countQueryCriteria(enhancement::accept)
-                .queryCriteria(enhancement.andThen(orderBy)::accept)
-                .build();
-
-        return new CountAndList(daoHelper.count(params), daoHelper.findAll(params)
+        return new CountAndList(jpaFinder.count(enhancement::accept),
+                jpaFinder.findAll(enhancement.andThen(orderBy)::accept)
                 .getResultList());
     }
     // end::daoExtractedParameters[] // @replace regex='.*\n' replacement=""
@@ -76,7 +72,7 @@ public class UserDAO {
     // @start region="nativeQuery"
     // tag::nativeQuery[] // @replace regex='.*\n' replacement=""
     public List<UserEntity> findByNative(String sql) {
-        return daoHelper.createNativeQuery(sql, daoHelper.getEntityClass()).getResultList();
+        return jpaFinder.createNativeQuery(sql, jpaFinder.getEntityClass()).getResultList();
     }
     // end::nativeQuery[] // @replace regex='.*\n' replacement=""
     // @end

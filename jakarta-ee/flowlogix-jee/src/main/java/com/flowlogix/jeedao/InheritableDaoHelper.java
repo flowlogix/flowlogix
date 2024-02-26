@@ -16,21 +16,23 @@
 package com.flowlogix.jeedao;
 
 import java.io.Serializable;
+import com.flowlogix.api.dao.JPAFinder;
+import com.flowlogix.api.dao.JPAFinderHelper;
 import lombok.experimental.Delegate;
 
 /**
  * Data Access Object pattern implementation that is meant to be inherited by the user's classes.
- * This is an alternative to {@link DaoHelper}, which does not have requirements
- * for inheritance. {@link DaoHelper} is the preferred method of implementing DAOs.
+ * This is an alternative to {@link JPAFinder}, which does not have requirements
+ * for inheritance. {@link JPAFinder} is the preferred method of implementing DAOs.
  * <p>
  * {@snippet class="com.flowlogix.demo.jeedao.InheritedDAO" region="inheritedDAO"}
  *
- * @see DaoHelper
+ * @see JPAFinder
  * @param <TT> Entity Type
  */
 public class InheritableDaoHelper<TT> implements Serializable {
     private static final long serialVersionUID = 4L;
 
     @Delegate
-    protected DaoHelper<TT> daoHelper;
+    protected JPAFinderHelper<TT> jpaFinder;
 }

@@ -108,10 +108,10 @@ public interface JPAFinder<TT> {
      */
     record QueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<TT> query) {
         /**
-         * @return partial query criteria, without the JPA {@link CriteriaQuery} object
+         * @return query criteria builder and root, without the JPA {@link CriteriaQuery} object
          */
-        public PartialQueryCriteria<TT> partial() {
-            return new PartialQueryCriteria<>(builder, root);
+        public CriteriaBuilderAndRoot<TT> partial() {
+            return new CriteriaBuilderAndRoot<>(builder, root);
         }
     }
 
@@ -125,10 +125,10 @@ public interface JPAFinder<TT> {
      */
     record CountQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root, CriteriaQuery<Long> query) {
         /**
-         * @return partial query criteria, without the JPA {@link CriteriaQuery} object
+         * @return query criteria builder and root, without the JPA {@link CriteriaQuery} object
          */
-        public PartialQueryCriteria<TT> partial() {
-            return new PartialQueryCriteria<>(builder, root);
+        public CriteriaBuilderAndRoot<TT> partial() {
+            return new CriteriaBuilderAndRoot<>(builder, root);
         }
     }
 
@@ -142,16 +142,16 @@ public interface JPAFinder<TT> {
      * @param root
      * @param <TT>
      */
-    record PartialQueryCriteria<TT>(CriteriaBuilder builder, Root<TT> root) { }
+    record CriteriaBuilderAndRoot<TT>(CriteriaBuilder builder, Root<TT> root) { }
 
     /**
-     * Convenience interface for use with {@link PartialQueryCriteria} and {@link QueryCriteria}
+     * Convenience interface for use with {@link CriteriaBuilderAndRoot} and {@link QueryCriteria}
      * <p>
      * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
 
      * @param <TT> Entity Type
      */
-    interface QueryEnhancement<TT> extends BiConsumer<PartialQueryCriteria<TT>, CriteriaQuery<?>> {
+    interface QueryEnhancement<TT> extends BiConsumer<CriteriaBuilderAndRoot<TT>, CriteriaQuery<?>> {
         /**
          * Convenience method reference for use in {@link JPAFinder#findAll(Consumer)}
          * and {@link JPAFinder#findRange(long, long, Consumer)} parameters

@@ -25,9 +25,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.shiro.crypto.CipherService;
+import org.apache.shiro.crypto.cipher.CipherService;
+import org.apache.shiro.lang.util.ByteSource;
 import org.apache.shiro.mgt.AbstractRememberMeManager;
-import org.apache.shiro.util.ByteSource;
 
 /**
  * Combines seamless support for Shiro 1/2

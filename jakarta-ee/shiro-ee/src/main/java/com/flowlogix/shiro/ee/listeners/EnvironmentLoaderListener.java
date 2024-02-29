@@ -69,7 +69,7 @@ public class EnvironmentLoaderListener extends EnvironmentLoader implements Serv
     }
 
     @Override
-    protected Class<? extends WebEnvironment> getDefaultWebEnvironmentClass() {
+    protected Class<? extends WebEnvironment> getDefaultWebEnvironmentClass(ServletContext ctx) {
         return IniEnvironment.class;
     }
 }

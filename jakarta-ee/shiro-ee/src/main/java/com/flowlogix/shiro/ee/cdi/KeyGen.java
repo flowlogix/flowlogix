@@ -18,7 +18,7 @@ package com.flowlogix.shiro.ee.cdi;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.crypto.AesCipherService;
+import org.apache.shiro.crypto.cipher.AesCipherService;
 import org.apache.shiro.mgt.AbstractRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.omnifaces.util.Beans;

@@ -28,6 +28,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.primefaces.model.MatchMode.ENDS_WITH;
+import static org.primefaces.model.MatchMode.NOT_ENDS_WITH;
 import static org.primefaces.model.MatchMode.NOT_STARTS_WITH;
 import static org.primefaces.model.MatchMode.STARTS_WITH;
 
@@ -64,6 +66,22 @@ class PredicateFromFilterTest {
         model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
                 .matchMode(NOT_STARTS_WITH).build(), "abc");
         verify(cb).notLike(any(), eq("abc%"));
+        verifyNoMoreInteractions(cb);
+    }
+
+    @Test
+    void endsWith() {
+        model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
+                .matchMode(ENDS_WITH).build(), "abc");
+        verify(cb).like(any(), eq("%abc"));
+        verifyNoMoreInteractions(cb);
+    }
+
+    @Test
+    void notEndsWith() {
+        model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
+                .matchMode(NOT_ENDS_WITH).build(), "abc");
+        verify(cb).notLike(any(), eq("%abc"));
         verifyNoMoreInteractions(cb);
     }
 }

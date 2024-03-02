@@ -32,7 +32,7 @@ import static org.primefaces.model.MatchMode.NOT_STARTS_WITH;
 import static org.primefaces.model.MatchMode.STARTS_WITH;
 
 @ExtendWith(MockitoExtension.class)
-public class PredicateFromFilterTest {
+class PredicateFromFilterTest {
     @Mock
     private CriteriaBuilder cb;
     @Mock

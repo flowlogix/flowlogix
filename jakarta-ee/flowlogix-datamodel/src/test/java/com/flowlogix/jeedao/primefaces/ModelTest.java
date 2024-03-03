@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -54,6 +55,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.primefaces.model.FilterMeta.GLOBAL_FILTER_KEY;
 import static org.primefaces.model.SortOrder.ASCENDING;
 import static org.primefaces.model.SortOrder.DESCENDING;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -69,7 +71,7 @@ import org.primefaces.model.SortMeta;
  * @author lprimak
  */
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("MagicNumber")
+@SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:MethodCount"})
 class ModelTest implements Serializable {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS, serializable = true)
     EntityManager em;
@@ -191,6 +193,33 @@ class ModelTest implements Serializable {
         var fm = FilterMeta.builder().field("aaa").matchMode(MatchMode.GREATER_THAN).filterValue(5L).build();
         impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
         verify(rootInteger).get("aaa");
+    }
+
+    @Test
+    void missingFilter() {
+        var clearFilters = new AtomicBoolean(false);
+        var impl = JPAModelImpl.builder()
+                .entityManager(() -> em)
+                .entityClass(Object.class)
+                .converter(s -> new Object())
+                .filter((filterData, cb, root) -> filterData.replaceFilter(GLOBAL_FILTER_KEY,
+                        (predicate, value) -> {
+                            if (clearFilters.get()) {
+                                filterData.clear();
+                            }
+                            return cb.isTrue(predicate);
+                        }))
+                .build();
+        when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
+        var fm = FilterMeta.builder().field("ccc").filterValue("hello").build();
+        impl.getFilters(Map.of("bbb", fm), cb, rootObject);
+        var fm2 = FilterMeta.of(null, null);
+        impl.getFilters(Map.of("bbb", fm2), cb, rootObject);
+        var fm3 = FilterMeta.builder().field(GLOBAL_FILTER_KEY).build();
+        impl.getFilters(Map.of("bbb", fm3), cb, rootObject);
+        clearFilters.set(true);
+        impl.getFilters(Map.of("bbb", FilterMeta.builder().field(GLOBAL_FILTER_KEY)
+                .filterValue("bye").build()), cb, rootObject);
     }
 
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {
@@ -419,5 +448,25 @@ class ModelTest implements Serializable {
                 .partialInitialize(builder -> builder.entityClass(Integer.class).build());
         assertThrows(IllegalStateException.class, () -> model.partialInitialize(builder -> builder.build()));
         assertEquals(Integer.class, model.getEntityClass());
+    }
+
+    @Test
+    void createNullModel() {
+        assertThrows(NullPointerException.class, () -> JPALazyDataModel.create(null));
+    }
+
+    @Test
+    void initializeNullModel() {
+        assertThrows(NullPointerException.class, () -> new JPALazyDataModel<Integer>().initialize(null));
+    }
+
+    @Test
+    void partialInitializationWithNull() {
+        assertThrows(NullPointerException.class, () -> new JPALazyDataModel<Integer>().partialInitialize(null));
+    }
+
+    @Test
+    void createInternalModelWithNull() {
+        assertThrows(NullPointerException.class, () -> JPAModelImpl.create(null));
     }
 }

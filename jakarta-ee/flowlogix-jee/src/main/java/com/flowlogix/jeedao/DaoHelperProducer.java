@@ -24,6 +24,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
 import com.flowlogix.api.dao.JPAFinder;
+import lombok.NoArgsConstructor;
 import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 
 /**
@@ -31,6 +32,7 @@ import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
  */
 @Dependent
 @SuppressWarnings("HideUtilityClassConstructor")
+@NoArgsConstructor
 class DaoHelperProducer {
     @Produces
     public static <TT> DaoHelper<TT>

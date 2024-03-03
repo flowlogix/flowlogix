@@ -23,7 +23,6 @@ import jakarta.persistence.criteria.Root;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,13 +51,11 @@ public interface Sorter<TT> {
          * Sort based on fields, the map key is equivalent to {@link SortMeta#getField()}
          */
         @Getter
-        private final Map<String, MergedSortOrder> sortOrder;
+        private final Map<String, MergedSortOrder> sortOrder = new LinkedHashMap<>();
 
         public SortData(Map<String, SortMeta> sm) {
-            sortOrder = sm.values().stream().sorted()
-                    .collect(Collectors.toMap(SortMeta::getField, value ->
-                                    new MergedSortOrder(value, null, false),
-                            (v1, v2) -> v1, LinkedHashMap::new));
+            sm.values().stream().sorted().forEach(value -> sortOrder.put(value.getField(),
+                    new MergedSortOrder(value, null, false)));
         }
 
         /**

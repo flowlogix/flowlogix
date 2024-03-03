@@ -71,7 +71,7 @@ import org.primefaces.model.SortMeta;
  * @author lprimak
  */
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("MagicNumber")
+@SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:MethodCount"})
 class ModelTest implements Serializable {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS, serializable = true)
     EntityManager em;
@@ -215,6 +215,8 @@ class ModelTest implements Serializable {
         impl.getFilters(Map.of("bbb", fm), cb, rootObject);
         var fm2 = FilterMeta.of(null, null);
         impl.getFilters(Map.of("bbb", fm2), cb, rootObject);
+        var fm3 = FilterMeta.builder().field(GLOBAL_FILTER_KEY).build();
+        impl.getFilters(Map.of("bbb", fm3), cb, rootObject);
         clearFilters.set(true);
         impl.getFilters(Map.of("bbb", FilterMeta.builder().field(GLOBAL_FILTER_KEY)
                 .filterValue("bye").build()), cb, rootObject);
@@ -461,5 +463,10 @@ class ModelTest implements Serializable {
     @Test
     void partialInitializationWithNull() {
         assertThrows(NullPointerException.class, () -> new JPALazyDataModel<Integer>().partialInitialize(null));
+    }
+
+    @Test
+    void createInternalModelWithNull() {
+        assertThrows(NullPointerException.class, () -> JPAModelImpl.create(null));
     }
 }

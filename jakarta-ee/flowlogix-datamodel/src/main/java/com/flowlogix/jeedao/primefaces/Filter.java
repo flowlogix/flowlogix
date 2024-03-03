@@ -22,7 +22,6 @@ import jakarta.persistence.criteria.Root;
 import java.util.function.BiFunction;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Filter Hook
@@ -47,16 +46,12 @@ public interface Filter<TT> {
          * @param fp lambda to get the new Filter predicate
          * @return true if succeeded
          */
-        @SuppressWarnings({"unchecked", "EmptyBlock"})
+        @SuppressWarnings("unchecked")
         default <TT> boolean replaceFilter(String fieldName, BiFunction<Predicate, TT, Predicate> fp) {
             FilterColumnData elt = get(fieldName);
             if (elt != null && elt.getFilterValue() != null) {
-                if (elt.getFilterValue() instanceof String && isBlank((String) elt.getFilterValue())) {
-                    // do nothing if blank string
-                } else {
-                    return replace(fieldName, new FilterColumnData(elt.getFilterValue(),
-                            fp.apply(elt.getPredicate(), (TT) elt.getFilterValue()))) != null;
-                }
+                return replace(fieldName, new FilterColumnData(elt.getFilterValue(),
+                        fp.apply(elt.getPredicate(), (TT) elt.getFilterValue()))) != null;
             }
             return false;
         }

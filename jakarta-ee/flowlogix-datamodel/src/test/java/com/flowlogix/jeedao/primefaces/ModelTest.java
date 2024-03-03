@@ -54,6 +54,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.primefaces.model.FilterMeta.GLOBAL_FILTER_KEY;
 import static org.primefaces.model.SortOrder.ASCENDING;
 import static org.primefaces.model.SortOrder.DESCENDING;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -199,12 +200,14 @@ class ModelTest implements Serializable {
                 .entityManager(() -> em)
                 .entityClass(Object.class)
                 .converter(s -> new Object())
-                .filter(ModelTest::filter)
+                .filter((filterData, cb, root) -> filterData.replaceFilter(GLOBAL_FILTER_KEY,
+                        (predicate, value) -> cb.isTrue(predicate)))
                 .build();
         when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
-        var fm = FilterMeta.builder().field("aaa").filterValue("hello").build();
+        var fm = FilterMeta.builder().field("ccc").filterValue("hello").build();
         impl.getFilters(Map.of("bbb", fm), cb, rootObject);
-        verify(rootObject).get("test");
+        var fm2 = FilterMeta.of(null, null);
+        impl.getFilters(Map.of("bbb", fm2), cb, rootObject);
     }
 
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {

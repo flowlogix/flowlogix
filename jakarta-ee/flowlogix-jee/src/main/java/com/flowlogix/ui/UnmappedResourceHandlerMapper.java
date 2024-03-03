@@ -33,10 +33,12 @@ import org.omnifaces.resourcehandler.UnmappedResourceHandler;
  */
 @WebListener
 public class UnmappedResourceHandlerMapper implements ServletContextListener {
+    static final String COM_FLOWLOGIX_ADD_UNMAPPED_RESOURCES = "com.flowlogix.add-unmapped-resources";
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         if (Boolean.parseBoolean(sce.getServletContext()
-                .getInitParameter("com.flowlogix.add-unmapped-resources"))) {
+                .getInitParameter(COM_FLOWLOGIX_ADD_UNMAPPED_RESOURCES))) {
             getFacesServlet(sce.getServletContext()).ifPresent(faces -> faces
                     .addMapping(jakartify(ResourceHandler.RESOURCE_IDENTIFIER) + "/*"));
         }

@@ -193,6 +193,20 @@ class ModelTest implements Serializable {
         verify(rootInteger).get("aaa");
     }
 
+    @Test
+    void missingFilter() {
+        var impl = JPAModelImpl.builder()
+                .entityManager(() -> em)
+                .entityClass(Object.class)
+                .converter(s -> new Object())
+                .filter(ModelTest::filter)
+                .build();
+        when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
+        var fm = FilterMeta.builder().field("aaa").filterValue("hello").build();
+        impl.getFilters(Map.of("bbb", fm), cb, rootObject);
+        verify(rootObject).get("test");
+    }
+
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {
         assertTrue(filterData.replaceFilter("aaa",
                 (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value)));

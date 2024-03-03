@@ -19,6 +19,7 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
+import lombok.NoArgsConstructor;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
@@ -28,7 +29,8 @@ import java.util.List;
  */
 @Dependent
 @SuppressWarnings("HideUtilityClassConstructor")
-public class DataModelProducer {
+@NoArgsConstructor
+class DataModelProducer {
     @Produces
     @Default
     @LazyModelConfig

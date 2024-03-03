@@ -18,18 +18,29 @@ package com.flowlogix.jeedao.primefaces.internal;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.primefaces.model.FilterMeta;
+import java.util.Collection;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.primefaces.model.MatchMode.ENDS_WITH;
+import static org.primefaces.model.MatchMode.EXACT;
+import static org.primefaces.model.MatchMode.GLOBAL;
+import static org.primefaces.model.MatchMode.IN;
+import static org.primefaces.model.MatchMode.NOT_CONTAINS;
 import static org.primefaces.model.MatchMode.NOT_ENDS_WITH;
+import static org.primefaces.model.MatchMode.NOT_EQUALS;
+import static org.primefaces.model.MatchMode.NOT_IN;
 import static org.primefaces.model.MatchMode.NOT_STARTS_WITH;
 import static org.primefaces.model.MatchMode.STARTS_WITH;
 
@@ -39,6 +50,10 @@ class PredicateFromFilterTest {
     private CriteriaBuilder cb;
     @Mock
     private Expression<?> expression;
+    @Mock
+    private Expression<String> stringExpression;
+    @Mock
+    private Predicate predicate;
     @Mock
     private EntityManager em;
 
@@ -58,7 +73,8 @@ class PredicateFromFilterTest {
         model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
                 .matchMode(STARTS_WITH).build(), "abc");
         verify(cb).like(any(), eq("abc%"));
-        verifyNoMoreInteractions(cb);
+        verify(expression).as(String.class);
+        verifyNoMoreInteractions(cb, expression);
     }
 
     @Test
@@ -66,7 +82,8 @@ class PredicateFromFilterTest {
         model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
                 .matchMode(NOT_STARTS_WITH).build(), "abc");
         verify(cb).notLike(any(), eq("abc%"));
-        verifyNoMoreInteractions(cb);
+        verify(expression).as(String.class);
+        verifyNoMoreInteractions(cb, expression);
     }
 
     @Test
@@ -74,7 +91,8 @@ class PredicateFromFilterTest {
         model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
                 .matchMode(ENDS_WITH).build(), "abc");
         verify(cb).like(any(), eq("%abc"));
-        verifyNoMoreInteractions(cb);
+        verify(expression).as(String.class);
+        verifyNoMoreInteractions(cb, expression);
     }
 
     @Test
@@ -82,6 +100,66 @@ class PredicateFromFilterTest {
         model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
                 .matchMode(NOT_ENDS_WITH).build(), "abc");
         verify(cb).notLike(any(), eq("%abc"));
+        verify(expression).as(String.class);
+        verifyNoMoreInteractions(cb, expression);
+    }
+
+    @Test
+    void notContains() {
+        model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
+                .matchMode(NOT_CONTAINS).build(), "abc");
+        verify(cb).notLike(any(), eq("%abc%"));
+        verify(expression).as(String.class);
+        verifyNoMoreInteractions(cb, expression);
+    }
+
+    @Test
+    void exact() {
+        model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
+                .matchMode(EXACT).build(), "abc");
+        verify(cb).equal(any(), eq("abc"));
+        verifyNoMoreInteractions(cb, expression);
+    }
+
+    @Test
+    void notEqual() {
+        model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
+                .matchMode(NOT_EQUALS).build(), "abc");
+        verify(cb).notEqual(any(), eq("abc"));
+        verifyNoMoreInteractions(cb, expression);
+    }
+
+    @Test
+    void in() {
+        model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
+                .matchMode(IN).build(), List.of("abc"));
+        verify(cb).equal(any(), eq("abc"));
+        verifyNoMoreInteractions(cb, expression);
+    }
+
+    @Test
+    void notInSingle() {
+        model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
+                .matchMode(NOT_IN).build(), List.of("abc"));
+        verify(cb).notEqual(any(), eq("abc"));
+        verifyNoMoreInteractions(cb, expression);
+    }
+
+    @Test
+    void notInMultiple() {
+        when(stringExpression.in(any(Collection.class))).thenReturn(predicate);
+        model.predicateFromFilter(cb, stringExpression, FilterMeta.builder().field("aaa")
+                .matchMode(NOT_IN).build(), List.of("abc", "def"));
+        verify(stringExpression).in(List.of("abc", "def"));
+        verify(stringExpression.in(List.of())).not();
+        verifyNoMoreInteractions(cb, stringExpression);
+    }
+
+    @Test
+    void globalFilter() {
+        assertThrows(UnsupportedOperationException.class, () ->
+                model.predicateFromFilter(cb, expression, FilterMeta.builder().field("globalFilter")
+                        .matchMode(GLOBAL).build(), "abc"));
         verifyNoMoreInteractions(cb);
     }
 }

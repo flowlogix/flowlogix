@@ -23,9 +23,9 @@ import org.junit.jupiter.api.Test;
  *
  * @author lprimak
  */
-public class LazyTest {
+class LazyTest {
     @Test
-    public void lazy() {
+    void lazy() {
         LazyExample example = new LazyExample();
         assertEquals(1, example.numInitialized.get());
         example.usingLazy();

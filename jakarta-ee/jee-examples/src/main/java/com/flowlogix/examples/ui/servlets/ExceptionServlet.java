@@ -42,19 +42,19 @@ public class ExceptionServlet extends HttpServlet {
         resp.setContentType(TEXT_PLAIN);
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        LogRecord record = LogCapture.get().poll();
-        while (record != null) {
-            if (record.getThrown() != null) {
-                var thrownString = record.getThrown().toString();
+        LogRecord logRecord = LogCapture.get().poll();
+        while (logRecord != null) {
+            if (logRecord.getThrown() != null) {
+                var thrownString = logRecord.getThrown().toString();
                 if (thrownString.contains("Unsupported class file major version")
-                    || record.getMessage().contains("class was compiled with an unsupported JDK")) {
+                    || logRecord.getMessage().contains("class was compiled with an unsupported JDK")) {
                     // do not report outdated ASM class file errors
                 } else {
-                    out.printf("%s: %s", record.getLevel(), thrownString);
+                    out.printf("%s: %s", logRecord.getLevel(), thrownString);
                     out.print(System.lineSeparator());
                 }
             }
-            record = LogCapture.get().poll();
+            logRecord = LogCapture.get().poll();
         }
         out.flush();
     }

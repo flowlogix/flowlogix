@@ -447,4 +447,19 @@ class ModelTest implements Serializable {
         assertThrows(IllegalStateException.class, () -> model.partialInitialize(builder -> builder.build()));
         assertEquals(Integer.class, model.getEntityClass());
     }
+
+    @Test
+    void createNullModel() {
+        assertThrows(NullPointerException.class, () -> JPALazyDataModel.create(null));
+    }
+
+    @Test
+    void initializeNullModel() {
+        assertThrows(NullPointerException.class, () -> new JPALazyDataModel<Integer>().initialize(null));
+    }
+
+    @Test
+    void partialInitializationWithNull() {
+        assertThrows(NullPointerException.class, () -> new JPALazyDataModel<Integer>().partialInitialize(null));
+    }
 }

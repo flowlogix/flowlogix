@@ -114,10 +114,25 @@ class PredicateFromFilterTest {
     }
 
     @Test
-    void exact() {
+    void exactWithoutWildcard() {
         model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
                 .matchMode(EXACT).build(), "abc");
         verify(cb).equal(any(), eq("abc"));
+        verifyNoMoreInteractions(cb, expression);
+    }
+
+    @Test
+    void exactWithWildcard() {
+        model = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .wildcardSupport(true)
+                .build();
+        model.predicateFromFilter(cb, expression, FilterMeta.builder().field("aaa")
+                .matchMode(EXACT).build(), "abc");
+        verify(cb).equal(any(), eq("abc"));
+        verify(expression).as(String.class);
         verifyNoMoreInteractions(cb, expression);
     }
 

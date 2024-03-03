@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -389,7 +389,7 @@ class ModelTest implements Serializable {
         verify(rootInteger).get("optimizer");
     }
 
-    Function<TypedQuery<Integer>, TypedQuery<Integer>> optimize() {
+    UnaryOperator<TypedQuery<Integer>> optimize() {
         return NonSerializableRequestScopedMock.INSTANCE.get()::optimizeQuery;
     }
 

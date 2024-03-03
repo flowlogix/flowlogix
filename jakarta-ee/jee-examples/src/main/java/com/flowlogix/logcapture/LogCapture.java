@@ -74,10 +74,10 @@ public final class LogCapture {
         }
 
         @Override
-        public void publish(LogRecord record) {
+        public void publish(LogRecord logRecord) {
             // the below line is if integrating with Payara due to race condition
-//            records.offer(new GFLogRecord(record));
-            records.offer(record);
+//            records.offer(new GFLogRecord(logRecord));
+            records.offer(logRecord);
             if (records.size() > capacity) {
                 records.poll();
             }
@@ -85,10 +85,12 @@ public final class LogCapture {
 
         @Override
         public void flush() {
+            // no-op
         }
 
         @Override
         public void close() throws SecurityException {
+            // no-op
         }
     }
 }

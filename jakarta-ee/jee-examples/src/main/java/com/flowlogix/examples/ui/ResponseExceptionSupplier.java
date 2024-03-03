@@ -32,6 +32,7 @@ public class ResponseExceptionSupplier implements PhaseListener {
 
     @Override
     public void afterPhase(PhaseEvent event) {
+        // nothing to do
     }
 
     @Override

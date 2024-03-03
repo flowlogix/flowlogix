@@ -64,7 +64,7 @@ public class UserViewer implements Serializable {
     }
 
     private static void sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
-        sortData.applicationSort(UserEntity_.address.getName(), var -> cb.asc(root.get(UserEntity_.address)));
+        sortData.applicationSort(UserEntity_.address.getName(), sortMeta -> cb.asc(root.get(UserEntity_.address)));
     }
 
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<UserEntity> root) {

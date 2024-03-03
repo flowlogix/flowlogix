@@ -52,10 +52,10 @@ public interface Sorter<TT> {
          * Sort based on fields, the map key is equivalent to {@link SortMeta#getField()}
          */
         @Getter
-        private final Map<String, MergedSortOrder> sortData;
+        private final Map<String, MergedSortOrder> sortOrder;
 
         public SortData(Map<String, SortMeta> sm) {
-            sortData = sm.values().stream().sorted()
+            sortOrder = sm.values().stream().sorted()
                     .collect(Collectors.toMap(SortMeta::getField, value ->
                                     new MergedSortOrder(value, null, false),
                             (v1, v2) -> v1, LinkedHashMap::new));
@@ -85,7 +85,7 @@ public interface Sorter<TT> {
          */
         public void applicationSort(String fieldName, boolean highPriority,
                                     Function<Optional<SortMeta>, Order> fp) {
-            getSortData().compute(fieldName, (key, value) -> new MergedSortOrder(null,
+            getSortOrder().compute(fieldName, (key, value) -> new MergedSortOrder(null,
                     Objects.requireNonNull(fp.apply(Optional.ofNullable(value != null
                                     ? value.getRequestedSortMeta() : null)),
                             "Sort Criteria cannot be null"), highPriority));
@@ -108,7 +108,7 @@ public interface Sorter<TT> {
 
     /**
      * Hook for sort criteria manipulation. Application can inspect or remove elements
-     * from the {@link SortData#sortData} map and add your own sort order
+     * from the {@link SortData#sortOrder} map and add your own sort order
      * via {@link SortData#applicationSort(String, Function)} method
      *
      * @param sortData merged sort criteria

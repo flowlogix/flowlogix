@@ -23,7 +23,7 @@ import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class ShrinkWrapManipulatorTest {
+class ShrinkWrapManipulatorTest {
     @Test
     void httpsUrl() throws MalformedURLException {
         var httpsUrl = ShrinkWrapManipulator.toHttpsURL(URI.create("http://localhost:1234").toURL());

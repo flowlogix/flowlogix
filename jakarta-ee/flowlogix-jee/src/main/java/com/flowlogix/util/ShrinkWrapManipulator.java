@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -93,7 +93,7 @@ public class ShrinkWrapManipulator {
      * @param <TT> ShrinkWrap archive type
      */
     public static <TT extends Archive<TT>>
-    TT createDeployment(Class<TT> archiveType, Function<String, String> nameTransformer) {
+    TT createDeployment(Class<TT> archiveType, UnaryOperator<String> nameTransformer) {
         char firstLetter = archiveType.getSimpleName().toLowerCase().charAt(0);
         return createDeployment(archiveType, String.format("s%s.%car",
                 nameTransformer.apply(UUID.randomUUID().toString()), firstLetter));

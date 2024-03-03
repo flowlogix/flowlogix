@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author lprimak
  */
-public class MinimizedHandlerTest {
+class MinimizedHandlerTest {
     @Test
     void js() {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions("css, js, ts"));

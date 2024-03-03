@@ -55,6 +55,8 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings("HideUtilityClassConstructor")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TypeConverter {
+    private static final String PARSE = "parse";
+    private static final String PARSE_BOOLEAN = "parseBoolean";
     private static final MethodHandles.Lookup publicLookup = MethodHandles.publicLookup();
     private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
     private static final Map<Class<?>, MethodHandle> valueOfMethod = new ConcurrentHashMap<>();
@@ -69,13 +71,13 @@ public class TypeConverter {
             entry(short.class, value -> new Result(processNumbers(value), Short.class)),
             entry(Long.class, value -> new Result(processNumbers(value), Long.class)),
             entry(long.class, value -> new Result(processNumbers(value), Long.class)),
-            entry(Boolean.class, value -> new Result(value, boolean.class, "parseBoolean", Boolean.class)),
-            entry(boolean.class, value -> new Result(value, boolean.class, "parseBoolean", Boolean.class)),
+            entry(Boolean.class, value -> new Result(value, boolean.class, PARSE_BOOLEAN, Boolean.class)),
+            entry(boolean.class, value -> new Result(value, boolean.class, PARSE_BOOLEAN, Boolean.class)),
             entry(BigInteger.class, value -> new Result(new BigInteger(value))),
             entry(BigDecimal.class, value -> new Result(new BigDecimal(value))),
-            entry(LocalDate.class, value -> new Result(value, "parse", CharSequence.class, LocalDate.class)),
-            entry(LocalTime.class, value -> new Result(value, "parse", CharSequence.class, LocalTime.class)),
-            entry(LocalDateTime.class, value -> new Result(value, "parse", CharSequence.class, LocalDateTime.class))
+            entry(LocalDate.class, value -> new Result(value, PARSE, CharSequence.class, LocalDate.class)),
+            entry(LocalTime.class, value -> new Result(value, PARSE, CharSequence.class, LocalTime.class)),
+            entry(LocalDateTime.class, value -> new Result(value, PARSE, CharSequence.class, LocalDateTime.class))
     );
 
     private static class Result {
@@ -156,7 +158,7 @@ public class TypeConverter {
             } catch (ClassNotFoundException e) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
-                pw.append(e.toString() + " Value: " + strValue + ", Type: " + type + ", Stack Trace: ");
+                pw.append(e + " Value: " + strValue + ", Type: " + type + ", Stack Trace: ");
                 e.printStackTrace(pw);
                 pw.flush();
                 log.warn(sw.toString());
@@ -210,6 +212,7 @@ public class TypeConverter {
                 return new CheckedValue<>(true, cv);
             }
         } catch (IllegalArgumentException e) {
+            log.debug("Conversion failed", e);
         }
         return new CheckedValue<>(false, cv);
     }
@@ -238,20 +241,12 @@ public class TypeConverter {
 
     @SuppressWarnings("MissingSwitchDefault")
     private static String processNumbers(String strValue) {
-        switch (strValue) {
-            case "nan":
-                strValue = "NaN";
-                break;
-            case "inf":
-                strValue = "Infinity";
-                break;
-            case "-inf":
-                strValue = "-Infinity";
-                break;
-            case "":
-                strValue = "0";
-                break;
-        }
-        return strValue;
+        return switch (strValue) {
+            case "nan" -> "NaN";
+            case "inf" -> "Infinity";
+            case "-inf" -> "-Infinity";
+            case "" -> "0";
+            default -> strValue;
+        };
     }
 }

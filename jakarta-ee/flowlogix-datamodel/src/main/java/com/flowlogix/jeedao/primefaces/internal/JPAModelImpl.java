@@ -44,6 +44,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.convert.Converter;
 import jakarta.persistence.EntityManager;
@@ -69,6 +70,7 @@ import org.omnifaces.util.Lazy;
 import org.omnifaces.util.Lazy.SerializableSupplier;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
+import org.primefaces.model.SortOrder;
 import org.primefaces.util.Constants;
 
 /**
@@ -121,7 +123,7 @@ public class JPAModelImpl<TT> implements Serializable {
      * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.OptimizingDataModel" region = "optimizing"}
      */
     @Default
-    private final transient @Getter @NonNull Function<TypedQuery<TT>, TypedQuery<TT>> optimizer = a -> a;
+    private final transient @Getter @NonNull UnaryOperator<TypedQuery<TT>> optimizer = a -> a;
 
     /**
      * Specifies whether String filters are case-sensitive
@@ -171,9 +173,8 @@ public class JPAModelImpl<TT> implements Serializable {
      * @param initializer
      * @return
      * @param <TT>
-     * @param <KK>
      */
-    public static <TT, KK> JPAModelImpl<TT> create(@NonNull BuilderInitializer<TT> initializer) {
+    public static <TT> JPAModelImpl<TT> create(@NonNull BuilderInitializer<TT> initializer) {
         var builderInstance = JPAModelImpl.<TT>builder();
         if (initializer.partialBuilder != null) {
             initializer.partialBuilder.accept(builderInstance);
@@ -253,7 +254,7 @@ public class JPAModelImpl<TT> implements Serializable {
     public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
         var sortData = new SortData(sortCriteria);
         sorter.sort(sortData, cb, root);
-        return processSortMeta(sortData.getSortData(), cb, root);
+        return processSortOrder(sortData.getSortOrder(), cb, root);
     }
 
     /**
@@ -356,7 +357,7 @@ public class JPAModelImpl<TT> implements Serializable {
         private final String value;
         private final boolean hasWildcards;
 
-        private record WildcardValue(boolean hasWildcards, String value) { };
+        private record WildcardValue(boolean hasWildcards, String value) { }
 
         ExpressionEvaluator(CriteriaBuilder cb, Expression<?> expression, Object value) {
             WildcardValue wildcardValue = replaceWildcards(wildcardSupport, value.toString());
@@ -411,8 +412,7 @@ public class JPAModelImpl<TT> implements Serializable {
                 }
             case EQUALS:
                 return cb.equal(expression, filterValue);
-            case NOT_EXACT:
-            case NOT_EQUALS:
+            case NOT_EXACT, NOT_EQUALS:
                 return cb.notEqual(expression, filterValue);
             case IN:
                 return filterValueAsCollection.get().size() == 1
@@ -458,17 +458,14 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     @SuppressWarnings("MissingSwitchDefault")
-    private List<Order> processSortMeta(Map<String, MergedSortOrder> sortMeta, CriteriaBuilder cb, Root<TT> root) {
+    private List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta, CriteriaBuilder cb, Root<TT> root) {
         Deque<Order> sortMetaOrdering = new ArrayDeque<>();
         sortMeta.values().forEach(order -> {
             if (order.getRequestedSortMeta() != null) {
-                switch (order.getRequestedSortMeta().getOrder()) {
-                    case ASCENDING:
-                        sortMetaOrdering.add(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
-                        break;
-                    case DESCENDING:
-                        sortMetaOrdering.add(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
-                        break;
+                if (order.getRequestedSortMeta().getOrder() == SortOrder.ASCENDING) {
+                    sortMetaOrdering.add(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
+                } else if (order.getRequestedSortMeta().getOrder() == SortOrder.DESCENDING) {
+                    sortMetaOrdering.add(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
                 }
             } else if (order.getApplicationSort() != null) {
                 if (order.isHighPriority()) {

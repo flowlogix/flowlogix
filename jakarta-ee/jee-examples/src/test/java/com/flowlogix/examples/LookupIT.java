@@ -47,7 +47,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(ArquillianExtension.class)
 @SuppressWarnings("MagicNumber")
-public class LookupIT {
+class LookupIT {
     static final String DEPLOYMENT_NAME = "LookupIT";
     private JndiExample example;
 
@@ -64,7 +64,7 @@ public class LookupIT {
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_NAME)
-    public void happyPath() {
+    void happyPath() {
         assertEquals(5, example.getNumber());
         assertNotNull(example.getLocator().getObject(AnotherEJB.class), "should not be null");
         assertNotNull(example.createLocatorWithEnvironment().getObject(AnotherEJB.class), "should not be null");
@@ -73,7 +73,7 @@ public class LookupIT {
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_NAME)
-    public void unhappyPath() throws NamingException {
+    void unhappyPath() throws NamingException {
         assertNull(example.getLocator().getObject("hello"));
     }
 
@@ -81,7 +81,7 @@ public class LookupIT {
     @Timeout(10)
     @Tag("StressTest")
     @OperateOnDeployment(DEPLOYMENT_NAME)
-    public void stressTest() throws InterruptedException {
+    void stressTest() throws InterruptedException {
         ExecutorService exec = Executors.newFixedThreadPool(50
                 * Runtime.getRuntime().availableProcessors());
         AtomicBoolean failed = new AtomicBoolean();

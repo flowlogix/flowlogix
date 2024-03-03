@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -196,18 +197,27 @@ class ModelTest implements Serializable {
 
     @Test
     void missingFilter() {
+        var clearFilters = new AtomicBoolean(false);
         var impl = JPAModelImpl.builder()
                 .entityManager(() -> em)
                 .entityClass(Object.class)
                 .converter(s -> new Object())
                 .filter((filterData, cb, root) -> filterData.replaceFilter(GLOBAL_FILTER_KEY,
-                        (predicate, value) -> cb.isTrue(predicate)))
+                        (predicate, value) -> {
+                            if (clearFilters.get()) {
+                                filterData.clear();
+                            }
+                            return cb.isTrue(predicate);
+                        }))
                 .build();
         when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
         var fm = FilterMeta.builder().field("ccc").filterValue("hello").build();
         impl.getFilters(Map.of("bbb", fm), cb, rootObject);
         var fm2 = FilterMeta.of(null, null);
         impl.getFilters(Map.of("bbb", fm2), cb, rootObject);
+        clearFilters.set(true);
+        impl.getFilters(Map.of("bbb", FilterMeta.builder().field(GLOBAL_FILTER_KEY)
+                .filterValue("bye").build()), cb, rootObject);
     }
 
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {

@@ -30,7 +30,7 @@ public class LazyExample {
         Expensive() {
             numInitialized.incrementAndGet();
         }
-    };
+    }
 
     // without Lazy
     private final Expensive expensiveInitialization = new Expensive();

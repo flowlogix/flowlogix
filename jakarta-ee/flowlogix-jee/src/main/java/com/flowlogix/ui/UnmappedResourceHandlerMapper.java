@@ -44,6 +44,7 @@ public class UnmappedResourceHandlerMapper implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        // nothing to do
     }
 
     private Optional<? extends ServletRegistration> getFacesServlet(ServletContext ctx) {

@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Timeout;
  *
  * @author lprimak
  */
-public class LazyTest {
+class LazyTest {
     private final AtomicInteger numCreations = new AtomicInteger();
 
     @BeforeEach

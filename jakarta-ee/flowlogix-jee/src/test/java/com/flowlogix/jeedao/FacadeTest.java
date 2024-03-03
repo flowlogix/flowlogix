@@ -44,7 +44,7 @@ import static org.mockito.Mockito.withSettings;
  *
  * @author lprimak
  */
-public class FacadeTest implements Serializable {
+class FacadeTest implements Serializable {
     private final EntityManager em = mock(EntityManager.class, withSettings().serializable()
             .defaultAnswer(RETURNS_DEEP_STUBS));
     class MyControl implements Serializable {
@@ -87,7 +87,8 @@ public class FacadeTest implements Serializable {
     @Test
     void findEntityManager() {
         try (var mock = mockStatic(Beans.class)) {
-            assertThrows(IllegalStateException.class, () -> DaoHelper.findEntityManager().get());
+            var entityManager = DaoHelper.findEntityManager();
+            assertThrows(IllegalStateException.class, entityManager::get);
         }
     }
 

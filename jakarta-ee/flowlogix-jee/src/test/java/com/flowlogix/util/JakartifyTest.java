@@ -22,7 +22,7 @@ import static com.flowlogix.util.JakartaTransformerUtils.isJakarta;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JakartifyTest {
+class JakartifyTest {
     @Test
     void checkJakarta() {
         assertTrue(isJakarta());

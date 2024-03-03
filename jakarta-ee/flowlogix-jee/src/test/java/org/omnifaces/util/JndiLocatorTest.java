@@ -49,7 +49,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.MockedConstruction;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.when;
@@ -59,7 +58,7 @@ import org.omnifaces.util.JNDIObjectLocator.JNDIObjectLocatorBuilder;
  *
  * @author lprimak
  */
-public class JndiLocatorTest {
+class JndiLocatorTest {
     private JNDIObjectLocator locator;
 
     @BeforeEach
@@ -146,10 +145,10 @@ public class JndiLocatorTest {
                 (icObject, context) -> {
                     // the '$' denotes inner class
                     // i.e. java:module/JndiLocatorTest$Test!com.flowlogix.jndi.JndiLocatorTest$TestLocal
-                    when(icObject.lookup(eq(String.format("java:module/%s$Test!%s$TestLocal",
-                            getClass().getSimpleName(), getClass().getName())))).thenReturn(new TestLocal());
-                    when(icObject.lookup(eq(String.format("java:module/%s$Test!%s$TestRemote",
-                            getClass().getSimpleName(), getClass().getName())))).thenReturn(new TestRemote());
+                    when(icObject.lookup(String.format("java:module/%s$Test!%s$TestLocal",
+                            getClass().getSimpleName(), getClass().getName()))).thenReturn(new TestLocal());
+                    when(icObject.lookup(String.format("java:module/%s$Test!%s$TestRemote",
+                            getClass().getSimpleName(), getClass().getName()))).thenReturn(new TestRemote());
                 })) {
             assertEquals(TestLocal.class, locator.getObject(TestLocal.class).getClass());
             assertEquals(TestRemote.class, locator.getObject(TestRemote.class).getClass());
@@ -188,15 +187,15 @@ public class JndiLocatorTest {
         AtomicInteger numInvocations = new AtomicInteger();
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
                 (icObject, context) -> {
-                    when(icObject.lookup(eq("hello"))).thenAnswer(iom -> {
+                    when(icObject.lookup("hello")).thenAnswer(iom -> {
                         numInvocations.incrementAndGet();
                         return result;
                     });
-                    when(icObject.lookup(eq("hello2"))).thenAnswer(iom -> {
+                    when(icObject.lookup("hello2")).thenAnswer(iom -> {
                         numInvocations.incrementAndGet();
                         return result;
                     });
-                    when(icObject.lookup(eq("exception"))).thenThrow(NamingException.class);
+                    when(icObject.lookup("exception")).thenThrow(NamingException.class);
                 })) {
             assertEquals(result, locator.getObjectNoCache("hello"));
             assertTrue(locator.getJNDIObjectCache().isEmpty(), "cache should be empty");
@@ -228,15 +227,15 @@ public class JndiLocatorTest {
         TestLocal result = new TestLocal();
         try (MockedConstruction<InitialContext> mocked = mockConstruction(InitialContext.class,
                 (icObject, context) -> {
-                    when(icObject.lookup(eq("hello"))).thenAnswer(iom -> {
+                    when(icObject.lookup("hello")).thenAnswer(iom -> {
                         numInvocations.incrementAndGet();
                         return result;
                     });
-                    when(icObject.lookup(eq("hello2"))).thenAnswer(iom -> {
+                    when(icObject.lookup("hello2")).thenAnswer(iom -> {
                         numInvocations.incrementAndGet();
                         return result;
                     });
-                    when(icObject.lookup(eq("exception"))).thenThrow(NamingException.class);
+                    when(icObject.lookup("exception")).thenThrow(NamingException.class);
                 })) {
             assertEquals(result, locator.getObjectNoCache("hello"));
             assertTrue(locator.getJNDIObjectCache().isEmpty(), "cache should be empty");

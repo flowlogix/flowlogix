@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author lprimak
  */
-public class TypeConverterTest {
+class TypeConverterTest {
     @Test
     @SuppressWarnings("MagicNumber")
     void natives() {

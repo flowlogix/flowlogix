@@ -95,7 +95,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     @SuppressWarnings("checkstyle:JavadocVariable")
     public enum FilterCaseConversion {
         UPPER, LOWER
-    };
+    }
 
     JPALazyDataModel<TT> partialInitialize(@NonNull PartialBuilderConsumer<TT> builder) {
         if (partialBuilder != null) {

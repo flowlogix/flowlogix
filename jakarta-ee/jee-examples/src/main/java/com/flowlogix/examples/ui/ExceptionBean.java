@@ -54,7 +54,7 @@ public class ExceptionBean implements Serializable {
     }
 
     public void success() {
-
+        // called from the page
     }
 
     public void invalidateSession() {

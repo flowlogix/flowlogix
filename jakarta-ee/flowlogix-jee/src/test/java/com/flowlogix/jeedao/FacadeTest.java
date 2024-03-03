@@ -93,6 +93,13 @@ class FacadeTest implements Serializable {
     }
 
     @Test
+    void findEntityManagerNullQualifiers() {
+        assertThrows(NullPointerException.class, () -> {
+            DaoHelper.findEntityManager(null);
+        });
+    }
+
+    @Test
     @SuppressWarnings({"unchecked", "MagicNumber"})
     void nativeQuery() {
         var query = mock(Query.class);
@@ -135,5 +142,19 @@ class FacadeTest implements Serializable {
         assertNotNull(mc.facade.em());
         assertEquals(5, mc.find(1L));
         assertNull(mc.find(2L));
+    }
+
+    @Test
+    void nullEntityManager() {
+        assertThrows(NullPointerException.class, () -> {
+            new DaoHelper<>(null, null);
+        });
+    }
+
+    @Test
+    void nullEntityClass() {
+        assertThrows(NullPointerException.class, () -> {
+            new DaoHelper<>(() -> em, null);
+        });
     }
 }

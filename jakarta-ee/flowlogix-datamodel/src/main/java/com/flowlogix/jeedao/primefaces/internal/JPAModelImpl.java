@@ -60,7 +60,6 @@ import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.PartialBuilderConsumer;
 import static java.lang.Math.toIntExact;
 import static lombok.Builder.Default;
-import lombok.Generated;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -387,8 +386,7 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     @SuppressWarnings({"CyclomaticComplexity", "ReturnCount", "MissingSwitchDefault"})
-    @Generated
-    private Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
+    Predicate predicateFromFilter(CriteriaBuilder cb, Expression<?> expression,
             FilterMeta filter, Object filterValue) {
         var stringExpression = new Lazy<>(() -> new ExpressionEvaluator(cb, expression, filterValue));
         Lazy<Collection<?>> filterValueAsCollection = new Lazy<>(() -> (Collection<?>) filterValue);
@@ -431,8 +429,7 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     @SuppressWarnings("MissingSwitchDefault")
-    @Generated
-    private <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
+    <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
             Expression<TC> objectExpression, FilterMeta filter, TC filterValue, Object filterValueCollection) {
         @SuppressWarnings("unchecked")
         Lazy<Collection<TC>> filterValueAsCollection = new Lazy<>(() -> (Collection<TC>) filterValueCollection);

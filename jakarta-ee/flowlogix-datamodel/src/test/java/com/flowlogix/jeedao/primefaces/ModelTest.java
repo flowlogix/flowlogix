@@ -70,7 +70,7 @@ import org.primefaces.model.SortMeta;
  */
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("MagicNumber")
-public class ModelTest implements Serializable {
+class ModelTest implements Serializable {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS, serializable = true)
     EntityManager em;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -338,6 +338,7 @@ public class ModelTest implements Serializable {
         verify(converter).getAsObject(any(), any(), eq("xxx"));
     }
 
+    @SuppressWarnings("checkstyle:RedundantModifier")
     public static class MyEntity {
         final Long id;
         public MyEntity() {

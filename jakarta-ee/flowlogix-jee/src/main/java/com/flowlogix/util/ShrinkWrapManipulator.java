@@ -17,7 +17,9 @@ package com.flowlogix.util;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +27,9 @@ import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -70,8 +74,8 @@ public class ShrinkWrapManipulator {
     static final String DEFAULT_SSL_PROPERTY = "sslPort";
     static final int DEFAULT_SSL_PORT = 8181;
 
-    private final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
-    private final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
+    final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
+    final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
 
     /**
      * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
@@ -160,7 +164,7 @@ public class ShrinkWrapManipulator {
      * @param defaultPort
      * @return https URL
      */
-    @SneakyThrows
+    @SneakyThrows({URISyntaxException.class, MalformedURLException.class})
     public static URL toHttpsURL(URL httpUrl, String sslPortPropertyName, int defaultPort) {
         if (httpUrl.getProtocol().endsWith("s")) {
             return httpUrl;
@@ -199,23 +203,27 @@ public class ShrinkWrapManipulator {
         for (Action action : actions) {
             var expr = xpath.compile(action.path);
             Node node = (Node) expr.evaluate(xmlDocument, XPathConstants.NODE);
-            if (node == null && action.optional) {
-                log.debug("Optional path {} ignored", action.path);
-            } else {
-                action.func.accept(node);
-            }
+            runActionOnNode(action, node);
         }
         StringWriter writer = new StringWriter();
         transformer.get().transform(new DOMSource(xmlDocument), new StreamResult(writer));
         return writer.getBuffer().toString();
     }
 
-    @SneakyThrows
+    static void runActionOnNode(Action action, Node node) {
+        if (node == null && action.optional) {
+            log.debug("Optional path {} ignored", action.path);
+        } else {
+            action.func.accept(node);
+        }
+    }
+
+    @SneakyThrows(ParserConfigurationException.class)
     private DocumentBuilder createDocumentBuilder() {
         return DocumentBuilderFactory.newInstance().newDocumentBuilder();
     }
 
-    @SneakyThrows
+    @SneakyThrows(TransformerConfigurationException.class)
     private Transformer createTransformer() {
         return TransformerFactory.newInstance().newTransformer();
     }

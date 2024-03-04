@@ -123,4 +123,30 @@ class TypeConverterTest {
         assertTrue(TypeConverter.checkType("true", boolean.class));
         assertFalse(TypeConverter.checkType("5", boolean.class));
     }
+
+    @Test
+    void valueOfNull() {
+        assertThrows(NullPointerException.class, () -> TypeConverter.valueOf(null, String.class));
+        assertThrows(NullPointerException.class, () -> TypeConverter.valueOf("abc", (Class<?>) null));
+
+        assertThrows(NullPointerException.class, () -> TypeConverter.valueOf(null, String.class.getName()));
+        assertThrows(NullPointerException.class, () -> TypeConverter.valueOf("abc", (String) null));
+
+        assertThrows(NullPointerException.class, () -> TypeConverter.checkType(null, String.class));
+        assertThrows(NullPointerException.class, () -> TypeConverter.checkType("abc", (Class<?>) null));
+
+        assertThrows(NullPointerException.class, () -> TypeConverter.checkAndConvert(null, String.class));
+        assertThrows(NullPointerException.class, () -> TypeConverter.checkAndConvert("abc", (Class<?>) null));
+    }
+
+    @Test
+    void stringShortcut() {
+        assertEquals("abc", TypeConverter.valueOf("abc", String.class.getName()));
+    }
+
+    @Test
+    void reflectiveException() {
+        class Value { }
+        assertThrows(IllegalAccessException.class, () -> TypeConverter.valueOf("abc", Value.class));
+    }
 }

@@ -27,7 +27,7 @@
 
         <eclipselink.version>4.0.2</eclipselink.version>
         <omnifaces.version>4.3</omnifaces.version>
-        <primefaces.version>13.0.6</primefaces.version>
+        <primefaces.version>13.0.7</primefaces.version>
     </properties>
 
     <scm>

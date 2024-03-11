@@ -298,7 +298,7 @@
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
-                    <version>8.0.0</version>
+                    <version>8.0.1</version>
                     <configuration>
                         <useNativeGit>false</useNativeGit>
                         <dotGitDirectory>${flowlogix.basedir}/.git</dotGitDirectory>

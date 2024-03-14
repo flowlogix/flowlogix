@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>7</version>
+        <version>8</version>
     </parent>
 
     <properties>
@@ -23,6 +23,9 @@
         <release.profiles>${release.profile},javadoc-release</release.profiles>
         <javadoc.title>${project.name}</javadoc.title>
         <javadoc.snippet.path>${snippet.path}:${flowlogix.basedir}/jakarta-ee/jee-examples/src/main/java</javadoc.snippet.path>
+        <base.directory.property>flowlogix.basedir</base.directory.property>
+        <base.directory.groupId>com.flowlogix</base.directory.groupId>
+        <base.directory.artifactId>flowlogix</base.directory.artifactId>
         <payara.start.disable>true</payara.start.disable>
 
         <eclipselink.version>4.0.2</eclipselink.version>
@@ -60,23 +63,6 @@
             <plugin>
                 <groupId>org.commonjava.maven.plugins</groupId>
                 <artifactId>directory-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <id>directories</id>
-                        <goals>
-                            <goal>directory-of</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <property>flowlogix.basedir</property>
-                            <project>
-                                <groupId>com.flowlogix</groupId>
-                                <artifactId>flowlogix</artifactId>
-                            </project>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>

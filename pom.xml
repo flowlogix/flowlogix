@@ -31,9 +31,6 @@
         <eclipselink.version>4.0.2</eclipselink.version>
         <omnifaces.version>4.3</omnifaces.version>
         <primefaces.version>13.0.7</primefaces.version>
-        <slf4j.version>2.0.12</slf4j.version>
-        <guava.version>33.1.0-jre</guava.version>
-        <commons-lang3.version>3.14.0</commons-lang3.version>
     </properties>
 
     <scm>

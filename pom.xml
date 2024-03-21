@@ -69,7 +69,7 @@
                     <dependency>
                         <groupId>org.apache.groovy</groupId>
                         <artifactId>groovy-all</artifactId>
-                        <version>${groovy.version}</version>
+                        <version>4.0.20</version>
                         <scope>runtime</scope>
                         <type>pom</type>
                     </dependency>

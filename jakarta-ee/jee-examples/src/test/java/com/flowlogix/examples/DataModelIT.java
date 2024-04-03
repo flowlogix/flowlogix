@@ -26,6 +26,7 @@ import static org.jboss.arquillian.graphene.Graphene.waitAjax;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  *
@@ -71,6 +73,7 @@ public class DataModelIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkPage() {
         webDriver.get(baseURL + "view-users");
+        waitGui(webDriver).until(ExpectedConditions.titleIs("View Users"));
         assertEquals("View Users", webDriver.getTitle());
         // sort
         guardAjax(userIdHeader.findElement(By.className("ui-column-title"))).click();

@@ -155,7 +155,6 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
-                            <arquillian.launch>${arquillian.launch}</arquillian.launch>
                             <integration.test.mode>${integration.test.mode}</integration.test.mode>
                             <webdriver.chrome.binary>${webdriver.chrome.binary}</webdriver.chrome.binary>
                             <webdriver.firefox.binary>${webdriver.firefox.binary}</webdriver.firefox.binary>

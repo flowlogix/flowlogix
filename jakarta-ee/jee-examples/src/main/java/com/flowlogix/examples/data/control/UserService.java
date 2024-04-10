@@ -16,7 +16,7 @@
 package com.flowlogix.examples.data.control;
 
 import com.flowlogix.examples.entities.UserEntity;
-import javax.ejb.Stateless;
+import jakarta.ejb.Stateless;
 import org.omnifaces.persistence.service.BaseEntityService;
 
 /**

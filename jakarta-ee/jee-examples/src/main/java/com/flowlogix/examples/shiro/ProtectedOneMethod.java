@@ -15,7 +15,7 @@
  */
 package com.flowlogix.examples.shiro;
 
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 import org.apache.shiro.authz.annotation.RequiresUser;
 
 /**

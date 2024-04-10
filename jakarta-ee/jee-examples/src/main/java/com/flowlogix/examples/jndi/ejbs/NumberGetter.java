@@ -15,9 +15,9 @@
  */
 package com.flowlogix.examples.jndi.ejbs;
 
-import javax.ejb.ConcurrencyManagement;
-import static javax.ejb.ConcurrencyManagementType.BEAN;
-import javax.ejb.Singleton;
+import jakarta.ejb.ConcurrencyManagement;
+import static jakarta.ejb.ConcurrencyManagementType.BEAN;
+import jakarta.ejb.Singleton;
 
 /**
  *

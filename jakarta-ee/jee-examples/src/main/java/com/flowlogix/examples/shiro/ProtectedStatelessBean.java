@@ -15,7 +15,7 @@
  */
 package com.flowlogix.examples.shiro;
 
-import javax.ejb.Stateless;
+import jakarta.ejb.Stateless;
 import org.apache.shiro.authz.annotation.RequiresUser;
 
 /**

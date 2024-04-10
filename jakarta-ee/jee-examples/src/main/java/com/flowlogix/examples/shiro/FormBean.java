@@ -16,7 +16,7 @@
 package com.flowlogix.examples.shiro;
 
 import com.flowlogix.shiro.ee.filters.Forms;
-import javax.enterprise.inject.Model;
+import jakarta.enterprise.inject.Model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

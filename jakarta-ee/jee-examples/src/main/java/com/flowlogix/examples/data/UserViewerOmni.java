@@ -19,12 +19,12 @@ import com.flowlogix.examples.data.control.UserService;
 import com.flowlogix.examples.entities.UserEntity;
 import java.io.Serializable;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.Getter;
 import org.omnifaces.optimusfaces.model.PagedDataModel;
 

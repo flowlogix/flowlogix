@@ -13,6 +13,7 @@
         <slf4j.version>2.0.12</slf4j.version>
         <junit.version>5.10.2</junit.version>
         <omnifaces.version>3.14.4</omnifaces.version>
+        <primefaces.version>13.0.7</primefaces.version>
         <shiro.version>2.0.0</shiro.version>
         <bytebuddy.version>1.14.13</bytebuddy.version>
     </properties>
@@ -70,7 +71,7 @@
             <dependency>
                 <groupId>org.primefaces</groupId>
                 <artifactId>primefaces</artifactId>
-                <version>13.0.7</version>
+                <version>${primefaces.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

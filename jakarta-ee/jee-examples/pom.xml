@@ -21,6 +21,7 @@
         <delombok.phase>generate-sources</delombok.phase>
         <javadoc.sourcepath>${project.build.directory}/generated-sources/annotations
             :${project.build.directory}/generated-sources/delombok</javadoc.sourcepath>
+        <payara.start.disable>${skipITs}</payara.start.disable>
         <arquillian.drone.version>2.5.6</arquillian.drone.version>
         <arquillian.graphene.version>2.5.4</arquillian.graphene.version>
         <arquillian.payara.version>3.0.alpha8</arquillian.payara.version>

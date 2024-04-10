@@ -16,3 +16,4 @@ target
 **.gradle
 **.sdkmanrc
 /docs/output
+.mvn/wrapper/maven-wrapper.jar

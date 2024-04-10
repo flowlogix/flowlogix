@@ -1,0 +1,3 @@
+# Add the following before the last java execution in mvnw:
+# . $MAVEN_PROJECTBASEDIR/.mvn/maven.args
+MAVEN_CONFIG="-s ${MAVEN_PROJECTBASEDIR}/.mvn/settings.xml -Dwebdriver.browser=firefox"

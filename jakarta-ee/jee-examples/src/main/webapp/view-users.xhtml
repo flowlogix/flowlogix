@@ -29,14 +29,6 @@
                 </p:column>
             </p:dataTable>
             <p/>
-            Data Table Omni Data Model
-            <o/>
-            <p:dataTable lazy="true" scrollRows="2" rows="3" scrollable="true" virtualScroll="true"
-                         scrollHeight="100" value="#{userViewerOmni.lazyModel}" var="user">
-                <p:column headerText="Full Name" sortBy="#{user.fullName}" filterBy="#{user.fullName}">
-                    <h:outputText value="#{user.fullName}" />
-                </p:column>
-            </p:dataTable>
         </h:form>
     </h:body>
 </html>

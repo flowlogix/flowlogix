@@ -26,6 +26,7 @@
         <arquillian.graphene.version>2.5.4</arquillian.graphene.version>
         <arquillian.payara.version>3.0.alpha8</arquillian.payara.version>
         <testcontainers.skip>true</testcontainers.skip>
+        <it.test.parallel>classes</it.test.parallel>
     </properties>
 
     <!-- tag::dependenciesStart[] -->

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 import javax.naming.NamingException;
+import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import lombok.Lombok;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -44,6 +45,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
  *
  * @author lprimak
  */
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
 @SuppressWarnings("MagicNumber")
 public class LookupIT {

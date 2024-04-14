@@ -18,6 +18,7 @@ package com.flowlogix.examples;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_PROD_MODE;
 import static com.flowlogix.util.ShrinkWrapManipulator.toHttpsURL;
 import java.net.URL;
+import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
@@ -36,6 +37,7 @@ import org.openqa.selenium.WebDriverException;
  *
  * @author lprimak
  */
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
 public class ShiroSSLFilterIT {

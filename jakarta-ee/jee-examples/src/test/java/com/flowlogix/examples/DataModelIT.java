@@ -17,6 +17,7 @@ package com.flowlogix.examples;
 
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import java.net.URL;
+import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
@@ -25,6 +26,7 @@ import static org.jboss.arquillian.graphene.Graphene.waitAjax;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -35,11 +37,13 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  *
  * @author lprimak
  */
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
 public class DataModelIT {
@@ -69,6 +73,7 @@ public class DataModelIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkPage() {
         webDriver.get(baseURL + "view-users");
+        waitGui(webDriver).until(ExpectedConditions.titleIs("View Users"));
         assertEquals("View Users", webDriver.getTitle());
         // sort
         guardAjax(userIdHeader.findElement(By.className("ui-column-title"))).click();

@@ -20,6 +20,7 @@ import static com.flowlogix.util.ShrinkWrapManipulator.isClientStateSavingIntegr
 import static com.flowlogix.util.ShrinkWrapManipulator.isShiroNativeSessionsIntegrationTest;
 import java.net.URL;
 import static org.apache.shiro.web.servlet.ShiroHttpSession.DEFAULT_SESSION_ID_NAME;
+import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
@@ -45,6 +46,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  *
  * @author lprimak
  */
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
 public class ShiroAuthFormsIT {

@@ -24,6 +24,9 @@
         <arquillian.version>1.8.0.Final</arquillian.version>
         <arquillian.drone.version>2.5.6</arquillian.drone.version>
         <arquillian.graphene.version>2.5.4</arquillian.graphene.version>
+        <arquillian.payara5.version>2.5</arquillian.payara5.version>
+        <testcontainers.skip>true</testcontainers.skip>
+        <payara.imageName>lprimak/payara-full:5-latest</payara.imageName>
     </properties>
 
     <dependencies>
@@ -115,6 +118,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.flowlogix.depchain</groupId>
+            <artifactId>integration-test</artifactId>
+            <version>3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.github.artsok</groupId>
             <artifactId>rerunner-jupiter</artifactId>
             <version>2.1.6</version>
@@ -135,7 +144,7 @@
         <dependency>
             <groupId>fish.payara.arquillian</groupId>
             <artifactId>arquillian-payara-server-remote</artifactId>
-            <version>2.5</version>
+            <version>${arquillian.payara5.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -219,4 +228,13 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>payara-docker</id>
+            <properties>
+                <testcontainers.skip>false</testcontainers.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>

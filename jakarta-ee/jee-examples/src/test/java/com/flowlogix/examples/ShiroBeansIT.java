@@ -19,6 +19,7 @@ import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static com.flowlogix.util.JakartaTransformerUtils.isJakarta;
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import java.net.URL;
+import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
@@ -44,6 +45,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  *
  * @author lprimak
  */
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
 public class ShiroBeansIT {

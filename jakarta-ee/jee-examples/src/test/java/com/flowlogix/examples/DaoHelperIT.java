@@ -17,6 +17,7 @@ package com.flowlogix.examples;
 
 import com.flowlogix.demo.jeedao.DaoHelperDemo;
 import com.flowlogix.demo.jeedao.UserDAO;
+import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import jakarta.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
 public class DaoHelperIT {
     @Inject

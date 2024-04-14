@@ -16,6 +16,7 @@
 package com.flowlogix.examples;
 
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
+import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
@@ -53,6 +54,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  *
  * @author lprimak
  */
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
 @RunAsClient

@@ -23,6 +23,7 @@ import java.util.Map;
 import com.flowlogix.demo.jeedao.primefaces.DataModelWrapper;
 import com.flowlogix.demo.jeedao.primefaces.InjectedDataModel;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import com.flowlogix.util.SerializeTester;
 import jakarta.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
 public class DataModelBackendIT {
     @Inject

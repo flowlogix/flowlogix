@@ -129,6 +129,7 @@
                         <exclude>com/flowlogix/examples/**</exclude>
                         <exclude>com/flowlogix/demo/**</exclude>
                         <exclude>com/flowlogix/logcapture/**</exclude>
+                        <exclude>com/flowlogix/testcontainers/**</exclude>
                     </excludes>
                     <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
                 </configuration>

@@ -219,7 +219,8 @@ public class ExceptionPageIT {
     static WebArchive createDeploymentDev(String archiveName) {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
-                .as(WebArchive.class);
+                .as(WebArchive.class)
+                .addClass(PayaraServerLifecycleExtension.class);
         new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
         return archive;
     }

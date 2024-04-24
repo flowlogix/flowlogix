@@ -18,8 +18,6 @@
         <maven.compiler.release>11</maven.compiler.release>
         <payara.version>5.2022.5</payara.version>
         <eclipselink.version>2.7.14</eclipselink.version>
-        <!-- Below is only until Graphene ByteBuddy PR is merged -->
-        <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <payara.start.disable>true</payara.start.disable>
     </properties>

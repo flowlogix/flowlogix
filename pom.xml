@@ -16,8 +16,6 @@
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
-        <!-- Below is only until Graphene ByteBuddy PR is merged -->
-        <jdk11FailsafeOptions>--add-opens java.base/java.lang=ALL-UNNAMED</jdk11FailsafeOptions>
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
 
         <release.profiles>${release.profile},javadoc-release</release.profiles>

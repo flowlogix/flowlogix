@@ -193,7 +193,7 @@ public class ExceptionPageIT {
             assertTrue(href.contains("v="), "not versioned");
             ++count;
         }
-        assertEquals(3, count);
+        assertEquals(5, count);
 
         count = 0;
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));

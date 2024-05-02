@@ -412,6 +412,7 @@ During direct creation, `JPALazyDataModel` only requires `entityClass` to work, 
 * sorter: Apply additional or replacement sort criteria
 * filter: Apply additional or replacement filter criteria
 * optimizer: Apply additional customizations to queries, such as JPA hints, works together with `JPAFinder`
+* resultEnricher: Apply transformation to the results of the query, such as adding or modifying resulting rows displayed by the model
 * converter: `Function` that converts String representation of a primary key into a primary key object. Needed only if the default is insufficient.
 * keyConverter: `Function` that converts an entity object into it's primary key in `String` form. Needed only if the default is insufficient.
 
@@ -431,13 +432,21 @@ include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/j
 ----
 https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[Full Demo on GitHub^]
 
-Optimizer hints can be used to fetch dependent entity relationships in batches. The `Function` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner:
+Optimizer hints can be used to fetch dependent entity relationships in batches. The `UnaryOperator` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner:
 [source,java]
 .Batch query of dependent entities using `IN` query
 ----
 include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[tags=optimized]
 ----
 https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[Full Demo on GitHub^]
+
+Results Enricher can be used to post-process the results of the query:
+[source,java]
+.Add a new row to the results
+----
+include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/EnrichedDataModel.java[tags=enriched]
+----
+https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/EnrichedDataModel.java[Full Demo on GitHub^]
 
 Let's select a specific entity manager for this particular data model, by using a CDI qualifier:
 [source,java]

@@ -123,6 +123,15 @@ public class DataModelBackendIT {
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     @SuppressWarnings("MagicNumber")
+    void enrichedDataModel() {
+        var rows = models.getEnriched().getUserModel().findRows(0, 3, Map.of(), Map.of());
+        assertEquals(4, rows.size());
+        assertEquals("Golden User", rows.get(3).getFullName());
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    @SuppressWarnings("MagicNumber")
     void converterModel() {
         var rows = models.getConverter().getUserModel().findRows(0, 100, Map.of(), Map.of());
         String binaryKey = Long.toBinaryString(rows.get(3).getId());

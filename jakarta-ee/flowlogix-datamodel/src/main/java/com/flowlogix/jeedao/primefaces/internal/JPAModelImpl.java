@@ -60,6 +60,7 @@ import lombok.Builder;
 import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.PartialBuilderConsumer;
 import static java.lang.Math.toIntExact;
+import static java.util.function.UnaryOperator.identity;
 import static lombok.Builder.Default;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -123,7 +124,13 @@ public class JPAModelImpl<TT> implements Serializable {
      * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.OptimizingDataModel" region = "optimizing"}
      */
     @Default
-    private final transient @Getter @NonNull UnaryOperator<TypedQuery<TT>> optimizer = a -> a;
+    private final transient @Getter @NonNull UnaryOperator<TypedQuery<TT>> optimizer = identity();
+
+    /**
+     * enriches the resulting model, by adding rows or post-processing columns
+     */
+    @Default
+    private final transient @Getter @NonNull UnaryOperator<List<TT>> resultEnricher = identity();
 
     /**
      * Specifies whether String filters are case-sensitive
@@ -194,9 +201,9 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        return optimizer.apply(
+        return resultEnricher.apply(optimizer.apply(
                 jpaFinder.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
-                        qc -> addToCriteria(qc, filters, sortMeta))).getResultList();
+                        qc -> addToCriteria(qc, filters, sortMeta))).getResultList());
     }
 
     public Supplier<EntityManager> getEntityManager() {

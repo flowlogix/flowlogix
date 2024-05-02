@@ -15,40 +15,35 @@
  */
 package com.flowlogix.demo.jeedao.primefaces;
 
+import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.viewscoped.ViewScoped;
+import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import lombok.Getter;
 import java.io.Serializable;
+import java.util.List;
 
+// @start region="enriched"
+// tag::enriched[] // @replace regex='.*\n' replacement=""
 @Named
 @ViewScoped
-@Getter
-public class DataModelWrapper implements Serializable {
+public class EnrichedDataModel implements Serializable {
     @Inject
-    BasicDataModel basic;
+    @Getter
+    JPALazyDataModel<UserEntity> userModel;
 
-    @Inject
-    DirectCreationDataModel direct;
+    @PostConstruct
+    void initialize() {
+        // enrich returned results from the model
+        userModel.initialize(builder -> builder.resultEnricher(EnrichedDataModel::addLastRow).build());
+    }
 
-    @Inject
-    ConverterDataModel converter;
-
-    @Inject
-    FilteringDataModel filtering;
-
-    @Inject
-    OptimizedDataModel optimized;
-
-    @Inject
-    EnrichedDataModel enriched;
-
-    @Inject
-    QualifiedDataModel qualified;
-
-    @Inject
-    SortingDataModel sorting;
-
-    @Inject
-    InvalidDataModel invalid;
+    private static List<UserEntity> addLastRow(List<UserEntity> list) {
+        list.add(UserEntity.builder().userId("golden").fullName("Golden User").build());
+        return list;
+    }
 }
+// end::enriched[] // @replace regex='.*\n' replacement=""
+// @end

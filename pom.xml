@@ -27,7 +27,7 @@
         <payara.start.disable>true</payara.start.disable>
 
         <eclipselink.version>4.0.2</eclipselink.version>
-        <omnifaces.version>4.4</omnifaces.version>
+        <omnifaces.version>4.4.1</omnifaces.version>
         <primefaces.version>14.0.0</primefaces.version>
     </properties>
 

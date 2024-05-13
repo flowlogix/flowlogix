@@ -11,7 +11,6 @@
 
     <properties>
         <slf4j.version>2.0.13</slf4j.version>
-        <junit.version>5.10.2</junit.version>
         <omnifaces.version>3.14.5</omnifaces.version>
         <shiro.version>2.0.0</shiro.version>
         <bytebuddy.version>1.14.15</bytebuddy.version>
@@ -26,30 +25,6 @@
     <dependencyManagement>
         <dependencies>
             <!-- test dependencies -->
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-params</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-junit-jupiter</artifactId>
-                <version>5.12.0</version>
-                <scope>test</scope>
-            </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>

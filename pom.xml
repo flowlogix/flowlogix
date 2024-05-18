@@ -172,7 +172,7 @@
                         <excludePackageNames>*.internal</excludePackageNames>
                         <links>
                             <link>${central.archive.url}/org/primefaces/primefaces/${primefaces.version}/primefaces-${primefaces.version}-javadoc.jar/!</link>
-                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/${omnifaces.version}</link>
+                            <link>${central.archive.url}/org/omnifaces/omnifaces/${omnifaces.version}/omnifaces-${omnifaces.version}-javadoc.jar/!</link>
                         </links>
                     </configuration>
                 </plugin>

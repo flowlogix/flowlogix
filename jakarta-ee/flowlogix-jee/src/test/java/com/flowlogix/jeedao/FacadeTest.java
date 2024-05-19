@@ -26,6 +26,7 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaQuery;
 import lombok.experimental.Delegate;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -72,7 +73,7 @@ class FacadeTest implements Serializable {
         assertEquals(Arrays.asList(1, 2), new MyControl().findRange(5, 7).getResultList());
 
         when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(2L);
-        assertEquals(2, new MyControl().count());
+        assertThat(new MyControl().count()).isEqualTo(2);
     }
 
     @Test

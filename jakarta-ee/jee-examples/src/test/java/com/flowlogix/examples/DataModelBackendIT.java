@@ -160,13 +160,15 @@ public class DataModelBackendIT {
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void nonDefaultInjectedModel() {
-        assertThat(injectedModel.getInjectedNonDefaultModel().getEntityManagerQualifiers().contains(NonDefault.class)).isTrue();
+        assertThat(injectedModel.getInjectedNonDefaultModel().getEntityManagerQualifiers()
+                .contains(NonDefault.class)).isTrue();
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void invalidInjectedModel() {
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> basicDataModel(models.getInvalid().getModel()));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> basicDataModel(models.getInvalid().getModel()));
     }
 
     @Test

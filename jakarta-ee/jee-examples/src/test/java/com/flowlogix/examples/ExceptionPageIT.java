@@ -112,7 +112,8 @@ public class ExceptionPageIT {
     void closedByInterrupted() {
         guardAjax(closedByIntrButton).click();
         assertThat(exceptionHeading.getText()).isEqualTo("Exception happened");
-        assertThat(exceptionTypeField.getText()).isEqualTo("Exception type: class java.nio.channels.ClosedByInterruptException");
+        assertThat(exceptionTypeField.getText())
+                .isEqualTo("Exception type: class java.nio.channels.ClosedByInterruptException");
         assertThat(getLastException(true)).isEqualTo("");
     }
 
@@ -150,7 +151,9 @@ public class ExceptionPageIT {
         }
         assertThat(exceptionString.matches(jakartify("""
                 ^WARNING: javax.faces.FacesException: #\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*""")
-                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\."))).as(String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match", exceptionString)).isTrue();
+                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\.")))
+                .as(String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match",
+                        exceptionString)).isTrue();
     }
 
     private String getLastException() {

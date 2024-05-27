@@ -33,8 +33,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -95,7 +95,7 @@ class PredicateFromFilterTest {
 
     @AfterAll
     static void checkExhaustiveMatchModes() {
-        assertEquals(0, untestedMatchModes.size(), "Not all match modes were tested: " + untestedMatchModes);
+        assertThat(untestedMatchModes.size()).as("Not all match modes were tested: " + untestedMatchModes).isEqualTo(0);
     }
 
     @Test
@@ -211,7 +211,7 @@ class PredicateFromFilterTest {
 
     @Test
     void globalFilter() {
-        assertThrows(UnsupportedOperationException.class, () ->
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() ->
                 model.predicateFromFilter(cb, expression, FilterMeta.builder().field("globalFilter")
                         .matchMode(GLOBAL).build(), "abc"));
         verifyNoMoreInteractions(cb);

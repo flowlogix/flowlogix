@@ -15,7 +15,7 @@
  */
 package com.flowlogix.examples;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 
@@ -27,8 +27,8 @@ class LazyTest {
     @Test
     void lazy() {
         LazyExample example = new LazyExample();
-        assertEquals(1, example.numInitialized.get());
+        assertThat(example.numInitialized.get()).isEqualTo(1);
         example.usingLazy();
-        assertEquals(2, example.numInitialized.get());
+        assertThat(example.numInitialized.get()).isEqualTo(2);
     }
 }

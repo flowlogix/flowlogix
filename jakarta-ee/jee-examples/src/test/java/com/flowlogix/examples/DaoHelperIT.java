@@ -26,7 +26,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
@@ -40,26 +40,26 @@ public class DaoHelperIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     @SuppressWarnings("MagicNumber")
     void extractedCountAndList() {
-        assertEquals(5, userDao.count());
-        assertEquals(userDao.extractedCountAndList("Cool Cousin"), userDao.countAndList("Cool Cousin"));
+        assertThat(userDao.count()).isEqualTo(5);
+        assertThat(userDao.countAndList("Cool Cousin")).isEqualTo(userDao.extractedCountAndList("Cool Cousin"));
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     @SuppressWarnings("MagicNumber")
     void demo() {
-        assertEquals(5, demo.count());
+        assertThat(demo.count()).isEqualTo(5);
         var users = demo.enhancedFind("Lovely Lady");
-        assertEquals(1, users.count());
+        assertThat(users.count()).isEqualTo(1);
         var user = users.list().stream().findFirst().orElseThrow();
-        assertEquals("jprimak", user.getUserId());
-        assertEquals(user.getFullName(), demo.findById(user.getId()).getFullName());
-        assertEquals(5, demo.injectedCount());
-        assertEquals(5, demo.inheritedCount());
-        assertEquals("anya", demo.nativeFind("""
+        assertThat(user.getUserId()).isEqualTo("jprimak");
+        assertThat(demo.findById(user.getId()).getFullName()).isEqualTo(user.getFullName());
+        assertThat(demo.injectedCount()).isEqualTo(5);
+        assertThat(demo.inheritedCount()).isEqualTo(5);
+        assertThat(demo.nativeFind("""
                         select * from userentity
                         where zipcode = 68502 order by userid limit 2""")
-                .getUserId());
+                .getUserId()).isEqualTo("anya");
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

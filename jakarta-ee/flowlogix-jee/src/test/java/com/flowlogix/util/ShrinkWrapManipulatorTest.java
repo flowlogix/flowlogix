@@ -36,9 +36,8 @@ import java.net.URI;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PORT;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.endsWith;
@@ -65,27 +64,27 @@ class ShrinkWrapManipulatorTest {
     @Test
     void httpsUrl() throws MalformedURLException {
         var httpsUrl = ShrinkWrapManipulator.toHttpsURL(URI.create("http://localhost:1234").toURL());
-        assertEquals(URI.create(String.format("https://localhost:%s", getPortFromProperty())).toURL(), httpsUrl);
+        assertThat(httpsUrl).isEqualTo(URI.create(String.format("https://localhost:%s", getPortFromProperty())).toURL());
     }
 
     @Test
     void alreadyHttpsUrl() throws MalformedURLException {
         var url = URI.create("https://localhost:1234").toURL();
         var httpsUrl = ShrinkWrapManipulator.toHttpsURL(url);
-        assertSame(url, httpsUrl);
+        assertThat(httpsUrl).isSameAs(url);
     }
 
     @Test
     void withoutPort() throws MalformedURLException {
         var httpsUrl = ShrinkWrapManipulator.toHttpsURL(URI.create("http://localhost").toURL());
-        assertEquals(URI.create(String.format("https://localhost:%s", getPortFromProperty())).toURL(), httpsUrl);
+        assertThat(httpsUrl).isEqualTo(URI.create(String.format("https://localhost:%s", getPortFromProperty())).toURL());
     }
 
     @Test
     void alreadyHttpsWithoutPort() throws MalformedURLException {
         var url = URI.create("https://localhost").toURL();
         var httpsUrl = ShrinkWrapManipulator.toHttpsURL(url);
-        assertSame(url, httpsUrl);
+        assertThat(httpsUrl).isSameAs(url);
     }
 
     @Test
@@ -102,7 +101,8 @@ class ShrinkWrapManipulatorTest {
 
     @Test
     void createDeploymentWithNull() {
-        assertThrows(NullPointerException.class, () -> ShrinkWrapManipulator.createDeployment(JavaArchive.class, (String) null));
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> ShrinkWrapManipulator.createDeployment(JavaArchive.class, (String) null));
     }
 
     @Test
@@ -111,7 +111,7 @@ class ShrinkWrapManipulatorTest {
         var url = URI.create("http://localhost:1234").toURL();
         try (var uriMock = mockConstruction(URI.class, (uri, context) -> when(uri.toURL())
                 .thenThrow(MalformedURLException.class))) {
-            assertThrows(MalformedURLException.class, () -> ShrinkWrapManipulator
+            assertThatExceptionOfType(MalformedURLException.class).isThrownBy(() -> ShrinkWrapManipulator
                     .toHttpsURL(url, "invalid", 1234));
         }
     }
@@ -121,7 +121,8 @@ class ShrinkWrapManipulatorTest {
         try (var docBuilder = mockStatic(DocumentBuilderFactory.class)) {
             docBuilder.when(DocumentBuilderFactory::newInstance).thenReturn(documentBuilderFactory);
             when(documentBuilderFactory.newDocumentBuilder()).thenThrow(ParserConfigurationException.class);
-            assertThrows(ParserConfigurationException.class, () -> new ShrinkWrapManipulator().builder.get());
+            assertThatExceptionOfType(ParserConfigurationException.class)
+                    .isThrownBy(() -> new ShrinkWrapManipulator().builder.get());
         }
     }
 
@@ -130,7 +131,8 @@ class ShrinkWrapManipulatorTest {
         try (var transformer = mockStatic(TransformerFactory.class)) {
             transformer.when(TransformerFactory::newInstance).thenReturn(transformerFactory);
             when(transformerFactory.newTransformer()).thenThrow(TransformerConfigurationException.class);
-            assertThrows(TransformerConfigurationException.class, () -> new ShrinkWrapManipulator().transformer.get());
+            assertThatExceptionOfType(TransformerConfigurationException.class)
+                    .isThrownBy(() -> new ShrinkWrapManipulator().transformer.get());
         }
     }
 
@@ -140,7 +142,8 @@ class ShrinkWrapManipulatorTest {
             docBuilder.when(DocumentBuilderFactory::newInstance).thenReturn(documentBuilderFactory);
             when(documentBuilderFactory.newDocumentBuilder()).thenReturn(documentBuilder);
             when(documentBuilder.parse(any(InputStream.class))).thenThrow(IOException.class);
-            assertThrows(IOException.class, () -> new ShrinkWrapManipulator().manipulateXml(javaArchive, null, "file"));
+            assertThatExceptionOfType(IOException.class)
+                    .isThrownBy(() -> new ShrinkWrapManipulator().manipulateXml(javaArchive, null, "file"));
         }
     }
 

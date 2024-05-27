@@ -32,14 +32,13 @@ import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -112,9 +111,9 @@ public class ExceptionPageIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void closedByInterrupted() {
         guardAjax(closedByIntrButton).click();
-        assertEquals("Exception happened", exceptionHeading.getText());
-        assertEquals("Exception type: class java.nio.channels.ClosedByInterruptException", exceptionTypeField.getText());
-        assertEquals("", getLastException(true));
+        assertThat(exceptionHeading.getText()).isEqualTo("Exception happened");
+        assertThat(exceptionTypeField.getText()).isEqualTo("Exception type: class java.nio.channels.ClosedByInterruptException");
+        assertThat(getLastException(true)).isEqualTo("");
     }
 
     @Test
@@ -125,34 +124,33 @@ public class ExceptionPageIT {
         webDriver.switchTo().alert().accept();
         if (!Boolean.parseBoolean(stateSaving.getText())) {
             waitForHttp(noAction).click();
-            assertEquals("Logged Out", isExpired.getText());
+            assertThat(isExpired.getText()).isEqualTo("Logged Out");
         }
         guardAjax(noAction).click();
-        assertEquals("Logged In", isExpired.getText());
+        assertThat(isExpired.getText()).isEqualTo("Logged In");
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void lateSqlThrow() {
         guardAjax(lateSqlThrow).click();
-        assertEquals("Exception happened", exceptionHeading.getText());
-        assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
+        assertThat(exceptionHeading.getText()).isEqualTo("Exception happened");
+        assertThat(exceptionTypeField.getText()).isEqualTo("Exception type: class java.sql.SQLException");
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void sqlThrowFromFacesMethod() {
         guardAjax(methodSqlThrow).click();
-        assertEquals("Exception happened", exceptionHeading.getText());
-        assertEquals("Exception type: class java.sql.SQLException", exceptionTypeField.getText());
+        assertThat(exceptionHeading.getText()).isEqualTo("Exception happened");
+        assertThat(exceptionTypeField.getText()).isEqualTo("Exception type: class java.sql.SQLException");
         String exceptionString = getLastException();
         while (exceptionString.startsWith("WARNING: java.io.IOException: Connection is closed")) {
             exceptionString = exceptionString.lines().skip(1).findFirst().orElseGet(this::getLastException);
         }
-        assertTrue(exceptionString.matches(jakartify("""
+        assertThat(exceptionString.matches(jakartify("""
                 ^WARNING: javax.faces.FacesException: #\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*""")
-                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\.")),
-                String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match", exceptionString));
+                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\."))).as(String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match", exceptionString)).isTrue();
     }
 
     private String getLastException() {
@@ -182,7 +180,7 @@ public class ExceptionPageIT {
 
     @SuppressWarnings("MagicNumber")
     private void versions(String expected) {
-        assertEquals(expected, endOfPage.getText());
+        assertThat(endOfPage.getText()).isEqualTo(expected);
         List<WebElement> scripts = webDriver.findElements(By.tagName("script"));
         int count = 0;
         for (WebElement script : scripts) {
@@ -190,10 +188,10 @@ public class ExceptionPageIT {
             if (StringUtils.isBlank(href)) {
                 continue;
             }
-            assertTrue(href.contains("v="), "not versioned");
+            assertThat(href.contains("v=")).as("not versioned").isTrue();
             ++count;
         }
-        assertEquals(5, count);
+        assertThat(count).isEqualTo(5);
 
         count = 0;
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));
@@ -202,10 +200,10 @@ public class ExceptionPageIT {
             if (StringUtils.isBlank(href)) {
                 continue;
             }
-            assertTrue(href.contains("v="), "not versioned");
+            assertThat(href.contains("v=")).as("not versioned").isTrue();
             ++count;
         }
-        assertEquals(2, count);
+        assertThat(count).isEqualTo(2);
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

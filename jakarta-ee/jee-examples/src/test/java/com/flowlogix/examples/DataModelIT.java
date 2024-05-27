@@ -16,6 +16,7 @@
 package com.flowlogix.examples;
 
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
+import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URL;
 import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -28,7 +29,6 @@ import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,10 +76,10 @@ public class DataModelIT {
     void checkPage() {
         webDriver.get(baseURL + "view-users");
         waitGui(webDriver).until(ExpectedConditions.titleIs("View Users"));
-        assertEquals("View Users", webDriver.getTitle());
+        assertThat(webDriver.getTitle()).isEqualTo("View Users");
         // sort
         guardAjax(userIdHeader.findElement(By.className("ui-column-title"))).click();
-        assertEquals("anya", firstRowUserId.getText());
+        assertThat(firstRowUserId.getText()).isEqualTo("anya");
         WebElement scrollable = firstTable.findElement(By.className("ui-datatable-scrollable-body"));
         ((JavascriptExecutor) webDriver)
                 .executeScript("arguments[0].scroll(0, 500);", scrollable);
@@ -88,7 +88,7 @@ public class DataModelIT {
         fullNameFilterInput.sendKeys("ly l");
         guardAjax(fullNameFilterInput).sendKeys(Keys.RETURN);
         waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Lovely Lady");
-        assertEquals("Lovely Lady", firstRowFullName.getText());
+        assertThat(firstRowFullName.getText()).isEqualTo("Lovely Lady");
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

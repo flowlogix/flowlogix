@@ -16,7 +16,7 @@
 package com.flowlogix.ui;
 
 import static com.flowlogix.ui.MinimizedHandler.parseExtensions;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,36 +27,36 @@ class MinimizedHandlerTest {
     @Test
     void js() {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions("css, js, ts"));
-        assertEquals("my.min.js", handler.toMinimized("my.js"));
-        assertEquals("my.js.xhtml", handler.toMinimized("my.js.xhtml"));
+        assertThat(handler.toMinimized("my.js")).isEqualTo("my.min.js");
+        assertThat(handler.toMinimized("my.js.xhtml")).isEqualTo("my.js.xhtml");
     }
 
     @Test
     void onlyOne() {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions(", js"));
-        assertEquals("my.min.js", handler.toMinimized("my.js"));
-        assertEquals("my.js.xhtml", handler.toMinimized("my.js.xhtml"));
+        assertThat(handler.toMinimized("my.js")).isEqualTo("my.min.js");
+        assertThat(handler.toMinimized("my.js.xhtml")).isEqualTo("my.js.xhtml");
     }
 
     @Test
     void css() {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions("css, js, ts"));
-        assertEquals("my.min.css", handler.toMinimized("my.css"));
-        assertEquals("my.css.xhtml", handler.toMinimized("my.css.xhtml"));
+        assertThat(handler.toMinimized("my.css")).isEqualTo("my.min.css");
+        assertThat(handler.toMinimized("my.css.xhtml")).isEqualTo("my.css.xhtml");
     }
 
     @Test
     void unhappyPath() {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions("css, js, ts"));
-        assertEquals("", handler.toMinimized(""));
-        assertEquals(" ", handler.toMinimized(" "));
-        assertEquals("my.js.css2", handler.toMinimized("my.js.css2"));
+        assertThat(handler.toMinimized("")).isEqualTo("");
+        assertThat(handler.toMinimized(" ")).isEqualTo(" ");
+        assertThat(handler.toMinimized("my.js.css2")).isEqualTo("my.js.css2");
     }
 
     @Test
     void none() {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions(""));
-        assertEquals("my.js", handler.toMinimized("my.js"));
-        assertEquals("my.js.xhtml", handler.toMinimized("my.js.xhtml"));
+        assertThat(handler.toMinimized("my.js")).isEqualTo("my.js");
+        assertThat(handler.toMinimized("my.js.xhtml")).isEqualTo("my.js.xhtml");
     }
 }

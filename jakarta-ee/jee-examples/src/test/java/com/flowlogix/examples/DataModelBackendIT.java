@@ -35,10 +35,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.MatchMode;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 @ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
@@ -56,13 +54,13 @@ public class DataModelBackendIT {
 
     @SuppressWarnings("MagicNumber")
     private void basicDataModel(JPALazyDataModel<UserEntity> model) {
-        assertEquals(5, model.count(Map.of()));
+        assertThat(model.count(Map.of())).isEqualTo(5);
         var rows = model.findRows(0, 3,
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jprimak")
                         .build()), Map.of());
-        assertEquals(1, rows.size());
-        assertEquals("Lovely Lady", rows.get(0).getFullName());
+        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows.get(0).getFullName()).isEqualTo("Lovely Lady");
     }
 
     @Test
@@ -73,7 +71,7 @@ public class DataModelBackendIT {
 
     @SuppressWarnings("MagicNumber")
     void doQualifiedDataModel(JPALazyDataModel<UserEntity> model) {
-        assertEquals(5, model.count(Map.of()));
+        assertThat(model.count(Map.of())).isEqualTo(5);
     }
 
     @Test
@@ -85,7 +83,7 @@ public class DataModelBackendIT {
     @SuppressWarnings("MagicNumber")
     void doSortingDataModel(JPALazyDataModel<UserEntity>  model) {
         var rows = model.findRows(0, 1, Map.of(), Map.of());
-        assertEquals(10012, rows.get(0).getZipCode());
+        assertThat(rows.get(0).getZipCode()).isEqualTo(10012);
     }
 
     @Test
@@ -99,8 +97,8 @@ public class DataModelBackendIT {
         var rows = model.findRows(0, 10,
                 Map.of(UserEntity_.zipCode.getName(), FilterMeta.builder().field(UserEntity_.zipCode.getName())
                         .filterValue(68501).build()), Map.of());
-        assertEquals(4, rows.size());
-        assertEquals(68502, rows.get(0).getZipCode());
+        assertThat(rows.size()).isEqualTo(4);
+        assertThat(rows.get(0).getZipCode()).isEqualTo(68502);
     }
 
     @Test
@@ -111,13 +109,13 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("lprimak")
                         .build()), Map.of());
-        assertEquals(1, rows.size());
-        assertEquals("Lenny Primak", rows.get(0).getFullName());
-        assertEquals(2, rows.get(0).getAlternateEmails().size());
-        assertEquals("two@two.com", rows.get(0).getAlternateEmails().get(1).getEmail());
-        assertEquals(2, rows.get(0).getUserSettings().size());
-        assertEquals("LennySettingOne", rows.get(0).getUserSettings().get(0).getSettingName());
-        assertEquals("Setting1Value", rows.get(0).getUserSettings().get(0).getSettingValue());
+        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows.get(0).getFullName()).isEqualTo("Lenny Primak");
+        assertThat(rows.get(0).getAlternateEmails().size()).isEqualTo(2);
+        assertThat(rows.get(0).getAlternateEmails().get(1).getEmail()).isEqualTo("two@two.com");
+        assertThat(rows.get(0).getUserSettings().size()).isEqualTo(2);
+        assertThat(rows.get(0).getUserSettings().get(0).getSettingName()).isEqualTo("LennySettingOne");
+        assertThat(rows.get(0).getUserSettings().get(0).getSettingValue()).isEqualTo("Setting1Value");
     }
 
     @Test
@@ -125,8 +123,8 @@ public class DataModelBackendIT {
     @SuppressWarnings("MagicNumber")
     void enrichedDataModel() {
         var rows = models.getEnriched().getUserModel().findRows(0, 3, Map.of(), Map.of());
-        assertEquals(4, rows.size());
-        assertEquals("Golden User", rows.get(3).getFullName());
+        assertThat(rows.size()).isEqualTo(4);
+        assertThat(rows.get(3).getFullName()).isEqualTo("Golden User");
     }
 
     @Test
@@ -136,8 +134,8 @@ public class DataModelBackendIT {
         var rows = models.getConverter().getUserModel().findRows(0, 100, Map.of(), Map.of());
         String binaryKey = Long.toBinaryString(rows.get(3).getId());
         var entity = models.getConverter().getUserModel().getRowData(binaryKey);
-        assertEquals(rows.get(3), entity);
-        assertEquals(binaryKey, models.getConverter().getUserModel().getRowKey(entity));
+        assertThat(entity).isEqualTo(rows.get(3));
+        assertThat(models.getConverter().getUserModel().getRowKey(entity)).isEqualTo(binaryKey);
     }
 
     @Test
@@ -149,26 +147,26 @@ public class DataModelBackendIT {
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void overriddenInjectedModel() {
-        assertEquals(UserEntity.class, injectedModel.getInjectedOverriddenModel().getEntityClass());
-        assertFalse(injectedModel.getInjectedOverriddenModel().isCaseSensitiveFilter());
+        assertThat(injectedModel.getInjectedOverriddenModel().getEntityClass()).isEqualTo(UserEntity.class);
+        assertThat(injectedModel.getInjectedOverriddenModel().isCaseSensitiveFilter()).isFalse();
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void caseInsensitiveInjectedModel() {
-        assertFalse(injectedModel.getInjectedCaseInsensitiveModel().isCaseSensitiveFilter());
+        assertThat(injectedModel.getInjectedCaseInsensitiveModel().isCaseSensitiveFilter()).isFalse();
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void nonDefaultInjectedModel() {
-        assertTrue(injectedModel.getInjectedNonDefaultModel().getEntityManagerQualifiers().contains(NonDefault.class));
+        assertThat(injectedModel.getInjectedNonDefaultModel().getEntityManagerQualifiers().contains(NonDefault.class)).isTrue();
     }
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void invalidInjectedModel() {
-        assertThrows(IllegalArgumentException.class, () -> basicDataModel(models.getInvalid().getModel()));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> basicDataModel(models.getInvalid().getModel()));
     }
 
     @Test
@@ -184,7 +182,7 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
-        assertEquals(0, rows.size());
+        assertThat(rows.size()).isEqualTo(0);
     }
 
     @Test
@@ -194,8 +192,8 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
-        assertEquals(1, rows.size());
-        assertEquals("Lovely Lady", rows.get(0).getFullName());
+        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows.get(0).getFullName()).isEqualTo("Lovely Lady");
     }
 
     @Test
@@ -205,8 +203,8 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
-        assertEquals(1, rows.size());
-        assertEquals("Lovely Lady", rows.get(0).getFullName());
+        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows.get(0).getFullName()).isEqualTo("Lovely Lady");
     }
 
     @Test
@@ -216,8 +214,8 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
-        assertEquals(1, rows.size());
-        assertEquals("Lovely Lady", rows.get(0).getFullName());
+        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows.get(0).getFullName()).isEqualTo("Lovely Lady");
     }
 
     @Test
@@ -227,8 +225,8 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName())
                         .filterValue("jpr*a").build()), Map.of());
-        assertEquals(1, rows.size());
-        assertEquals("Lovely Lady", rows.get(0).getFullName());
+        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows.get(0).getFullName()).isEqualTo("Lovely Lady");
     }
 
     @Test
@@ -238,8 +236,8 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).matchMode(MatchMode.EXACT)
                         .filterValue("jpr?mak").build()), Map.of());
-        assertEquals(1, rows.size());
-        assertEquals("Lovely Lady", rows.get(0).getFullName());
+        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows.get(0).getFullName()).isEqualTo("Lovely Lady");
     }
 
     @Test
@@ -249,8 +247,8 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).matchMode(MatchMode.EXACT)
                         .filterValue("jpr*ak").build()), Map.of());
-        assertEquals(1, rows.size());
-        assertEquals("Lovely Lady", rows.get(0).getFullName());
+        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows.get(0).getFullName()).isEqualTo("Lovely Lady");
     }
 
     @Test
@@ -261,7 +259,7 @@ public class DataModelBackendIT {
                         .field(UserEntity_.userId.getName()).matchMode(MatchMode.EXACT)
                         .filterValue("pr?mak")
                         .build()), Map.of());
-        assertEquals(0, rows.size());
+        assertThat(rows.size()).isEqualTo(0);
     }
 
     @Test
@@ -271,8 +269,8 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).matchMode(MatchMode.EQUALS)
                         .filterValue("jprimak").build()), Map.of());
-        assertEquals(1, rows.size());
-        assertEquals("Lovely Lady", rows.get(0).getFullName());
+        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows.get(0).getFullName()).isEqualTo("Lovely Lady");
     }
 
     @Test

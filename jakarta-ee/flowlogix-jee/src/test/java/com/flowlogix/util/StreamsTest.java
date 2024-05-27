@@ -20,19 +20,19 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import static com.flowlogix.util.Streams.readString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class StreamsTest {
     private final String testString = "hello flowlogix";
     @Test
     void streamsReadString() throws IOException {
         ByteArrayInputStream strm = new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_8));
-        assertEquals(testString, readString(strm));
+        assertThat(readString(strm)).isEqualTo(testString);
     }
 
     @Test
     void streamsReadStringCharset() throws IOException {
         ByteArrayInputStream strm = new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_8));
-        assertEquals(testString, readString(strm, StandardCharsets.UTF_8));
+        assertThat(readString(strm, StandardCharsets.UTF_8)).isEqualTo(testString);
     }
 }

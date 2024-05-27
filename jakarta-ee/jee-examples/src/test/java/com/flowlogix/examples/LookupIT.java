@@ -109,6 +109,7 @@ class LookupIT {
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class, String.format("%s-%s", UUID.randomUUID(), "LookupTest.war"))
                 .addPackages(true, "org.omnifaces")
+                .addPackages(true, "org.assertj")
                 .addPackages(true, "com.flowlogix")
                 .deletePackages(true, "com.flowlogix.demo")
                 .deletePackages(true, "com.flowlogix.examples.data")

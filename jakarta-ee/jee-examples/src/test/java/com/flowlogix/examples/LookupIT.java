@@ -76,7 +76,7 @@ class LookupIT {
     @Test
     @OperateOnDeployment(DEPLOYMENT_NAME)
     void unhappyPath() throws NamingException {
-        assertThat(example.getLocator().getObject("hello")).isNull();
+        assertNull(example.getLocator().getObject("hello"));
     }
 
     @Test

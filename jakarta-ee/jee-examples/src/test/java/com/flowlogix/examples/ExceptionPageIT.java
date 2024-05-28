@@ -149,11 +149,11 @@ public class ExceptionPageIT {
         while (exceptionString.startsWith("WARNING: java.io.IOException: Connection is closed")) {
             exceptionString = exceptionString.lines().skip(1).findFirst().orElseGet(this::getLastException);
         }
-        assertThat(exceptionString).matches(jakartify("""
+        assertThat(exceptionString).
+                as(String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match",
+                exceptionString)).matches(jakartify("""
                 ^WARNING: javax.faces.FacesException: #\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*""")
-                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\."))
-                .as(String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match",
-                        exceptionString));
+                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\."));
     }
 
     private String getLastException() {
@@ -191,7 +191,7 @@ public class ExceptionPageIT {
             if (StringUtils.isBlank(href)) {
                 continue;
             }
-            assertThat(href).contains("v=").as("not versioned");
+            assertThat(href).as("not versioned").contains("v=");
             ++count;
         }
         assertThat(count).isEqualTo(5);
@@ -203,7 +203,7 @@ public class ExceptionPageIT {
             if (StringUtils.isBlank(href)) {
                 continue;
             }
-            assertThat(href).contains("v=").as("not versioned");
+            assertThat(href).as("not versioned").contains("v=");
             ++count;
         }
         assertThat(count).isEqualTo(2);

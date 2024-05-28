@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +51,7 @@ class LazyTest {
     void threadedLazy() throws InterruptedException {
         final int numInstances = 5000;
         List<Lazy<Expensive>> cheap = IntStream.rangeClosed(1, numInstances)
-                .mapToObj(ii -> new Lazy<>(Expensive::new)).collect(Collectors.toList());
+                .mapToObj(ii -> new Lazy<>(Expensive::new)).toList();
         assertThat(numCreations.get()).isZero();
         final int numThreads = 50 * Runtime.getRuntime().availableProcessors();
         ExecutorService exec = Executors.newFixedThreadPool(numThreads);

@@ -54,6 +54,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.primefaces.model.FilterMeta.GLOBAL_FILTER_KEY;
@@ -203,15 +204,16 @@ class ModelTest implements Serializable {
                 .entityManager(() -> em)
                 .entityClass(Object.class)
                 .converter(s -> new Object())
-                .filter((filterData, cb, root) -> filterData.replaceFilter(GLOBAL_FILTER_KEY,
+                .filter((filterData, builder, root) -> filterData.replaceFilter(GLOBAL_FILTER_KEY,
                         (predicate, value) -> {
                             if (clearFilters.get()) {
                                 filterData.clear();
                             }
-                            return cb.isTrue(predicate);
+                            return builder.isTrue(predicate);
                         }))
                 .build();
         when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
+        verify(rootObject).get((String) null);
         var fm = FilterMeta.builder().field("ccc").filterValue("hello").build();
         impl.getFilters(Map.of("bbb", fm), cb, rootObject);
         var fm2 = FilterMeta.of(null, null);
@@ -221,6 +223,9 @@ class ModelTest implements Serializable {
         clearFilters.set(true);
         impl.getFilters(Map.of("bbb", FilterMeta.builder().field(GLOBAL_FILTER_KEY)
                 .filterValue("bye").build()), cb, rootObject);
+        verify(rootObject).get("ccc");
+        verify(rootObject).get(GLOBAL_FILTER_KEY);
+        verifyNoMoreInteractions(rootObject);
     }
 
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {
@@ -247,7 +252,7 @@ class ModelTest implements Serializable {
         var descendingOrder = createOrder(false);
         when(cb.desc(any())).thenReturn(descendingOrder);
         var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger);
-        assertThat(sortResult.size()).isEqualTo(4);
+        assertThat(sortResult).hasSize(4);
         assertThat(sortResult.get(0).isAscending()).isFalse();
         assertThat(sortResult.get(1).isAscending()).isTrue();
         assertThat(sortResult.get(3).isAscending()).isTrue();
@@ -283,7 +288,7 @@ class ModelTest implements Serializable {
         var descendingOrder = createOrder(false);
         when(cb.desc(any())).thenReturn(descendingOrder);
         var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger);
-        assertThat(sortResult.size()).isEqualTo(2);
+        assertThat(sortResult).hasSize(2);
         assertThat(sortResult.get(0).isAscending()).isTrue();
         assertThat(sortResult.get(1).isAscending()).isTrue();
     }

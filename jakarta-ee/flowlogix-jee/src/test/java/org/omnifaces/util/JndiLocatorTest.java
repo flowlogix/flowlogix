@@ -94,8 +94,8 @@ class JndiLocatorTest {
                     .environment("twoKey", "twoValue");
             builder.initialHost("myHost");
             builder.initialPort(12345);
-            JNDIObjectLocator locator = builder.build();
-            assertEquals("hello", locator.getObject(String.class));
+            JNDIObjectLocator envLocator = builder.build();
+            assertEquals("hello", envLocator.getObject(String.class));
             assertEquals(4, constructedEnvironment.size());
             assertEquals("oneValue", constructedEnvironment.get("oneKey"));
             assertEquals("twoValue", constructedEnvironment.get("twoKey"));
@@ -266,9 +266,9 @@ class JndiLocatorTest {
         boolean isShutdownCompleted = exec.awaitTermination(10, TimeUnit.SECONDS);
         assertEquals(isShutdownCompleted, runningThreads.isEmpty(), "completed but outstanding threads remain");
         if (!isShutdownCompleted) {
-            System.out.printf("Unfinished threads: %d\n", runningThreads.size());
+            System.out.printf("Unfinished threads: %d%n", runningThreads.size());
             for (Thread thr : runningThreads) {
-                System.out.printf("\nStack Dump for Thread %d\n", thr.getId());
+                System.out.printf("%nStack Dump for Thread %d%n", thr.getId());
                 Stream.of(thr.getStackTrace()).forEach(System.out::println);
             }
         }

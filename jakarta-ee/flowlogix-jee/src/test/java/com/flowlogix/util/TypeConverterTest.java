@@ -65,8 +65,8 @@ class TypeConverterTest {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> TypeConverter.valueOf(null, int.class));
         assertThat(TypeConverter.valueOf("", Double.class)).isZero();
-        assertThat(TypeConverter.valueOf("", double.class)).isZero()
-        assertThat(TypeConverter.valueOf("", int.class)).isZero()
+        assertThat(TypeConverter.valueOf("", double.class)).isZero();
+        assertThat(TypeConverter.valueOf("", int.class)).isZero();
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> TypeConverter.valueOf(null, String.class));
         assertThat(TypeConverter.valueOf("hello", String.class)).isEqualTo("hello");
@@ -76,7 +76,7 @@ class TypeConverterTest {
                 .isEqualTo(Double.POSITIVE_INFINITY);
         assertThat(TypeConverter.valueOf(Double.toString(Double.NEGATIVE_INFINITY), Double.class))
                 .isEqualTo(Double.NEGATIVE_INFINITY);
-        assertThat(TypeConverter.valueOf("nan", float.class)).isNaN()
+        assertThat(TypeConverter.valueOf("nan", float.class)).isNaN();
         assertThat(TypeConverter.valueOf("inf", float.class)).isEqualTo(Float.POSITIVE_INFINITY);
         assertThat(TypeConverter.valueOf("-inf", float.class)).isEqualTo(Float.NEGATIVE_INFINITY);
     }

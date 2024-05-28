@@ -53,7 +53,7 @@ class LazyTest {
         final int numInstances = 5000;
         List<Lazy<Expensive>> cheap = IntStream.rangeClosed(1, numInstances)
                 .mapToObj(ii -> new Lazy<>(Expensive::new)).collect(Collectors.toList());
-        assertThat(numCreations.get()).isEqualTo(0);
+        assertThat(numCreations.get()).isZero();
         final int numThreads = 50 * Runtime.getRuntime().availableProcessors();
         ExecutorService exec = Executors.newFixedThreadPool(numThreads);
         cheap.forEach(ii -> IntStream.rangeClosed(1, numThreads)

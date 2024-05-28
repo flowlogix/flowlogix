@@ -114,7 +114,7 @@ public class ExceptionPageIT {
         assertThat(exceptionHeading.getText()).isEqualTo("Exception happened");
         assertThat(exceptionTypeField.getText())
                 .isEqualTo("Exception type: class java.nio.channels.ClosedByInterruptException");
-        assertThat(getLastException(true)).isEqualTo("");
+        assertThat(getLastException(true)).isEmpty();
     }
 
     @Test
@@ -149,11 +149,11 @@ public class ExceptionPageIT {
         while (exceptionString.startsWith("WARNING: java.io.IOException: Connection is closed")) {
             exceptionString = exceptionString.lines().skip(1).findFirst().orElseGet(this::getLastException);
         }
-        assertThat(exceptionString.matches(jakartify("""
+        assertThat(exceptionString).matches(jakartify("""
                 ^WARNING: javax.faces.FacesException: #\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*""")
-                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\.")))
+                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\."))
                 .as(String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match",
-                        exceptionString)).isTrue();
+                        exceptionString));
     }
 
     private String getLastException() {
@@ -191,7 +191,7 @@ public class ExceptionPageIT {
             if (StringUtils.isBlank(href)) {
                 continue;
             }
-            assertThat(href.contains("v=")).as("not versioned").isTrue();
+            assertThat(href).contains("v=").as("not versioned");
             ++count;
         }
         assertThat(count).isEqualTo(5);
@@ -203,7 +203,7 @@ public class ExceptionPageIT {
             if (StringUtils.isBlank(href)) {
                 continue;
             }
-            assertThat(href.contains("v=")).as("not versioned").isTrue();
+            assertThat(href).contains("v=").as("not versioned");
             ++count;
         }
         assertThat(count).isEqualTo(2);

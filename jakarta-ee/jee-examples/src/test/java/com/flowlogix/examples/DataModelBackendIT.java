@@ -184,7 +184,7 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).filterValue("jpRimak")
                         .build()), Map.of());
-        assertThat(rows.size()).isEqualTo(0);
+        assertThat(rows.size()).isZero();
     }
 
     @Test
@@ -261,7 +261,7 @@ public class DataModelBackendIT {
                         .field(UserEntity_.userId.getName()).matchMode(MatchMode.EXACT)
                         .filterValue("pr?mak")
                         .build()), Map.of());
-        assertThat(rows.size()).isEqualTo(0);
+        assertThat(rows.size()).isZero();
     }
 
     @Test

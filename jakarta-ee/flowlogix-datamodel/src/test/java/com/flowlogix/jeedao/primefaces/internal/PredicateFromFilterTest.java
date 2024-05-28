@@ -95,7 +95,7 @@ class PredicateFromFilterTest {
 
     @AfterAll
     static void checkExhaustiveMatchModes() {
-        assertThat(untestedMatchModes.size()).as("Not all match modes were tested: " + untestedMatchModes).isEqualTo(0);
+        assertThat(untestedMatchModes.size()).as("Not all match modes were tested: " + untestedMatchModes).isZero();
     }
 
     @Test

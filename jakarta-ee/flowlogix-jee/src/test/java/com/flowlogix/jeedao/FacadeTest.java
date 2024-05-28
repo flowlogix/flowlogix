@@ -116,7 +116,7 @@ class FacadeTest implements Serializable {
     @Test
     void nulls() {
         assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> {
-            DaoHelper<Long> facade = new DaoHelper<>(() -> null, null);
+            new DaoHelper<Long>(() -> null, null);
         });
     }
 

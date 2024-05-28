@@ -48,7 +48,7 @@ class MinimizedHandlerTest {
     @Test
     void unhappyPath() {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions("css, js, ts"));
-        assertThat(handler.toMinimized("")).isEqualTo("");
+        assertThat(handler.toMinimized("")).isEmpty();
         assertThat(handler.toMinimized(" ")).isEqualTo(" ");
         assertThat(handler.toMinimized("my.js.css2")).isEqualTo("my.js.css2");
     }

@@ -271,7 +271,7 @@ public class DataModelBackendIT {
                 Map.of(UserEntity_.userId.getName(), FilterMeta.builder()
                         .field(UserEntity_.userId.getName()).matchMode(MatchMode.EQUALS)
                         .filterValue("jprimak").build()), Map.of());
-        assertThat(rows.size()).isEqualTo(1);
+        assertThat(rows).hasSize(1);
         assertThat(rows.get(0).getFullName()).isEqualTo("Lovely Lady");
     }
 

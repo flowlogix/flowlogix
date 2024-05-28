@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.container.ClassContainer;
 import org.jboss.shrinkwrap.api.container.ResourceContainer;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
@@ -112,9 +113,13 @@ public class ShrinkWrapManipulator {
      * @param <TT> ShrinkWrap archive type
      */
     public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType, @NonNull String archiveName) {
-        return ShrinkWrap.create(MavenImporter.class, archiveName)
+        TT deployment = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(archiveType);
+        if (deployment instanceof ClassContainer<?>) {
+            ((ClassContainer<?>) deployment).addPackages(true, "org.assertj");
+        }
+        return deployment;
     }
 
     /**

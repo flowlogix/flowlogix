@@ -45,6 +45,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
@@ -150,6 +151,7 @@ class ShrinkWrapManipulatorTest {
     @Test
     void actionOnNodeWhenNull() {
         runActionOnNode(new Action("path", null, true), null);
+        verifyNoMoreInteractions(documentBuilder, documentBuilderFactory, transformerFactory);
     }
 
     private static int getPortFromProperty() {

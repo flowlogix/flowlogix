@@ -59,7 +59,7 @@ import static org.primefaces.model.MatchMode.STARTS_WITH;
 
 @ExtendWith(MockitoExtension.class)
 class PredicateFromFilterTest {
-    private static Set<MatchMode> untestedMatchModes = ConcurrentHashMap.newKeySet();
+    private static final Set<MatchMode> untestedMatchModes = ConcurrentHashMap.newKeySet();
     @Mock(answer = RETURNS_DEEP_STUBS)
     private CriteriaBuilder cb;
     @Mock
@@ -95,7 +95,7 @@ class PredicateFromFilterTest {
 
     @AfterAll
     static void checkExhaustiveMatchModes() {
-        assertThat(untestedMatchModes.size()).as("Not all match modes were tested: " + untestedMatchModes).isZero();
+        assertThat(untestedMatchModes.size()).describedAs("Not all match modes were tested: " + untestedMatchModes).isZero();
     }
 
     @Test

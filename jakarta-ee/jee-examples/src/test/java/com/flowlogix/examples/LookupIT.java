@@ -32,8 +32,8 @@ import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.AfterEach;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,10 +67,10 @@ class LookupIT {
     @Test
     @OperateOnDeployment(DEPLOYMENT_NAME)
     void happyPath() {
-        assertEquals(5, example.getNumber());
-        assertNotNull(example.getLocator().getObject(AnotherEJB.class), "should not be null");
-        assertNotNull(example.createLocatorWithEnvironment().getObject(AnotherEJB.class), "should not be null");
-        assertNotNull(example.createLocatorWithNoCaching().getObject(AnotherEJB.class), "should not be null");
+        assertThat(example.getNumber()).isEqualTo(5);
+        assertThat(example.getLocator().getObject(AnotherEJB.class)).as("should not be null").isNotNull();
+        assertThat(example.createLocatorWithEnvironment().getObject(AnotherEJB.class)).as("should not be null").isNotNull();
+        assertThat(example.createLocatorWithNoCaching().getObject(AnotherEJB.class)).as("should not be null").isNotNull();
     }
 
     @Test
@@ -102,13 +102,14 @@ class LookupIT {
         }));
         exec.shutdown();
         exec.awaitTermination(10, TimeUnit.SECONDS);
-        assertFalse(failed.get(), "stress test failed");
+        assertThat(failed.get()).as("stress test failed").isFalse();
     }
 
     @Deployment(name = DEPLOYMENT_NAME)
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class, String.format("%s-%s", UUID.randomUUID(), "LookupTest.war"))
                 .addPackages(true, "org.omnifaces")
+                .addPackages(true, "org.assertj")
                 .addPackages(true, "com.flowlogix")
                 .deletePackages(true, "com.flowlogix.demo")
                 .deletePackages(true, "com.flowlogix.examples.data")

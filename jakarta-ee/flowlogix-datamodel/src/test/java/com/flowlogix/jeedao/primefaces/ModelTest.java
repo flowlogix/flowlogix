@@ -17,6 +17,8 @@ package com.flowlogix.jeedao.primefaces;
 
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.RESULT;
 import static com.flowlogix.util.SerializeTester.serializeAndDeserialize;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
@@ -42,7 +44,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -88,7 +89,7 @@ class ModelTest implements Serializable {
 
     @Test
     void resultField() {
-        assertEquals(String.format("%s.hello", RESULT), JPALazyDataModel.getResultField("hello"));
+        assertThat(JPALazyDataModel.getResultField("hello")).isEqualTo(String.format("%s.hello", RESULT));
     }
 
     @Test
@@ -223,8 +224,8 @@ class ModelTest implements Serializable {
     }
 
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<Object> root) {
-        assertTrue(filterData.replaceFilter("aaa",
-                (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value)));
+        assertThat(filterData.replaceFilter("aaa",
+                (Predicate predicate, String value) -> cb.greaterThan(root.get("column2"), value))).isTrue();
         root.get("test");
     }
 
@@ -246,11 +247,11 @@ class ModelTest implements Serializable {
         var descendingOrder = createOrder(false);
         when(cb.desc(any())).thenReturn(descendingOrder);
         var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger);
-        assertEquals(4, sortResult.size());
-        assertFalse(sortResult.get(0).isAscending());
-        assertTrue(sortResult.get(1).isAscending());
-        assertTrue(sortResult.get(3).isAscending());
-        assertFalse(sortResult.get(2).isAscending());
+        assertThat(sortResult.size()).isEqualTo(4);
+        assertThat(sortResult.get(0).isAscending()).isFalse();
+        assertThat(sortResult.get(1).isAscending()).isTrue();
+        assertThat(sortResult.get(3).isAscending()).isTrue();
+        assertThat(sortResult.get(2).isAscending()).isFalse();
     }
 
     private static void addingSorter(SortData sortData, CriteriaBuilder cb, Root<Integer> root) {
@@ -282,9 +283,9 @@ class ModelTest implements Serializable {
         var descendingOrder = createOrder(false);
         when(cb.desc(any())).thenReturn(descendingOrder);
         var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger);
-        assertEquals(2, sortResult.size());
-        assertTrue(sortResult.get(0).isAscending());
-        assertTrue(sortResult.get(1).isAscending());
+        assertThat(sortResult.size()).isEqualTo(2);
+        assertThat(sortResult.get(0).isAscending()).isTrue();
+        assertThat(sortResult.get(1).isAscending()).isTrue();
     }
 
     private static void replacingSorter(SortData sortData, CriteriaBuilder cb, Root<Integer> root) {
@@ -309,7 +310,7 @@ class ModelTest implements Serializable {
                 .build();
         when(rootInteger.<Integer, Integer>join(any(String.class))).thenReturn(integerJoin);
         when(rootInteger.<Integer>get("a")).thenReturn(integerPath);
-        assertEquals(integerPath, impl.resolveField(rootInteger, "a"));
+        assertThat(impl.resolveField(rootInteger, "a")).isEqualTo(integerPath);
         verify(rootInteger).get("a");
     }
 
@@ -323,7 +324,7 @@ class ModelTest implements Serializable {
         when(rootInteger.<Integer, Integer>join(any(String.class))).thenReturn(integerJoin);
         when(integerJoin.<Integer, Integer>join(any(String.class))).thenReturn(integerJoin);
         when(integerJoin.<Integer>get("c")).thenReturn(integerPath);
-        assertEquals(integerPath, impl.resolveField(rootInteger, "a.b.c"));
+        assertThat(impl.resolveField(rootInteger, "a.b.c")).isEqualTo(integerPath);
         verify(rootInteger).join("a");
         verify(integerJoin).join("b");
         verify(integerJoin).get("c");
@@ -386,8 +387,8 @@ class ModelTest implements Serializable {
                 .build();
         when(em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(any(MyEntity.class)))
                 .thenAnswer(entry -> entry.<MyEntity>getArgument(0).id);
-        assertEquals(5L, impl.getStringToKeyConverter().apply("5"));
-        assertEquals("10", impl.getKeyConverter().apply(new MyEntity(10L)));
+        assertThat(impl.getStringToKeyConverter().apply("5")).isEqualTo(5L);
+        assertThat(impl.getKeyConverter().apply(new MyEntity(10L))).isEqualTo("10");
     }
 
     @Test
@@ -403,7 +404,7 @@ class ModelTest implements Serializable {
         lenient().when(em.getEntityManagerFactory().getPersistenceUnitUtil()
                 .getIdentifier(any(MyEntity.class))).thenReturn(5L);
         var deserialized = serializeAndDeserialize(model);
-        assertEquals("5", deserialized.getRowKey(new MyEntity()));
+        assertThat(deserialized.getRowKey(new MyEntity())).isEqualTo("5");
     }
 
     @Test
@@ -446,27 +447,31 @@ class ModelTest implements Serializable {
     void partialInitialization() {
         var model = new JPALazyDataModel<Integer>()
                 .partialInitialize(builder -> builder.entityClass(Integer.class).build());
-        assertThrows(IllegalStateException.class, () -> model.partialInitialize(builder -> builder.build()));
-        assertEquals(Integer.class, model.getEntityClass());
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> model.partialInitialize(builder -> builder.build()));
+        assertThat(model.getEntityClass()).isEqualTo(Integer.class);
     }
 
     @Test
     void createNullModel() {
-        assertThrows(NullPointerException.class, () -> JPALazyDataModel.create(null));
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> JPALazyDataModel.create(null));
     }
 
     @Test
     void initializeNullModel() {
-        assertThrows(NullPointerException.class, () -> new JPALazyDataModel<Integer>().initialize(null));
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> new JPALazyDataModel<Integer>().initialize(null));
     }
 
     @Test
     void partialInitializationWithNull() {
-        assertThrows(NullPointerException.class, () -> new JPALazyDataModel<Integer>().partialInitialize(null));
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> new JPALazyDataModel<Integer>().partialInitialize(null));
     }
 
     @Test
     void createInternalModelWithNull() {
-        assertThrows(NullPointerException.class, () -> JPAModelImpl.create(null));
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> JPAModelImpl.create(null));
     }
 }

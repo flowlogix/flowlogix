@@ -27,10 +27,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaQuery;
 import lombok.experimental.Delegate;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.Beans;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,9 +65,9 @@ class FacadeTest implements Serializable {
     @Test
     @SuppressWarnings({"unchecked", "MagicNumber"})
     void usage() {
-        assertEquals(5, new MyControl().find(1L));
+        assertThat(new MyControl().find(1L)).isEqualTo(5);
         when(em.createQuery(any(CriteriaQuery.class)).getResultList()).thenReturn(Arrays.asList(1, 2));
-        assertEquals(Arrays.asList(1, 2), new MyControl().findRange(5, 7).getResultList());
+        assertThat(new MyControl().findRange(5, 7).getResultList()).isEqualTo(Arrays.asList(1, 2));
 
         when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(2L);
         assertThat(new MyControl().count()).isEqualTo(2);
@@ -82,20 +79,20 @@ class FacadeTest implements Serializable {
         var query = mock(TypedQuery.class);
         when(em.createQuery(any(CriteriaQuery.class))).thenReturn(query);
         when(query.getResultList()).thenReturn(List.of(10L));
-        assertEquals(List.of(10L), new MyControl().findAll().getResultList());
+        assertThat(new MyControl().findAll().getResultList()).isEqualTo(List.of(10L));
     }
 
     @Test
     void findEntityManager() {
         try (var mock = mockStatic(Beans.class)) {
             var entityManager = DaoHelper.findEntityManager();
-            assertThrows(IllegalStateException.class, entityManager::get);
+            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(entityManager::get);
         }
     }
 
     @Test
     void findEntityManagerNullQualifiers() {
-        assertThrows(NullPointerException.class, () -> {
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> {
             DaoHelper.findEntityManager(null);
         });
     }
@@ -109,17 +106,17 @@ class FacadeTest implements Serializable {
         when(query.getSingleResult()).thenReturn(5L);
         when(query.getResultStream()).thenAnswer(a -> Stream.of(3L));
         var tnq = new MyControl().createNativeQuery("hello", Long.class);
-        assertEquals(5L, tnq.<Long>getSingleResult());
-        assertEquals(3L, tnq.getResultStream().findFirst().get());
+        assertThat(tnq.<Long>getSingleResult()).isEqualTo(5L);
+        assertThat(tnq.getResultStream().findFirst().get()).isEqualTo(3L);
         var tnq2 = new MyControl().createNativeQuery("hello", "mapping");
-        assertEquals(5L, tnq2.<Long>getSingleResult());
-        assertEquals(3L, tnq2.getResultStream().findFirst().get());
+        assertThat(tnq2.<Long>getSingleResult()).isEqualTo(5L);
+        assertThat(tnq2.getResultStream().findFirst().get()).isEqualTo(3L);
     }
 
     @Test
     void nulls() {
-        assertThrows(NullPointerException.class, () -> {
-            DaoHelper<Long> facade = new DaoHelper<>(() -> null, null);
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> {
+            new DaoHelper<Long>(() -> null, null);
         });
     }
 
@@ -127,34 +124,34 @@ class FacadeTest implements Serializable {
     @SuppressWarnings("unchecked")
     void inheritableDao() {
         InheritableDaoHelper<Integer> helper = new InheritableDaoHelper<>();
-        assertNull(helper.jpaFinder);
+        assertThat(helper.jpaFinder).isNull();
         helper.jpaFinder = DaoHelper.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)
                 .build();
         when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(2L);
-        assertEquals(2, helper.count());
+        assertThat(helper.count()).isEqualTo(2);
     }
 
     @Test
     @SuppressWarnings("MagicNumber")
     void serialize() throws IOException, ClassNotFoundException {
         var mc = SerializeTester.serializeAndDeserialize(new MyControl());
-        assertNotNull(mc.facade.em());
-        assertEquals(5, mc.find(1L));
-        assertNull(mc.find(2L));
+        assertThat(mc.facade.em()).isNotNull();
+        assertThat(mc.find(1L)).isEqualTo(5);
+        assertThat(mc.find(2L)).isNull();
     }
 
     @Test
     void nullEntityManager() {
-        assertThrows(NullPointerException.class, () -> {
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> {
             new DaoHelper<>(null, null);
         });
     }
 
     @Test
     void nullEntityClass() {
-        assertThrows(NullPointerException.class, () -> {
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> {
             new DaoHelper<>(() -> em, null);
         });
     }

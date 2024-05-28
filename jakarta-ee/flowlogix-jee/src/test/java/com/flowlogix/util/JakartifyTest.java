@@ -19,23 +19,22 @@ import org.junit.jupiter.api.Test;
 import static com.flowlogix.demo.ui.JakartifyDemo.jakartifyError;
 import static com.flowlogix.demo.ui.JakartifyDemo.jakartifyServlet;
 import static com.flowlogix.util.JakartaTransformerUtils.isJakarta;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class JakartifyTest {
     @Test
     void checkJakarta() {
-        assertTrue(isJakarta());
+        assertThat(isJakarta()).isTrue();
     }
 
     @Test
     void servlet() {
-        assertEquals(isJakarta() ? "jakarta.servlet.Servlet" : "javax.servlet.Servlet", jakartifyServlet());
+        assertThat(jakartifyServlet()).isEqualTo(isJakarta() ? "jakarta.servlet.Servlet" : "javax.servlet.Servlet");
     }
 
     @Test
     void error() {
-        assertEquals(isJakarta() ? "jakarta.faces.FacesException: message X" : "javax.faces.FacesException: message X",
-                jakartifyError());
+        assertThat(jakartifyError()).isEqualTo(isJakarta() ? "jakarta.faces.FacesException: message X"
+                : "javax.faces.FacesException: message X");
     }
 }

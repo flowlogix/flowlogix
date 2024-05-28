@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -53,14 +53,14 @@ class LazyTest {
         final int numInstances = 5000;
         List<Lazy<Expensive>> cheap = IntStream.rangeClosed(1, numInstances)
                 .mapToObj(ii -> new Lazy<>(Expensive::new)).collect(Collectors.toList());
-        assertEquals(0, numCreations.get());
+        assertThat(numCreations.get()).isZero();
         final int numThreads = 50 * Runtime.getRuntime().availableProcessors();
         ExecutorService exec = Executors.newFixedThreadPool(numThreads);
         cheap.forEach(ii -> IntStream.rangeClosed(1, numThreads)
                 .forEach(iter -> exec.submit(() -> ii.get())));
         exec.shutdown();
         await(exec);
-        assertEquals(numInstances, numCreations.get());
+        assertThat(numCreations.get()).isEqualTo(numInstances);
     }
 
     @SuppressWarnings("MagicNumber")

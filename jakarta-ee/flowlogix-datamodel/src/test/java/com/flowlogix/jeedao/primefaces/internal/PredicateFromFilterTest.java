@@ -59,6 +59,7 @@ import static org.primefaces.model.MatchMode.STARTS_WITH;
 
 @ExtendWith(MockitoExtension.class)
 class PredicateFromFilterTest {
+    @SuppressWarnings("checkstyle:ConstantName")
     private static final Set<MatchMode> untestedMatchModes = ConcurrentHashMap.newKeySet();
     @Mock(answer = RETURNS_DEEP_STUBS)
     private CriteriaBuilder cb;

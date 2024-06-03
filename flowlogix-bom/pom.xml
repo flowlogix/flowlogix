@@ -5,7 +5,7 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>flowlogix-bom</artifactId>
-    <version>9.x-SNAPSHOT</version>
+    <version>9.0.1</version>
     <name>FlowLogix Bill of Materials</name>
     <packaging>pom</packaging>
 
@@ -17,7 +17,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix</artifactId>
-        <version>9.x-SNAPSHOT</version>
+        <version>9.0.1</version>
     </parent>
 
     <dependencyManagement>

@@ -217,7 +217,6 @@ public class ExceptionPageIT {
     static WebArchive createDeployment(String suffix) {
         WebArchive archive = ShrinkWrapManipulator.createDeployment(WebArchive.class,
                         name -> isBlank(suffix) ? name : String.format("%s-%s", name, suffix))
-                .addClass(PayaraServerLifecycleExtension.class)
                 .addClass(DaoHelperIT.class)
                 .addClass(DataModelBackendIT.class);
 

@@ -23,7 +23,7 @@
             :${project.build.directory}/generated-sources/delombok</javadoc.sourcepath>
         <payara.start.disable>${skipITs}</payara.start.disable>
         <arquillian.graphene.version>3.0.0-alpha.4</arquillian.graphene.version>
-        <arquillian.payara.version>3.0</arquillian.payara.version>
+        <arquillian.payara.version>3.1</arquillian.payara.version>
         <testcontainers.skip>true</testcontainers.skip>
         <it.test.parallel>classes</it.test.parallel>
     </properties>

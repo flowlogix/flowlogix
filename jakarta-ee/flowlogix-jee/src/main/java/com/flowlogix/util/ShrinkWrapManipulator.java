@@ -117,7 +117,9 @@ public class ShrinkWrapManipulator {
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(archiveType);
         if (deployment instanceof ClassContainer<?>) {
-            ((ClassContainer<?>) deployment).addPackages(true, "org.assertj");
+            var containerDeployment = ((ClassContainer<?>) deployment);
+            containerDeployment.addClass("com.flowlogix.testcontainers.PayaraServerLifecycleExtension");
+            containerDeployment.addPackages(true, "org.assertj");
         }
         return deployment;
     }

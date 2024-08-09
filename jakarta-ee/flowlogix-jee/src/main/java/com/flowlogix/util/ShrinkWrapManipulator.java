@@ -118,7 +118,8 @@ public class ShrinkWrapManipulator {
                 .as(archiveType);
         if (deployment instanceof ClassContainer<?>) {
             var containerDeployment = ((ClassContainer<?>) deployment);
-            containerDeployment.addClass("com.flowlogix.testcontainers.PayaraServerLifecycleExtension");
+            optionalDeploymentOp(() -> containerDeployment
+                    .addClass("com.flowlogix.testcontainers.PayaraServerLifecycleExtension"));
             containerDeployment.addPackages(true, "org.assertj");
         }
         return deployment;
@@ -233,5 +234,13 @@ public class ShrinkWrapManipulator {
     @SneakyThrows(TransformerConfigurationException.class)
     private Transformer createTransformer() {
         return TransformerFactory.newInstance().newTransformer();
+    }
+
+    private static void optionalDeploymentOp(Runnable operator) {
+        try {
+            operator.run();
+        } catch (IllegalArgumentException e) {
+            log.debug("Could not add optional class to deployment", e);
+        }
     }
 }

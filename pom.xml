@@ -20,7 +20,7 @@
         <eclipselink.version>2.7.15</eclipselink.version>
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <payara.start.disable>true</payara.start.disable>
-        <depchain.version>17</depchain.version>
+        <depchain.version>19</depchain.version>
     </properties>
 
     <scm>

@@ -16,7 +16,7 @@
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
-        <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
+        <checkstyle.supressionsLocation>${flowlogix.basedir}/src/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
 
         <release.profiles>${release.profile},javadoc-release</release.profiles>
         <javadoc.title>${project.name}</javadoc.title>

@@ -28,6 +28,7 @@
         <testcontainers.skip>true</testcontainers.skip>
         <payara.imageName>lprimak/payara-full:5-latest</payara.imageName>
         <it.test.parallel>classes</it.test.parallel>
+        <japicmp.skip>true</japicmp.skip>
     </properties>
 
     <dependencies>

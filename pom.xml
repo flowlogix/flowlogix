@@ -61,6 +61,19 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>5.5.4</version>
+                        </dependency>
+                    </oldVersion>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
                 <version>3.0.2</version>

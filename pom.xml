@@ -25,6 +25,7 @@
         <base.directory.groupId>com.flowlogix</base.directory.groupId>
         <base.directory.artifactId>flowlogix</base.directory.artifactId>
         <payara.start.disable>true</payara.start.disable>
+        <japicmp.skip>false</japicmp.skip>
 
         <eclipselink.version>4.0.4</eclipselink.version>
         <omnifaces.version>4.4.1</omnifaces.version>

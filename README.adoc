@@ -17,7 +17,7 @@ image:https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-
 
 - Jakarta EE Lazy Data Model for PrimeFaces DataTable image:https://javadoc.io/badge2/com.flowlogix/flowlogix-datamodel/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel",window=_blank]
 - Apache Shiro Security / Jakarta EE integration - Now part of https://shiro.apache.org/jakarta-ee.html[Apache Shiro^]
-- Jakarta EE JPAFinder image:https://javadoc.io/badge2/com.flowlogix/flowlogix-jee/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-jee",window=_blank]
+- Jakarta EE JPAFinder Composable Criteria Queries image:https://javadoc.io/badge2/com.flowlogix/flowlogix-jee/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-jee",window=_blank]
 - Jakarta EE JSF JavaScript Minimized resource handler
 - Utilities (String / Object Type Converter, Stream reader)
 

@@ -83,9 +83,9 @@ See the link:https://maven.apache.org/guides/introduction/introduction-to-depend
 [[section-jee]]
 === FlowLogix Jakarta EE Components
 [[section-jpafinder]]
-==== `JPAFinder` for JPA: Delegation-based Enhanced Queries for Data Access Objects and business logic
+==== `JPAFinder` for JPA: Delegation-based Composable Queries for Data Access Objects and business logic
 .Enhanced Finder and count methods
-`findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can add additional JPA clauses, enhancements and hints. This parameter takes a form of `QueryEnhancement` interface, which extends `BiConsumer` interface. There are a number of `accept` convenience methods in  `QueryEnhancement` interface that can be passed via a method reference.
+`findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can add additional JPA clauses, enhancements and hints. This parameter takes a form of `QueryEnhancement` interface, which extends `BiConsumer` interface. There are a number of `accept` convenience methods in  `QueryEnhancement` interface that can be passed via a method reference. This achieves composability and of JPA queries.
 [source,java]
 .Enhanced query and hints example
 ----
@@ -93,7 +93,7 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/
 ----
 https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[Full Demo on GitHub^]
 [source,java]
-.Enhanced query with customized parameters
+.Composable query with customized parameters
 ----
 include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoExtractedParameters,indent=0]
 ----

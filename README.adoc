@@ -11,7 +11,7 @@ image:https://img.shields.io/github/commit-activity/m/flowlogix/flowlogix?style=
 image:https://img.shields.io/ossf-scorecard/github.com/flowlogix/flowlogix?style=plastic&label=openssf%20scorecard[link="https://deps.dev/maven/com.flowlogix:flowlogix"]
 image:https://img.shields.io/github/license/flowlogix/flowlogix?style=plastic[link="http://www.apache.org/licenses/LICENSE-2.0"]
 image:https://www.bestpractices.dev/projects/8431/badge[link="https://www.bestpractices.dev/projects/8431"]
-image:https://img.shields.io/badge/Reproducible_Builds-ok-success?labelColor=1e5b96[link="https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/com/flowlogix/README.md"]
+image:https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/com/flowlogix/badge.json[link="https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/com/flowlogix/README.md"]
 
 === Current Projects
 

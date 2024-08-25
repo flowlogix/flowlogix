@@ -85,7 +85,7 @@ See the link:https://maven.apache.org/guides/introduction/introduction-to-depend
 [[section-jpafinder]]
 ==== `JPAFinder` for JPA: Delegation-based Composable Queries for Data Access Objects and business logic
 .Enhanced Finder and count methods
-`findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can add additional JPA clauses, enhancements and hints. This parameter takes a form of `QueryEnhancement` interface, which extends `BiConsumer` interface. There are a number of `accept` convenience methods in  `QueryEnhancement` interface that can be passed via a method reference. This achieves composability and of JPA queries.
+`findAll()`, `findRange()` and `count()` take an optional argument to enhance the queries, which can add additional JPA clauses, enhancements and hints. This parameter takes a form of `QueryEnhancement` interface, which extends `BiConsumer` interface. There are a number of `accept` convenience methods in  `QueryEnhancement` interface that can be passed via a method reference. This enables composition of different `QueryEnhancement` instances.
 [source,java]
 .Enhanced query and hints example
 ----

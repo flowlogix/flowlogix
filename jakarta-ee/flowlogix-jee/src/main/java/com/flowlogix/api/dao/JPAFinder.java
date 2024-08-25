@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * Easily add query enhancement criteria to
+ * Easily add a composable query enhancement criteria to
  * {@link #findAll()} and {@link #findRange(long, long)} methods,
  * as well as {@link #count()} methods
  * <p>
@@ -53,7 +53,7 @@ public interface JPAFinder<TT> {
     TypedQuery<TT> findAll();
 
     /**
-     * find all entities with enriched criteria
+     * find all entities with enriched, composable criteria
      * <p>
      * Example:
      * <p>
@@ -76,7 +76,7 @@ public interface JPAFinder<TT> {
     TypedQuery<TT> findRange(long min, long max);
 
     /**
-     * find entities with enriched criteria given a specified range
+     * find entities with enriched, composable criteria given a specified range
      *
      * @param min minimum index, starting with zero
      * @param max maximum index
@@ -92,7 +92,7 @@ public interface JPAFinder<TT> {
     long count();
 
     /**
-     * count with enriched criteria
+     * count with enriched, composable criteria
      *
      * @param countQueryCriteria
      * @return row count
@@ -134,7 +134,7 @@ public interface JPAFinder<TT> {
 
     /**
      * Partial query criteria, only {@link CriteriaBuilder} and {@link Root}
-     * Used for common enriched query methods / lambdas
+     * Used by enriched count and find query methods / lambdas
      * <p>
      * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
      *
@@ -146,6 +146,7 @@ public interface JPAFinder<TT> {
 
     /**
      * Convenience interface for use with {@link CriteriaBuilderAndRoot} and {@link QueryCriteria}
+     * and is able to compose many enhanced query lambdas together
      * <p>
      * {@snippet class = "com.flowlogix.demo.jeedao.UserDAO" region = "daoParameters"}
 
@@ -171,7 +172,7 @@ public interface JPAFinder<TT> {
         }
 
         /**
-         * Allows for combinations of enhancements via method references
+         * Allows for composition of enhancements via method references
          * @see BiConsumer#andThen(BiConsumer)
          *
          * @param after

@@ -107,6 +107,13 @@ class ShrinkWrapManipulatorTest {
     }
 
     @Test
+    void logArchiveContents() {
+        when(javaArchive.toString(true)).thenReturn("archive-output");
+        ShrinkWrapManipulator.logArchiveContents(javaArchive, s -> assertThat(s).isEqualTo("archive-output"));
+        verifyNoMoreInteractions(javaArchive);
+    }
+
+    @Test
     @SuppressWarnings("checkstyle:MagicNumber")
     void invalidUrl() throws MalformedURLException {
         var url = URI.create("http://localhost:1234").toURL();

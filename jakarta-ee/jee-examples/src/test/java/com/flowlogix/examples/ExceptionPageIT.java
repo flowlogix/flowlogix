@@ -58,7 +58,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 @Tag("UserInterface")
 @RunAsClient
 @Slf4j
-public class ExceptionPageIT {
+class ExceptionPageIT {
     static final String DEPLOYMENT_DEV_MODE = "DevMode";
     static final String DEPLOYMENT_PROD_MODE = "ProdMode";
 
@@ -210,7 +210,7 @@ public class ExceptionPageIT {
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)
-    public static WebArchive createDeploymentDev() {
+    static WebArchive createDeploymentDev() {
         return createDeployment("");
     }
 
@@ -226,7 +226,7 @@ public class ExceptionPageIT {
     }
 
     @Deployment(name = DEPLOYMENT_PROD_MODE)
-    public static WebArchive createDeploymentProd() {
+    static WebArchive createDeploymentProd() {
         var productionList = List.of(new Action(getContextParamValue("jakarta.faces.PROJECT_STAGE"),
                 node -> node.setTextContent("Production")));
         return new ShrinkWrapManipulator().webXmlXPath(createDeployment("prod"), productionList);

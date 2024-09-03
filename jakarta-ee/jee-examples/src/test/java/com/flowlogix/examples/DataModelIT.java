@@ -48,7 +48,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 @ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
 @RunAsClient
-public class DataModelIT {
+class DataModelIT {
     @Drone
     private WebDriver webDriver;
 
@@ -92,7 +92,7 @@ public class DataModelIT {
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)
-    public static WebArchive createDeployment() {
+    static WebArchive createDeployment() {
         return ExceptionPageIT.createDeploymentDev();
     }
 }

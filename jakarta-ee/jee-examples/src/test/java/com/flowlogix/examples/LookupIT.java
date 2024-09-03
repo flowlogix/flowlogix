@@ -55,12 +55,12 @@ class LookupIT {
 
 
     @BeforeEach
-    public void before() {
+    void before() {
         example = new JndiExample();
     }
 
     @AfterEach
-    public void after() {
+    void after() {
         example = null;
     }
 
@@ -106,7 +106,7 @@ class LookupIT {
     }
 
     @Deployment(name = DEPLOYMENT_NAME)
-    public static WebArchive createDeployment() {
+    static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class, String.format("%s-%s", UUID.randomUUID(), "LookupTest.war"))
                 .addPackages(true, "org.omnifaces")
                 .addPackages(true, "org.assertj")

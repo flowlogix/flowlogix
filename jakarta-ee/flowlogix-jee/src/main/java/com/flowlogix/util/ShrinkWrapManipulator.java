@@ -47,6 +47,7 @@ import org.jboss.shrinkwrap.api.container.ResourceContainer;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import org.omnifaces.util.Lazy;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -123,6 +124,58 @@ public class ShrinkWrapManipulator {
             containerDeployment.addPackages(true, "org.assertj");
         }
         return deployment;
+    }
+
+    /**
+     * Logs the contents of the archive to the consumer
+     *
+     * @param archive to log
+     * @param consumer to log the contents
+     * @return the same archive
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>> TT logArchiveContents(TT archive, Consumer<String> consumer) {
+        consumer.accept(archive.toString(true));
+        return archive;
+    }
+
+    /**
+     * Adds payara-web.xml to the archive with the specified class delegation
+     *
+     * @param archive to modify
+     * @param delegate whether to delegate or not
+     * @return the same archive
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>> TT payaraClassDelegation(TT archive, boolean delegate) {
+        if (archive instanceof WebArchive webArchive) {
+            webArchive.addAsWebInfResource(
+                    new StringAsset("<payara-web-app><class-loader delegate=\"%s\"/></payara-web-app>"
+                            .formatted(delegate)), "payara-web.xml");
+        } else {
+            log.warn("Cannot add payara-web.xml to non-WebArchive");
+        }
+        return archive;
+    }
+
+    /**
+     * Adds SLF4J to the archive
+     *
+     * @param archive to modify
+     * @return the same archive
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>> TT packageSlf4j(TT archive) {
+        payaraClassDelegation(archive, false);
+        if (archive instanceof WebArchive webArchive) {
+            String slf4jServiceProvider = "services/org.slf4j.spi.SLF4JServiceProvider";
+            webArchive.addPackages(true, Logger.class.getPackage())
+                    .addAsWebInfResource(String.format("META-INF/%s", slf4jServiceProvider),
+                            String.format("classes/META-INF/%s", slf4jServiceProvider));
+        } else {
+            log.warn("Cannot add SLF4J to non-WebArchive");
+        }
+        return archive;
     }
 
     /**

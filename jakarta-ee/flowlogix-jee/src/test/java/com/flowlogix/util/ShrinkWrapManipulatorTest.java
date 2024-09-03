@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,11 +41,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -111,6 +115,30 @@ class ShrinkWrapManipulatorTest {
         when(javaArchive.toString(true)).thenReturn("archive-output");
         ShrinkWrapManipulator.logArchiveContents(javaArchive, s -> assertThat(s).isEqualTo("archive-output"));
         verifyNoMoreInteractions(javaArchive);
+    }
+
+    @Test
+    void payaraClassDelegationWarningWrongType() {
+        try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
+            Logger log = mock(Logger.class);
+            manipulator.when(ShrinkWrapManipulator::getLogger).thenReturn(log);
+            manipulator.when(() -> ShrinkWrapManipulator.payaraClassDelegation(any(), anyBoolean())).thenCallRealMethod();
+            ShrinkWrapManipulator.payaraClassDelegation(javaArchive, true);
+            verify(log).warn(eq("Cannot add payara-web.xml to non-WebArchive"));
+            verifyNoMoreInteractions(log);
+        }
+    }
+
+    @Test
+    void packageSlf4jWarningWrongType() {
+        try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
+            Logger log = mock(Logger.class);
+            manipulator.when(ShrinkWrapManipulator::getLogger).thenReturn(log);
+            manipulator.when(() -> ShrinkWrapManipulator.packageSlf4j(any())).thenCallRealMethod();
+            ShrinkWrapManipulator.packageSlf4j(javaArchive);
+            verify(log).warn(eq("Cannot add SLF4J to non-WebArchive"));
+            verifyNoMoreInteractions(log);
+        }
     }
 
     @Test

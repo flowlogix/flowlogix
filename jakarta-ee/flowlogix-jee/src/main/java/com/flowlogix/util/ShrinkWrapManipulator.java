@@ -153,7 +153,7 @@ public class ShrinkWrapManipulator {
                     new StringAsset("<payara-web-app><class-loader delegate=\"%s\"/></payara-web-app>"
                             .formatted(delegate)), "payara-web.xml");
         } else {
-            log.warn("Cannot add payara-web.xml to non-WebArchive");
+            getLogger().warn("Cannot add payara-web.xml to non-WebArchive");
         }
         return archive;
     }
@@ -173,7 +173,7 @@ public class ShrinkWrapManipulator {
                     .addAsWebInfResource(String.format("META-INF/%s", slf4jServiceProvider),
                             String.format("classes/META-INF/%s", slf4jServiceProvider));
         } else {
-            log.warn("Cannot add SLF4J to non-WebArchive");
+            getLogger().warn("Cannot add SLF4J to non-WebArchive");
         }
         return archive;
     }
@@ -277,6 +277,10 @@ public class ShrinkWrapManipulator {
         } else {
             action.func.accept(node);
         }
+    }
+
+    static Logger getLogger() {
+        return log;
     }
 
     @SneakyThrows(ParserConfigurationException.class)

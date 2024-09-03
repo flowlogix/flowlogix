@@ -239,7 +239,7 @@ public class ShrinkWrapManipulator {
     private static void optionalDeploymentOp(Runnable operator) {
         try {
             operator.run();
-        } catch (IllegalArgumentException e) {
+        } catch (Throwable e) {
             log.debug("Could not add optional class to deployment", e);
         }
     }

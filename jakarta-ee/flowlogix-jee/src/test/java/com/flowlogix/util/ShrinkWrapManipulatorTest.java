@@ -17,7 +17,9 @@ package com.flowlogix.util;
 
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,6 +67,23 @@ class ShrinkWrapManipulatorTest {
     private DocumentBuilder documentBuilder;
     @Mock
     private TransformerFactory transformerFactory;
+
+    private static class ComparableStringAsset extends StringAsset {
+        ComparableStringAsset(String content) {
+            super(content);
+        }
+
+        @Override
+        @SuppressWarnings("checkstyle:EqualsHashCode")
+        public boolean equals(Object obj) {
+            return obj instanceof StringAsset asset && asset.getSource().equals(this.getSource());
+        }
+
+        @Override
+        public String toString() {
+            return "Content[" + this.getSource() + "]";
+        }
+    }
 
     @Test
     void httpsUrl() throws MalformedURLException {
@@ -118,6 +137,28 @@ class ShrinkWrapManipulatorTest {
     }
 
     @Test
+    void payaraClassDelegationTrue() {
+        var archive = mock(WebArchive.class);
+        when(archive.addAsWebInfResource(any(StringAsset.class), any(String.class))).thenReturn(archive);
+        ShrinkWrapManipulator.payaraClassDelegation(archive, true);
+        verify(archive).addAsWebInfResource(
+                new ComparableStringAsset("<payara-web-app><class-loader delegate=\"true\"/></payara-web-app>"),
+                "payara-web.xml");
+        verifyNoMoreInteractions(archive);
+    }
+
+    @Test
+    void payaraClassDelegationFalse() {
+        var archive = mock(WebArchive.class);
+        when(archive.addAsWebInfResource(any(StringAsset.class), any(String.class))).thenReturn(archive);
+        ShrinkWrapManipulator.payaraClassDelegation(archive, false);
+        verify(archive).addAsWebInfResource(
+                new ComparableStringAsset("<payara-web-app><class-loader delegate=\"false\"/></payara-web-app>"),
+                "payara-web.xml");
+        verifyNoMoreInteractions(archive);
+    }
+
+    @Test
     void payaraClassDelegationWarningWrongType() {
         try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
             Logger log = mock(Logger.class);
@@ -127,6 +168,11 @@ class ShrinkWrapManipulatorTest {
             verify(log).warn(eq("Cannot add payara-web.xml to non-WebArchive"));
             verifyNoMoreInteractions(log);
         }
+    }
+
+    @Test
+    void packageSlf4j() {
+
     }
 
     @Test

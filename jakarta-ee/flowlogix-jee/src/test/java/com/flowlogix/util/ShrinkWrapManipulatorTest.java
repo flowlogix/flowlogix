@@ -165,7 +165,7 @@ class ShrinkWrapManipulatorTest {
             manipulator.when(ShrinkWrapManipulator::getLogger).thenReturn(log);
             manipulator.when(() -> ShrinkWrapManipulator.payaraClassDelegation(any(), anyBoolean())).thenCallRealMethod();
             ShrinkWrapManipulator.payaraClassDelegation(javaArchive, true);
-            verify(log).warn(eq("Cannot add payara-web.xml to non-WebArchive"));
+            verify(log).warn("Cannot add payara-web.xml to non-WebArchive");
             verifyNoMoreInteractions(log);
         }
     }
@@ -182,7 +182,7 @@ class ShrinkWrapManipulatorTest {
             manipulator.when(ShrinkWrapManipulator::getLogger).thenReturn(log);
             manipulator.when(() -> ShrinkWrapManipulator.packageSlf4j(any())).thenCallRealMethod();
             ShrinkWrapManipulator.packageSlf4j(javaArchive);
-            verify(log).warn(eq("Cannot add SLF4J to non-WebArchive"));
+            verify(log).warn("Cannot add SLF4J to non-WebArchive");
             verifyNoMoreInteractions(log);
         }
     }

@@ -47,6 +47,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
@@ -120,6 +121,20 @@ class ShrinkWrapManipulatorTest {
                     .as(any())).thenReturn(javaArchive);
             ShrinkWrapManipulator.createDeployment(JavaArchive.class);
             shrinkWrap.verify(() -> ShrinkWrap.create(eq(MavenImporter.class), endsWith(".jar")));
+        }
+    }
+
+    @Test
+    void createDeploymentWithMissingTestContainers() {
+        try (var shrinkWrap = mockStatic(ShrinkWrap.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+            shrinkWrap.when(() -> ShrinkWrap.create(eq(MavenImporter.class),
+                    notNull(String.class))).thenReturn(mavenImporter);
+            WebArchive webArchive = mock(WebArchive.class);
+            when(mavenImporter.loadPomFromFile(any(String.class)).importBuildOutput()
+                    .as(any())).thenReturn(webArchive);
+            when(webArchive.addClass(startsWith("com.flowlogix.testcontainers"))).thenThrow(NoClassDefFoundError.class);
+            ShrinkWrapManipulator.createDeployment(WebArchive.class);
+            shrinkWrap.verify(() -> ShrinkWrap.create(eq(MavenImporter.class), endsWith(".war")));
         }
     }
 
@@ -245,6 +260,11 @@ class ShrinkWrapManipulatorTest {
     void actionOnNodeWhenNull() {
         runActionOnNode(new Action("path", null, true), null);
         verifyNoMoreInteractions(documentBuilder, documentBuilderFactory, transformerFactory);
+    }
+
+    @Test
+    void logger() {
+        assertThat(ShrinkWrapManipulator.getLogger()).isNotNull();
     }
 
     private static int getPortFromProperty() {

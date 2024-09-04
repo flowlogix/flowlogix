@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
-public class DaoHelperIT {
+class DaoHelperIT {
     @Inject
     UserDAO userDao;
     @Inject
@@ -63,7 +63,7 @@ public class DaoHelperIT {
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)
-    public static WebArchive createDeployment() {
+    static WebArchive createDeployment() {
         return ExceptionPageIT.createDeploymentDev();
     }
 }

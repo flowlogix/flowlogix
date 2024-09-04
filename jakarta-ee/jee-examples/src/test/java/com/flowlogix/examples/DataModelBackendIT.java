@@ -40,7 +40,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 
 @ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
-public class DataModelBackendIT {
+class DataModelBackendIT {
     @Inject
     DataModelWrapper models;
     @Inject
@@ -289,7 +289,7 @@ public class DataModelBackendIT {
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)
-    public static WebArchive createDeployment() {
+    static WebArchive createDeployment() {
         return ExceptionPageIT.createDeploymentDev();
     }
 }

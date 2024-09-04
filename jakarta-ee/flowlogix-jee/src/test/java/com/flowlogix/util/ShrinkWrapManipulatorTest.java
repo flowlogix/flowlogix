@@ -17,12 +17,15 @@ package com.flowlogix.util;
 
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,11 +43,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -61,6 +68,23 @@ class ShrinkWrapManipulatorTest {
     private DocumentBuilder documentBuilder;
     @Mock
     private TransformerFactory transformerFactory;
+
+    private static class ComparableStringAsset extends StringAsset {
+        ComparableStringAsset(String content) {
+            super(content);
+        }
+
+        @Override
+        @SuppressWarnings("checkstyle:EqualsHashCode")
+        public boolean equals(Object obj) {
+            return obj instanceof StringAsset asset && asset.getSource().equals(this.getSource());
+        }
+
+        @Override
+        public String toString() {
+            return "Content[" + this.getSource() + "]";
+        }
+    }
 
     @Test
     void httpsUrl() throws MalformedURLException {
@@ -101,9 +125,93 @@ class ShrinkWrapManipulatorTest {
     }
 
     @Test
+    void createDeploymentWithMissingTestContainers() {
+        try (var shrinkWrap = mockStatic(ShrinkWrap.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+            shrinkWrap.when(() -> ShrinkWrap.create(eq(MavenImporter.class),
+                    notNull(String.class))).thenReturn(mavenImporter);
+            WebArchive webArchive = mock(WebArchive.class);
+            when(mavenImporter.loadPomFromFile(any(String.class)).importBuildOutput()
+                    .as(any())).thenReturn(webArchive);
+            when(webArchive.addClass(startsWith("com.flowlogix.testcontainers"))).thenThrow(NoClassDefFoundError.class);
+            ShrinkWrapManipulator.createDeployment(WebArchive.class);
+            shrinkWrap.verify(() -> ShrinkWrap.create(eq(MavenImporter.class), endsWith(".war")));
+        }
+    }
+
+    @Test
     void createDeploymentWithNull() {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> ShrinkWrapManipulator.createDeployment(JavaArchive.class, (String) null));
+    }
+
+    @Test
+    void logArchiveContents() {
+        when(javaArchive.toString(true)).thenReturn("archive-output");
+        ShrinkWrapManipulator.logArchiveContents(javaArchive, s -> assertThat(s).isEqualTo("archive-output"));
+        verifyNoMoreInteractions(javaArchive);
+    }
+
+    @Test
+    void payaraClassDelegationTrue() {
+        var archive = mock(WebArchive.class);
+        when(archive.addAsWebInfResource(any(StringAsset.class), any(String.class))).thenReturn(archive);
+        ShrinkWrapManipulator.payaraClassDelegation(archive, true);
+        verify(archive).addAsWebInfResource(
+                new ComparableStringAsset("<payara-web-app><class-loader delegate=\"true\"/></payara-web-app>"),
+                "payara-web.xml");
+        verifyNoMoreInteractions(archive);
+    }
+
+    @Test
+    void payaraClassDelegationFalse() {
+        var archive = mock(WebArchive.class);
+        when(archive.addAsWebInfResource(any(StringAsset.class), any(String.class))).thenReturn(archive);
+        ShrinkWrapManipulator.payaraClassDelegation(archive, false);
+        checkPayaraClassDelegationFalse(archive);
+        verifyNoMoreInteractions(archive);
+    }
+
+    private void checkPayaraClassDelegationFalse(WebArchive archive) {
+        verify(archive).addAsWebInfResource(
+                new ComparableStringAsset("<payara-web-app><class-loader delegate=\"false\"/></payara-web-app>"),
+                "payara-web.xml");
+    }
+
+    @Test
+    void payaraClassDelegationWarningWrongType() {
+        try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
+            Logger log = mock(Logger.class);
+            manipulator.when(ShrinkWrapManipulator::getLogger).thenReturn(log);
+            manipulator.when(() -> ShrinkWrapManipulator.payaraClassDelegation(any(), anyBoolean())).thenCallRealMethod();
+            ShrinkWrapManipulator.payaraClassDelegation(javaArchive, true);
+            verify(log).warn("Cannot add payara-web.xml to non-WebArchive");
+            verifyNoMoreInteractions(log);
+        }
+    }
+
+    @Test
+    void packageSlf4j() {
+        var archive = mock(WebArchive.class);
+        when(archive.addAsWebInfResource(any(StringAsset.class), any(String.class))).thenReturn(archive);
+        when(archive.addPackages(anyBoolean(), any(Package.class))).thenReturn(archive);
+        ShrinkWrapManipulator.packageSlf4j(archive);
+        checkPayaraClassDelegationFalse(archive);
+        verify(archive).addPackages(true, Logger.class.getPackage());
+        verify(archive).addAsWebInfResource("META-INF/services/org.slf4j.spi.SLF4JServiceProvider",
+                "classes/META-INF/services/org.slf4j.spi.SLF4JServiceProvider");
+        verifyNoMoreInteractions(archive);
+    }
+
+    @Test
+    void packageSlf4jWarningWrongType() {
+        try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
+            Logger log = mock(Logger.class);
+            manipulator.when(ShrinkWrapManipulator::getLogger).thenReturn(log);
+            manipulator.when(() -> ShrinkWrapManipulator.packageSlf4j(any())).thenCallRealMethod();
+            ShrinkWrapManipulator.packageSlf4j(javaArchive);
+            verify(log).warn("Cannot add SLF4J to non-WebArchive");
+            verifyNoMoreInteractions(log);
+        }
     }
 
     @Test
@@ -152,6 +260,11 @@ class ShrinkWrapManipulatorTest {
     void actionOnNodeWhenNull() {
         runActionOnNode(new Action("path", null, true), null);
         verifyNoMoreInteractions(documentBuilder, documentBuilderFactory, transformerFactory);
+    }
+
+    @Test
+    void logger() {
+        assertThat(ShrinkWrapManipulator.getLogger()).isNotNull();
     }
 
     private static int getPortFromProperty() {

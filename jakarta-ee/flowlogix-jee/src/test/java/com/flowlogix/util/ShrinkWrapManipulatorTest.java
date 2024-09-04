@@ -152,10 +152,14 @@ class ShrinkWrapManipulatorTest {
         var archive = mock(WebArchive.class);
         when(archive.addAsWebInfResource(any(StringAsset.class), any(String.class))).thenReturn(archive);
         ShrinkWrapManipulator.payaraClassDelegation(archive, false);
+        checkPayaraClassDelegationFalse(archive);
+        verifyNoMoreInteractions(archive);
+    }
+
+    private void checkPayaraClassDelegationFalse(WebArchive archive) {
         verify(archive).addAsWebInfResource(
                 new ComparableStringAsset("<payara-web-app><class-loader delegate=\"false\"/></payara-web-app>"),
                 "payara-web.xml");
-        verifyNoMoreInteractions(archive);
     }
 
     @Test
@@ -172,7 +176,15 @@ class ShrinkWrapManipulatorTest {
 
     @Test
     void packageSlf4j() {
-
+        var archive = mock(WebArchive.class);
+        when(archive.addAsWebInfResource(any(StringAsset.class), any(String.class))).thenReturn(archive);
+        when(archive.addPackages(anyBoolean(), any(Package.class))).thenReturn(archive);
+        ShrinkWrapManipulator.packageSlf4j(archive);
+        checkPayaraClassDelegationFalse(archive);
+        verify(archive).addPackages(true, Logger.class.getPackage());
+        verify(archive).addAsWebInfResource("META-INF/services/org.slf4j.spi.SLF4JServiceProvider",
+                "classes/META-INF/services/org.slf4j.spi.SLF4JServiceProvider");
+        verifyNoMoreInteractions(archive);
     }
 
     @Test

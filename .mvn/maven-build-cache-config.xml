@@ -1,0 +1,77 @@
+<cache xmlns="http://maven.apache.org/BUILD-CACHE-CONFIG/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://maven.apache.org/BUILD-CACHE-CONFIG/1.0.0 https://maven.apache.org/xsd/build-cache-config-1.0.0.xsd">
+    <configuration>
+        <enabled>true</enabled>
+        <hashAlgorithm>SHA-256</hashAlgorithm>
+        <validateXml>true</validateXml>
+        <remote enabled="false"/>
+        <local>
+            <maxBuildsCached>3</maxBuildsCached>
+        </local>
+        <projectVersioning adjustMetaInf="true"/>
+    </configuration>
+    <input>
+        <global>
+            <glob>
+                {*.java,*.groovy,*.yaml,*.svcd,*.proto,*assembly.xml,assembly*.xml,*logback.xml,*.vm,*.ini,*.jks,*.properties,*.sh,*.bat}
+            </glob>
+            <includes>
+                <include>src/</include>
+            </includes>
+            <excludes>
+                <exclude>pom.xml</exclude>
+            </excludes>
+        </global>
+    </input>
+    <executionControl>
+        <runAlways>
+            <plugins>
+                <plugin artifactId="maven-failsafe-plugin"/>
+            </plugins>
+            <goalsLists>
+                <goalsList artifactId="maven-install-plugin">
+                    <goals>
+                        <goal>install</goal>
+                    </goals>
+                </goalsList>
+                <goalsList artifactId="maven-deploy-plugin">
+                    <goals>
+                        <goal>deploy</goal>
+                    </goals>
+                </goalsList>
+            </goalsLists>
+        </runAlways>
+        <reconcile logAllProperties="true">
+            <plugins>
+                <plugin artifactId="maven-compiler-plugin" goal="compile">
+                    <reconciles>
+                        <reconcile propertyName="source"/>
+                        <reconcile propertyName="target"/>
+                        <reconcile propertyName="debug"/>
+                        <reconcile propertyName="debuglevel"/>
+                    </reconciles>
+                    <!--  whitelist of logged properties -->
+                    <logs>
+                        <log propertyName="includes"/>
+                        <log propertyName="excludes"/>
+                        <log propertyName="argLine"/>
+                    </logs>
+                </plugin>
+                <plugin artifactId="duplicate-finder-maven-plugin" goal="check">
+                    <reconciles>
+                        <reconcile propertyName="skip" skipValue="true"/>
+                        <reconcile propertyName="quiet" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin artifactId="maven-enforcer-plugin" goal="enforce">
+                    <reconciles>
+                        <reconcile propertyName="skip" skipValue="true"/>
+                    </reconciles>
+                    <nologs>
+                        <nolog propertyName="commandLineRules"/>
+                    </nologs>
+                </plugin>
+            </plugins>
+        </reconcile>
+    </executionControl>
+</cache>

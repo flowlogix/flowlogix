@@ -15,6 +15,8 @@
  */
 package com.flowlogix.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import java.util.logging.LogManager;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -70,6 +73,19 @@ public class ShrinkWrapManipulator {
 
         public Action(String path, Consumer<Node> func) {
             this(path, func, false);
+        }
+    }
+
+    static {
+        if (!Boolean.getBoolean("com.flowlogix.maven.resolver.warn")) {
+            try {
+                LogManager.getLogManager().readConfiguration(
+                        new ByteArrayInputStream(
+                                "org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader=SEVERE"
+                                .getBytes()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

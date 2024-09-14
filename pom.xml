@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>29</version>
+        <version>30</version>
     </parent>
 
     <properties>
@@ -30,7 +30,7 @@
         <eclipselink.version>4.0.4</eclipselink.version>
         <omnifaces.version>4.5.1</omnifaces.version>
         <primefaces.version>14.0.5</primefaces.version>
-        <depchain.version>28</depchain.version>
+        <depchain.version>29</depchain.version>
     </properties>
 
     <scm>

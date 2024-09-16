@@ -49,7 +49,6 @@ public class ExceptionBean implements Serializable {
     }
 
     public void throwExceptionFromMethod() {
-        log.info("*=*=*=*= The next WARNING is legit, it's expected");
         ExceptionUtils.asRuntimeException(new SQLException("sql-from-method"));
     }
 
@@ -67,5 +66,9 @@ public class ExceptionBean implements Serializable {
 
     public String expired() {
         return wasViewExpired() ? "Logged Out" : "Logged In";
+    }
+
+    public void printWarning() {
+        log.info("*=*=*=*= The previous WARNING is legit, it's expected");
     }
 }

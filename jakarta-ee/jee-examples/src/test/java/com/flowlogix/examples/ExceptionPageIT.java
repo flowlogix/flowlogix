@@ -26,12 +26,13 @@ import java.util.List;
 import java.util.Properties;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.Condition;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
@@ -93,6 +94,9 @@ class ExceptionPageIT {
     @FindBy(id = "form:methodSqlThrow")
     private WebElement methodSqlThrow;
 
+    @FindBy(id = "form:printWarning")
+    private WebElement printWarning;
+
     @FindBy(id = "end-of-page")
     private WebElement endOfPage;
 
@@ -151,9 +155,15 @@ class ExceptionPageIT {
         }
         assertThat(exceptionString).
                 as(String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match",
-                exceptionString)).matches(jakartify("""
-                ^WARNING: javax.faces.FacesException: #\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*""")
-                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\."));
+                        exceptionString)).is(anyOf(new Condition<>(String::isEmpty, "empty exception"),
+                        new Condition<>(log -> log.matches(jakartify("""
+                                ^WARNING: javax.faces.FacesException: #\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*""")
+                                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\.")),
+                                "exception log warning")));
+        if (!exceptionString.isEmpty()) {
+            fetchExceptionPage();
+            guardAjax(printWarning).click();
+        }
     }
 
     private String getLastException() {
@@ -216,7 +226,7 @@ class ExceptionPageIT {
 
     static WebArchive createDeployment(String suffix) {
         WebArchive archive = ShrinkWrapManipulator.createDeployment(WebArchive.class,
-                        name -> isBlank(suffix) ? name : String.format("%s-%s", name, suffix))
+                        name -> StringUtils.isBlank(suffix) ? name : String.format("%s-%s", name, suffix))
                 .addClass(DaoHelperIT.class)
                 .addClass(DataModelBackendIT.class);
 

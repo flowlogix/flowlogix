@@ -37,6 +37,10 @@
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>
             <p/>
+            <h:commandButton id="printWarning" value="Print Warning Info" action="#{exceptionBean.printWarning()}" >
+                <f:ajax execute="@form" render="@form" />
+            </h:commandButton>
+            <p/>
             <h:commandButton value="Invalidate Session via Faces" action="#{exceptionBean.invalidateSession()}" >
                 <f:ajax execute="@form" render="@form" />
             </h:commandButton>

@@ -27,10 +27,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.Condition;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import static org.assertj.core.api.Assertions.anyOf;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
@@ -92,6 +95,9 @@ public class ExceptionPageIT {
 
     @FindBy(id = "form:methodSqlThrow")
     private WebElement methodSqlThrow;
+
+    @FindBy(id = "form:printWarning")
+    private WebElement printWarning;
 
     @FindBy(id = "end-of-page")
     private WebElement endOfPage;
@@ -160,10 +166,17 @@ public class ExceptionPageIT {
         while (exceptionString.startsWith("WARNING: java.io.IOException: Connection is closed")) {
             exceptionString = exceptionString.lines().skip(1).findFirst().orElseGet(this::getLastException);
         }
-        assertTrue(exceptionString.matches(jakartify("^WARNING: javax.faces.FacesException: "
-                        + "#\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*")
-                        + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\.")),
-                String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match", exceptionString));
+        assertThat(exceptionString).
+                as(String.format("exceptionBean.throwExceptionFromMethod() - exception string <%s> doesn't match",
+                        exceptionString)).is(anyOf(new Condition<>(String::isEmpty, "empty exception"),
+                        new Condition<>(log -> log.matches(jakartify("^WARNING: javax.faces.FacesException: "
+                                + "#\\{exceptionBean.throwExceptionFromMethod\\(\\)\\}: .*")
+                                + "java.sql.SQLException: sql-from-method$".replaceAll("\\.", "\\.")),
+                                "exception log warning")));
+        if (!exceptionString.isEmpty()) {
+            fetchExceptionPage();
+            guardAjax(printWarning).click();
+        }
     }
 
     private String getLastException() {

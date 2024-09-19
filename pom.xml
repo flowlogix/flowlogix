@@ -17,7 +17,7 @@
     <properties>
         <maven.compiler.release>11</maven.compiler.release>
         <payara.version>5.2022.5</payara.version>
-        <eclipselink.version>2.7.15</eclipselink.version>
+        <eclipselink.version>3.0.0</eclipselink.version>
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>

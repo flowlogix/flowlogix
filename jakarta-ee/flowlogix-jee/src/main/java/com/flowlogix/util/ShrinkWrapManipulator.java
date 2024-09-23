@@ -89,7 +89,7 @@ public class ShrinkWrapManipulator {
         }
     }
 
-    static final String DEFAULT_SSL_PROPERTY = "sslPort";
+    static final String DEFAULT_SSL_PROPERTY = "httpsPort";
     static final int DEFAULT_SSL_PORT = 8181;
 
     final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);

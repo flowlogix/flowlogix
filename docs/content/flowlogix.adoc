@@ -310,13 +310,13 @@ NOTE: The input stream is not closed by the `readString` method
 .Configuring testing environments and making testing easier
 `ShrinkWrapManupulator` class has a few utility methods that make testing tricky behaviors easier.
 
-Some tests require TLS/SSL to execute properly. Arquillian uses plain http by default. To facilitate tests that require TLS/SSL, `toHttpsURL(url)` takes a URL and converts it to it's https equivalent, taking the `sslPort` system property into account. Default TLS port is 8181.
+Some tests require TLS/SSL to execute properly. Arquillian uses plain http by default. To facilitate tests that require TLS/SSL, `toHttpsURL(url)` takes a URL and converts it to it's https equivalent, taking the `httpsPort` system property into account. Default TLS port is 8181.
 A more complete method `toHttpURL(url, sslPortPropertyName, defaultPort)` is available if the default system property and port are not suitable for your needs.
 
 .With command below, toHttpsUrl("http://host/index.html") will return "https://host:8282/index.html"
 [source,shell]
 ----
-$ mvn verify -DsslPort=8282
+$ mvn verify -DhttpsPort=8282
 ----
 .Creating ShrinkWrap (Arquillian) tests easily from maven POM file
 [source,java]

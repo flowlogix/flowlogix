@@ -89,7 +89,7 @@ public class ShrinkWrapManipulator {
         }
     }
 
-    static final String DEFAULT_SSL_PROPERTY = "sslPort";
+    static final String DEFAULT_SSL_PROPERTY = "httpsPort";
     static final int DEFAULT_SSL_PORT = 8181;
 
     final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
@@ -247,6 +247,10 @@ public class ShrinkWrapManipulator {
             return httpUrl;
         }
         int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
+        // try the backup system proper
+        if (sslPort == defaultPort) {
+            sslPort = Integer.getInteger("sslPort", defaultPort);
+        }
         return new URI(httpUrl.getProtocol() + "s", null, httpUrl.getHost(), sslPort,
                 httpUrl.getPath(), null, null).toURL();
     }

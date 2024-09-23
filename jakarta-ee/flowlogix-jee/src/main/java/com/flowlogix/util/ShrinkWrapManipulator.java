@@ -126,7 +126,7 @@ public class ShrinkWrapManipulator {
             return httpUrl;
         }
         int sslPort = Integer.getInteger(sslPortPropertyName, defaultPort);
-        // try the backup system proper
+        // try the backup system property
         if (sslPort == defaultPort) {
             sslPort = Integer.getInteger("sslPort", defaultPort);
         }

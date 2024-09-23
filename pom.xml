@@ -30,7 +30,7 @@
         <eclipselink.version>4.0.4</eclipselink.version>
         <omnifaces.version>4.5.1</omnifaces.version>
         <primefaces.version>14.0.5</primefaces.version>
-        <depchain.version>30</depchain.version>
+        <depchain.version>31</depchain.version>
     </properties>
 
     <scm>

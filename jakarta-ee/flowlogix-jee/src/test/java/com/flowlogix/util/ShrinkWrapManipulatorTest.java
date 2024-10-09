@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PORT;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -267,7 +266,8 @@ class ShrinkWrapManipulatorTest {
         assertThat(ShrinkWrapManipulator.getLogger()).isNotNull();
     }
 
+    @SuppressWarnings("checkstyle:MagicNumber")
     private static int getPortFromProperty() {
-        return Integer.parseInt(System.getProperty(DEFAULT_SSL_PROPERTY, String.valueOf(DEFAULT_SSL_PORT)));
+        return Integer.parseInt(System.getProperty(DEFAULT_SSL_PROPERTY, String.valueOf(8181)));
     }
 }

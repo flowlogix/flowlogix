@@ -64,7 +64,6 @@ public class ShrinkWrapManipulator {
     }
 
     static final String DEFAULT_SSL_PROPERTY = "httpsPort";
-    static final int DEFAULT_SSL_PORT = 8181;
 
     @SuppressWarnings("ConstantName")
     private static final @Getter List<Action> standardActions = initializeStandardActions();
@@ -117,7 +116,7 @@ public class ShrinkWrapManipulator {
      */
     @SuppressWarnings("MagicNumber")
     public static URL toHttpsURL(URL httpUrl) {
-        return toHttpsURL(httpUrl, DEFAULT_SSL_PROPERTY, DEFAULT_SSL_PORT);
+        return toHttpsURL(httpUrl, DEFAULT_SSL_PROPERTY, -1);
     }
 
     @SneakyThrows

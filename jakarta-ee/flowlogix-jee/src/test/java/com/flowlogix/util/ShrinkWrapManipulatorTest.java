@@ -18,7 +18,6 @@ package com.flowlogix.util;
 import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.net.URI;
-import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PORT;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -50,7 +49,8 @@ public class ShrinkWrapManipulatorTest {
         assertSame(url, httpsUrl);
     }
 
+    @SuppressWarnings("checkstyle:MagicNumber")
     private static int getPortFromProperty() {
-        return Integer.parseInt(System.getProperty(DEFAULT_SSL_PROPERTY, String.valueOf(DEFAULT_SSL_PORT)));
+        return Integer.parseInt(System.getProperty(DEFAULT_SSL_PROPERTY, String.valueOf(8181)));
     }
 }

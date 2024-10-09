@@ -156,6 +156,14 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <httpsPort>${payara.https.port}</httpsPort>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>

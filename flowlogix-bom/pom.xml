@@ -11,7 +11,7 @@
 
     <properties>
         <slf4j.version>2.0.16</slf4j.version>
-        <omnifaces.version>3.14.6</omnifaces.version>
+        <omnifaces.version>3.14.7</omnifaces.version>
         <shiro.version>2.0.2</shiro.version>
         <bytebuddy.version>1.15.10</bytebuddy.version>
     </properties>

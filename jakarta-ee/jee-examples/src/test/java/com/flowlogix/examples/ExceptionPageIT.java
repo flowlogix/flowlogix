@@ -202,7 +202,7 @@ public class ExceptionPageIT {
         List<WebElement> scripts = webDriver.findElements(By.tagName("script"));
         int count = 0;
         for (WebElement script : scripts) {
-            String href = script.getAttribute("src");
+            String href = script.getDomAttribute("src");
             if (StringUtils.isBlank(href)) {
                 continue;
             }
@@ -214,7 +214,7 @@ public class ExceptionPageIT {
         count = 0;
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));
         for (WebElement css : csses) {
-            String href = css.getAttribute("href");
+            String href = css.getDomAttribute("href");
             if (StringUtils.isBlank(href)) {
                 continue;
             }

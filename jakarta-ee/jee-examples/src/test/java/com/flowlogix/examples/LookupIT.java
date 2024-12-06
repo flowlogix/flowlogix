@@ -84,10 +84,12 @@ class LookupIT {
     @Tag("StressTest")
     @OperateOnDeployment(DEPLOYMENT_NAME)
     void stressTest() throws InterruptedException {
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         ExecutorService exec = Executors.newFixedThreadPool(50
                 * Runtime.getRuntime().availableProcessors());
         AtomicBoolean failed = new AtomicBoolean();
         IntStream.rangeClosed(1, 10000).forEach(ii -> exec.submit(() -> {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
             try {
                 NumberGetter target1 = example.getLocator().getObjectNoCache("java:module/NumberGetter");
                 assertEquals(5, target1.getNumber());
@@ -98,6 +100,8 @@ class LookupIT {
             } catch (Throwable thr) {
                 failed.set(true);
                 throw Lombok.sneakyThrow(thr);
+            } finally {
+                Thread.currentThread().setContextClassLoader(null);
             }
         }));
         exec.shutdown();

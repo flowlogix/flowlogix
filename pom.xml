@@ -21,6 +21,7 @@
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
+        <jacocoOutputFile>${flowlogix.basedir}/target/jacoco.exec</jacocoOutputFile>
         <depchain.version>40</depchain.version>
     </properties>
 
@@ -141,7 +142,9 @@
                         <exclude>com/flowlogix/logcapture/**</exclude>
                         <exclude>com/flowlogix/testcontainers/**</exclude>
                     </excludes>
-                    <classDumpDir>${flowlogix.basedir}/target/classes-jacoco</classDumpDir>
+                    <destFile>${jacocoOutputFile}</destFile>
+                    <dataFile>${jacocoOutputFile}</dataFile>
+                    <classDumpDir>${flowlogix.basedir}/target/classes</classDumpDir>
                 </configuration>
             </plugin>
         </plugins>

@@ -132,15 +132,6 @@
                         <exclude>com/flowlogix/testcontainers/**</exclude>
                     </excludes>
                     <classDumpDir>${flowlogix.basedir}/target/classes</classDumpDir>
-<!--                    TODO: remove the below when next Base POM is released -->
-                    <fileSets>
-                        <fileSet>
-                            <directory>${project.basedir}</directory>
-                            <includes>
-                                <include>**/*.exec</include>
-                            </includes>
-                        </fileSet>
-                    </fileSets>
                 </configuration>
             </plugin>
         </plugins>

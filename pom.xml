@@ -141,7 +141,6 @@
                         <exclude>com/flowlogix/logcapture/**</exclude>
                         <exclude>com/flowlogix/testcontainers/**</exclude>
                     </excludes>
-                    <classDumpDir>${flowlogix.basedir}/target/classes</classDumpDir>
                 </configuration>
             </plugin>
         </plugins>

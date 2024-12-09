@@ -1,4 +1,6 @@
-# Add the following before the last java execution in mvnw:
-# . $MAVEN_PROJECTBASEDIR/.mvn/maven.args
-MAVEN_CONFIG="-s ${MAVEN_PROJECTBASEDIR}/.mvn/settings.xml -Ddrone.browser=firefox \
--Dorg.slf4j.simpleLogger.log.org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader=error"
+# Add the following line before the last java execution in mvnw / exec_maven function:
+# . "$(dirname $0)"/.mvn/maven.args
+export MAVEN_ARGS="-s $(dirname $0)/.mvn/settings.xml -Ddrone.browser=firefox \
+${MAVEN_ARGS:-}"
+export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader=error \
+${MAVEN_OPTS:-}"

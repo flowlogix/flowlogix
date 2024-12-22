@@ -27,6 +27,8 @@
         <runAlways>
             <plugins>
                 <plugin artifactId="maven-failsafe-plugin"/>
+                <plugin groupId="org.codehaus.mojo" artifactId="exec-maven-plugin"/>
+                <plugin groupId="org.commonjava.maven.plugins" artifactId="directory-maven-plugin"/>
             </plugins>
             <goalsLists>
                 <goalsList artifactId="maven-install-plugin">

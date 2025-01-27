@@ -50,7 +50,7 @@
         <dependency>
             <groupId>org.omnifaces</groupId>
             <artifactId>optimusfaces</artifactId>
-            <version>0.16</version>
+            <version>0.18.J1</version>
         </dependency>
         <dependency>
             <groupId>org.omnifaces</groupId>

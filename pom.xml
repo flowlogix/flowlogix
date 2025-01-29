@@ -29,7 +29,7 @@
 
         <eclipselink.version>4.0.5</eclipselink.version>
         <omnifaces.version>4.6</omnifaces.version>
-        <primefaces.version>14.0.10</primefaces.version>
+        <primefaces.version>14.0.11</primefaces.version>
         <depchain.version>49</depchain.version>
     </properties>
 

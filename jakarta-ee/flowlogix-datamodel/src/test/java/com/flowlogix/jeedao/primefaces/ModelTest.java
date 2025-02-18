@@ -216,7 +216,7 @@ class ModelTest implements Serializable {
         verify(rootObject).get((String) null);
         var fm = FilterMeta.builder().field("ccc").filterValue("hello").build();
         impl.getFilters(Map.of("bbb", fm), cb, rootObject);
-        var fm2 = FilterMeta.of(null, null);
+        var fm2 = FilterMeta.of(null, null, false);
         impl.getFilters(Map.of("bbb", fm2), cb, rootObject);
         var fm3 = FilterMeta.builder().field(GLOBAL_FILTER_KEY).build();
         impl.getFilters(Map.of("bbb", fm3), cb, rootObject);

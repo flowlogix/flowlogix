@@ -209,7 +209,7 @@ public class ExceptionPageIT {
             assertTrue(href.contains("v="), "not versioned");
             ++count;
         }
-        assertEquals(isShiroNativeSessionsIntegrationTest() ? 6 : 5, count);
+        assertEquals(isShiroNativeSessionsIntegrationTest() ? 5 : 4, count);
 
         count = 0;
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));

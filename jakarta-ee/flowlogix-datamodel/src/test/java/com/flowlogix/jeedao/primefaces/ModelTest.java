@@ -453,7 +453,7 @@ class ModelTest implements Serializable {
         var model = new JPALazyDataModel<Integer>()
                 .partialInitialize(builder -> builder.entityClass(Integer.class).build());
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> model.partialInitialize(builder -> builder.build()));
+                .isThrownBy(() -> model.partialInitialize(JPAModelImpl.JPAModelImplBuilder::build));
         assertThat(model.getEntityClass()).isEqualTo(Integer.class);
     }
 

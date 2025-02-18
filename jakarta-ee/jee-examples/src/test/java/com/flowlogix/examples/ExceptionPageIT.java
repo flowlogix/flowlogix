@@ -204,7 +204,7 @@ class ExceptionPageIT {
             assertThat(href).as("not versioned").contains("v=");
             ++count;
         }
-        assertThat(count).isEqualTo(5);
+        assertThat(count).isEqualTo(4);
 
         count = 0;
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));

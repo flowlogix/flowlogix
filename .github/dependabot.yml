@@ -29,3 +29,10 @@ updates:
       update-types: ["version-update:semver-major"]
     - dependency-name: "fish.payara.arquillian:arquillian-payara-server-remote"
       update-types: ["version-update:semver-major"]
+
+# Dependencies for GitHub Actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+    open-pull-requests-limit: 10

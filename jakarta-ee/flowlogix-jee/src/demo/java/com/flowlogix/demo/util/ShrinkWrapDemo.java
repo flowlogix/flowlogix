@@ -23,16 +23,16 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
 
-@SuppressWarnings("HideUtilityClassConstructor")
+@SuppressWarnings({"HideUtilityClassConstructor", "unused"})
 @Slf4j
 public class ShrinkWrapDemo {
     // @Deployment
     // @start region="deployMaven"
     // tag::deployMaven[] // @replace regex='.*\n' replacement=""
-    public static WebArchive deployMaven() {
-        WebArchive archive = ShrinkWrapManipulator.createDeployment(WebArchive.class);
-        log.info("Archive Contents: %s", archive.toString(true));
-        return archive;
+    static WebArchive deployMaven() {
+        return ShrinkWrapManipulator.logArchiveContents(
+                ShrinkWrapManipulator.createDeployment(WebArchive.class),
+                contents -> log.info("Archive Contents: {}", contents));
     }
     // end::deployMaven[] // @replace regex='.*\n' replacement=""
     // @end
@@ -40,10 +40,11 @@ public class ShrinkWrapDemo {
     // @Deployment
     // @start region="deployMavenSuffix"
     // tag::deployMavenSuffix[] // @replace regex='.*\n' replacement=""
-    public static WebArchive deployMavenSuffix() {
-        WebArchive archive = ShrinkWrapManipulator.createDeployment(WebArchive.class, name -> name + "-prod");
-        log.info("Archive Contents: %s", archive.toString(true));
-        return archive;
+    static WebArchive deployMavenSuffix() {
+        return ShrinkWrapManipulator.logArchiveContents(
+                ShrinkWrapManipulator.createDeployment(WebArchive.class,
+                        name -> name + "-prod"),
+                contents -> log.info("Archive Contents: {}", contents));
     }
     // end::deployMavenSuffix[] // @replace regex='.*\n' replacement=""
     // @end
@@ -51,7 +52,7 @@ public class ShrinkWrapDemo {
     // @Deployment
     // @start region="productionMode"
     // tag::productionMode[] // @replace regex='.*\n' replacement=""
-    public static WebArchive deployProductionMode() {
+    static WebArchive deployProductionMode() {
         var archive = ShrinkWrapManipulator.createDeployment(WebArchive.class);
         // add classes to the archive here
         var productionList = List.of(new Action(getContextParamValue(

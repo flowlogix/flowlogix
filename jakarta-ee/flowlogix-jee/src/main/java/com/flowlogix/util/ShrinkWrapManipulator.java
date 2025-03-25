@@ -173,15 +173,9 @@ public class ShrinkWrapManipulator {
      */
     public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType, @NonNull String archiveName,
                                                                Path pomFilePath) {
-        TT deployment = ShrinkWrap.create(MavenImporter.class, archiveName)
+        return packageTestRequirements(ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile(pomFilePath.toFile()).importBuildOutput()
-                .as(archiveType);
-        if (deployment instanceof ClassContainer<?> containerDeployment) {
-            optionalDeploymentOp(() -> containerDeployment
-                    .addClass("com.flowlogix.testcontainers.PayaraServerLifecycleExtension"));
-            containerDeployment.addPackages(true, "org.assertj");
-        }
-        return deployment;
+                .as(archiveType));
     }
 
     /**
@@ -234,6 +228,23 @@ public class ShrinkWrapManipulator {
             getLogger().warn("Cannot add SLF4J to non-WebArchive");
         }
         return archive;
+    }
+
+    /**
+     * Adds test requirements to the deployment
+     * Currently adds PayaraServerLifecycleExtension and org.assertj packages
+
+     * @param deployment to modify
+     * @return the same deployment
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>> TT packageTestRequirements(TT deployment) {
+        if (deployment instanceof ClassContainer<?> containerDeployment) {
+            optionalDeploymentOp(() -> containerDeployment
+                    .addClass("com.flowlogix.testcontainers.PayaraServerLifecycleExtension"));
+            containerDeployment.addPackages(true, "org.assertj");
+        }
+        return deployment;
     }
 
     /**

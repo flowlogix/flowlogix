@@ -178,7 +178,7 @@ class ShrinkWrapManipulatorTest {
     }
 
     @Test
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     void packageTestRequirements() {
         assertThat(ShrinkWrapManipulator.packageTestRequirements((Archive) null)).isNull();
     }

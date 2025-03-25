@@ -16,6 +16,7 @@
 package com.flowlogix.util;
 
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -32,10 +33,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.file.Path;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -116,7 +119,7 @@ class ShrinkWrapManipulatorTest {
         try (var shrinkWrap = mockStatic(ShrinkWrap.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
             shrinkWrap.when(() -> ShrinkWrap.create(eq(MavenImporter.class),
                     notNull(String.class))).thenReturn(mavenImporter);
-            when(mavenImporter.loadPomFromFile(any(String.class)).importBuildOutput()
+            when(mavenImporter.loadPomFromFile(any(File.class)).importBuildOutput()
                     .as(any())).thenReturn(javaArchive);
             ShrinkWrapManipulator.createDeployment(JavaArchive.class);
             shrinkWrap.verify(() -> ShrinkWrap.create(eq(MavenImporter.class), endsWith(".jar")));
@@ -129,7 +132,7 @@ class ShrinkWrapManipulatorTest {
             shrinkWrap.when(() -> ShrinkWrap.create(eq(MavenImporter.class),
                     notNull(String.class))).thenReturn(mavenImporter);
             WebArchive webArchive = mock(WebArchive.class);
-            when(mavenImporter.loadPomFromFile(any(String.class)).importBuildOutput()
+            when(mavenImporter.loadPomFromFile(any(File.class)).importBuildOutput()
                     .as(any())).thenReturn(webArchive);
             when(webArchive.addClass(startsWith("com.flowlogix.testcontainers"))).thenThrow(NoClassDefFoundError.class);
             ShrinkWrapManipulator.createDeployment(WebArchive.class);
@@ -138,9 +141,46 @@ class ShrinkWrapManipulatorTest {
     }
 
     @Test
-    void createDeploymentWithNull() {
+    void createDeploymentWithPomPath() {
+        try (var shrinkWrap = mockStatic(ShrinkWrap.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+            shrinkWrap.when(() -> ShrinkWrap.create(eq(MavenImporter.class),
+                    notNull(String.class))).thenReturn(mavenImporter);
+            when(mavenImporter.loadPomFromFile(any(File.class)).importBuildOutput()
+                    .as(any())).thenReturn(javaArchive);
+            ShrinkWrapManipulator.createDeployment(JavaArchive.class, Path.of("abc.xml"));
+            verify(mavenImporter).loadPomFromFile(Path.of("abc.xml").toFile());
+            shrinkWrap.verify(() -> ShrinkWrap.create(eq(MavenImporter.class), endsWith(".jar")));
+        }
+    }
+
+    @Test
+    void createDeploymentWithArchiveName() {
+        try (var shrinkWrap = mockStatic(ShrinkWrap.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+            shrinkWrap.when(() -> ShrinkWrap.create(eq(MavenImporter.class),
+                    notNull(String.class))).thenReturn(mavenImporter);
+            when(mavenImporter.loadPomFromFile(any(File.class)).importBuildOutput()
+                    .as(any())).thenReturn(javaArchive);
+            ShrinkWrapManipulator.createDeployment(JavaArchive.class, "abc.jar");
+            shrinkWrap.verify(() -> ShrinkWrap.create(eq(MavenImporter.class), eq("abc.jar")));
+        }
+    }
+
+    @Test
+    void createDeploymentWithNullArchiveName() {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> ShrinkWrapManipulator.createDeployment(JavaArchive.class, (String) null));
+    }
+
+    @Test
+    void createDeploymentWithNullArchiveName2() {
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> ShrinkWrapManipulator.createDeployment(JavaArchive.class, (String) null, Path.of("abc.xml")));
+    }
+
+    @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void packageTestRequirements() {
+        assertThat(ShrinkWrapManipulator.packageTestRequirements((Archive) null)).isNull();
     }
 
     @Test

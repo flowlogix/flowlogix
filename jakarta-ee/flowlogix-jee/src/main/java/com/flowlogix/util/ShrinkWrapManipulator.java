@@ -23,9 +23,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.logging.LogManager;
 import javax.xml.parsers.DocumentBuilder;
@@ -90,6 +92,8 @@ public class ShrinkWrapManipulator {
     }
 
     static final String DEFAULT_SSL_PROPERTY = "httpsPort";
+    @SuppressWarnings("checkstyle:ConstantName")
+    private static final Supplier<Path> defaultPomFilePath = () -> Path.of("pom.xml");
 
     final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
     final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
@@ -109,15 +113,41 @@ public class ShrinkWrapManipulator {
      * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
      *
      * @param archiveType
+     * @param pomFilePath
+     * @return
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType, Path pomFilePath) {
+        return createDeployment(archiveType, name -> name, pomFilePath);
+    }
+
+    /**
+     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
+     *
+     * @param archiveType
      * @param nameTransformer transforms the UUID to a more suitable name
      * @return new archive
      * @param <TT> ShrinkWrap archive type
      */
     public static <TT extends Archive<TT>>
     TT createDeployment(Class<TT> archiveType, UnaryOperator<String> nameTransformer) {
+        return createDeployment(archiveType, nameTransformer, defaultPomFilePath.get());
+    }
+
+    /**
+     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
+     *
+     * @param archiveType
+     * @param nameTransformer transforms the UUID to a more suitable name
+     * @param pomFilePath
+     * @return new archive
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>>
+    TT createDeployment(Class<TT> archiveType, UnaryOperator<String> nameTransformer, Path pomFilePath) {
         char firstLetter = archiveType.getSimpleName().toLowerCase().charAt(0);
         return createDeployment(archiveType, String.format("s%s.%car",
-                nameTransformer.apply(UUID.randomUUID().toString()), firstLetter));
+                nameTransformer.apply(UUID.randomUUID().toString()), firstLetter), pomFilePath);
     }
 
     /**
@@ -129,11 +159,24 @@ public class ShrinkWrapManipulator {
      * @param <TT> ShrinkWrap archive type
      */
     public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType, @NonNull String archiveName) {
+        return createDeployment(archiveType, archiveName, defaultPomFilePath.get());
+    }
+
+    /**
+     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file
+     *
+     * @param archiveType
+     * @param archiveName
+     * @param pomFilePath
+     * @return new archive
+     * @param <TT> ShrinkWrap archive type
+     */
+    public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType, @NonNull String archiveName,
+                                                               Path pomFilePath) {
         TT deployment = ShrinkWrap.create(MavenImporter.class, archiveName)
-                .loadPomFromFile("pom.xml").importBuildOutput()
+                .loadPomFromFile(pomFilePath.toFile()).importBuildOutput()
                 .as(archiveType);
-        if (deployment instanceof ClassContainer<?>) {
-            var containerDeployment = ((ClassContainer<?>) deployment);
+        if (deployment instanceof ClassContainer<?> containerDeployment) {
             optionalDeploymentOp(() -> containerDeployment
                     .addClass("com.flowlogix.testcontainers.PayaraServerLifecycleExtension"));
             containerDeployment.addPackages(true, "org.assertj");

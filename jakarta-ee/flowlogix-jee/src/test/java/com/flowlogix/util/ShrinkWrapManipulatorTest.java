@@ -16,6 +16,7 @@
 package com.flowlogix.util;
 
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -168,6 +169,18 @@ class ShrinkWrapManipulatorTest {
     void createDeploymentWithNullArchiveName() {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> ShrinkWrapManipulator.createDeployment(JavaArchive.class, (String) null));
+    }
+
+    @Test
+    void createDeploymentWithNullArchiveName2() {
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> ShrinkWrapManipulator.createDeployment(JavaArchive.class, (String) null, Path.of("abc.xml")));
+    }
+
+    @Test
+    @SuppressWarnings("rawtypes")
+    void packageTestRequirements() {
+        assertThat(ShrinkWrapManipulator.packageTestRequirements((Archive) null)).isNull();
     }
 
     @Test

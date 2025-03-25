@@ -153,7 +153,19 @@ class ShrinkWrapManipulatorTest {
     }
 
     @Test
-    void createDeploymentWithNull() {
+    void createDeploymentWithArchiveName() {
+        try (var shrinkWrap = mockStatic(ShrinkWrap.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+            shrinkWrap.when(() -> ShrinkWrap.create(eq(MavenImporter.class),
+                    notNull(String.class))).thenReturn(mavenImporter);
+            when(mavenImporter.loadPomFromFile(any(File.class)).importBuildOutput()
+                    .as(any())).thenReturn(javaArchive);
+            ShrinkWrapManipulator.createDeployment(JavaArchive.class, "abc.jar");
+            shrinkWrap.verify(() -> ShrinkWrap.create(eq(MavenImporter.class), eq("abc.jar")));
+        }
+    }
+
+    @Test
+    void createDeploymentWithNullArchiveName() {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> ShrinkWrapManipulator.createDeployment(JavaArchive.class, (String) null));
     }

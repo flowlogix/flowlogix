@@ -82,8 +82,12 @@ public class ShrinkWrapManipulator {
         if (!Boolean.getBoolean("com.flowlogix.maven.resolver.warn")) {
             try {
                 LogManager.getLogManager().readConfiguration(
-                        new ByteArrayInputStream(
-                                "org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader=SEVERE"
+                        // first one is the maven rc-3 and later
+                        // second one is the pre-rc-3 logger
+                        new ByteArrayInputStream("""
+                                org.apache.maven.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
+                                org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
+                                """
                                 .getBytes()));
             } catch (IOException e) {
                 throw new RuntimeException(e);

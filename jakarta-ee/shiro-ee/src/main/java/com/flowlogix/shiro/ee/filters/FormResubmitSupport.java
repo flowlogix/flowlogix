@@ -122,7 +122,7 @@ public class FormResubmitSupport {
 
     @RequiredArgsConstructor
     @EqualsAndHashCode @ToString
-    @SuppressWarnings("VisibilityModifier")
+    @SuppressWarnings({"checkstyle:VisibilityModifier", "checkstyle:JavadocVariable"})
     static class PartialAjaxResult {
         public final String result;
         public final boolean isPartialAjaxRequest;

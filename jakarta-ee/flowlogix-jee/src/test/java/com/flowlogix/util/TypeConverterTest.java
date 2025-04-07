@@ -93,6 +93,7 @@ class TypeConverterTest {
         assertThat(TypeConverter.valueOf(BigDecimal.ONE.toPlainString(), BigDecimal.class)).isEqualTo(BigDecimal.ONE);
     }
 
+    @SuppressWarnings("checkstyle:JavadocVariable")
     private enum MyEnum {
         ONE, TWO;
     }

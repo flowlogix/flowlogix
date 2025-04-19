@@ -1,6 +1,8 @@
 = Welcome to Flow Logix Project Home Page
 :linkattrs:
 
+image:https://img.shields.io/maven-central/v/com.flowlogix/flowlogix?style=plastic&label=maven-central%20%5Bcomponents%5D[link="https://central.sonatype.com/artifact/com.flowlogix/flowlogix-jee"]
+image:https://img.shields.io/maven-central/v/com.flowlogix/flowlogix?style=plastic&label=maven-central%20%5Bdatamodel%5D[link="https://central.sonatype.com/artifact/com.flowlogix/flowlogix-datamodel"]
 image:https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.hope.nyc.ny.us%2Fjob%2Fflowlogix-ee-integration%2Fjob%2Fmain&style=plastic[link="https://jenkins.hope.nyc.ny.us/job/flowlogix-ee-integration/job/main/"]
 image:https://jenkins.hope.nyc.ny.us/job/flowlogix-ee-integration/job/main/lastCompletedBuild/badge/icon?subject=Coverage&status=${instructionCoverage}&color=${colorInstructionCoverage}&style=plastic[link="https://jenkins.hope.nyc.ny.us/job/flowlogix-ee-integration/job/main/lastCompletedBuild/jacoco/"]
 image:https://img.shields.io/jenkins/tests?compact_message&failed_label=failed&jobUrl=https%3A%2F%2Fjenkins.hope.nyc.ny.us%2Fjob%2Fflowlogix-ee-integration%2Fjob%2Fmain%2F&passed_label=passed&skipped_label=skipped&style=plastic[link="https://jenkins.hope.nyc.ny.us/job/flowlogix-ee-integration/job/main/lastCompletedBuild/testReport/"]

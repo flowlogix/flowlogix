@@ -22,6 +22,7 @@
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
         <depchain.version>57</depchain.version>
+        <groovy.version>4.0.26</groovy.version>
     </properties>
 
     <scm>
@@ -82,7 +83,7 @@
                     <dependency>
                         <groupId>org.apache.groovy</groupId>
                         <artifactId>groovy-all</artifactId>
-                        <version>4.0.26</version>
+                        <version>${groovy.version}</version>
                         <scope>runtime</scope>
                         <type>pom</type>
                     </dependency>

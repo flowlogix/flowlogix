@@ -21,7 +21,7 @@
         <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
-        <depchain.version>57</depchain.version>
+        <depchain.version>58</depchain.version>
         <groovy.version>4.0.26</groovy.version>
     </properties>
 

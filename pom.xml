@@ -171,8 +171,8 @@
                         <bottom>Copyright © ${project.inceptionYear}-2025 Flow Logix, Inc. All Rights Reserved.</bottom>
                         <excludePackageNames>*.internal</excludePackageNames>
                         <links>
-                            <link>${central.archive.url}/org/primefaces/primefaces/${primefaces.version}/primefaces-${primefaces.version}-javadoc.jar/!</link>
-                            <link>${central.archive.url}/org/omnifaces/omnifaces/${omnifaces.version}/omnifaces-${omnifaces.version}-javadoc.jar/!</link>
+                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/${omnifaces.version}</link>
+                            <link>https://javadoc.io/doc/org.primefaces/primefaces/${primefaces.version}</link>
                         </links>
                     </configuration>
                 </plugin>

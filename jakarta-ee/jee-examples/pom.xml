@@ -16,7 +16,6 @@
     </parent>
 
     <properties>
-        <root.basedir>${flowlogix.basedir}</root.basedir>
         <demo.entity.jar>lib/flowlogix-jee-${project.version}-tests.jar</demo.entity.jar>
         <delombok.phase>generate-sources</delombok.phase>
         <javadoc.sourcepath>${project.build.directory}/generated-sources/annotations

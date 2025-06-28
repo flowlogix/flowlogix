@@ -16,7 +16,6 @@
     </parent>
 
     <properties>
-        <root.basedir>${flowlogix.basedir}</root.basedir>
         <delombok.phase>generate-sources</delombok.phase>
         <javadoc.sourcepath>${project.build.directory}/generated-sources/annotations
             :${project.build.directory}/generated-sources/delombok</javadoc.sourcepath>
@@ -205,18 +204,6 @@
                 </executions>
             </plugin>
         </plugins>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <configuration>
-                        <executable>${flowlogix.basedir}/target/dependency/payara5/bin/asadmin</executable>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
     <profiles>

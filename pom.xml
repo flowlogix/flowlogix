@@ -18,7 +18,7 @@
         <maven.compiler.release>11</maven.compiler.release>
         <payara.version>5.2022.5</payara.version>
         <eclipselink.version>2.7.16</eclipselink.version>
-        <checkstyle.supressionsLocation>${flowlogix.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
+        <checkstyle.supressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
         <depchain.version>65</depchain.version>
@@ -38,30 +38,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.commonjava.maven.plugins</groupId>
-                <artifactId>directory-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <id>directories</id>
-                        <goals>
-                            <goal>directory-of</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <property>flowlogix.basedir</property>
-                            <project>
-                                <groupId>com.flowlogix</groupId>
-                                <artifactId>flowlogix</artifactId>
-                            </project>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
@@ -98,7 +74,7 @@
                         <configuration>
                             <scripts>
                                 <!-- combine individual test profiles into a single test group property -->
-                                <script>${flowlogix.basedir}/setTestGroupProperties.groovy</script>
+                                <script>${maven.multiModuleProjectDirectory}/setTestGroupProperties.groovy</script>
                             </scripts>
                         </configuration>
                     </execution>
@@ -314,7 +290,7 @@
                     <version>9.0.2</version>
                     <configuration>
                         <useNativeGit>false</useNativeGit>
-                        <dotGitDirectory>${flowlogix.basedir}/.git</dotGitDirectory>
+                        <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
                         <failOnNoGitDirectory>false</failOnNoGitDirectory>
                         <abbrevLength>7</abbrevLength>
                         <gitDescribe>

@@ -18,7 +18,7 @@
         <maven.compiler.release>11</maven.compiler.release>
         <payara.version>5.2022.5</payara.version>
         <eclipselink.version>2.7.16</eclipselink.version>
-        <checkstyle.supressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
+        <checkstyle.suppressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle/suppressions.xml</checkstyle.suppressionsLocation>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
         <depchain.version>68</depchain.version>

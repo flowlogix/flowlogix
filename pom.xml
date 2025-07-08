@@ -27,7 +27,7 @@
         <eclipselink.version>4.0.7</eclipselink.version>
         <omnifaces.version>4.6.5</omnifaces.version>
         <primefaces.version>15.0.5</primefaces.version>
-        <depchain.version>70</depchain.version>
+        <depchain.version>71</depchain.version>
     </properties>
 
     <scm>

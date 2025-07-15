@@ -1,0 +1,17 @@
+= How to build the documentation (dev mode)
+
+[source, bash]
+.Update the submodules (optional)
+----
+$ git submodule update --init --remote --recursive
+----
+[source, bash]
+.Host a local JBake server on port 8820 that will watch for changes
+----
+$ jbake -b -s . jbake-maven/target/output
+----
+[source, bash]
+.Or, you can generate the documentation via maven (one-time build)
+----
+$ mvnd generate-resources -Dsass.skip -f jbake-maven
+----

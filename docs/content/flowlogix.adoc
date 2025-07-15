@@ -6,7 +6,7 @@
 :toc:
 
 [[section-introduction-and-features]]
-== Introduction and Features
+== Introduction and Features of FlowLogix Jakarta EE Components
 .Why another utility or component library?
 FlowLogix provides a few remaining missing pieces in what is covered by Jakarta EE, PrimeFaces, OmniFaces, Apache Shiro and other very popular software.
 

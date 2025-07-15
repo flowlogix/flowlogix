@@ -1,0 +1,24 @@
+:jbake-title: Flow Logix Maven Parent POM
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-keywords: docs jee jakarta-ee jakartaee java-ee apache maven parent pom
+
+:toc:
+
+[[section-introduction]]
+== Introduction to Flow Logix Maven Parent POM
+Dramatically simplifies the development of applications by using the parent POM.
+
+[[section-questions]]
+== Frequently Asked Questions
+Q: Is this just for Flow Logix, or can I use it for my own projects? +
+A: This is a general-purpose parent POM that can be used for any project. It is not specific to Flow Logix. You can override the default settings to suit your project's name, developers, scm or any other section necessary to customize it for your own project.
+
+Q: Which one do I choose? `infra`, `payara` or `base`? +
+A: The `base` POM is minimal and can be used for any project. The `infra` POM is opinionated with many features and preconfigured defaults, while the `payara` POM is for projects that use Payara Platform. If you are not sure which one to use, start with the `base` POM.
+
+Q: I already have a parent POM, can I use this one? +
+A: Yes, you can use this POM as a parent POM for your project's parent POM. Then, you can remove all the dependencies and plugins that you do not need. This POM is designed to be flexible and can be used as a starting point for your own parent POM.
+
+Q: How often is this updated? +
+A: This POM is updated regularly to keep up with the latest versions of the dependencies and plugins. Most of the time, it is updated weekly.

@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-document.write("end of page");
+document.currentScript.parentElement.textContent += 'end of page';

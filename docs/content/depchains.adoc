@@ -7,7 +7,8 @@
 
 [[section-introduction]]
 == Introduction to Flow Logix Maven Dependency Chains
-Dramatically simplifies the development of applications in conjunction with the Flow Logix parent POM.
+Dramatically simplifies the development of applications in conjunction with the Flow Logix parent POM. +
+Supports Maven 4 and 3.
 
 == Features
 * Provides a set of dependency chains for Jakarta EE and Apache Shiro.

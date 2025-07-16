@@ -7,7 +7,8 @@
 
 [[section-introduction]]
 == Introduction to Flow Logix Maven Parent POM
-Dramatically simplifies the development of applications by using the parent POM.
+Dramatically simplifies the development of applications by using the parent POM. +
+Supports Maven 4 and 3.
 
 [[section-questions]]
 == Frequently Asked Questions

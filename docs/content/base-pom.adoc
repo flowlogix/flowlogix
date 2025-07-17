@@ -10,6 +10,260 @@
 Dramatically simplifies the development of applications by using the parent POM. +
 Supports Maven 4 and 3.
 
+[[section-overview]]
+== Project Overview
+
+The `base-pom` project is a Maven project that provides a collection of parent POMs designed to streamline the development and build process for Java-based applications. It establishes a consistent foundation by defining common configurations, dependencies, and best practices that can be inherited by other projects.
+
+The project is organized into the following modules:
+
+- `checkstyle`: Provides Checkstyle configurations to enforce a consistent code style.
+- `infra-pom`: An opinionated infrastructure POM that includes configurations for testing, code coverage, and dependency management.
+- `payara-pom`: A pre-configured environment for running integration tests with Payara Server.
+
+[[section-modules]]
+== Modules
+
+=== `checkstyle`
+
+This module contains the Checkstyle dependencies and configuration files. By inheriting from this POM, projects can ensure a consistent code style and quality across the entire codebase.
+
+=== `infra-pom`
+
+The `infra-pom` module is an opinionated infrastructure POM that provides a robust foundation for building and testing Java applications. It includes the following features:
+
+- *Testing*: Configures Surefire and Failsafe plugins for unit and integration testing, with support for parallel test execution.
+- *Code Coverage*: Integrates with JaCoCo to measure and report code coverage.
+- *Dependency Management*: Manages common dependencies, such as Jakarta EE, Lombok, and Mockito.
+- *Release Management*: Simplifies the release process with pre-configured profiles for deploying to various repositories.
+
+=== `payara-pom`
+
+The `payara-pom` module provides a pre-configured environment for running integration tests with Payara Server. It offers several profiles to support different testing scenarios:
+
+- `payara-server-local`: For running tests against a local Payara Server instance.
+- `payara-server-remote`: For running tests against a remote Payara Server instance.
+- `payara-docker`: For running tests in a Docker container.
+
+[[section-variables]]
+== `infra-pom` Variables
+
+The `infra-pom` module defines the following properties:
+
+|===
+| Variable | Description
+
+| `project.build.outputTimestamp`
+| The timestamp for the project build output.
+
+| `docs.phase`
+| The Maven phase to generate documentation.
+
+| `delombok.phase`
+| The Maven phase to run delombok.
+
+| `snippet.path`
+| The path to the code snippets.
+
+| `release.profile`
+| The release profile to use.
+
+| `gpg.keyname`
+| The GPG key name for signing artifacts.
+
+| `staging.server`
+| The staging server for deployment.
+
+| `nexus.url`
+| The URL of the Nexus repository.
+
+| `arquillian.container`
+| The Arquillian container to use for testing.
+
+| `drone.browser`
+| The browser to use for Drone tests.
+
+| `jacocoAddress`
+| The address for the JaCoCo agent.
+
+| `jacocoPort`
+| The port for the JaCoCo agent.
+
+| `jacocoReset`
+| Whether to reset the JaCoCo agent.
+
+| `jacoco.classDumpDir`
+| The directory to dump JaCoCo class files.
+
+| `jdk11SurefireOptions`
+| The Surefire options for JDK 11.
+
+| `jdk11FailsafeOptions`
+| The Failsafe options for JDK 11.
+
+| `mockito.agentOptions`
+| The agent options for Mockito.
+
+| `compiler.show.warnings`
+| Whether to show compiler warnings.
+
+| `compiler.deprecation.arg`
+| The compiler argument for deprecation warnings.
+
+| `compiler.unchecked.arg`
+| The compiler argument for unchecked warnings.
+
+| `compiler.parameters.arg`
+| The compiler argument for parameter names.
+
+| `compiler.annotation.processing`
+| The annotation processing mode for the compiler.
+
+| `junit5.parallel.tests.enabled`
+| Whether to enable parallel tests for JUnit 5.
+
+| `junit5.parallel.tests.mode`
+| The parallel test mode for JUnit 5.
+
+| `test.parallel`
+| The parallel mode for tests.
+
+| `it.test.parallel`
+| The parallel mode for integration tests.
+
+| `shrinkwrap.compile.skip`
+| Whether to skip ShrinkWrap compilation.
+
+| `shrinkwrap.decryption.ignore`
+| Whether to ignore ShrinkWrap decryption problems.
+
+| `test.containers.jdk.turnOffSVE`
+| Whether to turn off SVE for Testcontainers JDK.
+
+| `test.thread.count`
+| The number of threads to use for testing.
+
+| `test.run.order`
+| The run order for tests.
+
+| `test.redirect.to.file`
+| Whether to redirect test output to a file.
+
+| `deploy.at-end`
+| Whether to deploy at the end of the build.
+
+| `deploy.retry-failed-count`
+| The number of times to retry a failed deployment.
+
+| `jar.skip-if-empty`
+| Whether to skip creating a JAR file if it is empty.
+
+| `japicmp.skip`
+| Whether to skip the JAPICMP plugin.
+
+| `javadoc.doclint`
+| The doclint options for Javadoc.
+
+| `javadoc.sourcepath`
+| The source path for Javadoc.
+
+| `javadoc.snippet.path`
+| The snippet path for Javadoc.
+
+| `javadoc.snippet.path.options`
+| The snippet path options for Javadoc.
+
+| `checkstyle.configLocation`
+| The location of the Checkstyle configuration file.
+
+| `checkstyle.headerLocation`
+| The location of the Checkstyle header file.
+
+| `checkstyle.suppressionsLocation`
+| The location of the Checkstyle suppressions file.
+
+| `checkstyle.excludes`
+| The files to exclude from Checkstyle.
+
+| `jdk.minimum.version`
+| The minimum JDK version required to build the project.
+
+| `maven.minimum.version`
+| The minimum Maven version required to build the project.
+
+| `jakarta.ee.version`
+| The version of Jakarta EE to use.
+
+| `lombok.version`
+| The version of Lombok to use.
+
+| `lombok.javadoc.version`
+| The version of Lombok Javadoc to use.
+
+| `shrinkwrap.api.version`
+| The version of ShrinkWrap API to use.
+
+| `shrinkwrap.resolver.version`
+| The version of ShrinkWrap Resolver to use.
+
+| `mockito.version`
+| The version of Mockito to use.
+|===
+
+== `payara-pom` Variables
+
+The `payara-pom` module defines the following properties:
+
+|===
+| Variable | Description
+
+| `payara.start.disable`
+| Whether to disable starting Payara.
+
+| `payara.start.skip`
+| Whether to skip starting Payara.
+
+| `payara.version`
+| The version of Payara to use.
+
+| `root.basedir`
+| The base directory of the root project.
+
+| `dependencies.output-directory`
+| The output directory for dependencies.
+
+| `dependencies.markers-directory`
+| The markers directory for dependencies.
+
+| `payara.imageName`
+| The name of the Payara image to use.
+
+| `payara.asadmin.executable.suffix`
+| The suffix for the `asadmin` executable.
+
+| `payara.asadmin.executable`
+| The path to the `asadmin` executable.
+
+| `payara.http.port`
+| The HTTP port for Payara.
+
+| `payara.https.port`
+| The HTTPS port for Payara.
+
+| `testcontainers.skip`
+| Whether to skip Testcontainers.
+|===
+
+== CI/CD
+
+The project provides GitHub Actions for other projects. The workflows are defined in the `.github/workflows` directory and include the following:
+
+- `dependabot-automerge-self.yml`: This workflow automatically approves and merges pull requests created by Dependabot.
+- `dependabot-automerge.yml`: This reusable workflow performs the actual auto-merge process. This workflow can be reused by other projects in other organizations. It includes steps to:
+- Approve the pull request.
+- Wait for external checks (e.g., Jenkins, Snyk) to complete.
+- Merge the pull request if all checks pass.
+
 [[section-questions]]
 == Frequently Asked Questions
 Q: Is this just for Flow Logix, or can I use it for my own projects? +

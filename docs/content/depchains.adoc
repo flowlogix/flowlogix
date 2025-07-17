@@ -12,7 +12,161 @@ Supports Maven 4 and 3.
 
 == Features
 * Provides a set of dependency chains for Jakarta EE and Apache Shiro.
-* Includes support for testing with Testcontainers.
+* Includes support for testing with Arquillian and Testcontainers.
+
+[[section-overview]]
+== 1. Overview
+
+The `depchain` project serves as a collection of Maven dependency chains and an archetype for quickly setting up new projects. It aims to streamline dependency management for common Jakarta EE and testing scenarios, providing pre-configured sets of dependencies and a project template.
+
+The project is structured into several modules:
+
+*   `archetype`: A Maven archetype for generating new projects with pre-defined structures and dependencies.
+*   `integration-test`: A dependency chain for integration testing, primarily utilizing Arquillian, Selenium and Testcontainers.
+*   `shiro-jakarta`: A dependency chain providing Apache Shiro dependencies compatible with Jakarta EE.
+*   `unit-test`: A dependency chain for unit testing, including JUnit 5 and Mockito.
+
+[[section-modules]]
+== 2. Modules
+
+=== 2.1. `archetype` Module
+
+*   **Purpose**: This module provides a Maven archetype named "Starter project Archetype". It allows users to generate a new project with a pre-configured structure, including Maven wrapper, basic `pom.xml`, `.gitignore`, and example source code for a Jakarta EE web application.
+*   **Location**: `archetype/`
+*   **Key Files**:
+*   `archetype/pom.xml`: Defines the archetype and its properties.
+*   `archetype/src/main/resources/archetype-resources/`: Contains the template files for the generated project.
+*   `archetype/src/main/resources/META-INF/archetype-post-generate.groovy`: A Groovy script executed after project generation, likely for post-processing tasks.
+*   `archetype/src/main/resources/META-INF/maven/archetype-metadata.xml`: Describes the archetype's content and parameters.
+*   **Configuration Parameters (from `archetype/pom.xml` properties)**:
+*   `archetype.plugin.version`: Version of the Maven Archetype Plugin.
+*   `base.pom.version`: Version of `com.flowlogix:infra-pom`.
+*   `flowlogix.version`: Version of `com.flowlogix:flowlogix-jee`.
+*   `arquillian.graphene.version`: Version of Arquillian Graphene.
+*   `selenium.version`: Version of Selenium BOM.
+*   `arquillian.payara.version`: Version of Arquillian Payara Server Remote.
+*   `eclipselink.version`: Version of EclipseLink JPA Modelgen Processor.
+*   `maven.executable.version`: Version of Maven executable.
+*   `maven.wrapper.version`: Version of Maven Wrapper.
+*   `maven.cache.extension.version`: Version of Maven Build Cache Extension.
+
+=== 2.2. `integration-test` Module
+
+*   **Purpose**: This module provides a dependency chain for integration tests, simplifying the inclusion of necessary libraries for testing Java EE applications with Arquillian and Testcontainers. It includes support for JUnit 5 and TestNG.
+*   **Location**: `integration-test/`
+*   **Key Files**:
+*   `integration-test/pom.xml`: Defines the integration test dependencies.
+*   `integration-test/src/main/java/com/flowlogix/testcontainers/`: Contains custom Testcontainers integrations, particularly for Payara Server.
+*   **Key Dependencies**:
+*   `com.flowlogix.depchain:unit-test`: Inherits unit testing dependencies.
+*   `org.testcontainers:junit-jupiter`, `org.testcontainers:testcontainers`: For managing Docker containers in tests.
+*   `org.jboss.arquillian.*`: Various Arquillian modules for in-container testing (e.g., `arquillian-junit5-container`, `arquillian-protocol-servlet-jakarta`).
+*   `org.testng:testng`: Optional TestNG support.
+*   **Configuration Parameters (from `integration-test/pom.xml` properties)**:
+*   `arquillian.core.version`: Version of Arquillian Core.
+*   `arquillian.protocol.version`: Version of Arquillian Protocol.
+
+=== 2.3. `shiro-jakarta` Module
+
+*   **Purpose**: This module provides a dependency chain for integrating Apache Shiro with Jakarta EE applications. It includes various Shiro modules compiled for Jakarta EE compatibility.
+*   **Location**: `shiro-jakarta/`
+*   **Key Files**:
+*   `shiro-jakarta/pom.xml`: Defines the Shiro Jakarta EE dependencies.
+*   **Key Dependencies**:
+*   `org.apache.shiro:shiro-core` (jakarta classifier)
+*   `org.apache.shiro:shiro-web` (jakarta classifier)
+*   `org.apache.shiro:shiro-jakarta-ee` (jakarta classifier)
+*   `org.apache.shiro:shiro-cdi` (jakarta classifier)
+*   `org.apache.shiro:shiro-jaxrs` (jakarta classifier)
+*   `org.apache.commons:commons-configuration2`
+*   `org.omnifaces:omnifaces`
+*   **Configuration Parameters (from `shiro-jakarta/pom.xml` properties)**:
+*   `shiro.version`: Version of Apache Shiro.
+
+=== 2.4. `unit-test` Module
+
+*   **Purpose**: This module provides a dependency chain for unit testing, offering a pre-configured set of libraries for writing and running unit tests.
+*   **Location**: `unit-test/`
+*   **Key Files**:
+*   `unit-test/pom.xml`: Defines the unit test dependencies.
+*   **Key Dependencies**:
+*   `org.junit.jupiter:*`: JUnit 5 API, Engine, and Params.
+*   `org.assertj:assertj-core`: Fluent assertions library.
+*   `org.mockito:mockito-junit-jupiter`: Mocking framework with JUnit 5 support.
+*   `io.github.artsok:rerunner-jupiter`: For re-running failed tests.
+*   **Configuration Parameters (from `unit-test/pom.xml` properties)**:
+*   `junit.jupiter.version`: Version of JUnit Jupiter.
+*   `mockito.version`: Version of Mockito.
+
+== 3. Key Technologies and Frameworks
+
+The `depchain` project leverages several key technologies and frameworks:
+
+*   **Maven**: The primary build automation tool, used for project management, dependency management, and building artifacts.
+*   **Jakarta EE**: The platform for enterprise Java applications, with a focus on web and microservices.
+*   **Apache Shiro**: A powerful and easy-to-use Java security framework that performs authentication, authorization, cryptography, and session management.
+*   **JUnit 5**: The latest generation of the JUnit testing framework, used for writing unit and integration tests.
+*   **Mockito**: A popular mocking framework for Java, used in conjunction with JUnit for isolating units under test.
+*   **Arquillian**: An innovative testing platform that enables developers to test their business logic in a real target runtime environment.
+*   **Testcontainers**: A Java library that provides lightweight, throwaway instances of common databases, Selenium web browsers, or anything else that can run in a Docker container.
+*   **Payara Server**: A Jakarta EE application server, often used as the target runtime for Arquillian tests in this project.
+*   **AsciiDoc**: The markup language used for this documentation.
+
+[[section-configuration]]
+== 4. Configuration Parameters
+
+The following are key Maven properties defined across the project's `pom.xml` files, which allow for version management and other configurations:
+
+*   `project.build.sourceEncoding`: Character encoding for source files (default: `UTF-8`).
+*   `maven.compiler.source`: Java source compatibility version (default: `21`).
+*   `maven.compiler.target`: Java target compatibility version (default: `21`).
+*   `slf4j.version`: Version of SLF4J logging facade.
+*   `junit.jupiter.version`: Version of JUnit Jupiter (used in `unit-test` and `integration-test`).
+*   `mockito.version`: Version of Mockito (used in `unit-test`).
+*   `shrinkwrap.resolver.version`: Version of ShrinkWrap Resolver.
+*   `archetype.plugin.version`: Version of the Maven Archetype Plugin (in `archetype`).
+*   `base.pom.version`: Version of `com.flowlogix:infra-pom` (in `archetype`).
+*   `flowlogix.version`: Version of `com.flowlogix:flowlogix-jee` (in `archetype`).
+*   `arquillian.graphene.version`: Version of Arquillian Graphene (in `archetype`).
+*   `selenium.version`: Version of Selenium BOM (in `archetype`).
+*   `arquillian.payara.version`: Version of Arquillian Payara Server Remote (in `archetype`).
+*   `eclipselink.version`: Version of EclipseLink JPA Modelgen Processor (in `archetype`).
+*   `maven.executable.version`: Version of Maven executable (in `archetype`).
+*   `maven.wrapper.version`: Version of Maven Wrapper (in `archetype`).
+*   `maven.cache.extension.version`: Version of Maven Build Cache Extension (in `archetype`).
+*   `arquillian.core.version`: Version of Arquillian Core (in `integration-test`).
+*   `arquillian.protocol.version`: Version of Arquillian Protocol (in `integration-test`).
+*   `shiro.version`: Version of Apache Shiro (in `shiro-jakarta`).
+
+[[section-details]]
+== 5. Archetype Details
+
+The `archetype` module is designed to bootstrap new projects. When you generate a project using this archetype, it sets up a basic Jakarta EE web application with Maven wrapper, `.gitignore`, and pre-configured `pom.xml` files.
+
+*   `archetype-metadata.xml`: This file defines the structure of the generated project, including required properties (e.g., `groupId`, `artifactId`, `version`), and the files to be included.
+*   `archetype-post-generate.groovy`: This Groovy script is executed after the project files are generated. It can be used for tasks like modifying generated files, running initial commands, or setting up additional configurations.
+
+== 6. Integration Test Details
+
+The `integration-test` module provides a robust environment for testing Java EE applications.
+
+*   **Arquillian**: It integrates with Arquillian to allow tests to run inside a real application server (like Payara), providing a realistic testing environment.
+*   **Testcontainers**: It uses Testcontainers to spin up Docker containers for external dependencies (e.g., databases) during integration tests, ensuring isolated and reproducible test runs.
+*   **Payara Server Integration**: The `com.flowlogix.testcontainers` package contains custom extensions for integrating Testcontainers with Payara Server, simplifying the setup and teardown of Payara instances for testing.
+
+== 7. Shiro Jakarta Details
+
+The `shiro-jakarta` module addresses the need for Apache Shiro in Jakarta EE environments. It bundles the Jakarta-compatible versions of various Shiro modules, ensuring seamless integration with modern Java EE applications. This includes modules for core security, web integration, Jakarta EE specific features, CDI integration, and JAX-RS integration.
+
+== 8. Unit Test Details
+
+The `unit-test` module provides a foundational set of tools for writing effective unit tests.
+
+*   **JUnit 5**: The core testing framework, enabling modern testing practices with annotations and extensions.
+*   **Mockito**: Facilitates the creation of mock objects for dependencies, allowing for isolated testing of individual components.
+*   **AssertJ**: Provides a rich set of fluent assertions, making test code more readable and expressive.
+*   **Rerunner Jupiter**: A utility for automatically re-running failed JUnit Jupiter tests, which can be helpful during development.
+
 
 [[section-questions]]
 == Frequently Asked Questions

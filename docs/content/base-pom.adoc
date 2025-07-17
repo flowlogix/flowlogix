@@ -276,4 +276,4 @@ Q: I already have a parent POM, can I use this one? +
 A: Yes, you can use this POM as a parent POM for your project's parent POM. Then, you can remove all the dependencies and plugins that you do not need. This POM is designed to be flexible and can be used as a starting point for your own parent POM.
 
 Q: How often is this updated? +
-A: This POM is updated regularly to keep up with the latest versions of the dependencies and plugins. Most of the time, it is updated weekly.
+A: This POM is updated regularly to keep up with the latest versions of the dependencies and plugins. On averaage, it is updated weekly.

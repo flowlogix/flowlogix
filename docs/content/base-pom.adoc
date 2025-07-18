@@ -16,17 +16,13 @@ Supports Maven 4 and 3.
 The `base-pom` project is a Maven project that provides a collection of parent POMs designed to streamline the development and build process for Java-based applications. It establishes a consistent foundation by defining common configurations, dependencies, and best practices that can be inherited by other projects.
 
 The project is organized into the following modules:
-
-- `checkstyle`: Provides Checkstyle configurations to enforce a consistent code style.
+- `base-pom`: Minimal parent POM that can be used for any project. It is a good starting point for new projects. Produces no warnings with Maven 4.
 - `infra-pom`: An opinionated infrastructure POM that includes configurations for testing, code coverage, and dependency management.
 - `payara-pom`: A pre-configured environment for running integration tests with Payara Server.
+- `checkstyle`: Provides Checkstyle configurations to enforce a consistent code style.
 
 [[section-modules]]
 == Modules
-
-=== `checkstyle`
-
-This module contains the Checkstyle dependencies and configuration files. By inheriting from this POM, projects can ensure a consistent code style and quality across the entire codebase.
 
 === `infra-pom`
 
@@ -44,6 +40,10 @@ The `payara-pom` module provides a pre-configured environment for running integr
 - `payara-server-local`: For running tests against a local Payara Server instance.
 - `payara-server-remote`: For running tests against a remote Payara Server instance.
 - `payara-docker`: For running tests in a Docker container.
+
+=== `checkstyle`
+
+This module contains the Checkstyle dependencies and configuration files. The module is used automatically by the `infra-pom` module to enforce a consistent code style across your project.
 
 [[section-variables]]
 == `infra-pom` Variables

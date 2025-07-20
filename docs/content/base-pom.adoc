@@ -269,6 +269,9 @@ The project provides GitHub Actions for other projects. The workflows are define
 Q: Is this just for Flow Logix, or can I use it for my own projects? +
 A: This is a general-purpose parent POM that can be used for any project. It is not specific to Flow Logix. You can override the default settings to suit your project's name, developers, scm or any other section necessary to customize it for your own project.
 
+Q: How is this different from basepom.org or other base POM projects? +
+A: This POM is designed to be minimal and flexible, with a focus on aggressively reducing the size of your project's POM. It does not include unnecessary dependencies or plugins, and it is designed to work with Maven 4. It also includes features that are not available in other base POM projects, such as support for Payara Platform and Testcontainers.
+
 Q: Which one do I choose? `infra`, `payara` or `base`? +
 A: The `base` POM is minimal and can be used for any project. The `infra` POM is opinionated with many features and preconfigured defaults, while the `payara` POM is for projects that use Payara Platform. If you are not sure which one to use, start with the `base` POM.
 
@@ -277,3 +280,15 @@ A: Yes, you can use this POM as a parent POM for your project's parent POM. Then
 
 Q: How often is this updated? +
 A: This POM is updated regularly to keep up with the latest versions of the dependencies and plugins. On averaage, it is updated weekly.
+
+Q: Why are reporting plugins not included? +
+A: Reporting plugins are not included in the parent POM because they are not needed for every project. Reporting can be done more easily in the CI environments. You can add them to your project's POM if you need them. The `infra` POM includes some reporting plugins, but they are not mandatory.
+
+Q: Why not use a BOM instead of defining `<dependencyManagement>` in the parent POM? +
+A: It is difficult and error-prone to include multiple BOMs from different projects, especially in maven 4. Maven 4 will generate warnings for conflicting BOMs. First principle of this project is to aggressively minimize the size of your project's POM. The `<dependencyManagement>` section in the parent POM is designed to be minimal and only includes the most common and error-prone dependencies. You can add additional BOMs to your project if you need them.
+
+Q: Why is jacoco-maven-plugin configured differently than "normal"? +
+A: Jacoco is configured to merge both unit tests and integration tests into a single report to get a complete picture of the full code coverage. This includes integration tests done in Application Servers.
+
+Q: Why is the build-helper-maven-plugin defined? +
+A: It is defined to add the `src/demo` directory to the source directories. Code in this directory can be used in documentation or as Javadoc snippets. The code is built and tested as part of the project build, but it is not included in the final artifact. This allows you to include example code in your project without affecting the final artifact size or dependencies.

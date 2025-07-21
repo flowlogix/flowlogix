@@ -185,6 +185,15 @@ The `infra-pom` module defines the following properties:
 | `checkstyle.excludes`
 | The files to exclude from Checkstyle.
 
+| `ear.defaultLibBundleDir`
+| The default directory for library bundles in EAR files.
+
+| `ear.skinnyWars`
+| Whether to create skinny WAR files in EAR projects.
+
+| `ear.skipClassPathModification`
+| Whether to skip classpath modification in EAR projects.
+
 | `jdk.minimum.version`
 | The minimum JDK version required to build the project.
 

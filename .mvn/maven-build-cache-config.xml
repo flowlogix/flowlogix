@@ -30,6 +30,11 @@
                 <plugin groupId="org.codehaus.mojo" artifactId="exec-maven-plugin"/>
             </plugins>
             <goalsLists>
+                <goalsList artifactId="maven-dependency-plugin">
+                    <goals>
+                        <goal>properties</goal>
+                    </goals>
+                </goalsList>
                 <goalsList artifactId="maven-install-plugin">
                     <goals>
                         <goal>install</goal>

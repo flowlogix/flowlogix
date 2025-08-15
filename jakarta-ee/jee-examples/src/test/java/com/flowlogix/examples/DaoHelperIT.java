@@ -28,8 +28,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
+@ExtendWith(PayaraServerLifecycleExtension.class)
 class DaoHelperIT {
     @Inject
     UserDAO userDao;

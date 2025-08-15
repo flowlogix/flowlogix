@@ -54,8 +54,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  *
  * @author lprimak
  */
-@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @Tag("UserInterface")
 @RunAsClient
 @Slf4j

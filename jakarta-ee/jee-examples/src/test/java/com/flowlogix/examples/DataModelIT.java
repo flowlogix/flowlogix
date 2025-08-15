@@ -44,17 +44,18 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  *
  * @author lprimak
  */
-@ExtendWith(PayaraServerLifecycleExtension.class)
 @ExtendWith(ArquillianExtension.class)
+@ExtendWith(PayaraServerLifecycleExtension.class)
 @Tag("UserInterface")
 @RunAsClient
 class DataModelIT {
     @Drone
-    private WebDriver webDriver;
+    WebDriver webDriver;
 
-    @SuppressWarnings("DeclarationOrder")
     @ArquillianResource
-    protected URL baseURL;
+    URL baseURL;
+    @ArquillianResource
+    JavascriptExecutor jsExecutor;
 
     @FindBy(id = "model1")
     private WebElement firstTable;
@@ -81,10 +82,12 @@ class DataModelIT {
         guardAjax(userIdHeader.findElement(By.className("ui-column-title"))).click();
         assertThat(firstRowUserId.getText()).isEqualTo("anya");
         WebElement scrollable = firstTable.findElement(By.className("ui-datatable-scrollable-body"));
-        ((JavascriptExecutor) webDriver)
-                .executeScript("arguments[0].scroll(0, 500);", scrollable);
-        ((JavascriptExecutor) webDriver)
-                .executeScript("arguments[0].scroll(0, 0);", scrollable);
+        jsExecutor.executeScript("arguments[0].scroll(0, 500);", scrollable);
+        waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Friendly Pal");
+        assertThat(firstRowFullName.getText()).isEqualTo("Friendly Pal");
+        jsExecutor.executeScript("arguments[0].scroll(0, 0);", scrollable);
+        waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Lovely Daughter");
+        assertThat(firstRowFullName.getText()).isEqualTo("Lovely Daughter");
         fullNameFilterInput.sendKeys("ly l");
         guardAjax(fullNameFilterInput).sendKeys(Keys.RETURN);
         waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Lovely Lady");

@@ -46,8 +46,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
  *
  * @author lprimak
  */
-@ExtendWith(ArquillianExtension.class)
 @ExtendWith(PayaraServerLifecycleExtension.class)
+@ExtendWith(ArquillianExtension.class)
 @SuppressWarnings("MagicNumber")
 class LookupIT {
     static final String DEPLOYMENT_NAME = "LookupIT";

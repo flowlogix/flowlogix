@@ -44,8 +44,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  *
  * @author lprimak
  */
-@ExtendWith(ArquillianExtension.class)
 @ExtendWith(PayaraServerLifecycleExtension.class)
+@ExtendWith(ArquillianExtension.class)
 @Tag("UserInterface")
 @RunAsClient
 class DataModelIT {

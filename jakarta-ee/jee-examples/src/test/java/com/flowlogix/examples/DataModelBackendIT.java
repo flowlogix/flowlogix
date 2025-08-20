@@ -38,8 +38,8 @@ import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-@ExtendWith(ArquillianExtension.class)
 @ExtendWith(PayaraServerLifecycleExtension.class)
+@ExtendWith(ArquillianExtension.class)
 class DataModelBackendIT {
     @Inject
     DataModelWrapper models;

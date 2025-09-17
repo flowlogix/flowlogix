@@ -130,7 +130,7 @@ public interface Sorter<TT> {
                 case UNSORTED -> notFoundFn.get();
             };
             if (order != null) {
-                applicationSort(fieldName, highPriority, _ -> order);
+                applicationSort(fieldName, highPriority, var -> order);
             }
             return this;
         }

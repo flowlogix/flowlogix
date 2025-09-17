@@ -38,9 +38,11 @@ public class SortingDataModel implements Serializable {
     void initialize() {
         // add an ascending zip code-based sort order
         userModel.initialize(builder -> builder.sorter((sortData, cb, root) ->
-                        sortData.applicationSort(UserEntity_.zipCode.getName(),
-                        var -> cb.asc(root.get(UserEntity_.zipCode))))
-                .build());
+                sortData.applicationSort(UserEntity_.zipCode.getName(),
+                                var -> cb.asc(root.get(UserEntity_.zipCode)))
+                        .applicationSort(UserEntity_.zipCode.getName(), sortData,
+                                () -> cb.asc(root.get(UserEntity_.userId)),
+                                () -> cb.desc(root.get(UserEntity_.userId)), () -> null)).build());
     }
 }
 // end::sorting[] // @replace regex='.*\n' replacement=""

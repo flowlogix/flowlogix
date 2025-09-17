@@ -23,10 +23,12 @@ import jakarta.persistence.criteria.Root;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.primefaces.model.SortMeta;
+import static org.primefaces.model.SortOrder.UNSORTED;
 
 /**
  * Sorter Hook
@@ -64,9 +66,10 @@ public interface Sorter<TT> {
          *
          * @param fieldName element to be replaced or added
          * @param fp        lambda to get the application sort criteria
+         * @return this     fluent API
          */
-        public void applicationSort(String fieldName, Function<Optional<SortMeta>, Order> fp) {
-            applicationSort(fieldName, false, fp);
+        public SortData applicationSort(String fieldName, Function<Optional<SortMeta>, Order> fp) {
+            return applicationSort(fieldName, false, fp);
         }
 
         /**
@@ -79,13 +82,58 @@ public interface Sorter<TT> {
          *                     where this sort directive is put into the array,
          *                     only if it's inserted, and not modified
          * @param fp           lambda to get the application sort criteria
+         * @return this     fluent API
          */
-        public void applicationSort(String fieldName, boolean highPriority,
-                                    Function<Optional<SortMeta>, Order> fp) {
+        public SortData applicationSort(String fieldName, boolean highPriority,
+                                        Function<Optional<SortMeta>, Order> fp) {
             getSortOrder().compute(fieldName, (key, value) -> new MergedSortOrder(null,
                     Objects.requireNonNull(fp.apply(Optional.ofNullable(value != null
                                     ? value.getRequestedSortMeta() : null)),
                             "Sort Criteria cannot be null"), highPriority));
+            return this;
+        }
+
+        /**
+         *  Helper method to apply application sort criteria based on the UI requested sort criteria
+         *
+         * @param sourceFieldName field to retrieve UI requested sort criteria from
+         * @param fieldName     field to be replaced or added
+         * @param sortData      current sort data
+         * @param ascFn         lambda to get ascending sort criteria
+         * @param descFn        lambda to get descending sort criteria
+         * @param notFoundFn    lambda to get sort criteria when UI did not request sorting
+         * @return this         fluent API
+         */
+        public SortData applicationSort(String sourceFieldName, String fieldName, SortData sortData,
+                                             Supplier<Order> ascFn, Supplier<Order> descFn, Supplier<Order> notFoundFn) {
+            return applicationSort(sourceFieldName, fieldName, sortData, false, ascFn, descFn, notFoundFn);
+        }
+
+        /**
+         *  Helper method to apply application sort criteria based on the UI requested sort criteria
+         *
+         * @param sourceFieldName field to retrieve UI requested sort criteria from
+         * @param fieldName     field to be replaced or added
+         * @param sortData      current sort data
+         * @param highPriority  high priority flag, see {@link #applicationSort(String, boolean, Function)}
+         * @param ascFn         lambda to get ascending sort criteria
+         * @param descFn        lambda to get descending sort criteria
+         * @param notFoundFn    lambda to get sort criteria when UI did not request sorting
+         * @return this         fluent API
+         */
+        public SortData applicationSort(String sourceFieldName, String fieldName, SortData sortData, boolean highPriority,
+                                        Supplier<Order> ascFn, Supplier<Order> descFn, Supplier<Order> notFoundFn) {
+            Order order = switch (Optional.ofNullable(sortData.getSortOrder().get(sourceFieldName))
+                    .map(MergedSortOrder::getRequestedSortMeta).map(SortMeta::getOrder)
+                    .orElse(UNSORTED)) {
+                case ASCENDING -> ascFn.get();
+                case DESCENDING -> descFn.get();
+                case UNSORTED -> notFoundFn.get();
+            };
+            if (order != null) {
+                applicationSort(fieldName, highPriority, var -> order);
+            }
+            return this;
         }
     }
 

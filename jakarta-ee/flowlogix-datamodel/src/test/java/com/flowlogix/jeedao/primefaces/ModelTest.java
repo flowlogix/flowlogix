@@ -252,11 +252,13 @@ class ModelTest implements Serializable {
         var descendingOrder = createOrder(false);
         when(cb.desc(any())).thenReturn(descendingOrder);
         var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger);
-        assertThat(sortResult).hasSize(4);
+        assertThat(sortResult).hasSize(6);
         assertThat(sortResult.get(0).isAscending()).isFalse();
         assertThat(sortResult.get(1).isAscending()).isTrue();
         assertThat(sortResult.get(3).isAscending()).isTrue();
         assertThat(sortResult.get(2).isAscending()).isFalse();
+        assertThat(sortResult.get(4).isAscending()).isTrue();
+        assertThat(sortResult.get(5).isAscending()).isFalse();
     }
 
     private static void addingSorter(SortData sortData, CriteriaBuilder cb, Root<Integer> root) {
@@ -268,6 +270,10 @@ class ModelTest implements Serializable {
             assertTrue(sortMeta.isEmpty());
             return cb.desc(root.get("zipcode"));
         });
+        sortData.applicationSort("aaa", "randcol1",
+                sortData, () -> cb.asc(root.get("randcol1")), null, null);
+        sortData.applicationSort("bbb", "randcol2",
+                sortData, null, () -> cb.desc(root.get("randcol2")), null);
     }
 
     @Test

@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>flowlogix</artifactId>
-    <version>9.x-SNAPSHOT</version>
+    <version>10.x-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
@@ -22,7 +22,7 @@
         <javadoc.title>${project.name}</javadoc.title>
         <javadoc.snippet.path>${snippet.path}:${maven.multiModuleProjectDirectory}/jakarta-ee/jee-examples/src/main/java</javadoc.snippet.path>
         <payara.start.disable>true</payara.start.disable>
-        <japicmp.skip>false</japicmp.skip>
+        <japicmp.skip>true</japicmp.skip>
 
         <eclipselink.version>4.0.7</eclipselink.version>
         <omnifaces.version>4.6.5</omnifaces.version>

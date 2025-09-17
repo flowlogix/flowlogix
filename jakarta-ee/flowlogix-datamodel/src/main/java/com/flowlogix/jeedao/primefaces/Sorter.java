@@ -102,9 +102,8 @@ public interface Sorter<TT> {
          * @param descFn        lambda to get descending sort criteria
          * @param notFoundFn    lambda to get sort criteria when UI did not request sorting
          * @return this         fluent API
-         * @param <RT>          root entity type
          */
-        public <RT> SortData applicationSort(String fieldName, SortData sortData,
+        public SortData applicationSort(String fieldName, SortData sortData,
                                              Supplier<Order> ascFn, Supplier<Order> descFn, Supplier<Order> notFoundFn) {
             return applicationSort(fieldName, sortData, false, ascFn, descFn, notFoundFn);
         }

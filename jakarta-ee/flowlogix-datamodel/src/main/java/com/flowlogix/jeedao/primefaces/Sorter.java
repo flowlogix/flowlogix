@@ -96,6 +96,7 @@ public interface Sorter<TT> {
         /**
          *  Helper method to apply application sort criteria based on the UI requested sort criteria
          *
+         * @param sourceFieldName field to retrieve UI requested sort criteria from
          * @param fieldName     field to be replaced or added
          * @param sortData      current sort data
          * @param ascFn         lambda to get ascending sort criteria
@@ -103,14 +104,15 @@ public interface Sorter<TT> {
          * @param notFoundFn    lambda to get sort criteria when UI did not request sorting
          * @return this         fluent API
          */
-        public SortData applicationSort(String fieldName, SortData sortData,
+        public SortData applicationSort(String sourceFieldName, String fieldName, SortData sortData,
                                              Supplier<Order> ascFn, Supplier<Order> descFn, Supplier<Order> notFoundFn) {
-            return applicationSort(fieldName, sortData, false, ascFn, descFn, notFoundFn);
+            return applicationSort(sourceFieldName, fieldName, sortData, false, ascFn, descFn, notFoundFn);
         }
 
         /**
          *  Helper method to apply application sort criteria based on the UI requested sort criteria
          *
+         * @param sourceFieldName field to retrieve UI requested sort criteria from
          * @param fieldName     field to be replaced or added
          * @param sortData      current sort data
          * @param highPriority  high priority flag, see {@link #applicationSort(String, boolean, Function)}
@@ -119,9 +121,9 @@ public interface Sorter<TT> {
          * @param notFoundFn    lambda to get sort criteria when UI did not request sorting
          * @return this         fluent API
          */
-        public SortData applicationSort(String fieldName, SortData sortData, boolean highPriority,
+        public SortData applicationSort(String sourceFieldName, String fieldName, SortData sortData, boolean highPriority,
                                         Supplier<Order> ascFn, Supplier<Order> descFn, Supplier<Order> notFoundFn) {
-            Order order = switch (Optional.ofNullable(sortData.getSortOrder().get(fieldName))
+            Order order = switch (Optional.ofNullable(sortData.getSortOrder().get(sourceFieldName))
                     .map(MergedSortOrder::getRequestedSortMeta).map(SortMeta::getOrder)
                     .orElse(UNSORTED)) {
                 case ASCENDING -> ascFn.get();

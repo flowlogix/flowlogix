@@ -40,7 +40,7 @@ public class SortingDataModel implements Serializable {
         userModel.initialize(builder -> builder.sorter((sortData, cb, root) ->
                 sortData.applicationSort(UserEntity_.zipCode.getName(),
                                 var -> cb.asc(root.get(UserEntity_.zipCode)))
-                        .applicationSort(UserEntity_.zipCode.getName(), sortData,
+                        .applicationSort(UserEntity_.zipCode.getName(), UserEntity_.userId.getName(), sortData,
                                 () -> cb.asc(root.get(UserEntity_.userId)),
                                 () -> cb.desc(root.get(UserEntity_.userId)), () -> null)).build());
     }

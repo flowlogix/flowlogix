@@ -22,7 +22,7 @@
         <javadoc.title>${project.name}</javadoc.title>
         <javadoc.snippet.path>${snippet.path}:${maven.multiModuleProjectDirectory}/jakarta-ee/jee-examples/src/main/java</javadoc.snippet.path>
         <payara.start.disable>true</payara.start.disable>
-        <japicmp.skip>true</japicmp.skip>
+        <japicmp.skip>false</japicmp.skip>
 
         <eclipselink.version>4.0.7</eclipselink.version>
         <omnifaces.version>4.6.5</omnifaces.version>

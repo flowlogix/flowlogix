@@ -135,6 +135,11 @@ class ShrinkWrapManipulatorTest {
         LogManager.getLogManager().addConfigurationListener(() -> changed.set(true));
         ShrinkWrapManipulator.removeMavenWarningsFromLogging();
         assertThat(changed).isFalse();
+        ShrinkWrapManipulator.resetMavenWarningsRemovalFlag();
+        System.setProperty("com.flowlogix.maven.resolver.warn", Boolean.TRUE.toString());
+        ShrinkWrapManipulator.removeMavenWarningsFromLogging();
+        assertThat(changed).isFalse();
+        System.setProperty("com.flowlogix.maven.resolver.warn", Boolean.FALSE.toString());
     }
 
     @Test

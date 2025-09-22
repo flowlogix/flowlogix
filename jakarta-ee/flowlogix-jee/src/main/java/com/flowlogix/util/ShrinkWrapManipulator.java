@@ -377,4 +377,8 @@ public class ShrinkWrapManipulator {
                             .getBytes()));
         }
     }
+
+    static void resetMavenWarningsRemovalFlag() {
+        mavenWarningsRemoved = false;
+    }
 }

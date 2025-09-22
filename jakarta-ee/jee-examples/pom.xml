@@ -16,6 +16,7 @@
     </parent>
 
     <properties>
+        <flowlogix.examples.bom.version>10.0.1</flowlogix.examples.bom.version>
         <demo.entity.jar>lib/flowlogix-jee-${project.version}-tests.jar</demo.entity.jar>
         <delombok.phase>generate-sources</delombok.phase>
         <javadoc.sourcepath>${project.build.directory}/generated-sources/annotations
@@ -127,7 +128,7 @@
             <dependency>
                 <groupId>com.flowlogix</groupId>
                 <artifactId>flowlogix-bom</artifactId>
-                <version>10</version>
+                <version>${flowlogix.examples.bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

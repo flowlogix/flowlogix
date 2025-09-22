@@ -78,24 +78,8 @@ public class ShrinkWrapManipulator {
         }
     }
 
-    static {
-        if (!Boolean.getBoolean("com.flowlogix.maven.resolver.warn")) {
-            try {
-                LogManager.getLogManager().readConfiguration(
-                        // first one is the maven rc-3 and later
-                        // second one is the pre-rc-3 logger
-                        new ByteArrayInputStream("""
-                                org.apache.maven.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
-                                org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
-                                """
-                                .getBytes()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
     static final String DEFAULT_SSL_PROPERTY = "httpsPort";
+    static boolean mavenWarningsRemoved;
     @SuppressWarnings("checkstyle:ConstantName")
     private static final Supplier<Path> defaultPomFilePath = () -> Path.of("pom.xml");
 
@@ -177,6 +161,7 @@ public class ShrinkWrapManipulator {
      */
     public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType, @NonNull String archiveName,
                                                                Path pomFilePath) {
+        removeMavenWarningsFromLogging();
         return packageTestRequirements(ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile(pomFilePath.toFile()).importBuildOutput()
                 .as(archiveType));
@@ -375,6 +360,21 @@ public class ShrinkWrapManipulator {
             operator.run();
         } catch (Throwable e) {
             log.debug("Could not add optional class to deployment", e);
+        }
+    }
+
+    @SneakyThrows(IOException.class)
+    private static void removeMavenWarningsFromLogging() {
+        if (!mavenWarningsRemoved && !Boolean.getBoolean("com.flowlogix.maven.resolver.warn")) {
+            mavenWarningsRemoved = true;
+            LogManager.getLogManager().readConfiguration(
+                    // first one is the maven rc-3 and later
+                    // second one is the pre-rc-3 logger
+                    new ByteArrayInputStream("""
+                            org.apache.maven.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
+                            org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
+                            """
+                            .getBytes()));
         }
     }
 }

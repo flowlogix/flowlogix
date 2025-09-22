@@ -364,7 +364,7 @@ public class ShrinkWrapManipulator {
     }
 
     @SneakyThrows(IOException.class)
-    private static void removeMavenWarningsFromLogging() {
+    static void removeMavenWarningsFromLogging() {
         if (!mavenWarningsRemoved && !Boolean.getBoolean("com.flowlogix.maven.resolver.warn")) {
             mavenWarningsRemoved = true;
             LogManager.getLogManager().readConfiguration(

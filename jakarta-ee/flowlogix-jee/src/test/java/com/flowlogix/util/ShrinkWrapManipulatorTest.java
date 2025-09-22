@@ -39,6 +39,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.LogManager;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,6 +126,15 @@ class ShrinkWrapManipulatorTest {
             ShrinkWrapManipulator.createDeployment(JavaArchive.class);
             shrinkWrap.verify(() -> ShrinkWrap.create(eq(MavenImporter.class), endsWith(".jar")));
         }
+    }
+
+    @Test
+    void logManager() {
+        ShrinkWrapManipulator.removeMavenWarningsFromLogging();
+        AtomicBoolean changed = new AtomicBoolean();
+        LogManager.getLogManager().addConfigurationListener(() -> changed.set(true));
+        ShrinkWrapManipulator.removeMavenWarningsFromLogging();
+        assertThat(changed).isFalse();
     }
 
     @Test

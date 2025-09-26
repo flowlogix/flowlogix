@@ -19,6 +19,7 @@ import jakarta.websocket.OnClose;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.Set;
@@ -26,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
+@Generated
 @ServerEndpoint("/flowlogix/browsersync")
 public class ReloadEndpoint {
     private static final Set<Session> SESSIONS = new CopyOnWriteArraySet<>();

@@ -18,9 +18,11 @@ package com.flowlogix.ui.browsersync;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
+import lombok.Generated;
 import java.io.IOException;
 
 @Path("/")
+@Generated
 public class ReloadTrigger {
     @POST
     @Path("/reload")

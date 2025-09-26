@@ -18,11 +18,13 @@ package com.flowlogix.ui.browsersync;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.Faces;
 
 @Slf4j
 @WebListener
+@Generated
 public class Configurator implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {

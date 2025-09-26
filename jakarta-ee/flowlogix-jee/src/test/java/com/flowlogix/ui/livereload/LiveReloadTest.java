@@ -17,6 +17,8 @@ package com.flowlogix.ui.livereload;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,15 +26,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.omnifaces.util.Faces;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 import static com.flowlogix.ui.livereload.Configurator.DISABLE_CACHE_PARAM;
 import static com.flowlogix.ui.livereload.Configurator.FACELETS_REFRESH_PERIOD_PARAM;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class LiveReloadTest {
@@ -48,7 +51,7 @@ class LiveReloadTest {
             when(servletContext.getInitParameter(DISABLE_CACHE_PARAM)).thenReturn(null);
             when(servletContextEvent.getServletContext()).thenReturn(servletContext);
 
-            try (MockedStatic<Faces> facesMock = Mockito.mockStatic(Faces.class)) {
+            try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
                 facesMock.when(Faces::hasContext).thenReturn(true);
                 facesMock.when(Faces::isDevelopment).thenReturn(true);
 
@@ -63,8 +66,8 @@ class LiveReloadTest {
             when(servletContext.getInitParameter(DISABLE_CACHE_PARAM)).thenReturn("true");
             when(servletContextEvent.getServletContext()).thenReturn(servletContext);
 
-            try (MockedStatic<Faces> facesMock = Mockito.mockStatic(Faces.class);
-                 MockedStatic<ReloadEndpoint> reloadMock = Mockito.mockStatic(ReloadEndpoint.class)) {
+            try (MockedStatic<Faces> facesMock = mockStatic(Faces.class);
+                 MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
                 facesMock.when(Faces::hasContext).thenReturn(true);
                 facesMock.when(Faces::isDevelopment).thenReturn(false);
 
@@ -80,13 +83,56 @@ class LiveReloadTest {
             when(servletContext.getInitParameter(DISABLE_CACHE_PARAM)).thenReturn("false");
             when(servletContextEvent.getServletContext()).thenReturn(servletContext);
 
-            try (MockedStatic<Faces> facesMock = Mockito.mockStatic(Faces.class)) {
+            try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
                 facesMock.when(Faces::hasContext).thenReturn(true);
                 facesMock.when(Faces::isDevelopment).thenReturn(true);
 
                 new Configurator().contextInitialized(servletContextEvent);
 
                 verify(servletContext, never()).setInitParameter(eq(FACELETS_REFRESH_PERIOD_PARAM), anyString());
+            }
+        }
+    }
+
+    @Nested
+    class ReloadTriggerTest {
+        @Mock
+        Response response;
+        @Mock
+        ResponseBuilder responseBuilder;
+
+        @Test
+        void reloadReturnsOkWhenBroadcastSucceeds() throws Exception {
+            try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class);
+                 MockedStatic<Response> responseMock = mockStatic(Response.class)) {
+                reloadMock.when(ReloadEndpoint::broadcastReload).thenReturn(true);
+                responseMock.when(Response::ok).thenReturn(responseBuilder);
+                when(responseBuilder.build()).thenReturn(response);
+                when(response.getStatus()).thenReturn(Response.Status.OK.getStatusCode());
+
+                ReloadTrigger trigger = new ReloadTrigger();
+                Response actualResponse = trigger.reload();
+
+                assertThat(actualResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+            }
+        }
+
+        @Test
+        void reloadReturnsServiceUnavailableWhenBroadcastFails() throws Exception {
+            try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class);
+                 MockedStatic<Response> responseMock = mockStatic(Response.class)) {
+                reloadMock.when(ReloadEndpoint::broadcastReload).thenReturn(false);
+                responseMock.when(() -> Response.status(Response.Status.SERVICE_UNAVAILABLE)).thenReturn(responseBuilder);
+                when(responseBuilder.entity("Live Reloading Disabled")).thenReturn(responseBuilder);
+                when(responseBuilder.build()).thenReturn(response);
+                when(response.getStatus()).thenReturn(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+                when(response.getEntity()).thenReturn("Live Reloading Disabled");
+
+                ReloadTrigger trigger = new ReloadTrigger();
+                Response actualResponse = trigger.reload();
+
+                assertThat(actualResponse.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+                assertThat(actualResponse.getEntity()).isEqualTo("Live Reloading Disabled");
             }
         }
     }

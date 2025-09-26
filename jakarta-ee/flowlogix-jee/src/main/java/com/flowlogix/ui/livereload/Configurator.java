@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.ui.browsersync;
+package com.flowlogix.ui.livereload;
 
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
-import lombok.Generated;
 import org.omnifaces.util.Faces;
 
-@Generated
 @WebListener
 public class Configurator implements ServletContextListener {
     @Override

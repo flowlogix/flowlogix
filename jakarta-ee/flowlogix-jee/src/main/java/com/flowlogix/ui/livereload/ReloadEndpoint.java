@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.ui.browsersync;
+package com.flowlogix.ui.livereload;
 
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
-import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.Set;
@@ -29,20 +28,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-@Generated
-@ServerEndpoint(value = "/flowlogix/browsersync", configurator = ReloadEndpointConfigurator.class)
+@ServerEndpoint(value = "/flowlogix/livereload", configurator = ReloadEndpointConfigurator.class)
 public class ReloadEndpoint {
     static final Set<Session> SESSIONS = new CopyOnWriteArraySet<>();
     static final AtomicInteger MAX_SESSIONS = new AtomicInteger(
             Integer.getInteger("com.flowlogix.faces.MAX_LIVE_RELOAD_SESSIONS", 20));
-    private static final AtomicBoolean NEEDS_ANOTHER_RELOAD = new AtomicBoolean();
+    static final AtomicBoolean NEEDS_ANOTHER_RELOAD = new AtomicBoolean();
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) throws IOException {
         SESSIONS.add(session);
         if (NEEDS_ANOTHER_RELOAD.getAndSet(false)) {
             session.getBasicRemote().sendText("reload");
-            log.debug("Reloading Web BrowserSync session {} on connect", session.getId());
+            log.debug("Reloading Web LiveReload session {} on connect", session.getId());
         }
     }
 
@@ -62,7 +60,7 @@ public class ReloadEndpoint {
             log.debug("Setting Another Reload");
         }
         for (Session session : SESSIONS) {
-            log.debug("Reloading Web BrowserSync session {}", session.getId());
+            log.debug("Reloading Web LiveReload session {}", session.getId());
             session.getBasicRemote().sendText("reload");
         }
         return true;

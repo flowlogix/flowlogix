@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.ui.browsersync;
+package com.flowlogix.ui.livereload;
 
-import jakarta.websocket.server.ServerEndpointConfig;
-import lombok.Generated;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
-@Generated
-public class ReloadEndpointConfigurator extends ServerEndpointConfig.Configurator {
-    @Override
-    public boolean checkOrigin(String originHeaderValue) {
-        if (ReloadEndpoint.SESSIONS.size() < ReloadEndpoint.MAX_SESSIONS.get()) {
-            return super.checkOrigin(originHeaderValue);
-        } else {
-            return false;
-        }
-    }
+@ApplicationPath("/flowlogix")
+public class ReloadTriggerApplication extends Application {
 }

@@ -121,7 +121,7 @@ class LookupIT {
                 .deletePackages(true, "com.flowlogix.examples.ui")
                 .deletePackages(true, "com.flowlogix.logcapture")
                 .deletePackages(true, "com.flowlogix.jeedao")
-                .deletePackages(true, "com.flowlogix.ui.browsersync")
+                .deletePackages(true, "com.flowlogix.ui.livereload")
                 .deleteClass(ExceptionPageIT.class);
     }
 }

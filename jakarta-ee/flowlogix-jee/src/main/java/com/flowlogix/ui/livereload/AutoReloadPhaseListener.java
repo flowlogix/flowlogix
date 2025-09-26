@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.ui.browsersync;
+package com.flowlogix.ui.livereload;
 
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
@@ -80,7 +80,7 @@ public class AutoReloadPhaseListener implements PhaseListener {
                         connectWS();
                     </script>
                     """.formatted(Faces.getRequestBaseURL()
-                        .replaceFirst("^http(s)?", "ws") + "flowlogix/browsersync");
+                        .replaceFirst("^http(s)?", "ws") + "flowlogix/livereload");
                 facesContext.getResponseWriter().write(script);
             }
             getWrapped().endElement(name);

@@ -29,10 +29,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @ServerEndpoint(value = "/flowlogix/livereload", configurator = ReloadEndpointConfigurator.class)
 public class ReloadEndpoint {
-    static final Set<Session> SESSIONS = new CopyOnWriteArraySet<>();
-    static final AtomicInteger MAX_SESSIONS = new AtomicInteger(
+    private static final AtomicBoolean NEEDS_ANOTHER_RELOAD = new AtomicBoolean();
+    private static final Set<Session> SESSIONS = new CopyOnWriteArraySet<>();
+    private static final AtomicInteger MAX_SESSIONS = new AtomicInteger(
             Integer.getInteger("com.flowlogix.faces.MAX_LIVE_RELOAD_SESSIONS", 20));
-    static final AtomicBoolean NEEDS_ANOTHER_RELOAD = new AtomicBoolean();
 
     @OnOpen
     public void onOpen(Session session) throws IOException {
@@ -65,7 +65,15 @@ public class ReloadEndpoint {
         return true;
     }
 
+    static int getMaxSessions() {
+        return MAX_SESSIONS.get();
+    }
+
     static void setMaxSessions(int max) {
         MAX_SESSIONS.set(max);
+    }
+
+    static int getSessionCount() {
+        return SESSIONS.size();
     }
 }

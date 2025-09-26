@@ -19,6 +19,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
+import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,7 @@ import org.mockito.MockedStatic;
 
 import static com.flowlogix.ui.livereload.Configurator.DISABLE_CACHE_PARAM;
 import static com.flowlogix.ui.livereload.Configurator.FACELETS_REFRESH_PERIOD_PARAM;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mockStatic;
@@ -133,6 +135,47 @@ class LiveReloadTest {
 
                 assertThat(actualResponse.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
                 assertThat(actualResponse.getEntity()).isEqualTo("Live Reloading Disabled");
+            }
+        }
+    }
+
+    @Nested
+    @SuppressWarnings("checkstyle:MagicNumber")
+    class ReloadEndpointConfiguratorTest {
+        @AllArgsConstructor
+        static class REP extends ReloadEndpointConfigurator {
+            private final boolean returnValue;
+
+            @Override
+            boolean callSuperCheckOrigin(String originHeaderValue) {
+                return returnValue;
+            }
+        }
+
+        @Test
+        void checkOriginReturnsSuperWhenSessionsBelowMax() {
+            try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
+                reloadMock.when(ReloadEndpoint::getSessionCount).thenReturn(1);
+                reloadMock.when(ReloadEndpoint::getMaxSessions).thenReturn(5);
+
+                boolean result = new REP(true).checkOrigin("origin");
+                assertThat(result).isTrue();
+
+                assertThatThrownBy(() -> {
+                    new ReloadEndpointConfigurator().checkOrigin("none");
+                }).isInstanceOf(RuntimeException.class)
+                        .hasMessageContaining("Cannot load platform configurator");
+            }
+        }
+
+        @Test
+        void checkOriginReturnsFalseWhenSessionsAtMax() {
+            try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
+                reloadMock.when(ReloadEndpoint::getSessionCount).thenReturn(5);
+                reloadMock.when(ReloadEndpoint::getMaxSessions).thenReturn(5);
+
+                boolean result = new REP(true).checkOrigin("origin");
+                assertThat(result).isFalse();
             }
         }
     }

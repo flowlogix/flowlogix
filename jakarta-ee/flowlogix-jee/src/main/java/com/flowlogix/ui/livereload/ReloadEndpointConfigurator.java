@@ -20,10 +20,14 @@ import jakarta.websocket.server.ServerEndpointConfig;
 public class ReloadEndpointConfigurator extends ServerEndpointConfig.Configurator {
     @Override
     public boolean checkOrigin(String originHeaderValue) {
-        if (ReloadEndpoint.SESSIONS.size() < ReloadEndpoint.MAX_SESSIONS.get()) {
-            return super.checkOrigin(originHeaderValue);
+        if (ReloadEndpoint.getSessionCount() < ReloadEndpoint.getMaxSessions()) {
+            return callSuperCheckOrigin(originHeaderValue);
         } else {
             return false;
         }
+    }
+
+    boolean callSuperCheckOrigin(String originHeaderValue) {
+        return super.checkOrigin(originHeaderValue);
     }
 }

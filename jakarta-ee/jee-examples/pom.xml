@@ -17,7 +17,6 @@
 
     <properties>
         <flowlogix.examples.bom.version>10.0.1</flowlogix.examples.bom.version>
-        <demo.entity.jar>lib/flowlogix-jee-${project.version}-tests.jar</demo.entity.jar>
         <delombok.phase>generate-sources</delombok.phase>
         <javadoc.sourcepath>${project.build.directory}/generated-sources/annotations
             :${project.build.directory}/generated-sources/delombok</javadoc.sourcepath>
@@ -27,6 +26,8 @@
         <testcontainers.skip>true</testcontainers.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
         <it.test.parallel>classes</it.test.parallel>
+        <!-- con't copy test dependencies for skinny WARs -->
+        <excludeClassifiers>tests</excludeClassifiers>
     </properties>
 
     <!-- tag::dependenciesStart[] -->
@@ -166,6 +167,36 @@
                         <goals>
                             <goal>revision</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-specific-demo-classes</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.flowlogix</groupId>
+                                    <artifactId>flowlogix-jee</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>tests</classifier>
+                                    <type>test-jar</type>
+                                    <includes>
+                                        com/flowlogix/demo/jeedao/entities/AlternateEmails*.class,
+                                        com/flowlogix/demo/jeedao/entities/UserEntity*.class,
+                                        com/flowlogix/demo/jeedao/entities/UserSettings*.class,
+                                        com/flowlogix/demo/viewscoped/ViewScoped.class
+                                    </includes>
+                                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

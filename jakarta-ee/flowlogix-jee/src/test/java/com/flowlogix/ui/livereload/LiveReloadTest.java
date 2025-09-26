@@ -81,6 +81,23 @@ class LiveReloadTest {
         }
 
         @Test
+        void doesNotSetFaceletsRefreshPeriodWhenNoContext() {
+            when(servletContext.getInitParameter(DISABLE_CACHE_PARAM)).thenReturn("true");
+            when(servletContextEvent.getServletContext()).thenReturn(servletContext);
+
+            try (MockedStatic<Faces> facesMock = mockStatic(Faces.class);
+                 MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
+                facesMock.when(Faces::hasContext).thenReturn(false);
+                facesMock.when(Faces::isDevelopment).thenReturn(false);
+
+                new Configurator().contextInitialized(servletContextEvent);
+
+                verify(servletContext, never()).setInitParameter(eq(FACELETS_REFRESH_PERIOD_PARAM), anyString());
+                reloadMock.verify(() -> ReloadEndpoint.setMaxSessions(0));
+            }
+        }
+
+        @Test
         void doesNotSetFaceletsRefreshPeriodWhenDisableCacheFalse() {
             when(servletContext.getInitParameter(DISABLE_CACHE_PARAM)).thenReturn("false");
             when(servletContextEvent.getServletContext()).thenReturn(servletContext);

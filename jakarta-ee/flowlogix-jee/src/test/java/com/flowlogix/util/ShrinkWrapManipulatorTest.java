@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.LogManager;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
@@ -48,6 +49,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
@@ -308,6 +310,22 @@ class ShrinkWrapManipulatorTest {
             when(documentBuilder.parse(any(InputStream.class))).thenThrow(IOException.class);
             assertThatExceptionOfType(IOException.class)
                     .isThrownBy(() -> new ShrinkWrapManipulator().manipulateXml(javaArchive, null, "file"));
+        }
+    }
+
+    @Test
+    void persistenceXmlPath() throws ParserConfigurationException, IOException, SAXException {
+        try (var docBuilder = mockStatic(DocumentBuilderFactory.class)) {
+            docBuilder.when(DocumentBuilderFactory::newInstance).thenReturn(documentBuilderFactory);
+            when(documentBuilderFactory.newDocumentBuilder()).thenReturn(documentBuilder);
+            new ShrinkWrapManipulator().persistenceXmlXPath(javaArchive, List.of());
+            verify(javaArchive).get("WEB-INF/classes/META-INF/persistence.xml");
+            verify(javaArchive).addAsResource(
+                    argThat((StringAsset asset) -> asset.getSource()
+                                    .equals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>")),
+                    eq("META-INF/persistence.xml")
+            );
+            verifyNoMoreInteractions(javaArchive);
         }
     }
 

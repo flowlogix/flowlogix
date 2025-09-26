@@ -15,7 +15,6 @@
  */
 package com.flowlogix.ui.livereload;
 
-import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;

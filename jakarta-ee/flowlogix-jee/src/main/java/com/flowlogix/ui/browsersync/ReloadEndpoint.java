@@ -15,6 +15,7 @@
  */
 package com.flowlogix.ui.browsersync;
 
+import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
@@ -25,16 +26,19 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Generated
-@ServerEndpoint("/flowlogix/browsersync")
+@ServerEndpoint(value = "/flowlogix/browsersync", configurator = ReloadEndpointConfigurator.class)
 public class ReloadEndpoint {
-    private static final Set<Session> SESSIONS = new CopyOnWriteArraySet<>();
+    static final Set<Session> SESSIONS = new CopyOnWriteArraySet<>();
+    static final AtomicInteger MAX_SESSIONS = new AtomicInteger(
+            Integer.getInteger("com.flowlogix.faces.MAX_LIVE_RELOAD_SESSIONS", 20));
     private static final AtomicBoolean NEEDS_ANOTHER_RELOAD = new AtomicBoolean();
 
     @OnOpen
-    public void onOpen(Session session) throws IOException {
+    public void onOpen(Session session, EndpointConfig config) throws IOException {
         SESSIONS.add(session);
         if (NEEDS_ANOTHER_RELOAD.getAndSet(false)) {
             session.getBasicRemote().sendText("reload");
@@ -47,7 +51,11 @@ public class ReloadEndpoint {
         SESSIONS.remove(session);
     }
 
-    public static void broadcastReload() throws IOException {
+    public static boolean broadcastReload() throws IOException {
+        if (MAX_SESSIONS.get() == 0) {
+            log.debug("Max sessions is 0, not broadcasting reload");
+            return false;
+        }
         log.debug("broadcasting reload endpoint");
         if (SESSIONS.isEmpty()) {
             NEEDS_ANOTHER_RELOAD.set(true);
@@ -57,5 +65,6 @@ public class ReloadEndpoint {
             log.debug("Reloading Web BrowserSync session {}", session.getId());
             session.getBasicRemote().sendText("reload");
         }
+        return true;
     }
 }

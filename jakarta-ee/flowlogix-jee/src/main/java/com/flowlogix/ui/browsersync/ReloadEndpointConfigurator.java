@@ -15,23 +15,17 @@
  */
 package com.flowlogix.ui.browsersync;
 
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.Response;
+import jakarta.websocket.server.ServerEndpointConfig;
 import lombok.Generated;
-import java.io.IOException;
 
-@Path("/")
 @Generated
-public class ReloadTrigger {
-    @POST
-    @Path("/reload")
-    public Response reload() throws IOException {
-        if (ReloadEndpoint.broadcastReload()) {
-            return Response.ok().build();
+public class ReloadEndpointConfigurator extends ServerEndpointConfig.Configurator {
+    @Override
+    public boolean checkOrigin(String originHeaderValue) {
+        if (ReloadEndpoint.SESSIONS.size() < ReloadEndpoint.MAX_SESSIONS.get()) {
+            return super.checkOrigin(originHeaderValue);
         } else {
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                    .entity("Live Reloading Disabled").build();
+            return false;
         }
     }
 }

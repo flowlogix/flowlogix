@@ -22,12 +22,10 @@ import jakarta.faces.event.PhaseEvent;
 import jakarta.faces.event.PhaseId;
 import jakarta.faces.event.PhaseListener;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.Faces;
 import java.io.IOException;
 import java.io.Writer;
 
-@Slf4j
 public class AutoReloadPhaseListener implements PhaseListener {
     @Override
     public PhaseId getPhaseId() {

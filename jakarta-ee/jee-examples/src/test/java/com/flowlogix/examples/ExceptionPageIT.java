@@ -20,11 +20,8 @@ import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Properties;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Condition;
@@ -32,6 +29,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import static com.flowlogix.util.ShrinkWrapManipulator.logArchiveContents;
 import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
@@ -229,10 +227,7 @@ class ExceptionPageIT {
                         name -> StringUtils.isBlank(suffix) ? name : String.format("%s-%s", name, suffix))
                 .addClass(DaoHelperIT.class)
                 .addClass(DataModelBackendIT.class);
-
-        filterPersistenceXML(archive);
-        log.debug("Archive contents: {}", archive.toString(true));
-        return archive;
+        return logArchiveContents(archive, log::debug);
     }
 
     @Deployment(name = DEPLOYMENT_PROD_MODE)
@@ -240,17 +235,5 @@ class ExceptionPageIT {
         var productionList = List.of(new Action(getContextParamValue("jakarta.faces.PROJECT_STAGE"),
                 node -> node.setTextContent("Production")));
         return new ShrinkWrapManipulator().webXmlXPath(createDeployment("prod"), productionList);
-    }
-
-    @SneakyThrows(IOException.class)
-    static void filterPersistenceXML(WebArchive archive) {
-        try (var propStream = archive.get("WEB-INF/classes/git.properties").getAsset().openStream()) {
-            var props = new Properties();
-            props.load(propStream);
-            String version = props.getProperty("git.build.version");
-            new ShrinkWrapManipulator().persistenceXmlXPath(archive,
-                    List.of(new Action("//persistence/persistence-unit/jar-file",
-                            node -> node.setTextContent(String.format("lib/flowlogix-jee-%s-tests.jar", version)))));
-        }
     }
 }

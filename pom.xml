@@ -24,7 +24,7 @@
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
 
-        <eclipselink.version>4.0.7</eclipselink.version>
+        <eclipselink.version>4.0.8</eclipselink.version>
         <omnifaces.version>4.6.5</omnifaces.version>
         <primefaces.version>15.0.8</primefaces.version>
         <depchain.version>80</depchain.version>

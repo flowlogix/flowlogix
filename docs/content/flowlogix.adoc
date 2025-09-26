@@ -236,6 +236,16 @@ The above example changes resolution from `mycss.css` -> `mycss.min.css` to `myc
 </context-param>
 ----
 
+[source,xml]
+.Disable caching of resources, this setting has any effect in development mode only
+----
+<!-- Optional, default is true for Development mode, false otherwise -->
+<context-param>
+    <param-name>com.flowlogix.faces.DISABLE_CACHE</param-name>
+    <param-value>false</param-value>
+</context-param>
+----
+
 [[section-omnifaces]]
 ==== OmniFaces: Automatic initialization of _UnmappedResourceHandler_
 In order to initialize https://showcase.omnifaces.org/resourcehandlers/UnmappedResourceHandler[OmniFaces' UnmappedResourceHandler], both `web.xml` `servlet-mapping` and `faces-config.xml` entries are ordinarily required. FlowLogix automates more complicated `web.xml` requirements by configuring the servlet container to include all unmapped resources. This alleviates requirement to specify `Faces Servlet` mapping in your `web.xml` file at all. In order to enable this, add the below context parameter in `web.xml`:

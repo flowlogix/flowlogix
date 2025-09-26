@@ -17,6 +17,7 @@ package com.flowlogix.ui.livereload;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
+import jakarta.websocket.Session;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.omnifaces.util.Faces;
 import org.mockito.MockedStatic;
 
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import static com.flowlogix.ui.livereload.Configurator.DISABLE_CACHE_PARAM;
 import static com.flowlogix.ui.livereload.Configurator.FACELETS_REFRESH_PERIOD_PARAM;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -47,6 +50,8 @@ class LiveReloadTest {
         ServletContext servletContext;
         @Mock
         ServletContextEvent servletContextEvent;
+        @Mock
+        AtomicInteger maxSessions;
 
         @Test
         void setsFaceletsRefreshPeriodWhenDevelopmentAndDisableCache() {
@@ -72,11 +77,12 @@ class LiveReloadTest {
                  MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
                 facesMock.when(Faces::hasContext).thenReturn(true);
                 facesMock.when(Faces::isDevelopment).thenReturn(false);
+                reloadMock.when(ReloadEndpoint::maxSessions).thenReturn(maxSessions);
 
                 new Configurator().contextInitialized(servletContextEvent);
 
                 verify(servletContext, never()).setInitParameter(eq(FACELETS_REFRESH_PERIOD_PARAM), anyString());
-                reloadMock.verify(() -> ReloadEndpoint.setMaxSessions(0));
+                verify(maxSessions).set(0);
             }
         }
 
@@ -89,11 +95,12 @@ class LiveReloadTest {
                  MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
                 facesMock.when(Faces::hasContext).thenReturn(false);
                 facesMock.when(Faces::isDevelopment).thenReturn(false);
+                reloadMock.when(ReloadEndpoint::maxSessions).thenReturn(maxSessions);
 
                 new Configurator().contextInitialized(servletContextEvent);
 
                 verify(servletContext, never()).setInitParameter(eq(FACELETS_REFRESH_PERIOD_PARAM), anyString());
-                reloadMock.verify(() -> ReloadEndpoint.setMaxSessions(0));
+                verify(maxSessions).set(0);
             }
         }
 
@@ -159,6 +166,11 @@ class LiveReloadTest {
     @Nested
     @SuppressWarnings("checkstyle:MagicNumber")
     class ReloadEndpointConfiguratorTest {
+        @Mock
+        Set<Session> sessions;
+        @Mock
+        AtomicInteger maxSessions;
+
         @AllArgsConstructor
         static class REP extends ReloadEndpointConfigurator {
             private final boolean returnValue;
@@ -172,8 +184,10 @@ class LiveReloadTest {
         @Test
         void checkOriginReturnsSuperWhenSessionsBelowMax() {
             try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
-                reloadMock.when(ReloadEndpoint::getSessionCount).thenReturn(1);
-                reloadMock.when(ReloadEndpoint::getMaxSessions).thenReturn(5);
+                reloadMock.when(ReloadEndpoint::sessions).thenReturn(sessions);
+                reloadMock.when(ReloadEndpoint::maxSessions).thenReturn(maxSessions);
+                when(sessions.size()).thenReturn(1);
+                when(maxSessions.get()).thenReturn(5);
 
                 boolean result = new REP(true).checkOrigin("origin");
                 assertThat(result).isTrue();
@@ -188,8 +202,10 @@ class LiveReloadTest {
         @Test
         void checkOriginReturnsFalseWhenSessionsAtMax() {
             try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
-                reloadMock.when(ReloadEndpoint::getSessionCount).thenReturn(5);
-                reloadMock.when(ReloadEndpoint::getMaxSessions).thenReturn(5);
+                reloadMock.when(ReloadEndpoint::sessions).thenReturn(sessions);
+                reloadMock.when(ReloadEndpoint::maxSessions).thenReturn(maxSessions);
+                when(sessions.size()).thenReturn(5);
+                when(maxSessions.get()).thenReturn(5);
 
                 boolean result = new REP(true).checkOrigin("origin");
                 assertThat(result).isFalse();

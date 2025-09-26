@@ -65,15 +65,15 @@ public class ReloadEndpoint {
         return true;
     }
 
-    static int getMaxSessions() {
-        return MAX_SESSIONS.get();
+    static AtomicBoolean needsAnotherReload() {
+        return NEEDS_ANOTHER_RELOAD;
     }
 
-    static void setMaxSessions(int max) {
-        MAX_SESSIONS.set(max);
+    static Set<Session> sessions() {
+        return SESSIONS;
     }
 
-    static int getSessionCount() {
-        return SESSIONS.size();
+    static AtomicInteger maxSessions() {
+        return MAX_SESSIONS;
     }
 }

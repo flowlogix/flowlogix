@@ -23,19 +23,18 @@
 <!-- See https://github.com/hazelcast/hazelcast/blob/master/checkstyle/suppressions.xml for examples -->
 <suppressions>
     <!-- do not require package-info.java -->
-    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]ui[\\/]*"/>
-    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]jeedao[\\/]*"/>
-    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]demo[\\/]*"/>
-    <suppress checks="JavadocPackage" files="org[\\/]omnifaces[\\/]util[\\/]*"/>
-    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]jeedao[\\/]primefaces[\\/]JPALazyDataModel"/>
-    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]logcapture[\\/]*"/>
-    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]viewscoped[\\/]*"/>
-    <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]examples[\\/]*"/>
+    <suppress checks="JavadocPackage" files="com.flowlogix.ui.*"/>
+    <suppress checks="JavadocPackage" files="com.flowlogix.jeedao.*"/>
+    <suppress checks="JavadocPackage" files="com.flowlogix.demo.*"/>
+    <suppress checks="JavadocPackage" files="org.omnifaces.util.*"/>
+    <suppress checks="JavadocPackage" files="com.flowlogix.logcapture.*"/>
+    <suppress checks="JavadocPackage" files="com.flowlogix.viewscoped.*"/>
+    <suppress checks="JavadocPackage" files="com.flowlogix.examples.*"/>
     <suppress checks="JavadocType" files="PackageMarker"/>
     <suppress checks="JavadocType" files="InternalQualifierJPALazyModel" lines="26"/>
     <suppress checks="JavadocType" files="JPAModelImpl" lines="80,157,194"/>
     <suppress checks="JavadocType" files="JPALazyDataModel.java" lines="128"/>
 
-    <suppress checks="JavadocVariable" lines="49-52" files="com[\\/]flowlogix[\\/]util[\\/]ShrinkWrapManipulator"/>
-    <suppress checks="ConstantName" lines="60-63" files="com[\\/]flowlogix[\\/]util[\\/]TypeConverter"/>
+    <suppress checks="JavadocVariable" lines="49-52" files="com.flowlogix.util.ShrinkWrapManipulator"/>
+    <suppress checks="ConstantName" lines="60-63" files="com.flowlogix.util.TypeConverter"/>
 </suppressions>

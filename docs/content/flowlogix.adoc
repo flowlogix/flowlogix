@@ -246,7 +246,7 @@ The above example changes resolution from `mycss.css` -> `mycss.min.css` to `myc
 </context-param>
 ----
 
-Below system property controls maximum number of Live Reload sessions that can be connected to the server. This is useful in development mode, when multiple browsers or devices are used to test the application. Setting this value to 0 disables Live Reload support completely. Default is 20
+Below system property controls maximum number of Live Reload sessions that can be connected to the server. This is useful in development mode, when multiple browsers or devices are used to test the application. Setting this value to 0 disables Live Reload support completely. Live reload is only enabled in development mode. Default is 20
 [source,shell]
 .Example: Configure maximum number of Live Reload sessions, default is 20.
 ----

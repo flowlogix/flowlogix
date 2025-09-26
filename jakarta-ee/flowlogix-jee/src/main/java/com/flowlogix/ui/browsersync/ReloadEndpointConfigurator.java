@@ -22,7 +22,7 @@ import lombok.Generated;
 public class ReloadEndpointConfigurator extends ServerEndpointConfig.Configurator {
     @Override
     public boolean checkOrigin(String originHeaderValue) {
-        if (ReloadEndpoint.SESSIONS.size() < ReloadEndpoint.MAX_SESSIONS) {
+        if (ReloadEndpoint.SESSIONS.size() < ReloadEndpoint.MAX_SESSIONS.get()) {
             return super.checkOrigin(originHeaderValue);
         } else {
             return false;

@@ -26,14 +26,15 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Generated
 @ServerEndpoint(value = "/flowlogix/browsersync", configurator = ReloadEndpointConfigurator.class)
 public class ReloadEndpoint {
     static final Set<Session> SESSIONS = new CopyOnWriteArraySet<>();
-    static final int MAX_SESSIONS =
-            Integer.getInteger("com.flowlogix.faces.MAX_LIVE_RELOAD_SESSIONS", 20);
+    static final AtomicInteger MAX_SESSIONS = new AtomicInteger(
+            Integer.getInteger("com.flowlogix.faces.MAX_LIVE_RELOAD_SESSIONS", 20));
     private static final AtomicBoolean NEEDS_ANOTHER_RELOAD = new AtomicBoolean();
 
     @OnOpen
@@ -51,7 +52,7 @@ public class ReloadEndpoint {
     }
 
     public static boolean broadcastReload() throws IOException {
-        if (MAX_SESSIONS == 0) {
+        if (MAX_SESSIONS.get() == 0) {
             log.debug("Max sessions is 0, not broadcasting reload");
             return false;
         }

@@ -28,8 +28,12 @@ public class Configurator implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         String disableCacheStr = sce.getServletContext().getInitParameter("com.flowlogix.faces.DISABLE_CACHE");
         boolean disableCache = disableCacheStr == null || Boolean.parseBoolean(disableCacheStr);
-        if (Faces.isDevelopment() && disableCache) {
+        boolean isFacesDevelopment = Faces.hasContext() && Faces.isDevelopment();
+        if (isFacesDevelopment && disableCache) {
             sce.getServletContext().setInitParameter("jakarta.faces.FACELETS_REFRESH_PERIOD", "0");
+        }
+        if (!isFacesDevelopment) {
+            ReloadEndpoint.MAX_SESSIONS.set(0);
         }
     }
 }

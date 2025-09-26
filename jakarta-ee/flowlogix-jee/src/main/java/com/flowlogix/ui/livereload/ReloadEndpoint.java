@@ -36,7 +36,7 @@ public class ReloadEndpoint {
     static final AtomicBoolean NEEDS_ANOTHER_RELOAD = new AtomicBoolean();
 
     @OnOpen
-    public void onOpen(Session session, EndpointConfig config) throws IOException {
+    public void onOpen(Session session) throws IOException {
         SESSIONS.add(session);
         if (NEEDS_ANOTHER_RELOAD.getAndSet(false)) {
             session.getBasicRemote().sendText("reload");

@@ -22,16 +22,19 @@ import org.omnifaces.util.Faces;
 
 @WebListener
 public class Configurator implements ServletContextListener {
+    static final String DISABLE_CACHE_PARAM = "com.flowlogix.faces.DISABLE_CACHE";
+    static final String FACELETS_REFRESH_PERIOD_PARAM = "jakarta.faces.FACELETS_REFRESH_PERIOD";
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        String disableCacheStr = sce.getServletContext().getInitParameter("com.flowlogix.faces.DISABLE_CACHE");
+        String disableCacheStr = sce.getServletContext().getInitParameter(DISABLE_CACHE_PARAM);
         boolean disableCache = disableCacheStr == null || Boolean.parseBoolean(disableCacheStr);
         boolean isFacesDevelopment = Faces.hasContext() && Faces.isDevelopment();
         if (isFacesDevelopment && disableCache) {
-            sce.getServletContext().setInitParameter("jakarta.faces.FACELETS_REFRESH_PERIOD", "0");
+            sce.getServletContext().setInitParameter(FACELETS_REFRESH_PERIOD_PARAM, "0");
         }
         if (!isFacesDevelopment) {
-            ReloadEndpoint.MAX_SESSIONS.set(0);
+            ReloadEndpoint.setMaxSessions(0);
         }
     }
 }

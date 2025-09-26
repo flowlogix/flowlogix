@@ -64,4 +64,8 @@ public class ReloadEndpoint {
         }
         return true;
     }
+
+    static void setMaxSessions(int max) {
+        MAX_SESSIONS.set(max);
+    }
 }

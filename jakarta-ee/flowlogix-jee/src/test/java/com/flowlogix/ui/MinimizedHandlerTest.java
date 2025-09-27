@@ -17,13 +17,26 @@ package com.flowlogix.ui;
 
 import static com.flowlogix.ui.MinimizedHandler.parseExtensions;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import jakarta.faces.application.Resource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.omnifaces.util.Faces;
 
 /**
  *
  * @author lprimak
  */
+@ExtendWith(MockitoExtension.class)
 class MinimizedHandlerTest {
+    @Mock
+    Resource resource;
+
     @Test
     void js() {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions("css, js, ts"));
@@ -58,5 +71,16 @@ class MinimizedHandlerTest {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions(""));
         assertThat(handler.toMinimized("my.js")).isEqualTo("my.js");
         assertThat(handler.toMinimized("my.js.xhtml")).isEqualTo("my.js.xhtml");
+    }
+
+    @Test
+    void productionModeAndLibraryIsNull() {
+        MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions(""));
+        try (var mocked = mockStatic(Faces.class)) {
+            mocked.when(Faces::isDevelopment).thenReturn(false);
+            when(resource.getResourceName()).thenReturn("my.js");
+            handler.decorateResource(resource);
+        }
+        verify(resource).setResourceName(any());
     }
 }

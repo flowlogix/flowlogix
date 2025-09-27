@@ -108,6 +108,24 @@ class LiveReloadTest {
         }
     }
 
+    @Test
+    void openSocketWhenNeedsAnotherReload() throws IOException {
+        try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
+            reloadMock.when(ReloadEndpoint::needsAnotherReload).thenReturn(needsAnotherReload);
+            reloadMock.when(ReloadEndpoint::sessions).thenReturn(mockSessions);
+            when(needsAnotherReload.getAndSet(false)).thenReturn(true);
+
+            new ReloadEndpoint().onOpen(session);
+
+            verify(mockSessions).add(session);
+            verify(needsAnotherReload).getAndSet(false);
+            verify(session).getBasicRemote();
+            verify(session).getId();
+            verify(session.getBasicRemote()).sendText("reload");
+            verifyNoMoreInteractions(needsAnotherReload, session, mockSessions);
+        }
+    }
+
     @Nested
     class ConfiguratorTest {
         @Test

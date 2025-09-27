@@ -36,8 +36,8 @@ public class ReloadEndpoint {
 
     @OnOpen
     public void onOpen(Session session) throws IOException {
-        SESSIONS.add(session);
-        if (NEEDS_ANOTHER_RELOAD.getAndSet(false)) {
+        sessions().add(session);
+        if (needsAnotherReload().getAndSet(false)) {
             session.getBasicRemote().sendText("reload");
             log.debug("Reloading Web LiveReload session {} on connect", session.getId());
         }
@@ -45,20 +45,20 @@ public class ReloadEndpoint {
 
     @OnClose
     public void onClose(Session session) {
-        SESSIONS.remove(session);
+        sessions().remove(session);
     }
 
     public static boolean broadcastReload() throws IOException {
-        if (MAX_SESSIONS.get() == 0) {
+        if (maxSessions().get() == 0) {
             log.debug("Max sessions is 0, not broadcasting reload");
             return false;
         }
         log.debug("broadcasting reload endpoint");
-        if (SESSIONS.isEmpty()) {
-            NEEDS_ANOTHER_RELOAD.set(true);
+        if (sessions().isEmpty()) {
+            needsAnotherReload().set(true);
             log.debug("Setting Another Reload");
         }
-        for (Session session : SESSIONS) {
+        for (Session session : sessions()) {
             log.debug("Reloading Web LiveReload session {}", session.getId());
             session.getBasicRemote().sendText("reload");
         }

@@ -24,12 +24,15 @@ import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.omnifaces.util.Faces;
 import org.mockito.MockedStatic;
 
+import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import static com.flowlogix.ui.livereload.Configurator.DISABLE_CACHE_PARAM;
 import static com.flowlogix.ui.livereload.Configurator.FACELETS_REFRESH_PERIOD_PARAM;
@@ -38,21 +41,75 @@ import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class LiveReloadTest {
+    @Mock
+    ServletContext servletContext;
+    @Mock
+    ServletContextEvent servletContextEvent;
+    @Mock
+    Set<Session> mockSessions;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    Session session;
+    @Mock
+    AtomicInteger maxSessions;
+    @Mock
+    AtomicBoolean needsAnotherReload;
+
+    @Test
+    void broadcastReloadFailsWhenNotAllowed() throws IOException {
+        try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
+            reloadMock.when(ReloadEndpoint::maxSessions).thenReturn(maxSessions);
+            reloadMock.when(ReloadEndpoint::broadcastReload).thenCallRealMethod();
+
+            assertThat(ReloadEndpoint.broadcastReload()).isFalse();
+            verify(maxSessions).get();
+            verifyNoMoreInteractions(maxSessions, mockSessions, needsAnotherReload);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
+    void broadcastReloadDoesNotFailWhenNoSessions() throws IOException {
+        try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
+            reloadMock.when(ReloadEndpoint::sessions).thenReturn(Set.of());
+            reloadMock.when(ReloadEndpoint::maxSessions).thenReturn(maxSessions);
+            reloadMock.when(ReloadEndpoint::needsAnotherReload).thenReturn(needsAnotherReload);
+            reloadMock.when(ReloadEndpoint::broadcastReload).thenCallRealMethod();
+            when(maxSessions.get()).thenReturn(5);
+
+            assertThat(ReloadEndpoint.broadcastReload()).isTrue();
+            verify(needsAnotherReload).set(true);
+            verifyNoMoreInteractions(maxSessions, mockSessions, needsAnotherReload);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
+    void broadcastReloadDoesNotFailWhenOneSession() throws IOException {
+        try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
+            reloadMock.when(ReloadEndpoint::sessions).thenReturn(Set.of(session));
+            reloadMock.when(ReloadEndpoint::maxSessions).thenReturn(maxSessions);
+            reloadMock.when(ReloadEndpoint::needsAnotherReload).thenReturn(needsAnotherReload);
+            reloadMock.when(ReloadEndpoint::broadcastReload).thenCallRealMethod();
+            when(maxSessions.get()).thenReturn(5);
+
+            assertThat(ReloadEndpoint.broadcastReload()).isTrue();
+            verify(session).getId();
+            verify(session.getBasicRemote()).sendText("reload");
+            verify(session, times(2)).getBasicRemote();
+            verifyNoMoreInteractions(maxSessions, mockSessions, needsAnotherReload, session);
+        }
+    }
+
     @Nested
     class ConfiguratorTest {
-        @Mock
-        ServletContext servletContext;
-        @Mock
-        ServletContextEvent servletContextEvent;
-        @Mock
-        AtomicInteger maxSessions;
-
         @Test
         void setsFaceletsRefreshPeriodWhenDevelopmentAndDisableCache() {
             when(servletContext.getInitParameter(DISABLE_CACHE_PARAM)).thenReturn(null);
@@ -166,11 +223,6 @@ class LiveReloadTest {
     @Nested
     @SuppressWarnings("checkstyle:MagicNumber")
     class ReloadEndpointConfiguratorTest {
-        @Mock
-        Set<Session> sessions;
-        @Mock
-        AtomicInteger maxSessions;
-
         @AllArgsConstructor
         static class REP extends ReloadEndpointConfigurator {
             private final boolean returnValue;
@@ -184,9 +236,9 @@ class LiveReloadTest {
         @Test
         void checkOriginReturnsSuperWhenSessionsBelowMax() {
             try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
-                reloadMock.when(ReloadEndpoint::sessions).thenReturn(sessions);
+                reloadMock.when(ReloadEndpoint::sessions).thenReturn(mockSessions);
                 reloadMock.when(ReloadEndpoint::maxSessions).thenReturn(maxSessions);
-                when(sessions.size()).thenReturn(1);
+                when(mockSessions.size()).thenReturn(1);
                 when(maxSessions.get()).thenReturn(5);
 
                 boolean result = new REP(true).checkOrigin("origin");
@@ -202,9 +254,9 @@ class LiveReloadTest {
         @Test
         void checkOriginReturnsFalseWhenSessionsAtMax() {
             try (MockedStatic<ReloadEndpoint> reloadMock = mockStatic(ReloadEndpoint.class)) {
-                reloadMock.when(ReloadEndpoint::sessions).thenReturn(sessions);
+                reloadMock.when(ReloadEndpoint::sessions).thenReturn(mockSessions);
                 reloadMock.when(ReloadEndpoint::maxSessions).thenReturn(maxSessions);
-                when(sessions.size()).thenReturn(5);
+                when(mockSessions.size()).thenReturn(5);
                 when(maxSessions.get()).thenReturn(5);
 
                 boolean result = new REP(true).checkOrigin("origin");

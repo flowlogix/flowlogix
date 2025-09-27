@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,6 +42,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.logging.LogManager;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
@@ -74,6 +76,8 @@ class ShrinkWrapManipulatorTest {
     private DocumentBuilder documentBuilder;
     @Mock
     private TransformerFactory transformerFactory;
+    @Mock
+    private Consumer<Node> func;
 
     private static class ComparableStringAsset extends StringAsset {
         ComparableStringAsset(String content) {
@@ -332,7 +336,9 @@ class ShrinkWrapManipulatorTest {
     @Test
     void actionOnNodeWhenNull() {
         runActionOnNode(new Action("path", null, true), null);
-        verifyNoMoreInteractions(documentBuilder, documentBuilderFactory, transformerFactory);
+        runActionOnNode(new Action("path", func, false), null);
+        verify(func).accept(null);
+        verifyNoMoreInteractions(documentBuilder, documentBuilderFactory, transformerFactory, func);
     }
 
     @Test

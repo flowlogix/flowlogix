@@ -17,9 +17,8 @@ package com.flowlogix.ui;
 
 import static com.flowlogix.ui.MinimizedHandler.parseExtensions;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import jakarta.faces.application.Resource;
 import org.junit.jupiter.api.Test;
@@ -74,13 +73,13 @@ class MinimizedHandlerTest {
     }
 
     @Test
-    void productionModeAndLibraryIsNull() {
+    void productionModeAndLibraryIsNotNull() {
         MinimizedHandler handler = new MinimizedHandler(null, "min", parseExtensions(""));
         try (var mocked = mockStatic(Faces.class)) {
             mocked.when(Faces::isDevelopment).thenReturn(false);
-            when(resource.getResourceName()).thenReturn("my.js");
+            when(resource.getLibraryName()).thenReturn("my.lib.js");
             handler.decorateResource(resource);
         }
-        verify(resource).setResourceName(any());
+        verifyNoMoreInteractions(resource);
     }
 }

@@ -20,6 +20,8 @@ import static com.flowlogix.demo.ui.JakartifyDemo.jakartifyError;
 import static com.flowlogix.demo.ui.JakartifyDemo.jakartifyServlet;
 import static com.flowlogix.util.JakartaTransformerUtils.isJakarta;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 
 class JakartifyTest {
     @Test
@@ -30,6 +32,15 @@ class JakartifyTest {
     @Test
     void servlet() {
         assertThat(jakartifyServlet()).isEqualTo(isJakarta() ? "jakarta.servlet.Servlet" : "javax.servlet.Servlet");
+    }
+
+    @Test
+    void javaxServlet() {
+        try (var mocked = mockStatic(JakartaTransformerUtils.class)) {
+            mocked.when(JakartaTransformerUtils::isJakarta).thenReturn(false);
+            mocked.when(() -> JakartaTransformerUtils.jakartify(any())).thenCallRealMethod();
+            assertThat(jakartifyServlet()).isEqualTo(isJakarta() ? "jakarta.servlet.Servlet" : "javax.servlet.Servlet");
+        }
     }
 
     @Test

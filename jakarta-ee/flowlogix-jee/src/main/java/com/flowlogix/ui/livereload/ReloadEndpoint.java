@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.ui.browsersync;
+package com.flowlogix.ui.livereload;
 
-import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
-import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.Set;
@@ -29,42 +27,53 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-@Generated
-@ServerEndpoint(value = "/flowlogix/browsersync", configurator = ReloadEndpointConfigurator.class)
+@ServerEndpoint(value = "/flowlogix/livereload", configurator = ReloadEndpointConfigurator.class)
 public class ReloadEndpoint {
-    static final Set<Session> SESSIONS = new CopyOnWriteArraySet<>();
-    static final AtomicInteger MAX_SESSIONS = new AtomicInteger(
-            Integer.getInteger("com.flowlogix.faces.MAX_LIVE_RELOAD_SESSIONS", 20));
     private static final AtomicBoolean NEEDS_ANOTHER_RELOAD = new AtomicBoolean();
+    private static final Set<Session> SESSIONS = new CopyOnWriteArraySet<>();
+    private static final AtomicInteger MAX_SESSIONS = new AtomicInteger(
+            Integer.getInteger("com.flowlogix.faces.MAX_LIVE_RELOAD_SESSIONS", 20));
 
     @OnOpen
-    public void onOpen(Session session, EndpointConfig config) throws IOException {
-        SESSIONS.add(session);
-        if (NEEDS_ANOTHER_RELOAD.getAndSet(false)) {
+    public void onOpen(Session session) throws IOException {
+        sessions().add(session);
+        if (needsAnotherReload().getAndSet(false)) {
             session.getBasicRemote().sendText("reload");
-            log.debug("Reloading Web BrowserSync session {} on connect", session.getId());
+            log.debug("Reloading Web LiveReload session {} on connect", session.getId());
         }
     }
 
     @OnClose
     public void onClose(Session session) {
-        SESSIONS.remove(session);
+        sessions().remove(session);
     }
 
     public static boolean broadcastReload() throws IOException {
-        if (MAX_SESSIONS.get() == 0) {
+        if (maxSessions().get() == 0) {
             log.debug("Max sessions is 0, not broadcasting reload");
             return false;
         }
         log.debug("broadcasting reload endpoint");
-        if (SESSIONS.isEmpty()) {
-            NEEDS_ANOTHER_RELOAD.set(true);
+        if (sessions().isEmpty()) {
+            needsAnotherReload().set(true);
             log.debug("Setting Another Reload");
         }
-        for (Session session : SESSIONS) {
-            log.debug("Reloading Web BrowserSync session {}", session.getId());
+        for (Session session : sessions()) {
+            log.debug("Reloading Web LiveReload session {}", session.getId());
             session.getBasicRemote().sendText("reload");
         }
         return true;
+    }
+
+    static AtomicBoolean needsAnotherReload() {
+        return NEEDS_ANOTHER_RELOAD;
+    }
+
+    static Set<Session> sessions() {
+        return SESSIONS;
+    }
+
+    static AtomicInteger maxSessions() {
+        return MAX_SESSIONS;
     }
 }

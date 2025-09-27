@@ -13,25 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.flowlogix.ui.browsersync;
+package com.flowlogix.ui.livereload;
 
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.Response;
-import lombok.Generated;
-import java.io.IOException;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
-@Path("/")
-@Generated
-public class ReloadTrigger {
-    @POST
-    @Path("/reload")
-    public Response reload() throws IOException {
-        if (ReloadEndpoint.broadcastReload()) {
-            return Response.ok().build();
-        } else {
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                    .entity("Live Reloading Disabled").build();
-        }
-    }
+@ApplicationPath("/flowlogix")
+public class ReloadTriggerApplication extends Application {
 }

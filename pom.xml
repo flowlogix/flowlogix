@@ -23,6 +23,8 @@
         <javadoc.snippet.path>${snippet.path}:${maven.multiModuleProjectDirectory}/jakarta-ee/jee-examples/src/main/java</javadoc.snippet.path>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
+        <!-- major version is "10" so have to supply it as such here -->
+        <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
         <eclipselink.version>4.0.8</eclipselink.version>
         <omnifaces.version>4.6.5</omnifaces.version>
@@ -121,6 +123,15 @@
                         <exclude>com/flowlogix/logcapture/**</exclude>
                         <exclude>com/flowlogix/testcontainers/**</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <configuration>
+                    <parameter>
+                        <oldVersionPattern>${japicmp.old.version.pattern}</oldVersionPattern>
+                    </parameter>
                 </configuration>
             </plugin>
         </plugins>

@@ -27,6 +27,7 @@
         <it.test.parallel>classes</it.test.parallel>
         <!-- con't copy test dependencies for skinny WARs -->
         <excludeClassifiers>tests</excludeClassifiers>
+        <japicmp.skip>true</japicmp.skip>
     </properties>
 
     <!-- tag::dependenciesStart[] -->

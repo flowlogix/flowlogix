@@ -53,7 +53,7 @@ public class AutoReloadPhaseListener implements PhaseListener {
                 new MyResponseWriter(originalWriter, event.getFacesContext()));
     }
 
-    private static class MyResponseWriter extends ResponseWriterWrapper {
+    static class MyResponseWriter extends ResponseWriterWrapper {
         private final FacesContext facesContext;
 
         MyResponseWriter(ResponseWriter wrapped, FacesContext context) {
@@ -73,14 +73,19 @@ public class AutoReloadPhaseListener implements PhaseListener {
                     <script>
                         function connectWS() {
                         const ws = new WebSocket('%s');
+                        ws.onopen = () => {
+                            ws.send('%s');
+                        };
                         ws.onmessage = e => { if (e.data === 'reload') location.reload(); };
                         ws.onclose = () => setTimeout(connectWS, 2000);
                         ws.onerror = () => ws.close();
                         }
                         connectWS();
                     </script>
-                    """.formatted(Faces.getRequestBaseURL()
-                        .replaceFirst("^http(s)?", "ws") + "flowlogix/livereload");
+                    """.formatted(Faces.getRequestDomainURL() + "/flowlogix-livereload/livereload",
+                        Faces.getRequestContextPath().startsWith("/")
+                                ? Faces.getRequestContextPath().substring(1)
+                                : Faces.getRequestContextPath());
                 facesContext.getResponseWriter().write(script);
             }
             getWrapped().endElement(name);

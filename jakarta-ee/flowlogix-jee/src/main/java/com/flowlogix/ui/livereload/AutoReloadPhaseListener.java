@@ -73,10 +73,11 @@ public class AutoReloadPhaseListener implements PhaseListener {
                     <script>
                         function connectWS() {
                         const ws = new WebSocket('%s');
-                        ws.onopen = () => {
-                            ws.send('%s');
+                        ws.onopen = () => ws.send('%s');
+                        ws.onmessage = e => {
+                            if (e.data === 'reload') location.reload();
+                            if (e.data === 'shutdown') ws.close();
                         };
-                        ws.onmessage = e => { if (e.data === 'reload') location.reload(); };
                         ws.onclose = () => setTimeout(connectWS, 2000);
                         ws.onerror = () => ws.close();
                         }

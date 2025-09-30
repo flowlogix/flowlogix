@@ -33,8 +33,5 @@ public class Configurator implements ServletContextListener {
         if (isFacesDevelopment && disableCache) {
             sce.getServletContext().setInitParameter(FACELETS_REFRESH_PERIOD_PARAM, "0");
         }
-        if (!isFacesDevelopment) {
-            ReloadEndpoint.maxSessions().set(0);
-        }
     }
 }

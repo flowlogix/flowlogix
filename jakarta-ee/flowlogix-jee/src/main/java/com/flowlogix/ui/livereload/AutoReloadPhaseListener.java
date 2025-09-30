@@ -53,7 +53,7 @@ public class AutoReloadPhaseListener implements PhaseListener {
                 new MyResponseWriter(originalWriter, event.getFacesContext()));
     }
 
-    private static class MyResponseWriter extends ResponseWriterWrapper {
+    static class MyResponseWriter extends ResponseWriterWrapper {
         private final FacesContext facesContext;
 
         MyResponseWriter(ResponseWriter wrapped, FacesContext context) {

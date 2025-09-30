@@ -15,6 +15,8 @@
  */
 package com.flowlogix.ui.livereload;
 
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import org.junit.jupiter.api.Nested;
@@ -26,11 +28,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.omnifaces.util.Faces;
 import static com.flowlogix.ui.livereload.Configurator.DISABLE_CACHE_PARAM;
 import static com.flowlogix.ui.livereload.Configurator.FACELETS_REFRESH_PERIOD_PARAM;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +44,25 @@ class LiveReloadTest {
     ServletContext servletContext;
     @Mock
     ServletContextEvent servletContextEvent;
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    FacesContext facesContext;
+    @Mock
+    ResponseWriter responseWriter;
+
+    @Test
+    void requestContextPathNoBeginningSlash() throws Exception {
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            facesMock.when(Faces::getRequestContextPath).thenReturn("noslash");
+
+            new AutoReloadPhaseListener.MyResponseWriter(responseWriter, facesContext)
+                    .endElement("body");
+            facesMock.verify(Faces::getRequestContextPath, times(2));
+            verify(facesContext).getResponseWriter();
+            verify(facesContext.getResponseWriter()).write(anyString());
+            verify(responseWriter).endElement("body");
+            verifyNoMoreInteractions(responseWriter, facesContext);
+        }
+    }
 
     @Nested
     class ConfiguratorTest {

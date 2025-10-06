@@ -23,7 +23,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
-import javax.naming.NamingException;
 import com.flowlogix.test.PayaraServerLifecycle;
 import lombok.Lombok;
 import org.jboss.arquillian.container.test.api.Deployment;

@@ -17,19 +17,16 @@ package com.flowlogix.examples;
 
 import com.flowlogix.demo.jeedao.DaoHelperDemo;
 import com.flowlogix.demo.jeedao.UserDAO;
-import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
+import com.flowlogix.test.PayaraServerLifecycle;
 import jakarta.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(PayaraServerLifecycleExtension.class)
-@ExtendWith(ArquillianExtension.class)
+@PayaraServerLifecycle
 class DaoHelperIT {
     @Inject
     UserDAO userDao;

@@ -23,23 +23,20 @@ import java.util.Map;
 import com.flowlogix.demo.jeedao.primefaces.DataModelWrapper;
 import com.flowlogix.demo.jeedao.primefaces.InjectedDataModel;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
+import com.flowlogix.test.PayaraServerLifecycle;
 import com.flowlogix.util.SerializeTester;
 import jakarta.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.MatchMode;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-@ExtendWith(PayaraServerLifecycleExtension.class)
-@ExtendWith(ArquillianExtension.class)
+@PayaraServerLifecycle
 class DataModelBackendIT {
     @Inject
     DataModelWrapper models;

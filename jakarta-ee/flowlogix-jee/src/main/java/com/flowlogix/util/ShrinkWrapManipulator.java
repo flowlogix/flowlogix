@@ -231,6 +231,8 @@ public class ShrinkWrapManipulator {
         if (deployment instanceof ClassContainer<?> containerDeployment) {
             optionalDeploymentOp(() -> containerDeployment
                     .addClass("com.flowlogix.testcontainers.PayaraServerLifecycleExtension"));
+            optionalDeploymentOp(() -> containerDeployment
+                    .addClass("com.flowlogix.test.PayaraServerLifecycle"));
             containerDeployment.addPackages(true, "org.assertj");
         }
         return deployment;

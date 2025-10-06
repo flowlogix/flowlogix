@@ -24,11 +24,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 import javax.naming.NamingException;
-import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
+import com.flowlogix.test.PayaraServerLifecycle;
 import lombok.Lombok;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.AfterEach;
@@ -40,14 +39,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  *
  * @author lprimak
  */
-@ExtendWith(PayaraServerLifecycleExtension.class)
-@ExtendWith(ArquillianExtension.class)
+@PayaraServerLifecycle
 @SuppressWarnings("MagicNumber")
 class LookupIT {
     static final String DEPLOYMENT_NAME = "LookupIT";
@@ -75,7 +72,7 @@ class LookupIT {
 
     @Test
     @OperateOnDeployment(DEPLOYMENT_NAME)
-    void unhappyPath() throws NamingException {
+    void unhappyPath() {
         assertNull(example.getLocator().getObject("hello"));
     }
 

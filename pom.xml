@@ -112,11 +112,10 @@
                         <include>com/flowlogix/**</include>
                     </includes>
                     <excludes>
-                        <exclude>com/flowlogix/**/*Test</exclude>
-                        <exclude>com/flowlogix/**/*Test$*</exclude>
-                        <exclude>com/flowlogix/**/*IT</exclude>
-                        <exclude>com/flowlogix/**/*IT$*</exclude>
-                        <exclude>com/flowlogix/**/__EJB31_Generated*</exclude>
+                        <exclude>com/flowlogix/*Test</exclude>
+                        <exclude>com/flowlogix/*Test$*</exclude>
+                        <exclude>com/flowlogix/*IT</exclude>
+                        <exclude>com/flowlogix/*IT$*</exclude>
                         <!-- cause too many coverage misses -->
                         <exclude>com/flowlogix/examples/**</exclude>
                         <exclude>com/flowlogix/demo/**</exclude>

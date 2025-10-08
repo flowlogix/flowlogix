@@ -70,12 +70,11 @@ The JaCoCo code coverage is configured to merge both unit tests and integration 
                     <includes>
                         <include>com/example/**</include>
                     </includes>
-                    <!-- ignore tests and ITs - too much coverage noise -->
                     <excludes>
-                        <exclude>com/example/**/*Test</exclude>
-                        <exclude>com/example/**/*Test$*</exclude>
-                        <exclude>com/example/**/*IT</exclude>
-                        <exclude>com/example/**/*IT$*</exclude>
+                        <exclude>com/example/*Test</exclude>
+                        <exclude>com/example/*Test$*</exclude>
+                        <exclude>com/example/*IT</exclude>
+                        <exclude>com/example/*IT$*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

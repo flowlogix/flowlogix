@@ -45,6 +45,67 @@ The `payara-pom` module provides a pre-configured environment for running integr
 
 This module contains the Checkstyle dependencies and configuration files. The module is used automatically by the `infra-pom` module to enforce a consistent code style across your project.
 
+== CI/CD
+
+The project provides GitHub Actions for other projects. The workflows are defined in the `.github/workflows` directory and include the following:
+
+- `dependabot-automerge-self.yml`: This workflow automatically approves and merges pull requests created by Dependabot.
+- `dependabot-automerge.yml`: This reusable workflow performs the actual auto-merge process. This workflow can be reused by other projects in other organizations. It includes steps to:
+- Approve the pull request.
+- Wait for external checks (e.g., Jenkins, Snyk) to complete.
+- Merge the pull request if all checks pass.
+
+=== Configuring JaCoCo code coverage
+The JaCoCo code coverage is configured to merge both unit tests and integration tests into a single report to get a complete picture of the full code coverage. This includes integration tests done in Application Servers.
+
+[source,xml]
+.Add the following to your `pom.xml` (replace com/example with your package name)
+----
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>com/example/**</include>
+                    </includes>
+                    <!-- ignore tests and ITs - too much coverage noise -->
+                    <excludes>
+                        <exclude>com/example/**/*Test</exclude>
+                        <exclude>com/example/**/*Test$*</exclude>
+                        <exclude>com/example/**/*IT</exclude>
+                        <exclude>com/example/**/*IT$*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+----
+This configuration ensures that the JaCoCo plugin only includes your main application code in the coverage report, while excluding test classes. Adjust the package name as necessary to match your project's structure.
+
+At this point, your CI/CD pipeline can generate the JaCoCo reports. You can see an example of this in the FlowLogix Jenkins Repository: link:https://github.com/flowlogix/jenkins/blob/main/UnitTests.groovy[UnitTests.groovy] that uses link:https://github.com/flowlogix/jenkins/blob/main/payara-lib/vars[Payara Jenkins Library]
+
+You can also run the tests and generate the report locally. To configure Payara or GlassFish for JaCoCo, download and run the initialization script link:https:/github.com/flowlogix/base-pom/blob/main/payara-pom/jacoco-init.sh[jacoco-init.sh]:
+
+[source,shell]
+.Run the JaCoCo initialization script for Payara or GlassFish
+----
+curl -sSL https://raw.githubusercontent.com/flowlogix/base-pom/main/payara-pom/jacoco-init.sh | bash -p
+----
+
+Now you can run the tests and generate the report with the following commands
+[source,shell]
+.Run tests and record the code coverage data
+----
+mvn verify -Dmaven.build.cache.enabled=false -Ppayara-server-local,coverage
+----
+[source,shell]
+.Generate the merged report from both unit tests and integration tests inside all modules
+----
+mvn -N -Pcoverage initialize jacoco:dump jacoco:merge jacoco:report -DjacocoPort=14948
+----
+
 [[section-variables]]
 == `infra-pom` Variables
 
@@ -262,16 +323,6 @@ The `payara-pom` module defines the following properties:
 | `testcontainers.skip`
 | Whether to skip Testcontainers.
 |===
-
-== CI/CD
-
-The project provides GitHub Actions for other projects. The workflows are defined in the `.github/workflows` directory and include the following:
-
-- `dependabot-automerge-self.yml`: This workflow automatically approves and merges pull requests created by Dependabot.
-- `dependabot-automerge.yml`: This reusable workflow performs the actual auto-merge process. This workflow can be reused by other projects in other organizations. It includes steps to:
-- Approve the pull request.
-- Wait for external checks (e.g., Jenkins, Snyk) to complete.
-- Merge the pull request if all checks pass.
 
 [[section-questions]]
 == Frequently Asked Questions

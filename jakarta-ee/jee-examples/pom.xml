@@ -24,7 +24,7 @@
         <excludeClassifiers>tests</excludeClassifiers>
         <maven.deploy.skip>true</maven.deploy.skip>
         <testcontainers.skip>true</testcontainers.skip>
-        <javadoc.skip>true</javadoc.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
         <japicmp.skip>true</japicmp.skip>
     </properties>
 

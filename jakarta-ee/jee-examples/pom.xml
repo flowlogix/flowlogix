@@ -16,17 +16,15 @@
     </parent>
 
     <properties>
-        <delombok.phase>generate-sources</delombok.phase>
-        <javadoc.sourcepath>${project.build.directory}/generated-sources/annotations
-            :${project.build.directory}/generated-sources/delombok</javadoc.sourcepath>
         <payara.start.disable>${skipITs}</payara.start.disable>
         <arquillian.graphene.version>3.0.0-alpha.4</arquillian.graphene.version>
         <arquillian.payara.version>3.1</arquillian.payara.version>
-        <testcontainers.skip>true</testcontainers.skip>
-        <maven.deploy.skip>true</maven.deploy.skip>
         <it.test.parallel>classes</it.test.parallel>
         <!-- con't copy test dependencies for skinny WARs -->
         <excludeClassifiers>tests</excludeClassifiers>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <testcontainers.skip>true</testcontainers.skip>
+        <javadoc.skip>true</javadoc.skip>
         <japicmp.skip>true</japicmp.skip>
     </properties>
 

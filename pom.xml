@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>76</version>
+        <version>78</version>
     </parent>
 
     <properties>

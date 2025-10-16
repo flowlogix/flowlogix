@@ -21,7 +21,7 @@
         <checkstyle.suppressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle/suppressions.xml</checkstyle.suppressionsLocation>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
-        <depchain.version>93</depchain.version>
+        <depchain.version>94</depchain.version>
         <groovy.version>5.0.1</groovy.version>
     </properties>
 

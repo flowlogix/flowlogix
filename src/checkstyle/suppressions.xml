@@ -22,6 +22,8 @@
 
 <!-- See https://github.com/hazelcast/hazelcast/blob/master/checkstyle/suppressions.xml for examples -->
 <suppressions>
+    <suppress checks=".*" files="target/generated-sources/.*"/>
+    <suppress checks=".*" files="target/generated-test-sources/.*"/>
     <!-- do not require package-info.java -->
     <suppress checks="JavadocPackage" files="com.flowlogix.ui.*"/>
     <suppress checks="JavadocPackage" files="com.flowlogix.jeedao.*"/>

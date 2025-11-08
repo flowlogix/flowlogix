@@ -25,6 +25,7 @@ import lombok.SneakyThrows;
 import org.omnifaces.util.Faces;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.regex.Pattern;
 
 public class AutoReloadPhaseListener implements PhaseListener {
     @Override
@@ -54,6 +55,9 @@ public class AutoReloadPhaseListener implements PhaseListener {
     }
 
     static class MyResponseWriter extends ResponseWriterWrapper {
+        static final String HTTPS_SCHEME = "https";
+        static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
+        static final Pattern HTTP_TO_HTTPS = Pattern.compile("^\\s*http(.*)");
         private final FacesContext facesContext;
 
         MyResponseWriter(ResponseWriter wrapped, FacesContext context) {
@@ -83,13 +87,25 @@ public class AutoReloadPhaseListener implements PhaseListener {
                         }
                         connectWS();
                     </script>
-                    """.formatted(Faces.getRequestDomainURL() + "/flowlogix-livereload/livereload",
+                    """.formatted(toHttpsURL(Faces.getRequestDomainURL())
+                                + "/flowlogix-livereload/livereload",
                         Faces.getRequestContextPath().startsWith("/")
                                 ? Faces.getRequestContextPath().substring(1)
                                 : Faces.getRequestContextPath());
                 facesContext.getResponseWriter().write(script);
             }
             getWrapped().endElement(name);
+        }
+
+        static String toHttpsURL(String url) {
+            return createHttpButNeedHttps()
+                    ? HTTP_TO_HTTPS.matcher(url).replaceFirst(HTTPS_SCHEME + "$1")
+                    : url;
+        }
+
+        private static boolean createHttpButNeedHttps() {
+            return !HTTPS_SCHEME.equalsIgnoreCase(Faces.getRequest().getScheme())
+                    && HTTPS_SCHEME.equalsIgnoreCase(Faces.getRequest().getHeader(X_FORWARDED_PROTO));
         }
     }
 }

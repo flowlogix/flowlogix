@@ -19,6 +19,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,8 +27,12 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.omnifaces.util.Faces;
+import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.HTTPS_SCHEME;
+import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.X_FORWARDED_PROTO;
+import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.toHttpsURL;
 import static com.flowlogix.ui.livereload.Configurator.DISABLE_CACHE_PARAM;
 import static com.flowlogix.ui.livereload.Configurator.FACELETS_REFRESH_PERIOD_PARAM;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
@@ -48,11 +53,14 @@ class LiveReloadTest {
     FacesContext facesContext;
     @Mock
     ResponseWriter responseWriter;
+    @Mock(answer = RETURNS_DEEP_STUBS)
+    HttpServletRequest httpServletRequest;
 
     @Test
     void requestContextPathNoBeginningSlash() throws Exception {
         try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
             facesMock.when(Faces::getRequestContextPath).thenReturn("noslash");
+            facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
 
             new AutoReloadPhaseListener.MyResponseWriter(responseWriter, facesContext)
                     .endElement("body");
@@ -61,6 +69,33 @@ class LiveReloadTest {
             verify(facesContext.getResponseWriter()).write(anyString());
             verify(responseWriter).endElement("body");
             verifyNoMoreInteractions(responseWriter, facesContext);
+        }
+    }
+
+    @Test
+    void convertToHttpsWhenNotNeeded() {
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
+            when(httpServletRequest.getScheme()).thenReturn(HTTPS_SCHEME);
+            assertThat(toHttpsURL("http://example.com/path")).isEqualTo("http://example.com/path");
+        }
+    }
+
+    @Test
+    void convertToHttpsWhenAlready() {
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
+            when(httpServletRequest.getScheme()).thenReturn(HTTPS_SCHEME);
+            assertThat(toHttpsURL("https://example.com/path")).isEqualTo("https://example.com/path");
+        }
+    }
+
+    @Test
+    void convertToHttps() {
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
+            when(httpServletRequest.getHeader(X_FORWARDED_PROTO)).thenReturn(HTTPS_SCHEME);
+            assertThat(toHttpsURL("http://example.com/path")).isEqualTo("https://example.com/path");
         }
     }
 

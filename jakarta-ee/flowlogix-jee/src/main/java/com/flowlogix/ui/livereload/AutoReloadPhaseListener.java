@@ -25,6 +25,7 @@ import lombok.SneakyThrows;
 import org.omnifaces.util.Faces;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 public class AutoReloadPhaseListener implements PhaseListener {
@@ -41,8 +42,7 @@ public class AutoReloadPhaseListener implements PhaseListener {
         }
 
         FacesContext context = event.getFacesContext();
-        String encoding = context.getExternalContext().getRequestCharacterEncoding();
-        context.getExternalContext().setResponseCharacterEncoding(encoding);
+        context.getExternalContext().setResponseCharacterEncoding(getResponseCharacterEncoding(context));
         context.getExternalContext().setResponseContentType(getResponseContentType(context));
 
         ResponseWriter originalWriter = context.getRenderKit().createResponseWriter(
@@ -53,6 +53,11 @@ public class AutoReloadPhaseListener implements PhaseListener {
 
         event.getFacesContext().setResponseWriter(
                 new MyResponseWriter(originalWriter, event.getFacesContext()));
+    }
+
+    static String getResponseCharacterEncoding(FacesContext context) {
+        String requestEncoding = context.getExternalContext().getRequestCharacterEncoding();
+        return requestEncoding != null ? requestEncoding : StandardCharsets.UTF_8.name();
     }
 
     static String getResponseContentType(FacesContext context) {

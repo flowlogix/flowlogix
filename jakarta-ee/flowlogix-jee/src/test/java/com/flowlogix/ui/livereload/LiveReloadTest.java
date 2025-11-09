@@ -30,6 +30,7 @@ import org.omnifaces.util.Faces;
 import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.HTTPS_SCHEME;
 import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.X_FORWARDED_PROTO;
 import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.toHttpsURL;
+import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.getResponseCharacterEncoding;
 import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.getResponseContentType;
 import static com.flowlogix.ui.livereload.Configurator.DISABLE_CACHE_PARAM;
 import static com.flowlogix.ui.livereload.Configurator.FACELETS_REFRESH_PERIOD_PARAM;
@@ -109,6 +110,17 @@ class LiveReloadTest {
     void responseNonHtmlContentType() {
         when(facesContext.getExternalContext().getRequestContentType()).thenReturn("application/xml");
         assertThat(getResponseContentType(facesContext)).isEqualTo("application/xml");
+    }
+
+    @Test
+    void responseEncoding() {
+        assertThat(getResponseCharacterEncoding(facesContext)).isEqualTo("UTF-8");
+    }
+
+    @Test
+    void responseNonStandardEncoding() {
+        when(facesContext.getExternalContext().getRequestCharacterEncoding()).thenReturn("UTF-22");
+        assertThat(getResponseCharacterEncoding(facesContext)).isEqualTo("UTF-22");
     }
 
     @Nested

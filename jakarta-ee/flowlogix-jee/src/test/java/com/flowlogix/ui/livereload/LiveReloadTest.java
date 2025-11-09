@@ -30,6 +30,7 @@ import org.omnifaces.util.Faces;
 import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.HTTPS_SCHEME;
 import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.X_FORWARDED_PROTO;
 import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.toHttpsURL;
+import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.getResponseContentType;
 import static com.flowlogix.ui.livereload.Configurator.DISABLE_CACHE_PARAM;
 import static com.flowlogix.ui.livereload.Configurator.FACELETS_REFRESH_PERIOD_PARAM;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,6 +98,17 @@ class LiveReloadTest {
             when(httpServletRequest.getHeader(X_FORWARDED_PROTO)).thenReturn(HTTPS_SCHEME);
             assertThat(toHttpsURL("http://example.com/path")).isEqualTo("https://example.com/path");
         }
+    }
+
+    @Test
+    void responseContentType() {
+        assertThat(getResponseContentType(facesContext)).isEqualTo("text/html");
+    }
+
+    @Test
+    void responseNonHtmlContentType() {
+        when(facesContext.getExternalContext().getRequestContentType()).thenReturn("application/xml");
+        assertThat(getResponseContentType(facesContext)).isEqualTo("application/xml");
     }
 
     @Nested

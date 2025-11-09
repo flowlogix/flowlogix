@@ -36,13 +36,16 @@ public class AutoReloadPhaseListener implements PhaseListener {
     @Override
     @SneakyThrows(IOException.class)
     public void beforePhase(PhaseEvent event) {
-        if (!Faces.isDevelopment()) {
+        if (!Faces.isDevelopment() || Faces.isAjaxRequest()) {
             return;
         }
 
         FacesContext context = event.getFacesContext();
         String encoding = context.getExternalContext().getRequestCharacterEncoding();
         context.getExternalContext().setResponseCharacterEncoding(encoding);
+        String requestContentType = context.getExternalContext().getRequestContentType();
+        context.getExternalContext().setResponseContentType(requestContentType != null
+                ? requestContentType : "text/html");
 
         ResponseWriter originalWriter = context.getRenderKit().createResponseWriter(
                 context.getExternalContext().getResponseOutputWriter(),

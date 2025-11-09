@@ -43,9 +43,7 @@ public class AutoReloadPhaseListener implements PhaseListener {
         FacesContext context = event.getFacesContext();
         String encoding = context.getExternalContext().getRequestCharacterEncoding();
         context.getExternalContext().setResponseCharacterEncoding(encoding);
-        String requestContentType = context.getExternalContext().getRequestContentType();
-        context.getExternalContext().setResponseContentType(requestContentType != null
-                ? requestContentType : "text/html");
+        context.getExternalContext().setResponseContentType(getResponseContentType(context));
 
         ResponseWriter originalWriter = context.getRenderKit().createResponseWriter(
                 context.getExternalContext().getResponseOutputWriter(),
@@ -55,6 +53,11 @@ public class AutoReloadPhaseListener implements PhaseListener {
 
         event.getFacesContext().setResponseWriter(
                 new MyResponseWriter(originalWriter, event.getFacesContext()));
+    }
+
+    static String getResponseContentType(FacesContext context) {
+        String requestContentType = context.getExternalContext().getRequestContentType();
+        return requestContentType != null ? requestContentType : "text/html";
     }
 
     static class MyResponseWriter extends ResponseWriterWrapper {

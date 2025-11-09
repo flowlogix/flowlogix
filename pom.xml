@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>flowlogix</artifactId>
-    <version>10.x-SNAPSHOT</version>
+    <version>10.0.8</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
@@ -36,7 +36,8 @@
         <url>https://github.com/flowlogix/flowlogix</url>
         <connection>scm:git:git://github.com:flowlogix/flowlogix.git</connection>
         <developerConnection>scm:git:git@github.com:flowlogix/flowlogix.git</developerConnection>
-    </scm>
+      <tag>Version-10.0.8</tag>
+  </scm>
 
     <modules>
         <module>flowlogix-bom</module>

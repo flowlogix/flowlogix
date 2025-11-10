@@ -27,7 +27,7 @@
         <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
         <eclipselink.version>4.0.8</eclipselink.version>
-        <omnifaces.version>4.6.5</omnifaces.version>
+        <omnifaces.version>4.7</omnifaces.version>
         <primefaces.version>15.0.9</primefaces.version>
         <depchain.version>99</depchain.version>
     </properties>

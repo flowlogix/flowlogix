@@ -5,7 +5,7 @@
     <activeProfiles>
         <activeProfile>jakarta-ee-version-override</activeProfile>
         <activeProfile>graphene-version-override</activeProfile>
-        <activeProfile>hope-repository</activeProfile>
+        <activeProfile>flowlogix-repository</activeProfile>
     </activeProfiles>
 
     <profiles>
@@ -23,11 +23,11 @@
         </profile>
 
         <profile>
-            <id>hope-repository</id>
+            <id>flowlogix-repository</id>
             <repositories>
                 <repository>
-                    <id>hope-repository</id>
-                    <url>https://nexus.hope.nyc.ny.us/repository/maven-releases</url>
+                    <id>flowlogix-repository</id>
+                    <url>https://nexus.flowlogix.com/repository/maven-releases</url>
                     <releases>
                         <enabled>true</enabled>
                         <checksumPolicy>fail</checksumPolicy>

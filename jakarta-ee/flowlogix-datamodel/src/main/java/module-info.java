@@ -12,7 +12,7 @@ module com.flowlogix.datamodel {
     requires org.apache.commons.lang3;
     requires org.omnifaces;
     requires jakarta.persistence;
-    requires jakarta.faces.api;
+    requires jakarta.faces;
     requires jakarta.cdi;
     requires jakarta.transaction;
     requires jakarta.el;

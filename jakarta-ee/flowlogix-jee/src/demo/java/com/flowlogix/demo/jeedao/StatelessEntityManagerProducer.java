@@ -15,17 +15,22 @@
  */
 package com.flowlogix.demo.jeedao;
 
+import jakarta.annotation.Priority;
 import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
+import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.Getter;
 import static jakarta.ejb.TransactionAttributeType.SUPPORTS;
+import static jakarta.interceptor.Interceptor.Priority.APPLICATION;
 
 // @start region="statelessEntityProducer"
 // tag::statelessEntityProducer[] // @replace regex='.*\n' replacement=""
 @Stateless
+@Alternative
+@Priority(APPLICATION + 1)
 @TransactionAttribute(SUPPORTS)
 public class StatelessEntityManagerProducer {
     @Getter(onMethod = @__({@Produces, @NonDefault}))

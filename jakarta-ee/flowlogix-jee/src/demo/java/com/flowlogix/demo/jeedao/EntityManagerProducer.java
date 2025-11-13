@@ -15,15 +15,20 @@
  */
 package com.flowlogix.demo.jeedao;
 
+import jakarta.annotation.Priority;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.Getter;
+import static jakarta.interceptor.Interceptor.Priority.APPLICATION;
 
 // @start region="nonDefaultEntityProducer"
 // tag::nonDefaultEntityProducer[] // @replace regex='.*\n' replacement=""
+@Alternative
 @RequestScoped
+@Priority(APPLICATION + 1)
 public class EntityManagerProducer {
     @Getter(onMethod = @__({@Produces, @NotDefault}))
     @PersistenceContext(unitName = "nonDefault")

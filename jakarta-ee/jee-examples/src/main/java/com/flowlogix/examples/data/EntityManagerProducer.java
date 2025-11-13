@@ -15,14 +15,19 @@
  */
 package com.flowlogix.examples.data;
 
+import jakarta.annotation.Priority;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.Getter;
+import static jakarta.interceptor.Interceptor.Priority.APPLICATION;
 
+@Alternative
 @RequestScoped
+@Priority(APPLICATION + 1)
 public class EntityManagerProducer {
     @Getter(onMethod = @__({@Produces, @Default, @AnotherEntityManager}))
     @PersistenceContext(unitName = "pu")

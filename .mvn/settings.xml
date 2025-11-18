@@ -3,18 +3,11 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
                       http://maven.apache.org/xsd/settings-1.0.0.xsd">
     <activeProfiles>
-        <activeProfile>jakarta-ee-version-override</activeProfile>
         <activeProfile>graphene-version-override</activeProfile>
         <activeProfile>flowlogix-repository</activeProfile>
     </activeProfiles>
 
     <profiles>
-        <profile>
-            <id>jakarta-ee-version-override</id>
-            <properties>
-                <jakarta.ee.version>10.0.0-lp-nov6</jakarta.ee.version>
-            </properties>
-        </profile>
         <profile>
             <id>graphene-version-override</id>
             <properties>

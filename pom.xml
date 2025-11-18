@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>flowlogix</artifactId>
-    <version>10.x-SNAPSHOT</version>
+    <version>11.x-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>86</version>
+        <version>88</version>
     </parent>
 
     <properties>
@@ -26,8 +26,8 @@
         <!-- major version is "10" so have to supply it as such here -->
         <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
-        <eclipselink.version>4.0.8</eclipselink.version>
-        <omnifaces.version>4.7</omnifaces.version>
+        <eclipselink.version>5.0.0-B11</eclipselink.version>
+        <omnifaces.version>5.0-M5</omnifaces.version>
         <primefaces.version>15.0.10</primefaces.version>
         <depchain.version>100</depchain.version>
     </properties>

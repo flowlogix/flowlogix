@@ -4,14 +4,14 @@
 
     <groupId>com.flowlogix</groupId>
     <artifactId>jakarta-ee</artifactId>
-    <version>10.x-SNAPSHOT</version>
+    <version>11.x-SNAPSHOT</version>
     <name>FlowLogix Jakarta EE Modules</name>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix-bom</artifactId>
-        <version>10.x-SNAPSHOT</version>
+        <version>11.x-SNAPSHOT</version>
         <relativePath>../flowlogix-bom</relativePath>
     </parent>
 

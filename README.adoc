@@ -37,13 +37,10 @@ and https://javadoc.flowlogix.com/datamodel-apidocs[PrimeFaces Lazy Data Model^]
 
 === News
 
-- 3/3/2024: Version 9.0 has been released
-- 5/4/2023: Version 6.0 has been released (Java 17, Jakarta EE 10)
+- 11/18/2025: Version 11 has been released (Java 17-25+, Jakarta EE 11)
+- 9/18/2024: Version 10 has been released (Java 17+, Jakarta EE 10)
 - 3/3/2023: Documentation is here!
 - 2/1/2023: Version 5.x is moved to maintenance mode
-- 11/5/2022: Version 5.0 has been released with Java 11 being the minimum default
-- 3/15/2022: Version 4.0.7 has been released. Java 8 through 18
-compatible.
 - 12/08/2020: Version 4.0 of flowlogix-jee and flowlogix-datamodel Major
 refactor and contributed many EE and JSF modules to
 https://omnifaces.org[OmniFaces^]

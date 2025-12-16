@@ -203,8 +203,8 @@
                         <bottom>Copyright © ${project.inceptionYear}-2025 Flow Logix, Inc. All Rights Reserved.</bottom>
                         <excludePackageNames>*.internal</excludePackageNames>
                         <links>
-                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/4.7</link>
-                            <link>https://javadoc.io/doc/org.primefaces/primefaces/15.0.10</link>
+                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/latest</link>
+                            <link>https://javadoc.io/doc/org.primefaces/primefaces/latest</link>
                         </links>
                     </configuration>
                 </plugin>

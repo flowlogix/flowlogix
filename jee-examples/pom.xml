@@ -44,10 +44,6 @@
             <artifactId>primefaces</artifactId>
             <classifier>jakarta</classifier>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>

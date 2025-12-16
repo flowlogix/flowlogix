@@ -51,31 +51,25 @@ link:https://s01.oss.sonatype.org/content/repositories/snapshots/com/flowlogix/[
 [source,xml]
 .Jakarta EE Components - Maven Example
 ----
-include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesStart,indent=0]
+include::../../jee-examples/pom.xml[tags=dependenciesStart,indent=0]
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix-jee</artifactId>
         <version><<LATEST>></version>
-include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesEnd,indent=0]
+include::../../jee-examples/pom.xml[tags=dependenciesEnd,indent=0]
 ----
 [source,xml]
 .PrimeFaces JPA LazyDataModel - Maven Example
 ----
-include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesStart,indent=0]
+include::../../jee-examples/pom.xml[tags=dependenciesStart,indent=0]
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix-datamodel</artifactId>
         <version><<LATEST>></version>
-include::../../jakarta-ee/jee-examples/pom.xml[tags=dependenciesEnd,indent=0]
+include::../../jee-examples/pom.xml[tags=dependenciesEnd,indent=0]
 ----
 
 === Flow Logix BOM
-Flow Logix includes an easy way to declare all the required dependency versions, via the Maven Bill of Materials.
-[source,xml]
-.Example
-----
-include::../../jakarta-ee/jee-examples/pom.xml[tags=depManagementStart,indent=0]
-include::../../jakarta-ee/jee-examples/pom.xml[tags=bomUsage,indent=8]
-include::../../jakarta-ee/jee-examples/pom.xml[tags=depManagementEnd,indent=0]
-----
+Flow Logix includes an easy way to declare all the required dependency versions, via the Maven Bill of Materials. It is automatically included when using https://docs.flowlogix.com/base-pom[FlowLogix Base POM].
+
 See the link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms[Maven Documentation^] for more information on BOMs
 
 [[section-dev-guide]]
@@ -89,15 +83,15 @@ See the link:https://maven.apache.org/guides/introduction/introduction-to-depend
 [source,java]
 .Enhanced query and hints example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoParameters,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoParameters,indent=0]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[Full Demo on GitHub^]
 [source,java]
 .Composable query with customized parameters
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoExtractedParameters,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=daoExtractedParameters,indent=0]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[Full Demo on GitHub^]
 
 There are many ways to implement the Data-Access-Object pattern in Java. Most of them require to implement an interface, have some kind of bytecode generation magic or inherit from a base class. FlowLogix takes a different approach. The amount of magic is totally up to the developers. If none of the below approaches work, your DAO can simply inherit from `InheritableDaoHelper`, and initialize the `jpaFinder` protected field in your `@PostConstruct` method.
 
@@ -118,54 +112,54 @@ That's Because `EntityManager` is not initialized when the object is created. `S
 .Where are `find()` and related methods?
 These methods are built into the EntityManager and can be accessed that way (see the "more complete" example below). There is no need for JPAFinder to provide them. If more functionality related to `find()` is desired, Jakarta Data or https://deltaspike.apache.org[Apache DeltaSpike^] project is a wonderful addition to your architecture and will satisfy those needs.
 
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao[Full Demos on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao[Full Demos on GitHub^]
 
 [source,java]
 .Simple DAO Example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/ExampleDAO.java[tags=simpleExampleDAO,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/ExampleDAO.java[tags=simpleExampleDAO,indent=0]
 ----
 [source,java]
 .Injected DAO example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InjectedDAO.java[tags=injectedExampleDAO,ident=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InjectedDAO.java[tags=injectedExampleDAO,ident=0]
 ----
 [source,java]
 .Non-Default annotation example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/NonDefault.java[tags=nonDefault,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/NonDefault.java[tags=nonDefault,indent=0]
 ----
 [source,java]
 .Non-Default EntityManager injection example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InjectedEntityManager.java[tags=injectedEntityManager]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InjectedEntityManager.java[tags=injectedEntityManager]
 ----
 [source,java]
 .Injected DAO with non-default EntityManager
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InjectedNonDefaultDAO.java[tags=injectedNonDefaultExampleDAO,ident=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InjectedNonDefaultDAO.java[tags=injectedNonDefaultExampleDAO,ident=0]
 ----
 [source,java]
 .More complete DAO example that forwards `EntityManager` methods
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/ExampleDelegateDAO.java[tags=delegateDAO]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/ExampleDelegateDAO.java[tags=delegateDAO]
 ----
 [source,java]
 .Non-default EntityManager Producer example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/EntityManagerProducer.java[tags=nonDefaultEntityProducer,ident=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/EntityManagerProducer.java[tags=nonDefaultEntityProducer,ident=0]
 ----
 NOTE: `@NonDefault` annotation can be removed to use it as a Default producer. If there is only one Persistence Unit, `unitName` can be also omitted.
 [source,java]
 .EJB Stateless EntityManager Producer example (optimization)
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/StatelessEntityManagerProducer.java[tags=statelessEntityProducer,ident=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/StatelessEntityManagerProducer.java[tags=statelessEntityProducer,ident=0]
 ----
 The example above works well if `@RequestScope` is unavailable and may work better because of EJB bean pooling optimizations.
 [source,java]
 .Inherited DaoHelper example (not recommeded)
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InheritedDAO.java[tags=inheritedDAO]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/InheritedDAO.java[tags=inheritedDAO]
 ----
 
 [[section-nativequery]]
@@ -174,7 +168,7 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/
 [source,java]
 .Native Query Example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=nativeQuery,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/jeedao/UserDAO.java[tags=nativeQuery,indent=0]
 ----
 
 [[section-jsf]]
@@ -277,12 +271,12 @@ If those are desired, other libraries do a great job of handling custom converte
 [source,java]
 .Generically and dynamically transform a `String` to any class, throws an exception if failed
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/TypeConverterDemo.java[tags=typeConvert,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/util/TypeConverterDemo.java[tags=typeConvert,indent=0]
 ----
 [source,java]
 .Convert and check if returned value matches the input after the conversion, without throwing any exceptions
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/TypeConverterDemo.java[tags=checkTypeConvert,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/util/TypeConverterDemo.java[tags=checkTypeConvert,indent=0]
 ----
 
 .Transform java -> jakarta namespace at run-time (jakartify)
@@ -290,12 +284,12 @@ FlowLogix provides a convenience method for converting strings from `javax` to `
 [source,java]
 .Servlet example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/ui/JakartifyDemo.java[tags=jakartifyServlet,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/ui/JakartifyDemo.java[tags=jakartifyServlet,indent=0]
 ----
 [source,java]
 .Jakarta Faces example
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/ui/JakartifyDemo.java[tags=jakartifyError,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/ui/JakartifyDemo.java[tags=jakartifyError,indent=0]
 ----
 FlowLogix automatically detects which environment it's in, and converts `javax`-based names into `jakarta`-based namespace accordingly. Keep in mind that the environment check occurs at run-time, and not compile time. This method works not only for classes, but also for error messages and other strings.
 
@@ -306,14 +300,14 @@ Generic `serializeAndDeserialize()` method can be used to check the true ability
 [source,java]
 .Check correctness of serialized object
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/SerializeDemo.java[tags=serialize,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/util/SerializeDemo.java[tags=serialize,indent=0]
 ----
 
 .Read String from Stream easily
 FlowLogix provides an easy way to read a String from any input stream:
 [source,java]
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ReadStringDemo.java[tags=readStringFromStream,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ReadStringDemo.java[tags=readStringFromStream,indent=0]
 ----
 NOTE: The input stream is not closed by the `readString` method
 
@@ -332,13 +326,13 @@ $ mvn verify -DhttpsPort=8282
 [source,java]
 ----
 @Deployment
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=deployMaven,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=deployMaven,indent=0]
 ----
 .Creating ShrinkWrap (Arquillian) tests easily from maven POM file with prod suffix
 [source,java]
 ----
 @Deployment
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=deployMavenSuffix,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=deployMavenSuffix,indent=0]
 ----
 
 .Configuring ShrinkWrap (Arquillian) test artifacts
@@ -348,9 +342,9 @@ include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/Sh
 .Configure tests for Jakarta Faces production mode
 ----
 @Deployment
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=productionMode,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=productionMode,indent=0]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java#L54[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java#L54[Full Demo on GitHub^]
 
 `getContextParamValue()` is a shorthand to produce XPath for `web.xml` context parameter (`<context-param>`) element:
 [source]
@@ -372,9 +366,9 @@ Above, we also combine `web.xml` manipulation with `jakartify` to be compatible 
 [source,java]
 .Example of manipulation of `persistence.xml` file
 ----
-include::../../jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=persistence,indent=0]
+include::../../flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java[tags=persistence,indent=0]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java#L69[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-jee/src/demo/java/com/flowlogix/demo/util/ShrinkWrapDemo.java#L69[Full Demo on GitHub^]
 
 Developers can transform any XML file from the archive by using the generic `manipulateXml()` method, which both `webXmlXPath()` and `persistenceXmlXPath()` methods utilize to do their job.
 
@@ -385,7 +379,7 @@ PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/prime
 [source,xhtml]
 .userviewer.xhtml
 ----
-include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/BasicDataModel.java[tags=basicUsageHtml]
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/BasicDataModel.java[tags=basicUsageHtml]
 ----
 [source,java]
 .UserViewer.java
@@ -393,10 +387,10 @@ include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/j
 @Named
 @ViewScoped
 public class UserViewer implements Serializable {
-include::../../jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage"]
+include::../../jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[tags="simpleLazyDataModelUsage"]
 }
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
 
 Above we created a model with case-insensitive filtering. Model can be optionally initialized further inside `@PostConstruct` using `initialize()` method and builder pattern (see below)
 
@@ -406,10 +400,10 @@ Above we created a model with case-insensitive filtering. Model can be optionall
 @Named
 @ViewScoped
 public class UserViewer implements Serializable {
-include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/DirectCreationDataModel.java[tags=basicUsage]
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/DirectCreationDataModel.java[tags=basicUsage]
 }
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
 
 Above, we create the model without injection.
 During direct creation, `JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
@@ -430,41 +424,41 @@ Let's use custom criteria to add address to the default sort:
 [source,java]
 .Add sorting by zip code
 ----
-include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[tags=sorting]
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[tags=sorting]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[Full Demo on GitHub^]
 
 Let's use custom filter criteria using `replaceFilter` convenience method. Here we make sure that only zip codes greater than that in the filter are returned:
 [source,java]
 .Show only zip codes greater than filtered field
 ----
-include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[tags=filtering]
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[tags=filtering]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[Full Demo on GitHub^]
 
 Optimizer hints can be used to fetch dependent entity relationships in batches. The `UnaryOperator` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner:
 [source,java]
 .Batch query of dependent entities using `IN` query
 ----
-include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[tags=optimized]
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[tags=optimized]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[Full Demo on GitHub^]
 
 Results Enricher can be used to post-process the results of the query:
 [source,java]
 .Add a new row to the results
 ----
-include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/EnrichedDataModel.java[tags=enriched]
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/EnrichedDataModel.java[tags=enriched]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/EnrichedDataModel.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/EnrichedDataModel.java[Full Demo on GitHub^]
 
 Let's select a specific entity manager for this particular data model, by using a CDI qualifier:
 [source,java]
 .Using `@LazyModelConfig(entityManagerSelector)` to use a specific persistence unit
 ----
-include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[tags=qualifier]
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[tags=qualifier]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[Full Demo on GitHub^]
 
 `JPALazyDataModel` needs to convert a String representation of the entity's primary key into the actual entity primary key object. This is a requirement for PrimeFaces' `LazyDataModel.getRowKey(String)` method. Default converter is provided. However, if it's insufficient, `converter` builder method is provided to override the default.
 
@@ -472,9 +466,9 @@ https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/
 [source,java]
 .Use binary value as a primary key representation, using converters
 ----
-include::../../jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/ConverterDataModel.java[tags=converter]
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/ConverterDataModel.java[tags=converter]
 ----
-https://github.com/flowlogix/flowlogix/tree/main/jakarta-ee/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/ConverterDataModel.java[Full Demo on GitHub^]
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/ConverterDataModel.java[Full Demo on GitHub^]
 
 == API Reference
 FlowLogix features a full API references:

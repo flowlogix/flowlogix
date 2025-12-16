@@ -19,6 +19,7 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -29,12 +30,12 @@ import java.util.List;
  */
 @Dependent
 @SuppressWarnings("HideUtilityClassConstructor")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 class DataModelProducer {
     @Produces
     @Default
     @LazyModelConfig
-    public static <TT> JPALazyDataModel<TT> produceDataModelWithConfig(InjectionPoint injectionPoint) {
+    static <TT> JPALazyDataModel<TT> produceDataModelWithConfig(InjectionPoint injectionPoint) {
         var parameterizedType = (ParameterizedType) injectionPoint.getType();
         @SuppressWarnings("unchecked")
         var entityClass = (Class<TT>) parameterizedType.getActualTypeArguments()[0];

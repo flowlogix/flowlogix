@@ -12,13 +12,11 @@
         <groupId>com.flowlogix</groupId>
         <artifactId>flowlogix</artifactId>
         <version>11.x-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
     </parent>
 
     <properties>
         <payara.start.disable>${skipITs}</payara.start.disable>
         <arquillian.graphene.version>3.0.0-alpha.4</arquillian.graphene.version>
-        <arquillian.payara.version>3.1</arquillian.payara.version>
         <it.test.parallel>classes</it.test.parallel>
         <!-- con't copy test dependencies for skinny WARs -->
         <excludeClassifiers>tests</excludeClassifiers>
@@ -42,29 +40,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.omnifaces</groupId>
-            <artifactId>omnifaces</artifactId>
-            <version>${omnifaces.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <classifier>jakarta</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.platform</groupId>
-            <artifactId>jakarta.jakartaee-api</artifactId>
-            <version>${jakarta.ee.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Test Dependencies -->
@@ -92,12 +70,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>fish.payara.arquillian</groupId>
-            <artifactId>arquillian-payara-server-remote</artifactId>
-            <version>${arquillian.payara.version}</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Selenium test dependencies -->
@@ -111,38 +84,6 @@
         </dependency>
     </dependencies>
     <!-- end::dependenciesEnd[] -->
-
-    <!-- tag::depManagementStart[] -->
-    <dependencyManagement>
-        <dependencies>
-        <!-- end::depManagementStart[] -->
-            <dependency>
-                <groupId>org.primefaces</groupId>
-                <artifactId>primefaces</artifactId>
-                <classifier>jakarta</classifier>
-                <version>${primefaces.version}</version>
-            </dependency>
-            <!-- The below BOM version can't be automated, or be a variable, needs to be the latest in maven central -->
-            <!-- tag::bomUsage[] // @replace regex='.*\n' replacement="" -->
-            <dependency>
-                <groupId>com.flowlogix</groupId>
-                <artifactId>flowlogix-bom</artifactId>
-                <version>11</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- end::bomUsage[] // @replace regex='.*\n' replacement="" -->
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-bom</artifactId>
-                <version>4.39.0</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-        <!-- tag::depManagementEnd[] -->
-        </dependencies>
-    </dependencyManagement>
-    <!-- end::depManagementEnd[] -->
 
     <build>
         <resources>

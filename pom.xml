@@ -26,9 +26,6 @@
         <!-- major version is "10" so have to supply it as such here -->
         <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
-        <eclipselink.version>5.0.0-B13</eclipselink.version>
-        <omnifaces.version>5.0-M6</omnifaces.version>
-        <primefaces.version>15.0.10</primefaces.version>
         <depchain.version>103</depchain.version>
     </properties>
 
@@ -39,9 +36,46 @@
     </scm>
 
     <modules>
-        <module>flowlogix-bom</module>
-        <module>jakarta-ee</module>
+        <module>flowlogix-jee</module>
+        <module>flowlogix-datamodel</module>
+        <module>jee-examples</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>${jakarta.ee.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.omnifaces</groupId>
+            <artifactId>omnifaces</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flowlogix.depchain</groupId>
+            <artifactId>unit-test</artifactId>
+            <version>${depchain.version}</version>
+            <scope>test</scope>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -144,12 +178,10 @@
                             <annotationProcessorPath>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
-                                <version>${lombok.version}</version>
                             </annotationProcessorPath>
                             <annotationProcessorPath>
                                 <groupId>org.eclipse.persistence</groupId>
                                 <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-                                <version>${eclipselink.version}</version>
                             </annotationProcessorPath>
                         </annotationProcessorPaths>
                     </configuration>
@@ -171,8 +203,8 @@
                         <bottom>Copyright © ${project.inceptionYear}-2025 Flow Logix, Inc. All Rights Reserved.</bottom>
                         <excludePackageNames>*.internal</excludePackageNames>
                         <links>
-                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/${omnifaces.version}</link>
-                            <link>https://javadoc.io/doc/org.primefaces/primefaces/${primefaces.version}</link>
+                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/latest</link>
+                            <link>https://javadoc.io/doc/org.primefaces/primefaces/latest</link>
                         </links>
                     </configuration>
                 </plugin>
@@ -228,15 +260,4 @@
             </properties>
         </profile>
     </profiles>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.eclipse.persistence</groupId>
-                <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-                <version>${eclipselink.version}</version>
-                <scope>provided</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>

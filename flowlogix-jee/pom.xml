@@ -11,7 +11,7 @@
 
     <parent>
         <groupId>com.flowlogix</groupId>
-        <artifactId>jakarta-ee</artifactId>
+        <artifactId>flowlogix</artifactId>
         <version>11.x-SNAPSHOT</version>
     </parent>
 

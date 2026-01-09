@@ -199,7 +199,7 @@
                     <configuration>
                         <overview>${project.build.sourceDirectory}/overview.html</overview>
                         <doctitle>${javadoc.title}</doctitle>
-                        <bottom>Copyright © ${project.inceptionYear}-2025 Flow Logix, Inc. All Rights Reserved.</bottom>
+                        <bottom>Copyright © ${project.inceptionYear}-2026 Flow Logix, Inc. All Rights Reserved.</bottom>
                         <excludePackageNames>*.internal</excludePackageNames>
                         <links>
                             <link>https://javadoc.io/doc/org.omnifaces/omnifaces/latest</link>

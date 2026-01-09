@@ -26,7 +26,7 @@
         <!-- major version is "10" so have to supply it as such here -->
         <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
-        <depchain.version>105</depchain.version>
+        <depchain.version>106</depchain.version>
     </properties>
 
     <scm>

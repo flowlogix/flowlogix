@@ -5,7 +5,7 @@
     <artifactId>jee-examples</artifactId>
     <version>11.x-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>JEE Services and PrimeFaces Examples</name>
+    <name>Flow Logix JEE Components and PrimeFaces Examples</name>
 
     <!-- parent is only present for testing profiles -->
     <parent>

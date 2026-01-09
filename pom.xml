@@ -38,7 +38,6 @@
     <modules>
         <module>flowlogix-jee</module>
         <module>flowlogix-datamodel</module>
-        <module>jee-examples</module>
     </modules>
 
     <dependencies>
@@ -235,6 +234,17 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>build-jee-examples</id>
+            <activation>
+                <property>
+                    <name>!skip-jee-examples</name>
+                </property>
+            </activation>
+            <modules>
+                <module>jee-examples</module>
+            </modules>
+        </profile>
         <profile>
             <id>stress-test</id>
             <properties>

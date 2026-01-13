@@ -20,7 +20,7 @@
 
         <release.profiles>${release.profile},javadoc-release</release.profiles>
         <javadoc.title>${project.name}</javadoc.title>
-        <javadoc.snippet.path>${snippet.path}:${maven.multiModuleProjectDirectory}/jakarta-ee/jee-examples/src/main/java</javadoc.snippet.path>
+        <javadoc.snippet.path>${snippet.path}:${maven.multiModuleProjectDirectory}/jee-examples/src/main/java</javadoc.snippet.path>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
         <!-- major version is "10" so have to supply it as such here -->

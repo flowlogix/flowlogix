@@ -16,7 +16,7 @@
 
     <properties>
         <payara.start.disable>${skipITs}</payara.start.disable>
-        <arquillian.graphene.version>3.0.0-alpha.4</arquillian.graphene.version>
+        <arquillian.graphene.version>3.0.0.Final</arquillian.graphene.version>
         <it.test.parallel>classes</it.test.parallel>
         <!-- con't copy test dependencies for skinny WARs -->
         <excludeClassifiers>tests</excludeClassifiers>

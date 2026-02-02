@@ -22,7 +22,7 @@
         <payara.start.disable>${skipITs}</payara.start.disable>
         <arquillian.core.version>1.10.0.Final</arquillian.core.version>
         <arquillian.drone.version>2.5.6</arquillian.drone.version>
-        <arquillian.graphene.version>3.0.0-alpha.4</arquillian.graphene.version>
+        <arquillian.graphene.version>3.0.0.Final</arquillian.graphene.version>
         <arquillian.payara5.version>2.5</arquillian.payara5.version>
         <testcontainers.skip>true</testcontainers.skip>
         <payara.imageName>lprimak/payara-full:5-latest</payara.imageName>

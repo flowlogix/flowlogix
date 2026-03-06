@@ -85,7 +85,7 @@ This configuration ensures that the JaCoCo plugin only includes your main applic
 
 At this point, your CI/CD pipeline can generate the JaCoCo reports. You can see an example of this in the FlowLogix Jenkins Repository: link:https://github.com/flowlogix/jenkins/blob/main/UnitTests.groovy[UnitTests.groovy] that uses link:https://github.com/flowlogix/jenkins/blob/main/payara-lib/vars[Payara Jenkins Library]
 
-You can also run the tests and generate the report locally. To configure Payara or GlassFish for JaCoCo, download and run the initialization script link:https:/github.com/flowlogix/base-pom/blob/main/payara-pom/jacoco-init.sh[jacoco-init.sh]:
+You can also run the tests and generate the report locally. To configure Payara or GlassFish for JaCoCo, download and run the initialization script link:https://github.com/flowlogix/base-pom/blob/main/payara-pom/jacoco-init.sh[jacoco-init.sh]:
 
 [source,shell]
 .Run the JaCoCo initialization script for Payara or GlassFish

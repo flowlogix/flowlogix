@@ -44,7 +44,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>target/replacer</outputDirectory>
-                            <overwrite>true</overwrite>
+                            <changeDetection>always</changeDetection>
                             <resources>
                                 <resource>
                                     <directory>target/classes/META-INF</directory>

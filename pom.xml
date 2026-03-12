@@ -202,7 +202,7 @@
                         <bottom>Copyright © ${project.inceptionYear}-2026 Flow Logix, Inc. All Rights Reserved.</bottom>
                         <excludePackageNames>*.internal</excludePackageNames>
                         <links>
-                            <link>https://javadoc.io/doc/org.omnifaces/omnifaces/latest</link>
+                            <link>https://omnifaces.org/docs/javadoc/current</link>
                             <link>https://javadoc.io/doc/org.primefaces/primefaces/latest</link>
                         </links>
                     </configuration>

@@ -39,6 +39,7 @@ public class AjaxErrorHandlerListener implements SystemEventListener {
                     .createComponent(HtmlOutputText.COMPONENT_TYPE);
             script.setEscape(false);
             script.setValue("<script src=\"" + url + "\"></script>");
+            script.getAttributes().put("name", url);
             view.addComponentResource(context, script,
                     Faces.getInitParameterOrDefault(CDN_URL_TARGET_PARAM, "body"));
             view.getAttributes().put(marker, Boolean.TRUE);

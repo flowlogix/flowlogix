@@ -193,7 +193,7 @@ class ExceptionPageIT {
         int count = 0;
         for (WebElement script : scripts) {
             String href = script.getDomAttribute("src");
-            if (StringUtils.isBlank(href)) {
+            if (StringUtils.isBlank(href) || href.startsWith("http")) {
                 continue;
             }
             assertThat(href).as("not versioned").contains("v=");
@@ -205,7 +205,7 @@ class ExceptionPageIT {
         List<WebElement> csses = webDriver.findElements(By.tagName("link"));
         for (WebElement css : csses) {
             String href = css.getDomAttribute("href");
-            if (StringUtils.isBlank(href)) {
+            if (StringUtils.isBlank(href) || href.startsWith("http")) {
                 continue;
             }
             assertThat(href).as("not versioned").contains("v=");

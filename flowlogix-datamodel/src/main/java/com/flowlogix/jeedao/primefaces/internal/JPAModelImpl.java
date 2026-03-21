@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import jakarta.faces.component.UIComponent;
@@ -132,6 +133,10 @@ public class JPAModelImpl<TT> implements Serializable {
     @Default
     private final transient @Getter @NonNull UnaryOperator<List<TT>> resultEnricher = identity();
 
+    /// TODO
+    @Default
+    private final transient @Getter @NonNull IntUnaryOperator cursor = IntUnaryOperator.identity();
+
     /**
      * Specifies whether String filters are case-sensitive
      */
@@ -201,6 +206,7 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
+        first = cursor.applyAsInt(first);
         return resultEnricher.apply(optimizer.apply(
                 jpaFinder.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
                         qc -> addToCriteria(qc, filters, sortMeta))).getResultList());
@@ -220,11 +226,8 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     private JPAFinderHelper<TT> createJPAFinder() {
-        if (entityManager != null) {
-            return new DaoHelper<>(entityManager, entityClass);
-        } else {
-            return new DaoHelper<>(findEntityManager(entityManagerQualifiers), entityClass);
-        }
+        return new DaoHelper<>(Objects.requireNonNullElseGet(entityManager,
+                () -> findEntityManager(entityManagerQualifiers)), entityClass);
     }
 
     private Function<String, ?> createConverter() {

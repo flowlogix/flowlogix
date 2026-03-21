@@ -34,7 +34,7 @@
     <suppress checks="JavadocPackage" files="com.flowlogix.examples.*"/>
     <suppress checks="JavadocType" files="PackageMarker"/>
     <suppress checks="JavadocType" files="InternalQualifierJPALazyModel" lines="26"/>
-    <suppress checks="JavadocType" files="JPAModelImpl" lines="81,162,199"/>
+    <suppress checks="JavadocType" files="JPAModelImpl" lines="82,163,200"/>
     <suppress checks="JavadocType" files="JPALazyDataModel.java" lines="128"/>
 
     <suppress checks="JavadocVariable" lines="49-52" files="com.flowlogix.util.ShrinkWrapManipulator"/>

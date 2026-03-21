@@ -18,6 +18,7 @@ package com.flowlogix.jeedao.primefaces.internal;
 import com.flowlogix.api.dao.JPAFinder.QueryCriteria;
 import com.flowlogix.api.dao.JPAFinderHelper;
 import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.jeedao.primefaces.CursorPagination;
 import com.flowlogix.jeedao.primefaces.Filter;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Filter.FilterColumnData;
@@ -43,9 +44,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.convert.Converter;
 import jakarta.persistence.EntityManager;
@@ -135,7 +136,7 @@ public class JPAModelImpl<TT> implements Serializable {
 
     /// TODO
     @Default
-    private final transient @Getter @NonNull IntUnaryOperator cursor = IntUnaryOperator.identity();
+    private final transient @Getter @NonNull CursorPagination cursor = CursorPagination.noop();
 
     /**
      * Specifies whether String filters are case-sensitive
@@ -206,10 +207,10 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        first = cursor.applyAsInt(first);
+        int cursorFirst = cursor.cursorOffset(first);
         return resultEnricher.apply(optimizer.apply(
-                jpaFinder.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
-                        qc -> addToCriteria(qc, filters, sortMeta))).getResultList());
+                jpaFinder.get().findRange(Integer.max(cursorFirst, 0), Integer.max(cursorFirst + pageSize, 1),
+                        qc -> addToCriteria(qc, filters, sortMeta, cursorFirst))).getResultList());
     }
 
     public Supplier<EntityManager> getEntityManager() {
@@ -238,13 +239,18 @@ public class JPAModelImpl<TT> implements Serializable {
         return entry -> getPrimaryKey(Optional.of(entry)).toString();
     }
 
-    private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        qc.query().where(getFilters(filters, qc.builder(), qc.root()));
+    private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta,
+                               int offset) {
+        qc.query().where(getFilters(filters, qc.builder(), qc.root(), offset));
         qc.query().orderBy(getSort(sortMeta, qc.builder(), qc.root()));
         qc.root().alias(JPALazyDataModel.RESULT);
     }
 
     public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
+        return getFilters(filters, cb, root, 0);
+    }
+
+    public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root, int offset) {
         FilterData predicates = new FilterDataMap();
         filters.values().forEach(filterMeta -> {
             if (filterMeta.isGlobalFilter()) {
@@ -257,7 +263,9 @@ public class JPAModelImpl<TT> implements Serializable {
             }
         });
         filter.filter(predicates, cb, root);
-        return cb.and(predicates.values().stream().map(FilterColumnData::getPredicate)
+        Stream<Predicate> filterPredicates = predicates.values().stream()
+                .map(FilterColumnData::getPredicate);
+        return cb.and(Stream.concat(filterPredicates, Stream.of(cursor.cursorPredicate(offset)))
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
 

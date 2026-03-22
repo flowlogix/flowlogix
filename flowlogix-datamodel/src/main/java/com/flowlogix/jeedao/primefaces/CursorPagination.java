@@ -36,7 +36,7 @@ public interface CursorPagination {
 
             @Override
             public int cursorOffset(int offset) {
-                return 0;
+                return offset;
             }
 
             @Override

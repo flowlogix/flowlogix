@@ -15,34 +15,37 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
-import java.util.Collections;
+import jakarta.persistence.criteria.Root;
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.SortMeta;
 import java.util.Map;
 
 /// TODO
-public interface CursorPagination {
-    /// @return storage for cached cursors
-    Map<Integer, ?> map();
+public interface CursorPagination<TT> {
+    void save(int offset, TT entity);
     int cursorOffset(int offset);
-    Predicate cursorPredicate(int offset);
+    Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root, Map<String, SortMeta> sortMeta);
+    default boolean isSupported(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
+        return false;
+    }
 
     /// TODO
-    static CursorPagination noop() {
-        return new CursorPagination() {
-            @Override
-            public Map<Integer, ?> map() {
-                return Collections.emptyMap();
-            }
-
+    static <TT> CursorPagination<TT> noop() {
+        return new CursorPagination<TT>() {
             @Override
             public int cursorOffset(int offset) {
                 return offset;
             }
 
             @Override
-            public Predicate cursorPredicate(int offset) {
+            public Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root, Map<String, SortMeta> sortMeta) {
                 return null;
             }
+
+            @Override
+            public void save(int offset, TT entity) { }
         };
     }
 }

@@ -136,7 +136,7 @@ public class JPAModelImpl<TT> implements Serializable {
 
     /// TODO
     @Default
-    private final transient @Getter @NonNull CursorPagination cursor = CursorPagination.noop();
+    private final transient @Getter @NonNull CursorPagination<TT> cursor = CursorPagination.noop();
 
     /**
      * Specifies whether String filters are case-sensitive
@@ -207,10 +207,17 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        int cursorFirst = cursor.cursorOffset(first);
-        return resultEnricher.apply(optimizer.apply(
-                jpaFinder.get().findRange(Integer.max(cursorFirst, 0), Integer.max(cursorFirst + pageSize, 1),
-                        qc -> addToCriteria(qc, filters, sortMeta, cursorFirst))).getResultList());
+        int sanitizedFirst = Integer.max(first, 0);
+        boolean cursorSupported = cursor.isSupported(filters, sortMeta);
+        int cursorFirst = cursorSupported ? cursor.cursorOffset(sanitizedFirst) : sanitizedFirst;
+        List<TT> result = resultEnricher.apply(optimizer.apply(
+                jpaFinder.get().findRange(cursorFirst, Integer.max(cursorFirst + pageSize, 1),
+                        qc -> addToCriteria(qc, filters, sortMeta,
+                                cursorSupported, sanitizedFirst))).getResultList());
+        if (cursorSupported && !result.isEmpty()) {
+            cursor.save(first + result.size(), result.get(result.size() - 1));
+        }
+        return result;
     }
 
     public Supplier<EntityManager> getEntityManager() {
@@ -240,17 +247,18 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta,
-                               int offset) {
-        qc.query().where(getFilters(filters, qc.builder(), qc.root(), offset));
+                               boolean cursorSupported, int offset) {
+        qc.query().where(getFilters(filters, qc.builder(), qc.root(), cursorSupported, offset, sortMeta));
         qc.query().orderBy(getSort(sortMeta, qc.builder(), qc.root()));
         qc.root().alias(JPALazyDataModel.RESULT);
     }
 
     public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
-        return getFilters(filters, cb, root, 0);
+        return getFilters(filters, cb, root, false, 0, null);
     }
 
-    public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root, int offset) {
+    public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root,
+                                boolean cursorSupported, int offset, Map<String, SortMeta> sortMeta) {
         FilterData predicates = new FilterDataMap();
         filters.values().forEach(filterMeta -> {
             if (filterMeta.isGlobalFilter()) {
@@ -265,7 +273,9 @@ public class JPAModelImpl<TT> implements Serializable {
         filter.filter(predicates, cb, root);
         Stream<Predicate> filterPredicates = predicates.values().stream()
                 .map(FilterColumnData::getPredicate);
-        return cb.and(Stream.concat(filterPredicates, Stream.of(cursor.cursorPredicate(offset)))
+        return cb.and(Stream.concat(filterPredicates, offset != 0 && cursorSupported
+                        ? Stream.of(cursor.cursorPredicate(offset, cb, root, sortMeta))
+                        : Stream.empty())
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
 

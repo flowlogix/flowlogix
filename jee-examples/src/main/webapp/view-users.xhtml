@@ -15,6 +15,10 @@
         <h:form prependId="false">
             <p:dataTable id="model1" lazy="true" scrollRows="2" rows="3" scrollable="true" virtualScroll="true"
                          scrollHeight="100" value="#{userViewer.lazyModel}" var="user" filterEvent="enter">
+                <p:column headerText="ID" sortBy="#{user.id}" filterBy="#{user.id}"
+                          filterMatchMode="exact" id="idHeader">
+                    <h:outputText id="ddRow" value="#{user.id}" />
+                </p:column>
                 <p:column headerText="User ID" sortBy="#{user.userId}" filterBy="#{user.userId}"
                           filterMatchMode="contains" id="userIdHeader">
                     <h:outputText id="userIdRow" value="#{user.userId}" />

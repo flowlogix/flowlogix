@@ -26,6 +26,7 @@ import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Startup;
 import jakarta.inject.Inject;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import jakarta.transaction.Transactional;
 
@@ -42,6 +43,7 @@ public class Initializer {
 
     @SuppressWarnings("MagicNumber")
     void init(@Observes Startup init) {
+        helper.findAll().getResultStream().forEach(entity -> helper.getEntityManager().get().remove(entity));
         if (helper.count() == 0) {
             Stream.of(
                     UserEntity.builder().userId("lprimak").fullName("Lenny Primak")
@@ -62,6 +64,15 @@ public class Initializer {
                     UserEntity.builder().userId("cousin").fullName("Cool Cousin")
                             .address("Beastly Court").zipCode(68502).build()
             ).forEach(helper.getEntityManager().get()::merge);
+
+            generateUsers(1, 100).forEach(helper.getEntityManager().get()::merge);
         }
+    }
+
+    @SuppressWarnings("checkstyle:MagicNumber")
+    private Stream<UserEntity> generateUsers(int startInclusive, int endInclusive) {
+        return IntStream.rangeClosed(startInclusive, endInclusive)
+                .mapToObj(i -> UserEntity.builder().userId("user" + i).fullName("User " + i)
+                        .address("Address " + i).zipCode(10_000 + i).build());
     }
 }

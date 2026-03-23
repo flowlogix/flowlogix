@@ -44,7 +44,7 @@ public interface CursorPagination<TT> extends Serializable {
         return false;
     }
 
-    default Map<String, Function<TT, ?>> columns() {
+    default Map<String, Function<TT, Comparable<?>>> columns() {
         return Collections.emptyMap();
     }
 
@@ -76,8 +76,8 @@ public interface CursorPagination<TT> extends Serializable {
         @Serial
         private static final long serialVersionUID = 2L;
 
-        private final Lazy.SerializableSupplier<Map<String, Function<TT, ?>>> columns;
-        private final NavigableMap<Integer, Object> cursorCache = new TreeMap<>();
+        private final Lazy.SerializableSupplier<Map<String, Function<TT, Comparable<?>>>> columns;
+        private final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
         private Map<String, FilterMeta> cursorFilters = new LinkedHashMap<>();
         private Map<String, SortMeta> cursorSorts = new LinkedHashMap<>();
         @Setter
@@ -85,7 +85,7 @@ public interface CursorPagination<TT> extends Serializable {
         private boolean isDescending;
 
         @Override
-        public Map<String, Function<TT, ?>> columns() {
+        public Map<String, Function<TT, Comparable<?>>> columns() {
             return columns.get();
         }
 

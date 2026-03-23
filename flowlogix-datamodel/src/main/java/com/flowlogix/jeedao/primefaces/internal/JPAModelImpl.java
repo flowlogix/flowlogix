@@ -134,9 +134,9 @@ public class JPAModelImpl<TT> implements Serializable {
     @Default
     private final transient @Getter @NonNull UnaryOperator<List<TT>> resultEnricher = identity();
 
-    /// TODO
+    /// TODO docs
     @Default
-    private final transient @Getter @NonNull CursorPagination<TT> cursor = CursorPagination.noop();
+    private final @Getter @NonNull CursorPagination<TT> cursor = CursorPagination.noop();
 
     /**
      * Specifies whether String filters are case-sensitive

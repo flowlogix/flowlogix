@@ -130,6 +130,7 @@ class DataModelIT {
         webDriver.get(baseURL.toString());
         waitGui(webDriver).until(ExpectedConditions.titleIs("Index"));
         guardAjax(forceEmptyResult).click();
+        guardAjax(defaultCursorPagination).click();
         webDriver.get(baseURL + "view-users");
         waitGui(webDriver).until(ExpectedConditions.titleIs("View Users"));
         assertThat(webDriver.getTitle()).isEqualTo("View Users");

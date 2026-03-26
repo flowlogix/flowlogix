@@ -89,7 +89,8 @@ public class UserViewer implements Serializable {
         }
         if (forceEmptyResult) {
             builder.resultEnricher(list -> {
-                list.clear(); return list;
+                list.clear();
+                return list;
             });
         }
         return builder.build();

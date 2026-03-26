@@ -19,16 +19,15 @@ import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import com.flowlogix.examples.ui.LazyModelParameters;
 import com.flowlogix.jeedao.primefaces.CursorPagination;
+import com.flowlogix.jeedao.primefaces.CursorPagination.Field;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.LazyModelConfig;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
-import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
-import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
@@ -37,6 +36,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.Getter;
+import org.omnifaces.util.Lazy;
 
 /**
  *
@@ -46,7 +46,7 @@ import lombok.Getter;
 @ViewScoped
 public class UserViewer implements Serializable {
     @Serial
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     // @start region="simpleLazyDataModelUsage"
     // tag::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
@@ -61,16 +61,14 @@ public class UserViewer implements Serializable {
     @Inject
     LazyModelParameters lazyModelParameters;
 
-    private boolean sortingAndFiltering;
-    private boolean defaultCursorPagination;
-    private boolean forceEmptyResult;
-
     @PostConstruct
     void initialize() {
-        sortingAndFiltering = lazyModelParameters.isSortingAndFiltering();
-        defaultCursorPagination = lazyModelParameters.isDefaultCursorPagination();
-        forceEmptyResult = lazyModelParameters.isForceEmptyResult();
-        lazyModel.initialize(this::buildModel);
+        lazyModel.initialize(builder -> builder
+                .sorter(this::sorter)
+                .filter(this::filter)
+                .resultEnricher(this::forceEmptyResult)
+                .cursor(cursorPagination())
+                .build());
     }
 
     public String getUsers() {
@@ -79,29 +77,28 @@ public class UserViewer implements Serializable {
                 .map(UserEntity::getFullName).collect(Collectors.joining(", "));
     }
 
-    private JPAModelImpl<UserEntity> buildModel(JPAModelImplBuilder<UserEntity> builder) {
-        if (sortingAndFiltering) {
-            builder.sorter(UserViewer::sorter).filter(UserViewer::filter);
+    private void sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
+        if (lazyModelParameters.isSortingAndFiltering()) {
+            sortData.applicationSort(UserEntity_.address.getName(), sortMeta -> cb.asc(root.get(UserEntity_.address)));
         }
-        if (defaultCursorPagination) {
-            builder.cursor(CursorPagination.create(
-                    Map.of(UserEntity_.id.getName(), UserEntity::getId), UserEntity_.id.getName()));
-        }
-        if (forceEmptyResult) {
-            builder.resultEnricher(list -> {
-                list.clear();
-                return list;
-            });
-        }
-        return builder.build();
     }
 
-    private static void sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
-        sortData.applicationSort(UserEntity_.address.getName(), sortMeta -> cb.asc(root.get(UserEntity_.address)));
+    private void filter(FilterData filterData, CriteriaBuilder cb, Root<UserEntity> root) {
+        if (lazyModelParameters.isSortingAndFiltering()) {
+            filterData.replaceFilter(UserEntity_.zipCode.getName(),
+                    (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value));
+        }
     }
 
-    private static void filter(FilterData filterData, CriteriaBuilder cb, Root<UserEntity> root) {
-        filterData.replaceFilter(UserEntity_.zipCode.getName(),
-                (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value));
+    private Lazy<CursorPagination<UserEntity>> cursorPagination() {
+        return CursorPagination.create(List.of(new Field<>(UserEntity_.id.getName(), UserEntity::getId)),
+                () -> lazyModelParameters.isDefaultCursorPagination());
+    }
+
+    private List<UserEntity> forceEmptyResult(List<UserEntity> users) {
+        if (lazyModelParameters.isForceEmptyResult()) {
+            users.clear();
+        }
+        return users;
     }
 }

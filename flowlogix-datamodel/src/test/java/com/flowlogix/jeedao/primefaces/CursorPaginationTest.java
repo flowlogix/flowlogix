@@ -15,9 +15,9 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
+import com.flowlogix.jeedao.primefaces.CursorPagination.Field;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Root;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
+import java.util.List;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,23 +36,18 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @ExtendWith(MockitoExtension.class)
 class CursorPaginationTest {
     static class Entity { }
-    CursorPagination<Entity> cursor = CursorPagination.create(Map.of("id", e -> "one"));
+    CursorPagination<Entity> cursor = CursorPagination.<Entity>create(
+            List.of(new Field<>("id", e -> "one"))).get();
 
     @Mock
     private CriteriaBuilder cb;
     @Mock
     private Root<Entity> root;
 
-    @BeforeEach
-    void setUp() {
-        cursor.setCurrentColumn("id");
-    }
-
     @Test
     void save() {
-        var rawCursor = CursorPagination.create(Map.of("id", e -> "one"));
-        assertThatThrownBy(() -> rawCursor.save(0, new Entity())).isInstanceOf(NullPointerException.class);
-        rawCursor.setCurrentColumn("id");
+        var rawCursor = CursorPagination.<Entity>create(
+                List.of(new Field<>("id", e -> "one"))).get();
         rawCursor.save(2, new Entity());
         assertThat(rawCursor.cursorOffset(1)).isEqualTo(1);
         assertThat(rawCursor.cursorOffset(3)).isEqualTo(1);
@@ -60,8 +56,8 @@ class CursorPaginationTest {
 
     @Test
     void createWithDefaultColumn() {
-        assertThatThrownBy(() -> CursorPagination.create(Map.of(), null)).isInstanceOf(NullPointerException.class);
-        CursorPagination.create(Map.of("hello", e -> "one"), "hello").save(0, new Entity());
+        assertThatThrownBy(() -> CursorPagination.create(List.of()).get()).isInstanceOf(IllegalArgumentException.class);
+        CursorPagination.create(List.of(new Field<>("hello", e -> "one"))).get().save(0, new Entity());
     }
 
     @Test
@@ -121,25 +117,23 @@ class CursorPaginationTest {
 
     @Test
     void cursorOffsetWithNoop() {
-        var noop = CursorPagination.noop();
+        var noop = CursorPagination.noop().get();
         assertThat(noop.cursorOffset(0)).isZero();
         assertThat(noop.cursorOffset(1)).isEqualTo(1);
     }
 
     @Test
     void cursorPredicateWithNoop() {
-        var noop = CursorPagination.noop();
+        var noop = CursorPagination.noop().get();
         assertThat(noop.cursorPredicate(0, null, null, null)).isNull();
         assertThat(noop.cursorPredicate(1, null, null, null)).isNull();
     }
 
     @Test
     void miscWithNoop() {
-        var noop = CursorPagination.noop();
+        var noop = CursorPagination.noop().get();
         assertThat(noop.columns()).isEmpty();
         assertThat(noop.isSupported(null, null)).isFalse();
-        assertThatThrownBy(() -> noop.setCurrentColumn(null)).isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> noop.setCurrentColumn("hello")).isInstanceOf(UnsupportedOperationException.class);
         assertThatThrownBy(() -> noop.save(0, null)).isInstanceOf(UnsupportedOperationException.class);
     }
 }

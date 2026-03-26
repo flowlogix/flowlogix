@@ -18,6 +18,7 @@ package com.flowlogix.jeedao.primefaces;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +29,15 @@ import org.primefaces.model.SortMeta;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /// Interface defining cursor pagination behavior for PrimeFaces JPA LazyDataModel
 public interface CursorPagination<TT> extends Serializable {
@@ -43,23 +47,25 @@ public interface CursorPagination<TT> extends Serializable {
                               Map<String, SortMeta> sortMeta);
     boolean isSupported(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta);
     Map<String, SerializableFunction<TT, Comparable<?>>> columns();
-    void setCurrentColumn(@NonNull String columnName);
+
+    record Field<TT>(String fieldName, SerializableFunction<TT, Comparable<?>> fieldMethod) implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+    }
 
     /// Returns a no-op implementation of CursorPagination that can be used when cursor pagination is not supported or desired
-    static <TT> CursorPagination<TT> noop() {
-        return new NoopCursorData<>();
+    static <TT> Lazy<CursorPagination<TT>> noop() {
+        return new Lazy<>(NoopCursorData::new);
     }
 
     /// Creates a default implementation of cursor pagination
-    static <TT> CursorPagination<TT> create(Map<String, SerializableFunction<TT, Comparable<?>>> supportedColumns) {
-        return new CursorData<>(() -> supportedColumns, null);
-
+    static <TT> Lazy<CursorPagination<TT>> create(List<Field<TT>> supportedColumns) {
+        return new Lazy<>(() -> new CursorData<>(supportedColumns));
     }
 
-    /// Creates a default implementation of cursor pagination
-    static <TT> CursorPagination<TT> create(Map<String, SerializableFunction<TT, Comparable<?>>> supportedColumns,
-                                            @NonNull String defaultColumnName) {
-        return new CursorData<>(() -> supportedColumns, defaultColumnName);
+    static <TT> Lazy<CursorPagination<TT>> create(List<Field<TT>> supportedColumns,
+                                                  Lazy.SerializableSupplier<Boolean> conditional) {
+        return new Lazy<>(() -> conditional.get() ? new CursorData<>(supportedColumns) : new NoopCursorData<>());
     }
 }
 
@@ -68,23 +74,28 @@ class CursorData<TT> implements CursorPagination<TT> {
     @Serial
     private static final long serialVersionUID = 2L;
 
-    private final Lazy.SerializableSupplier<Map<String, SerializableFunction<TT, Comparable<?>>>> columns;
+    private final Map<String, SerializableFunction<TT, Comparable<?>>> columns;
     private final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
     private Map<String, FilterMeta> cursorFilters;
     private Map<String, SortMeta> cursorSorts;
-    @Setter(onMethod = @__(@NonNull))
+    @Setter(onMethod = @__(@NonNull), value = AccessLevel.PRIVATE)
     private String currentColumn;
     private boolean isDescending;
 
-    CursorData(Lazy.SerializableSupplier<Map<String, SerializableFunction<TT, Comparable<?>>>> columns,
-               String defaultColumnName) {
-        this.columns = columns;
-        this.currentColumn = defaultColumnName;
+    CursorData(List<Field<TT>> columns) {
+        this.columns = columns.stream().collect(Collectors.toMap(Field::fieldName, Field::fieldMethod,
+                (v1, v2) -> v1,
+                LinkedHashMap::new));
+        if (columns.isEmpty()) {
+            throw new IllegalArgumentException("Cursor Pagination requires at least one column");
+        }
+        this.currentColumn = Objects.requireNonNull(columns.get(0).fieldName(),
+                "Cursor Pagination requires at least one column");
     }
 
     @Override
     public Map<String, SerializableFunction<TT, Comparable<?>>> columns() {
-        return columns.get();
+        return columns;
     }
 
     public void save(int offset, TT entity) {
@@ -172,11 +183,6 @@ class NoopCursorData<TT> implements CursorPagination<TT> {
     @Override
     public Map<String, SerializableFunction<TT, Comparable<?>>> columns() {
         return Collections.emptyMap();
-    }
-
-    @Override
-    public void setCurrentColumn(@NonNull String columnName) {
-        throw new UnsupportedOperationException("NoopCursorData does not support setting current column");
     }
 
     @Override

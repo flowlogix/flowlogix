@@ -85,7 +85,7 @@ import org.primefaces.util.Constants;
 @Builder
 @Slf4j
 public class JPAModelImpl<TT> implements Serializable {
-    private static final long serialVersionUID = 5L;
+    private static final long serialVersionUID = 6L;
     /**
      * Return entity manager to operate on
      */
@@ -136,7 +136,7 @@ public class JPAModelImpl<TT> implements Serializable {
 
     /// Add cursor pagination support
     @Default
-    private final @Getter @NonNull CursorPagination<TT> cursor = CursorPagination.noop();
+    private final @Getter @NonNull Lazy<CursorPagination<TT>> cursor = CursorPagination.noop();
 
     /**
      * Specifies whether String filters are case-sensitive
@@ -208,14 +208,14 @@ public class JPAModelImpl<TT> implements Serializable {
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
         int sanitizedFirst = Integer.max(first, 0);
-        boolean cursorSupported = cursor.isSupported(filters, sortMeta);
-        int cursorFirst = cursorSupported ? cursor.cursorOffset(sanitizedFirst) : sanitizedFirst;
+        boolean cursorSupported = cursor.get().isSupported(filters, sortMeta);
+        int cursorFirst = cursorSupported ? cursor.get().cursorOffset(sanitizedFirst) : sanitizedFirst;
         List<TT> result = resultEnricher.apply(optimizer.apply(
                 jpaFinder.get().findRange(cursorFirst, Integer.max(cursorFirst + pageSize, 1),
                         qc -> addToCriteria(qc, filters, sortMeta,
                                 cursorSupported, sanitizedFirst))).getResultList());
         if (cursorSupported && !result.isEmpty()) {
-            cursor.save(first + result.size(), result.get(result.size() - 1));
+            cursor.get().save(first + result.size(), result.get(result.size() - 1));
         }
         return result;
     }
@@ -274,7 +274,7 @@ public class JPAModelImpl<TT> implements Serializable {
         Stream<Predicate> filterPredicates = predicates.values().stream()
                 .map(FilterColumnData::getPredicate);
         return cb.and(Stream.concat(filterPredicates, offset != 0 && cursorSupported
-                        ? Stream.of(cursor.cursorPredicate(offset, cb, root, sortMeta))
+                        ? Stream.of(cursor.get().cursorPredicate(offset, cb, root, sortMeta))
                         : Stream.empty())
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }

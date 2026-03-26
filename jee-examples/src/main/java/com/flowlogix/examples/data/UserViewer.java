@@ -17,7 +17,7 @@ package com.flowlogix.examples.data;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
-import com.flowlogix.jeedao.primefaces.CursorPagination.CursorData;
+import com.flowlogix.jeedao.primefaces.CursorPagination;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.LazyModelConfig;
@@ -63,7 +63,7 @@ public class UserViewer implements Serializable {
     @PostConstruct
     void initialize() {
         lazyModel.initialize(builder -> builder
-                .cursor(new CursorData<>(() -> Map.of(
+                .cursor(CursorPagination.create(Map.of(
                         UserEntity_.id.getName(), UserEntity::getId,
                         UserEntity_.zipCode.getName(), UserEntity::getZipCode)))
                 .sorter(this::cursorSorter)

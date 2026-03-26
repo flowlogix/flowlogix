@@ -134,7 +134,7 @@ public class JPAModelImpl<TT> implements Serializable {
     @Default
     private final transient @Getter @NonNull UnaryOperator<List<TT>> resultEnricher = identity();
 
-    /// TODO docs
+    /// Add cursor pagination support
     @Default
     private final @Getter @NonNull CursorPagination<TT> cursor = CursorPagination.noop();
 

@@ -59,6 +59,12 @@ class CursorPaginationTest {
     }
 
     @Test
+    void createWithDefaultColumn() {
+        assertThatThrownBy(() -> CursorPagination.create(Map.of(), null)).isInstanceOf(NullPointerException.class);
+        CursorPagination.create(Map.of("hello", e -> "one"), "hello").save(0, new Entity());
+    }
+
+    @Test
     void supportedWhenNoSortRequested() {
         assertThatThrownBy(() -> cursor.isSupported(null, null)).isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> cursor.isSupported(Map.of(), null)).isInstanceOf(NullPointerException.class);

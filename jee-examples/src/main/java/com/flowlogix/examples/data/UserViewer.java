@@ -17,12 +17,18 @@ package com.flowlogix.examples.data;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
+import com.flowlogix.examples.ui.LazyModelParameters;
+import com.flowlogix.jeedao.primefaces.CursorPagination;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.LazyModelConfig;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.stream.Collectors;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
+import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
+import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -50,17 +56,29 @@ public class UserViewer implements Serializable {
     // end::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
     // @end
 
-    /**
-     * Enable sort and filter with {@link jakarta.annotation.PostConstruct} annotation
-     */
+    @Inject
+    LazyModelParameters lazyModelParameters;
+
+    @PostConstruct
     void initialize() {
-        lazyModel.initialize(builder -> builder.sorter(UserViewer::sorter).filter(UserViewer::filter).build());
+        lazyModel.initialize(this::buildModel);
     }
 
     public String getUsers() {
         return lazyModel.getEntityManager().get()
                 .createQuery("select u from UserEntity u", lazyModel.getEntityClass()).getResultStream()
                 .map(UserEntity::getFullName).collect(Collectors.joining(", "));
+    }
+
+    private JPAModelImpl<UserEntity> buildModel(JPAModelImplBuilder<UserEntity> builder) {
+        if (lazyModelParameters.isSortingAndFiltering()) {
+            builder.sorter(UserViewer::sorter).filter(UserViewer::filter);
+        }
+        if (lazyModelParameters.isDefaultCursorPagination()) {
+            builder.cursor(CursorPagination.create(
+                    Map.of(UserEntity_.id.getName(), UserEntity::getId), UserEntity_.id.getName()));
+        }
+        return builder.build();
     }
 
     private static void sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {

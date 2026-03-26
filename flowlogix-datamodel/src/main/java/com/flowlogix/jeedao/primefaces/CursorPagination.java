@@ -19,7 +19,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.Lazy;
@@ -53,12 +52,18 @@ public interface CursorPagination<TT> extends Serializable {
 
     /// Creates a default implementation of cursor pagination
     static <TT> CursorPagination<TT> create(Map<String, Function<TT, Comparable<?>>> supportedColumns) {
-        return new CursorData<>(() -> supportedColumns);
+        return new CursorData<>(() -> supportedColumns, null);
+
+    }
+
+    /// Creates a default implementation of cursor pagination
+    static <TT> CursorPagination<TT> create(Map<String, Function<TT, Comparable<?>>> supportedColumns,
+                                            @NonNull String defaultColumnName) {
+        return new CursorData<>(() -> supportedColumns, defaultColumnName);
     }
 }
 
 @Slf4j
-@RequiredArgsConstructor
 class CursorData<TT> implements CursorPagination<TT> {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -70,6 +75,11 @@ class CursorData<TT> implements CursorPagination<TT> {
     @Setter(onMethod = @__(@NonNull))
     private String currentColumn;
     private boolean isDescending;
+
+    CursorData(Lazy.SerializableSupplier<Map<String, Function<TT, Comparable<?>>>> columns, String defaultColumnName) {
+        this.columns = columns;
+        this.currentColumn = defaultColumnName;
+    }
 
     @Override
     public Map<String, Function<TT, Comparable<?>>> columns() {

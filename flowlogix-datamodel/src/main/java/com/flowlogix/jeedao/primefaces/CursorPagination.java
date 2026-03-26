@@ -106,10 +106,8 @@ class CursorData<TT> implements CursorPagination<TT> {
                 .filter(columns().keySet()::contains);
         requestedSort.ifPresent(this::setCurrentColumn);
         if (!sortMeta.isEmpty() && requestedSort.isEmpty()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Cursor pagination only supports sorting by {} columns, requested sort: {}",
-                        columns().keySet(), sortMeta.keySet());
-            }
+            log.atDebug().setMessage("Cursor pagination only supports sorting by {} columns, requested sort: {}")
+                            .addArgument(columns()::keySet).addArgument(sortMeta::keySet).log();
             cursorCache.clear();
             return false;
         } else if (isDescending != Optional.ofNullable(sortMeta.get(currentColumn))
@@ -127,10 +125,9 @@ class CursorData<TT> implements CursorPagination<TT> {
                                      Map<String, SortMeta> sortMeta) {
         Objects.requireNonNull(currentColumn, "Current column must be set before creating cursor predicate");
         var floor = cursorCache.floorEntry(offset);
-        if (log.isDebugEnabled()) {
-            log.debug("Creating cursor predicate for offset {} - cache = {}", offset,
-                    Optional.ofNullable(floor).map(Map.Entry::getValue).orElse(null));
-        }
+        log.atDebug().setMessage("Creating cursor predicate for offset {} - cache = {}")
+                .addArgument(offset).addArgument(() -> Optional.ofNullable(floor).map(Map.Entry::getValue)
+                        .orElse(null)).log();
         boolean descending = Optional.ofNullable(sortMeta.get(currentColumn))
                 .map(order -> order.getOrder().isDescending())
                 .orElse(false);

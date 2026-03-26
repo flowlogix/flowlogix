@@ -16,10 +16,24 @@
 package com.flowlogix.jeedao.primefaces;
 
 import org.junit.jupiter.api.Test;
+import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CursorPaginationTest {
+    static class Entity { }
+
+    @Test
+    void save() {
+        var cursor = CursorPagination.create(Map.of("id", e -> "one"));
+        assertThatThrownBy(() -> cursor.save(0, new Entity())).isInstanceOf(NullPointerException.class);
+        cursor.setCurrentColumn("id");
+        cursor.save(2, new Entity());
+        assertThat(cursor.cursorOffset(1)).isEqualTo(1);
+        assertThat(cursor.cursorOffset(3)).isEqualTo(1);
+        assertThat(cursor.cursorOffset(0)).isZero();
+    }
+
     @Test
     void cursorOffsetWithNoop() {
         var noop = CursorPagination.noop();

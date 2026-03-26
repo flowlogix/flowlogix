@@ -167,7 +167,7 @@ public class JPAModelImpl<TT> implements Serializable {
      * @param <TT>
      */
     public record BuilderInitializer<TT>(@NonNull BuilderFunction<TT> builder,
-                                             PartialBuilderConsumer<TT> partialBuilder) implements Serializable { }
+                                         PartialBuilderConsumer<TT> partialBuilder) implements Serializable { }
 
     /**
      * @hidden

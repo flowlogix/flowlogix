@@ -18,6 +18,7 @@ package com.flowlogix.jeedao.primefaces;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public interface CursorPagination<TT> extends Serializable {
                               Map<String, SortMeta> sortMeta);
     boolean isSupported(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta);
     Map<String, Function<TT, Comparable<?>>> columns();
-    void setCurrentColumn(String columnName);
+    void setCurrentColumn(@NonNull String columnName);
 
     /// Returns a no-op implementation of CursorPagination that can be used when cursor pagination is not supported or desired
     static <TT> CursorPagination<TT> noop() {
@@ -65,7 +66,7 @@ class CursorData<TT> implements CursorPagination<TT> {
     private final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
     private Map<String, FilterMeta> cursorFilters;
     private Map<String, SortMeta> cursorSorts;
-    @Setter
+    @Setter(onMethod = @__(@NonNull))
     private String currentColumn;
     private boolean isDescending;
 
@@ -162,12 +163,12 @@ class NoopCursorData<TT> implements CursorPagination<TT> {
     }
 
     @Override
-    public void setCurrentColumn(String columnName) {
-        // empty by design
+    public void setCurrentColumn(@NonNull String columnName) {
+        throw new UnsupportedOperationException("NoopCursorData does not support setting current column");
     }
 
     @Override
     public void save(int offset, TT entity) {
-        // empty by design
+        throw new UnsupportedOperationException("NoopCursorData does not support saving cursor state");
     }
 }

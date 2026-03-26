@@ -27,9 +27,9 @@ import org.primefaces.model.SortMeta;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -63,8 +63,8 @@ class CursorData<TT> implements CursorPagination<TT> {
 
     private final Lazy.SerializableSupplier<Map<String, Function<TT, Comparable<?>>>> columns;
     private final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
-    private Map<String, FilterMeta> cursorFilters = new LinkedHashMap<>();
-    private Map<String, SortMeta> cursorSorts = new LinkedHashMap<>();
+    private Map<String, FilterMeta> cursorFilters;
+    private Map<String, SortMeta> cursorSorts;
     @Setter
     private String currentColumn;
     private boolean isDescending;
@@ -75,16 +75,17 @@ class CursorData<TT> implements CursorPagination<TT> {
     }
 
     public void save(int offset, TT entity) {
+        Objects.requireNonNull(currentColumn, "Current column must be set before saving cursor");
         var value = columns().get(currentColumn).apply(entity);
-        log.info("Saving cursor for offset {} and entity id {}", offset, value);
+        log.debug("Saving cursor for offset {} and entity id {}", offset, value);
         cursorCache.put(offset, value);
     }
 
     @Override
     public int cursorOffset(int offset) {
-        int returnedOffset = Optional.ofNullable(cursorCache.floorKey(offset))
-                .map(key -> offset - key).orElse(offset);
-        log.info("Cursor offset {}, floorKey = {} returned {}", offset, cursorCache.floorKey(offset), returnedOffset);
+        var floor = cursorCache.floorKey(offset);
+        int returnedOffset = Optional.ofNullable(floor).map(key -> offset - key).orElse(offset);
+        log.debug("Cursor offset {}, floorKey = {} returned {}", offset, floor, returnedOffset);
         return returnedOffset;
     }
 
@@ -104,8 +105,10 @@ class CursorData<TT> implements CursorPagination<TT> {
                 .filter(columns().keySet()::contains);
         requestedSort.ifPresent(this::setCurrentColumn);
         if (!sortMeta.isEmpty() && requestedSort.isEmpty()) {
-            log.warn("Cursor pagination only supports sorting by {} columns, requested sort: {}",
-                    columns().keySet(), sortMeta.keySet());
+            if (log.isDebugEnabled()) {
+                log.debug("Cursor pagination only supports sorting by {} columns, requested sort: {}",
+                        columns().keySet(), sortMeta.keySet());
+            }
             cursorCache.clear();
             return false;
         } else if (isDescending != Optional.ofNullable(sortMeta.get(currentColumn))
@@ -121,14 +124,16 @@ class CursorData<TT> implements CursorPagination<TT> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root,
                                      Map<String, SortMeta> sortMeta) {
-        log.info("Creating cursor predicate for offset {} - cache = {}", offset,
-                Optional.ofNullable(cursorCache.floorEntry(offset))
-                        .map(Map.Entry::getValue).orElse(null));
+        Objects.requireNonNull(currentColumn, "Current column must be set before creating cursor predicate");
+        var floor = cursorCache.floorEntry(offset);
+        if (log.isDebugEnabled()) {
+            log.debug("Creating cursor predicate for offset {} - cache = {}", offset,
+                    Optional.ofNullable(floor).map(Map.Entry::getValue).orElse(null));
+        }
         boolean descending = Optional.ofNullable(sortMeta.get(currentColumn))
                 .map(order -> order.getOrder().isDescending())
                 .orElse(false);
-        return Optional.ofNullable(cursorCache.floorEntry(offset))
-                .map(entry -> descending
+        return Optional.ofNullable(floor).map(entry -> descending
                         ? cb.lessThan(root.get(currentColumn), (Comparable) entry.getValue())
                         : cb.greaterThan(root.get(currentColumn), (Comparable) entry.getValue())).orElse(null);
     }

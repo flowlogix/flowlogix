@@ -21,6 +21,7 @@ import jakarta.persistence.criteria.Root;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.omnifaces.util.FunctionalInterfaces.SerializableFunction;
 import org.omnifaces.util.Lazy;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
@@ -32,7 +33,6 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /// Interface defining cursor pagination behavior for PrimeFaces JPA LazyDataModel
@@ -42,7 +42,7 @@ public interface CursorPagination<TT> extends Serializable {
     Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root,
                               Map<String, SortMeta> sortMeta);
     boolean isSupported(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta);
-    Map<String, Function<TT, Comparable<?>>> columns();
+    Map<String, SerializableFunction<TT, Comparable<?>>> columns();
     void setCurrentColumn(@NonNull String columnName);
 
     /// Returns a no-op implementation of CursorPagination that can be used when cursor pagination is not supported or desired
@@ -51,13 +51,13 @@ public interface CursorPagination<TT> extends Serializable {
     }
 
     /// Creates a default implementation of cursor pagination
-    static <TT> CursorPagination<TT> create(Map<String, Function<TT, Comparable<?>>> supportedColumns) {
+    static <TT> CursorPagination<TT> create(Map<String, SerializableFunction<TT, Comparable<?>>> supportedColumns) {
         return new CursorData<>(() -> supportedColumns, null);
 
     }
 
     /// Creates a default implementation of cursor pagination
-    static <TT> CursorPagination<TT> create(Map<String, Function<TT, Comparable<?>>> supportedColumns,
+    static <TT> CursorPagination<TT> create(Map<String, SerializableFunction<TT, Comparable<?>>> supportedColumns,
                                             @NonNull String defaultColumnName) {
         return new CursorData<>(() -> supportedColumns, defaultColumnName);
     }
@@ -68,7 +68,7 @@ class CursorData<TT> implements CursorPagination<TT> {
     @Serial
     private static final long serialVersionUID = 2L;
 
-    private final Lazy.SerializableSupplier<Map<String, Function<TT, Comparable<?>>>> columns;
+    private final Lazy.SerializableSupplier<Map<String, SerializableFunction<TT, Comparable<?>>>> columns;
     private final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
     private Map<String, FilterMeta> cursorFilters;
     private Map<String, SortMeta> cursorSorts;
@@ -76,13 +76,14 @@ class CursorData<TT> implements CursorPagination<TT> {
     private String currentColumn;
     private boolean isDescending;
 
-    CursorData(Lazy.SerializableSupplier<Map<String, Function<TT, Comparable<?>>>> columns, String defaultColumnName) {
+    CursorData(Lazy.SerializableSupplier<Map<String, SerializableFunction<TT, Comparable<?>>>> columns,
+               String defaultColumnName) {
         this.columns = columns;
         this.currentColumn = defaultColumnName;
     }
 
     @Override
-    public Map<String, Function<TT, Comparable<?>>> columns() {
+    public Map<String, SerializableFunction<TT, Comparable<?>>> columns() {
         return columns.get();
     }
 
@@ -169,7 +170,7 @@ class NoopCursorData<TT> implements CursorPagination<TT> {
     }
 
     @Override
-    public Map<String, Function<TT, Comparable<?>>> columns() {
+    public Map<String, SerializableFunction<TT, Comparable<?>>> columns() {
         return Collections.emptyMap();
     }
 

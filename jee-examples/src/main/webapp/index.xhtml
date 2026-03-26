@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html">
+      xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core">
     <h:head>
         <title>Index</title>
     </h:head>
@@ -10,5 +10,21 @@
         <h:link outcome="path-example">Path Example</h:link>
         <p/>
         <h:link outcome="view-users">View Users</h:link>
+
+        <br/>
+        <br/>
+        <hr/>
+        <h:form id="parametersForm">
+            <h:outputLabel for="sortingAndFiltering" value="Enable Sorting and Filtering:" />
+            <h:selectBooleanCheckbox id="sortingAndFiltering" value="#{lazyModelParameters.sortingAndFiltering}">
+                <f:ajax execute="@this" render="@form" />
+            </h:selectBooleanCheckbox>
+            <br/>
+
+            <h:outputLabel for="defaultCursorPagination" value="Enable Default Cursor Pagination:" />
+            <h:selectBooleanCheckbox id="defaultCursorPagination" value="#{lazyModelParameters.defaultCursorPagination}">
+                <f:ajax execute="@this" render="@form" />
+            </h:selectBooleanCheckbox>
+        </h:form>
     </h:body>
 </html>

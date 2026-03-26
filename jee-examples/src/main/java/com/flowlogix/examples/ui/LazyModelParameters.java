@@ -16,11 +16,13 @@
 package com.flowlogix.examples.ui;
 
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Named;
 import lombok.Getter;
 import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 
+@Named
 @Getter
 @Setter
 @SessionScoped

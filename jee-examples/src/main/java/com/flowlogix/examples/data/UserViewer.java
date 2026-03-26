@@ -59,8 +59,13 @@ public class UserViewer implements Serializable {
     @Inject
     LazyModelParameters lazyModelParameters;
 
+    private boolean sortingAndFiltering;
+    private boolean defaultCursorPagination;
+
     @PostConstruct
     void initialize() {
+        sortingAndFiltering = lazyModelParameters.isSortingAndFiltering();
+        defaultCursorPagination = lazyModelParameters.isDefaultCursorPagination();
         lazyModel.initialize(this::buildModel);
     }
 
@@ -71,10 +76,10 @@ public class UserViewer implements Serializable {
     }
 
     private JPAModelImpl<UserEntity> buildModel(JPAModelImplBuilder<UserEntity> builder) {
-        if (lazyModelParameters.isSortingAndFiltering()) {
+        if (sortingAndFiltering) {
             builder.sorter(UserViewer::sorter).filter(UserViewer::filter);
         }
-        if (lazyModelParameters.isDefaultCursorPagination()) {
+        if (defaultCursorPagination) {
             builder.cursor(CursorPagination.create(
                     Map.of(UserEntity_.id.getName(), UserEntity::getId), UserEntity_.id.getName()));
         }

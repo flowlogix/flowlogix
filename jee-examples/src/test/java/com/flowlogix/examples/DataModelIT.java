@@ -102,6 +102,8 @@ class DataModelIT {
         guardAjax(fullNameFilterInput).sendKeys(Keys.RETURN);
         waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Lovely Lady");
         assertThat(firstRowFullName.getText()).isEqualTo("Lovely Lady");
+        guardAjax(userIdHeader.findElement(By.className("ui-column-title"))).click();
+        assertThat(firstRowUserId.getText()).isEqualTo("jprimak");
     }
 
     @Test

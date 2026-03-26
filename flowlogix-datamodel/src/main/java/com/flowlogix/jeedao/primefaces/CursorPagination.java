@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /// Interface defining cursor pagination behavior for PrimeFaces JPA LazyDataModel
 public interface CursorPagination<TT> extends Serializable {
@@ -91,8 +92,8 @@ class CursorData<TT> implements CursorPagination<TT> {
     }
 
     @Override
-    public boolean isSupported(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        if (cursorFilters == null || cursorSorts == null) {
+    public boolean isSupported(@NonNull Map<String, FilterMeta> filters, @NonNull Map<String, SortMeta> sortMeta) {
+        if (cursorFilters == null) {
             cursorFilters = filters;
             cursorSorts = sortMeta;
         }
@@ -126,14 +127,17 @@ class CursorData<TT> implements CursorPagination<TT> {
         Objects.requireNonNull(currentColumn, "Current column must be set before creating cursor predicate");
         var floor = cursorCache.floorEntry(offset);
         log.atDebug().setMessage("Creating cursor predicate for offset {} - cache = {}")
-                .addArgument(offset).addArgument(() -> Optional.ofNullable(floor).map(Map.Entry::getValue)
-                        .orElse(null)).log();
+                .addArgument(offset).addArgument(valueForLogging(floor)).log();
         boolean descending = Optional.ofNullable(sortMeta.get(currentColumn))
                 .map(order -> order.getOrder().isDescending())
                 .orElse(false);
         return Optional.ofNullable(floor).map(entry -> descending
                         ? cb.lessThan(root.get(currentColumn), (Comparable) entry.getValue())
                         : cb.greaterThan(root.get(currentColumn), (Comparable) entry.getValue())).orElse(null);
+    }
+
+    static Supplier<Comparable<?>> valueForLogging(Map.Entry<Integer, Comparable<?>> entry) {
+        return () -> Optional.ofNullable(entry).map(Map.Entry::getValue).orElse(null);
     }
 }
 

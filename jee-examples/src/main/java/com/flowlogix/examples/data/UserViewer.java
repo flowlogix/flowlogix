@@ -17,16 +17,12 @@ package com.flowlogix.examples.data;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
-import com.flowlogix.jeedao.primefaces.CursorPagination;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.LazyModelConfig;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
-import java.io.Serial;
 import java.io.Serializable;
-import java.util.Map;
 import java.util.stream.Collectors;
-import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -34,18 +30,15 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @author lprimak
  */
-@Slf4j
 @Named
 @ViewScoped
 public class UserViewer implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 1L;
 
     // @start region="simpleLazyDataModelUsage"
     // tag::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
@@ -58,36 +51,20 @@ public class UserViewer implements Serializable {
     // @end
 
     /**
-     * Enable cursor pagination, and optionally sort and filter
+     * Enable sort and filter with {@link jakarta.annotation.PostConstruct} annotation
      */
-    @PostConstruct
     void initialize() {
-        lazyModel.initialize(builder -> builder
-                .cursor(CursorPagination.create(Map.of(
-                        UserEntity_.id.getName(), UserEntity::getId,
-                        UserEntity_.zipCode.getName(), UserEntity::getZipCode)))
-                .sorter(this::cursorSorter)
-                // uncomment the below line to activate application sort and filter
-//                 .sorter(this::sorter).filter(UserViewer::filter)
-                .build());
+        lazyModel.initialize(builder -> builder.sorter(UserViewer::sorter).filter(UserViewer::filter).build());
     }
 
     public String getUsers() {
         return lazyModel.getEntityManager().get()
                 .createQuery("select u from UserEntity u", lazyModel.getEntityClass()).getResultStream()
-                .map(u -> "%d -> %s".formatted(u.getId(), u.getFullName())).collect(Collectors.joining(", "));
+                .map(UserEntity::getFullName).collect(Collectors.joining(", "));
     }
 
-    private void cursorSorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
-        if (sortData.getSortOrder().isEmpty()) {
-            lazyModel.getCursor().setCurrentColumn(UserEntity_.id.getName());
-            sortData.applicationSort(UserEntity_.id.getName(), true, sortMeta -> cb.asc(root.get(UserEntity_.id)));
-        }
-    }
-
-    private void sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
+    private static void sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
         sortData.applicationSort(UserEntity_.address.getName(), sortMeta -> cb.asc(root.get(UserEntity_.address)));
-        cursorSorter(sortData, cb, root);
     }
 
     private static void filter(FilterData filterData, CriteriaBuilder cb, Root<UserEntity> root) {

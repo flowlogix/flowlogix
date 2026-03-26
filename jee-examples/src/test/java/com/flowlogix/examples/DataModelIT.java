@@ -23,6 +23,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitAjax;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -73,10 +75,14 @@ class DataModelIT {
     @FindBy(id = "parametersForm:defaultCursorPagination")
     private WebElement defaultCursorPagination;
 
+    @FindBy(id = "parametersForm:forceEmptyResult")
+    private WebElement forceEmptyResult;
+
     @Test
     @Order(1)
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkPage() {
+        webDriver.manage().deleteAllCookies();
         webDriver.get(baseURL + "view-users");
         waitGui(webDriver).until(ExpectedConditions.titleIs("View Users"));
         assertThat(webDriver.getTitle()).isEqualTo("View Users");
@@ -115,6 +121,20 @@ class DataModelIT {
         jsExecutor.executeScript("arguments[0].scroll(0, 0);", scrollable);
         waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Lenny Primak");
         assertThat(firstRowFullName.getText()).isEqualTo("Lenny Primak");
+    }
+
+    @Test
+    @Order(3)
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void checkPageWithCursorPaginationAndEmptyResult() {
+        webDriver.get(baseURL.toString());
+        waitGui(webDriver).until(ExpectedConditions.titleIs("Index"));
+        guardAjax(forceEmptyResult).click();
+        webDriver.get(baseURL + "view-users");
+        waitGui(webDriver).until(ExpectedConditions.titleIs("View Users"));
+        assertThat(webDriver.getTitle()).isEqualTo("View Users");
+
+        assertThatThrownBy(() -> firstRowUserId.getText()).isInstanceOf(NoSuchElementException.class);
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

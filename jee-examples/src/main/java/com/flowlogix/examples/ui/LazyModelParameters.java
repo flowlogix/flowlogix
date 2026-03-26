@@ -28,8 +28,9 @@ import java.io.Serializable;
 @SessionScoped
 public class LazyModelParameters implements Serializable {
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private boolean sortingAndFiltering;
     private boolean defaultCursorPagination;
+    private boolean forceEmptyResult;
 }

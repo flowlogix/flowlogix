@@ -23,6 +23,7 @@ import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.LazyModelConfig;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,7 +45,8 @@ import lombok.Getter;
 @Named
 @ViewScoped
 public class UserViewer implements Serializable {
-    private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 2L;
 
     // @start region="simpleLazyDataModelUsage"
     // tag::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
@@ -61,11 +63,13 @@ public class UserViewer implements Serializable {
 
     private boolean sortingAndFiltering;
     private boolean defaultCursorPagination;
+    private boolean forceEmptyResult;
 
     @PostConstruct
     void initialize() {
         sortingAndFiltering = lazyModelParameters.isSortingAndFiltering();
         defaultCursorPagination = lazyModelParameters.isDefaultCursorPagination();
+        forceEmptyResult = lazyModelParameters.isForceEmptyResult();
         lazyModel.initialize(this::buildModel);
     }
 
@@ -82,6 +86,11 @@ public class UserViewer implements Serializable {
         if (defaultCursorPagination) {
             builder.cursor(CursorPagination.create(
                     Map.of(UserEntity_.id.getName(), UserEntity::getId), UserEntity_.id.getName()));
+        }
+        if (forceEmptyResult) {
+            builder.resultEnricher(list -> {
+                list.clear(); return list;
+            });
         }
         return builder.build();
     }

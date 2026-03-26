@@ -25,6 +25,12 @@
             <h:selectBooleanCheckbox id="defaultCursorPagination" value="#{lazyModelParameters.defaultCursorPagination}">
                 <f:ajax execute="@this" render="@form" />
             </h:selectBooleanCheckbox>
+            <br/>
+
+            <h:outputLabel for="forceEmptyResult" value="Force Empty Result:" />
+            <h:selectBooleanCheckbox id="forceEmptyResult" value="#{lazyModelParameters.forceEmptyResult}">
+                <f:ajax execute="@this" render="@form" />
+            </h:selectBooleanCheckbox>
         </h:form>
     </h:body>
 </html>

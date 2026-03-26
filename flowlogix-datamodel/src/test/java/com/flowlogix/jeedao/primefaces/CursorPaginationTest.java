@@ -136,4 +136,10 @@ class CursorPaginationTest {
         assertThat(noop.isSupported(null, null)).isFalse();
         assertThatThrownBy(() -> noop.save(0, null)).isInstanceOf(UnsupportedOperationException.class);
     }
+
+    @Test
+    void duplicateColumn() {
+        assertThat(CursorPagination.create(List.of(new Field<>("id", e -> "one"),
+                new Field<>("id", e -> "two"))).get().columns()).hasSize(1);
+    }
 }

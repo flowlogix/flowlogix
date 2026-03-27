@@ -48,7 +48,7 @@ class CursorPaginationTest {
     void save() {
         var rawCursor = CursorPagination.<Entity>create(
                 List.of(new Field<>("id", e -> "one"))).get();
-        rawCursor.save(2, new Entity());
+        rawCursor.save(2, new Entity(), Map.of());
         assertThat(rawCursor.cursorOffset(1)).isEqualTo(1);
         assertThat(rawCursor.cursorOffset(3)).isEqualTo(1);
         assertThat(rawCursor.cursorOffset(0)).isZero();
@@ -57,7 +57,8 @@ class CursorPaginationTest {
     @Test
     void createWithDefaultColumn() {
         assertThatThrownBy(() -> CursorPagination.create(List.of()).get()).isInstanceOf(IllegalArgumentException.class);
-        CursorPagination.create(List.of(new Field<>("hello", e -> "one"))).get().save(0, new Entity());
+        CursorPagination.create(List.of(new Field<>("hello", e -> "one"))).get()
+                .save(0, new Entity(), Map.of());
     }
 
     @Test
@@ -97,7 +98,7 @@ class CursorPaginationTest {
     @Test
     @SuppressWarnings("checkstyle:MagicNumber")
     void predicate() {
-        cursor.save(3, new Entity());
+        cursor.save(3, new Entity(), Map.of());
         assertThat(cursor.cursorPredicate(0, cb, root, Map.of("id", SortMeta.builder().field("id").build()))).isNull();
         assertThat(cursor.cursorPredicate(4, cb, root, Map.of("id", SortMeta.builder().field("id").build()))).isNull();
         verify(cb).greaterThan(root.get("id"), "one");
@@ -134,7 +135,7 @@ class CursorPaginationTest {
         var noop = CursorPagination.noop().get();
         assertThat(noop.columns()).isEmpty();
         assertThat(noop.isSupported(null, null)).isFalse();
-        assertThatThrownBy(() -> noop.save(0, null)).isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> noop.save(0, null, Map.of())).isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test

@@ -215,7 +215,7 @@ public class JPAModelImpl<TT> implements Serializable {
                         qc -> addToCriteria(qc, filters, sortMeta,
                                 cursorSupported, sanitizedFirst))).getResultList());
         if (cursorSupported && !result.isEmpty()) {
-            cursor.get().save(first + result.size(), result.get(result.size() - 1));
+            cursor.get().save(first + result.size(), result.get(result.size() - 1), sortMeta);
         }
         return result;
     }

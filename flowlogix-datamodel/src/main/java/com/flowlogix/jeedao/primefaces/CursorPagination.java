@@ -18,9 +18,7 @@ package com.flowlogix.jeedao.primefaces;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.FunctionalInterfaces.SerializableFunction;
 import org.omnifaces.util.Lazy;
@@ -33,15 +31,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import static com.flowlogix.jeedao.primefaces.CursorPagination.requestedSort;
 
 /// Interface defining cursor pagination behavior for PrimeFaces JPA LazyDataModel
 public interface CursorPagination<TT> extends Serializable {
-    void save(int offset, TT entity);
+    void save(int offset, TT entity, Map<String, SortMeta> sortMeta);
     int cursorOffset(int offset);
     Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root,
                               Map<String, SortMeta> sortMeta);
@@ -67,30 +65,33 @@ public interface CursorPagination<TT> extends Serializable {
                                                   Lazy.SerializableSupplier<Boolean> conditional) {
         return new Lazy<>(() -> conditional.get() ? new CursorData<>(supportedColumns) : new NoopCursorData<>());
     }
+
+    static <TT> String requestedSort(Map<String, SortMeta> sortMeta,
+                                     Map<String, SerializableFunction<TT, Comparable<?>>> columns,
+                                     boolean useDefault) {
+        return sortMeta.keySet().stream().findFirst().filter(columns.keySet()::contains)
+                .orElseGet(() -> useDefault ? columns.keySet().stream().findFirst().get() : "");
+    }
 }
 
 @Slf4j
 class CursorData<TT> implements CursorPagination<TT> {
     @Serial
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     private final Map<String, SerializableFunction<TT, Comparable<?>>> columns;
     private final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
     private Map<String, FilterMeta> cursorFilters;
     private Map<String, SortMeta> cursorSorts;
-    @Setter(onMethod = @__(@NonNull), value = AccessLevel.PRIVATE)
-    private String currentColumn;
     private boolean isDescending;
 
     CursorData(List<Field<TT>> columns) {
         this.columns = columns.stream().collect(Collectors.toMap(Field::fieldName, Field::fieldMethod,
                 (v1, v2) -> v1,
                 LinkedHashMap::new));
-        if (columns.isEmpty()) {
+        if (columns.isEmpty() || columns.get(0).fieldName() == null) {
             throw new IllegalArgumentException("Cursor Pagination requires at least one column");
         }
-        this.currentColumn = Objects.requireNonNull(columns.get(0).fieldName(),
-                "Cursor Pagination requires at least one column");
     }
 
     @Override
@@ -98,9 +99,8 @@ class CursorData<TT> implements CursorPagination<TT> {
         return columns;
     }
 
-    public void save(int offset, TT entity) {
-        Objects.requireNonNull(currentColumn, "Current column must be set before saving cursor");
-        var value = columns().get(currentColumn).apply(entity);
+    public void save(int offset, TT entity, Map<String, SortMeta> sortMeta) {
+        var value = columns().get(requestedSort(sortMeta, columns, true)).apply(entity);
         log.debug("Saving cursor for offset {} and entity id {}", offset, value);
         cursorCache.put(offset, value);
     }
@@ -125,15 +125,13 @@ class CursorData<TT> implements CursorPagination<TT> {
             cursorCache.clear();
             return false;
         }
-        var requestedSort = sortMeta.keySet().stream().findFirst()
-                .filter(columns().keySet()::contains);
-        requestedSort.ifPresent(this::setCurrentColumn);
+        var requestedSort = requestedSort(sortMeta, columns(), false);
         if (!sortMeta.isEmpty() && requestedSort.isEmpty()) {
             log.atDebug().setMessage("Cursor pagination only supports sorting by {} columns, requested sort: {}")
                             .addArgument(columns()::keySet).addArgument(sortMeta::keySet).log();
             cursorCache.clear();
             return false;
-        } else if (isDescending != Optional.ofNullable(sortMeta.get(currentColumn))
+        } else if (isDescending != Optional.ofNullable(sortMeta.get(requestedSort))
                 .map(sort -> sort.getOrder().isDescending()).orElse(false)) {
             isDescending = !isDescending;
             cursorCache.clear();
@@ -146,10 +144,10 @@ class CursorData<TT> implements CursorPagination<TT> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root,
                                      Map<String, SortMeta> sortMeta) {
-        Objects.requireNonNull(currentColumn, "Current column must be set before creating cursor predicate");
         var floor = cursorCache.floorEntry(offset);
         log.atDebug().setMessage("Creating cursor predicate for offset {} - cache = {}")
                 .addArgument(offset).addArgument(valueForLogging(floor)).log();
+        var currentColumn = requestedSort(sortMeta, columns(), true);
         boolean descending = Optional.ofNullable(sortMeta.get(currentColumn))
                 .map(order -> order.getOrder().isDescending())
                 .orElse(false);
@@ -186,7 +184,7 @@ class NoopCursorData<TT> implements CursorPagination<TT> {
     }
 
     @Override
-    public void save(int offset, TT entity) {
+    public void save(int offset, TT entity, Map<String, SortMeta> sortMeta) {
         throw new UnsupportedOperationException("NoopCursorData does not support saving cursor state");
     }
 }

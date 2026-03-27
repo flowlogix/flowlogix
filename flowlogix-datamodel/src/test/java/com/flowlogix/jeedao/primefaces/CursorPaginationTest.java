@@ -37,7 +37,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class CursorPaginationTest {
     static class Entity { }
     CursorPagination<Entity> cursor = CursorPagination.<Entity>create(builder ->
-            builder.supportedFields(List.of(new Field<>("id", e -> "one"))).build()).get();
+            builder.supportedFields(List.of(new Field<>("id", e -> "one")))
+                    .defaultDescendingSort(true).build()).get();
 
     @Mock
     private CriteriaBuilder cb;
@@ -114,6 +115,14 @@ class CursorPaginationTest {
     }
 
     @Test
+    void defaultSort() {
+        assertThat(cursor.defaultSort(cb, root)).isNull();
+        verify(cb).desc(root.get("id"));
+        verify(root, times(2)).get("id");
+        verifyNoMoreInteractions(cb, root);
+    }
+
+    @Test
     void valueForLogging() {
         assertThat(CursorData.valueForLogging(null).get()).isNull();
     }
@@ -138,6 +147,7 @@ class CursorPaginationTest {
         assertThat(noop.columns()).isEmpty();
         assertThat(noop.isSupported(null, null)).isFalse();
         assertThatThrownBy(() -> noop.save(0, null, Map.of())).isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> noop.defaultSort(null, null)).isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test

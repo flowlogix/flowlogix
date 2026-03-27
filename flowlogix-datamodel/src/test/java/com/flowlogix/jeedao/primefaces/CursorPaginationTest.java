@@ -143,4 +143,10 @@ class CursorPaginationTest {
         assertThat(CursorPagination.create(List.of(new Field<>("id", e -> "one"),
                 new Field<>("id", e -> "two"))).get().columns()).hasSize(1);
     }
+
+    @Test
+    void emptyColumn() {
+        assertThatThrownBy(() -> CursorPagination.create(List.of(new Field<>("", e -> "one"))))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }

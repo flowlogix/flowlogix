@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Supplier;
@@ -49,6 +50,13 @@ public interface CursorPagination<TT> extends Serializable {
     record Field<TT>(String fieldName, SerializableFunction<TT, Comparable<?>> fieldMethod) implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
+
+        public Field {
+            if (Objects.requireNonNull(fieldName, "fieldName cannot be null").isEmpty()) {
+                throw new IllegalArgumentException("fieldName cannot be empty");
+            }
+            Objects.requireNonNull(fieldMethod, "fieldMethod cannot be null");
+        }
     }
 
     /// Returns a no-op implementation of CursorPagination that can be used when cursor pagination is not supported or desired
@@ -86,12 +94,12 @@ class CursorData<TT> implements CursorPagination<TT> {
     private boolean isDescending;
 
     CursorData(List<Field<TT>> columns) {
+        if (columns.isEmpty()) {
+            throw new IllegalArgumentException("Cursor Pagination requires at least one column");
+        }
         this.columns = columns.stream().collect(Collectors.toMap(Field::fieldName, Field::fieldMethod,
                 (v1, v2) -> v1,
                 LinkedHashMap::new));
-        if (columns.isEmpty() || columns.get(0).fieldName() == null) {
-            throw new IllegalArgumentException("Cursor Pagination requires at least one column");
-        }
     }
 
     @Override

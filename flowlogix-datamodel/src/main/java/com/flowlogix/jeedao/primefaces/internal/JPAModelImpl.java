@@ -57,6 +57,7 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Builder;
@@ -287,6 +288,9 @@ public class JPAModelImpl<TT> implements Serializable {
         return processSortOrder(sortData.getSortOrder(), cb, root, cursorSupported);
     }
 
+    /// @deprecated - use {@link #getSort(Map, CriteriaBuilder, Root, boolean)} instead, which supports cursor pagination
+    @Generated
+    @Deprecated(since = "11.1.2")
     public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
         return getSort(sortCriteria, cb, root, false);
     }

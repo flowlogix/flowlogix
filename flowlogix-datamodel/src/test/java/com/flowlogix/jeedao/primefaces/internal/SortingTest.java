@@ -55,8 +55,11 @@ class SortingTest {
     @Test
     void cursorSupportedWithApplicationSort() {
         assertThatNoException().isThrownBy(() -> model.processSortOrder(Map.of("id",
-                        mergeSortOrder(SortMeta.builder().order(SortOrder.ASCENDING).field("xxx").build(), null, false)),
+                        mergeSortOrder(SortMeta.builder().order(SortOrder.DESCENDING).field("xxx").build(), null, false)),
                 cb, root, true));
+        assertThatThrownBy(() -> model.processSortOrder(Map.of("id",
+                        mergeSortOrder(SortMeta.builder().field("xxx").build(), null, false)),
+                cb, root, true)).isInstanceOf(UnsupportedOperationException.class);
         JPAModelImpl.processApplicationSortOrder(true, mergeSortOrder(null, order, true), null);
     }
 

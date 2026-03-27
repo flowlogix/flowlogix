@@ -16,16 +16,20 @@
 package com.flowlogix.jeedao.primefaces.internal;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.primefaces.model.SortMeta;
+import org.primefaces.model.SortOrder;
 import java.util.Map;
 import java.util.Optional;
 import static com.flowlogix.jeedao.primefaces.Accessors.mergeSortOrder;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +38,10 @@ class SortingTest {
     Order order;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     EntityManager em;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    Root<Object> root;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    CriteriaBuilder cb;
 
     private final JPAModelImpl<Object> model = JPAModelImpl.builder()
             .entityClass(Object.class).build();
@@ -46,9 +54,9 @@ class SortingTest {
 
     @Test
     void cursorSupportedWithApplicationSort() {
-        assertThatThrownBy(() -> model.processSortOrder(Map.of("id",
-                        mergeSortOrder(SortMeta.builder().field("xxx").build(), null, false)),
-                null, null, true)).isInstanceOf(UnsupportedOperationException.class);
+        assertThatNoException().isThrownBy(() -> model.processSortOrder(Map.of("id",
+                        mergeSortOrder(SortMeta.builder().order(SortOrder.ASCENDING).field("xxx").build(), null, false)),
+                cb, root, true));
         JPAModelImpl.processApplicationSortOrder(true, mergeSortOrder(null, order, true), null);
     }
 

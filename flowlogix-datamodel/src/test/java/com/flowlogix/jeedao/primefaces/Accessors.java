@@ -16,8 +16,10 @@
 package com.flowlogix.jeedao.primefaces;
 
 import jakarta.persistence.criteria.Order;
+import lombok.Generated;
 import org.primefaces.model.SortMeta;
 
+@Generated
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class Accessors {
     public static Sorter.MergedSortOrder mergeSortOrder(SortMeta sm, Order as, boolean hp) {

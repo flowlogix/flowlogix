@@ -29,11 +29,9 @@ import static org.jboss.arquillian.graphene.Graphene.waitAjax;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -50,7 +48,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 @Tag("UserInterface")
 @RunAsClient
 @PayaraServerLifecycle
-@TestMethodOrder(OrderAnnotation.class)
 class DataModelIT {
     @Drone
     WebDriver webDriver;
@@ -81,8 +78,12 @@ class DataModelIT {
     @FindBy(id = "parametersForm:forceEmptyResult")
     private WebElement forceEmptyResult;
 
+    @BeforeEach
+    void setup() {
+        webDriver.manage().deleteAllCookies();
+    }
+
     @Test
-    @Order(1)
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkPage() {
         webDriver.get(baseURL + "view-users");
@@ -107,7 +108,6 @@ class DataModelIT {
     }
 
     @Test
-    @Order(2)
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkPageWithCursorPagination() {
         webDriver.get(baseURL.toString());
@@ -128,11 +128,11 @@ class DataModelIT {
     }
 
     @Test
-    @Order(3)
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkPageWithCursorPaginationAndEmptyResult() {
         webDriver.get(baseURL.toString());
         waitGui(webDriver).until(ExpectedConditions.titleIs("Index"));
+        guardAjax(defaultCursorPagination).click();
         guardAjax(forceEmptyResult).click();
         webDriver.get(baseURL + "view-users");
         waitGui(webDriver).until(ExpectedConditions.titleIs("View Users"));

@@ -218,7 +218,7 @@ public class JPAModelImpl<TT> implements Serializable {
                         qc -> addToCriteria(qc, filters, sortMeta,
                                 cursorSupported, sanitizedFirst))).getResultList());
         if (cursorSupported && !result.isEmpty()) {
-            cursor.get().save(first + result.size(), result.get(result.size() - 1), sortMeta);
+            cursor.get().save(sanitizedFirst + result.size(), result.get(result.size() - 1), sortMeta);
         }
         return result;
     }
@@ -507,8 +507,10 @@ public class JPAModelImpl<TT> implements Serializable {
         AtomicBoolean userSortRequested = new AtomicBoolean();
         sortMeta.values().forEach(order -> {
             if (order.getRequestedSortMeta() != null) {
-                userSortRequested.set(true);
-                processUserSortOrder(cb, root, order, sortMetaOrdering);
+                processUserSortOrder(cb, root, order).ifPresent(sortOrder -> {
+                    userSortRequested.set(true);
+                    sortMetaOrdering.add(sortOrder);
+                });
             } else if (order.getApplicationSort() != null) {
                 processApplicationSortOrder(cursorSupported, order, sortMetaOrdering);
             } else {
@@ -537,13 +539,13 @@ public class JPAModelImpl<TT> implements Serializable {
         }
     }
 
-    private void processUserSortOrder(CriteriaBuilder cb, Root<TT> root, MergedSortOrder order,
-                                      Deque<Order> sortMetaOrdering) {
+    private Optional<Order> processUserSortOrder(CriteriaBuilder cb, Root<TT> root, MergedSortOrder order) {
         if (order.getRequestedSortMeta().getOrder() == SortOrder.ASCENDING) {
-            sortMetaOrdering.add(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
+            return Optional.of(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
         } else if (order.getRequestedSortMeta().getOrder() == SortOrder.DESCENDING) {
-            sortMetaOrdering.add(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
+            return Optional.of(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
         }
+        return Optional.empty();
     }
 
     @SneakyThrows(ReflectiveOperationException.class)

@@ -98,7 +98,7 @@ public class UserViewer implements Serializable {
 
     private List<UserEntity> forceEmptyResult(List<UserEntity> users) {
         if (lazyModelParameters.isForceEmptyResult()) {
-            users.clear();
+            return List.of();
         }
         return users;
     }

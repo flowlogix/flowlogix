@@ -26,7 +26,6 @@ import org.primefaces.model.SortMeta;
 import java.util.Map;
 import java.util.Optional;
 import static com.flowlogix.jeedao.primefaces.Accessors.mergeSortOrder;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,9 +46,9 @@ class SortingTest {
 
     @Test
     void cursorSupportedWithApplicationSort() {
-        assertThatNoException().isThrownBy(() -> model.processSortOrder(Map.of("id",
+        assertThatThrownBy(() -> model.processSortOrder(Map.of("id",
                         mergeSortOrder(SortMeta.builder().field("xxx").build(), null, false)),
-                null, null, true));
+                null, null, true)).isInstanceOf(UnsupportedOperationException.class);
         JPAModelImpl.processApplicationSortOrder(true, mergeSortOrder(null, order, true), null);
     }
 

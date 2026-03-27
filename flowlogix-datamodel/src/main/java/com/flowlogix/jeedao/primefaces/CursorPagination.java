@@ -113,9 +113,10 @@ class CursorData<TT> implements CursorPagination<TT> {
         if (columns.isEmpty()) {
             throw new IllegalArgumentException("Cursor Pagination requires at least one column");
         }
-        this.columns = columns.stream().collect(Collectors.toMap(Field::fieldName, Field::fieldMethod,
+        this.columns = Collections.unmodifiableMap(columns.stream()
+                .collect(Collectors.toMap(Field::fieldName, Field::fieldMethod,
                 (v1, v2) -> v1,
-                LinkedHashMap::new));
+                LinkedHashMap::new)));
         this.isDescendingDefault = isDescendingDefault;
     }
 

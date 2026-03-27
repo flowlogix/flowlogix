@@ -287,6 +287,10 @@ public class JPAModelImpl<TT> implements Serializable {
         return processSortOrder(sortData.getSortOrder(), cb, root, cursorSupported);
     }
 
+    public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
+        return getSort(sortCriteria, cb, root, false);
+    }
+
     /**
      * Recursively resolve field name, possibly by joining other tables,
      * based on a dotted notation of the field

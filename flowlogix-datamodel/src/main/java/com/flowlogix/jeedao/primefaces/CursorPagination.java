@@ -16,8 +16,10 @@
 package com.flowlogix.jeedao.primefaces;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.FunctionalInterfaces.SerializableFunction;
@@ -34,9 +36,11 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import static com.flowlogix.jeedao.primefaces.CursorPagination.requestedSort;
+import static com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.resolveField0;
 
 /// Interface defining cursor pagination behavior for PrimeFaces JPA LazyDataModel
 public interface CursorPagination<TT> extends Serializable {
@@ -44,6 +48,7 @@ public interface CursorPagination<TT> extends Serializable {
     int cursorOffset(int offset);
     Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root,
                               Map<String, SortMeta> sortMeta);
+    Order defaultSort(CriteriaBuilder cb, Root<TT> root);
     boolean isSupported(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta);
     Map<String, SerializableFunction<TT, Comparable<?>>> columns();
 
@@ -64,14 +69,23 @@ public interface CursorPagination<TT> extends Serializable {
         return new Lazy<>(NoopCursorData::new);
     }
 
-    /// Creates a default implementation of cursor pagination
-    static <TT> Lazy<CursorPagination<TT>> create(List<Field<TT>> supportedColumns) {
-        return new Lazy<>(() -> new CursorData<>(supportedColumns));
+    @Builder
+    class Config<TT> implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        @NonNull List<Field<TT>> supportedFields;
+        @NonNull @Builder.Default
+        Lazy.SerializableSupplier<Boolean> conditional = () -> true;
+        boolean defaultDescendingSort;
     }
 
-    static <TT> Lazy<CursorPagination<TT>> create(List<Field<TT>> supportedColumns,
-                                                  Lazy.SerializableSupplier<Boolean> conditional) {
-        return new Lazy<>(() -> conditional.get() ? new CursorData<>(supportedColumns) : new NoopCursorData<>());
+    /// Creates a default implementation of cursor pagination
+    static <TT> Lazy<CursorPagination<TT>> create(Function<Config.ConfigBuilder<TT>, Config<TT>> configConsumer) {
+        var config = configConsumer.apply(new Config.ConfigBuilder<>());
+        return new Lazy<>(() -> config.conditional.get()
+                ? new CursorData<>(config.supportedFields, config.defaultDescendingSort)
+                : new NoopCursorData<>());
     }
 
     static <TT> String requestedSort(Map<String, SortMeta> sortMeta,
@@ -88,18 +102,21 @@ class CursorData<TT> implements CursorPagination<TT> {
     private static final long serialVersionUID = 3L;
 
     private final Map<String, SerializableFunction<TT, Comparable<?>>> columns;
+    private final boolean isDescendingDefault;
+
     private final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
     private Map<String, FilterMeta> cursorFilters;
     private Map<String, SortMeta> cursorSorts;
-    private boolean isDescending;
+    private boolean isDescendingState;
 
-    CursorData(List<Field<TT>> columns) {
+    CursorData(List<Field<TT>> columns, boolean isDescendingDefault) {
         if (columns.isEmpty()) {
             throw new IllegalArgumentException("Cursor Pagination requires at least one column");
         }
         this.columns = columns.stream().collect(Collectors.toMap(Field::fieldName, Field::fieldMethod,
                 (v1, v2) -> v1,
                 LinkedHashMap::new));
+        this.isDescendingDefault = isDescendingDefault;
     }
 
     @Override
@@ -139,9 +156,9 @@ class CursorData<TT> implements CursorPagination<TT> {
                             .addArgument(columns()::keySet).addArgument(sortMeta::keySet).log();
             cursorCache.clear();
             return false;
-        } else if (isDescending != Optional.ofNullable(sortMeta.get(requestedSort))
+        } else if (isDescendingState != Optional.ofNullable(sortMeta.get(requestedSort))
                 .map(sort -> sort.getOrder().isDescending()).orElse(false)) {
-            isDescending = !isDescending;
+            isDescendingState = !isDescendingState;
             cursorCache.clear();
         }
 
@@ -158,10 +175,16 @@ class CursorData<TT> implements CursorPagination<TT> {
         var currentColumn = requestedSort(sortMeta, columns(), true);
         boolean descending = Optional.ofNullable(sortMeta.get(currentColumn))
                 .map(order -> order.getOrder().isDescending())
-                .orElse(false);
+                .orElse(isDescendingDefault);
         return Optional.ofNullable(floor).map(entry -> descending
-                        ? cb.lessThan(root.get(currentColumn), (Comparable) entry.getValue())
-                        : cb.greaterThan(root.get(currentColumn), (Comparable) entry.getValue())).orElse(null);
+                        ? cb.lessThan(resolveField0(root, currentColumn), (Comparable) entry.getValue())
+                        : cb.greaterThan(resolveField0(root, currentColumn), (Comparable) entry.getValue())).orElse(null);
+    }
+
+    @Override
+    public Order defaultSort(CriteriaBuilder cb, Root<TT> root) {
+        var sortField = requestedSort(Map.of(), columns(), true);
+        return isDescendingDefault ? cb.desc(resolveField0(root, sortField)) : cb.asc(resolveField0(root, sortField));
     }
 
     static Supplier<Comparable<?>> valueForLogging(Map.Entry<Integer, Comparable<?>> entry) {
@@ -179,6 +202,11 @@ class NoopCursorData<TT> implements CursorPagination<TT> {
     @Override
     public Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root, Map<String, SortMeta> sortMeta) {
         return null;
+    }
+
+    @Override
+    public Order defaultSort(CriteriaBuilder cb, Root<TT> root) {
+        throw new UnsupportedOperationException("NoopCursorData does not support default sorting");
     }
 
     @Override

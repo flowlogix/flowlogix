@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -249,7 +250,7 @@ public class JPAModelImpl<TT> implements Serializable {
     private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta,
                                boolean cursorSupported, int offset) {
         qc.query().where(getFilters(filters, qc.builder(), qc.root(), cursorSupported, offset, sortMeta));
-        qc.query().orderBy(getSort(sortMeta, qc.builder(), qc.root()));
+        qc.query().orderBy(getSort(sortMeta, qc.builder(), qc.root(), cursorSupported));
         qc.root().alias(JPALazyDataModel.RESULT);
     }
 
@@ -279,10 +280,11 @@ public class JPAModelImpl<TT> implements Serializable {
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
 
-    public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
+    public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root,
+                               boolean cursorSupported) {
         var sortData = new SortData(sortCriteria);
         sorter.sort(sortData, cb, root);
-        return processSortOrder(sortData.getSortOrder(), cb, root);
+        return processSortOrder(sortData.getSortOrder(), cb, root, cursorSupported);
     }
 
     /**
@@ -295,6 +297,11 @@ public class JPAModelImpl<TT> implements Serializable {
      * @param <YY> expression type
      */
     public <YY> Expression<YY> resolveField(Root<TT> root, String fieldName) {
+        return resolveField0(root, fieldName);
+    }
+
+    /// static version of {@link #resolveField}
+    public static <YY, TT> Expression<YY> resolveField0(Root<TT> root, String fieldName) {
         Join<?, ?> join = null;
         // traverse all dotted fields, and join each
         while (fieldName.contains(".")) {
@@ -485,27 +492,49 @@ public class JPAModelImpl<TT> implements Serializable {
                 cb.lessThanOrEqualTo(objectExpression, iterBetween.next()));
     }
 
-    @SuppressWarnings("MissingSwitchDefault")
-    private List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta, CriteriaBuilder cb, Root<TT> root) {
+    private List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta,
+                                         CriteriaBuilder cb, Root<TT> root, boolean cursorSupported) {
         Deque<Order> sortMetaOrdering = new ArrayDeque<>();
+        AtomicBoolean userSortRequested = new AtomicBoolean();
         sortMeta.values().forEach(order -> {
             if (order.getRequestedSortMeta() != null) {
-                if (order.getRequestedSortMeta().getOrder() == SortOrder.ASCENDING) {
-                    sortMetaOrdering.add(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
-                } else if (order.getRequestedSortMeta().getOrder() == SortOrder.DESCENDING) {
-                    sortMetaOrdering.add(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
-                }
+                userSortRequested.set(true);
+                processUserSortOrder(cb, root, order, sortMetaOrdering);
             } else if (order.getApplicationSort() != null) {
-                if (order.isHighPriority()) {
-                    sortMetaOrdering.addFirst(order.getApplicationSort());
-                } else {
-                    sortMetaOrdering.add(order.getApplicationSort());
-                }
+                processApplicationSortOrder(cursorSupported, order, sortMetaOrdering);
             } else {
                 throw new IllegalStateException("Neither application sort request, nor UI sort request is available");
             }
         });
+        if (cursorSupported && !userSortRequested.get()) {
+            sortMetaOrdering.addFirst(cursor.get().defaultSort(cb, root));
+        }
         return sortMetaOrdering.stream().toList();
+    }
+
+    private static void processApplicationSortOrder(boolean cursorSupported, MergedSortOrder order,
+                                                    Deque<Order> sortMetaOrdering) {
+        if (order.isHighPriority()) {
+            if (cursorSupported) {
+                log.warn("""
+                        High priority application sort {} is not supported with cursor pagination,
+                        ignoring application sort for this query""",
+                        order.getApplicationSort());
+            } else {
+                sortMetaOrdering.addFirst(order.getApplicationSort());
+            }
+        } else {
+            sortMetaOrdering.add(order.getApplicationSort());
+        }
+    }
+
+    private void processUserSortOrder(CriteriaBuilder cb, Root<TT> root, MergedSortOrder order,
+                                      Deque<Order> sortMetaOrdering) {
+        if (order.getRequestedSortMeta().getOrder() == SortOrder.ASCENDING) {
+            sortMetaOrdering.add(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
+        } else if (order.getRequestedSortMeta().getOrder() == SortOrder.DESCENDING) {
+            sortMetaOrdering.add(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
+        }
     }
 
     @SneakyThrows(ReflectiveOperationException.class)

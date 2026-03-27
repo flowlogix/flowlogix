@@ -36,8 +36,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @ExtendWith(MockitoExtension.class)
 class CursorPaginationTest {
     static class Entity { }
-    CursorPagination<Entity> cursor = CursorPagination.<Entity>create(
-            List.of(new Field<>("id", e -> "one"))).get();
+    CursorPagination<Entity> cursor = CursorPagination.<Entity>create(builder ->
+            builder.supportedFields(List.of(new Field<>("id", e -> "one"))).build()).get();
 
     @Mock
     private CriteriaBuilder cb;
@@ -46,8 +46,8 @@ class CursorPaginationTest {
 
     @Test
     void save() {
-        var rawCursor = CursorPagination.<Entity>create(
-                List.of(new Field<>("id", e -> "one"))).get();
+        var rawCursor = CursorPagination.<Entity>create(builder ->
+                builder.supportedFields(List.of(new Field<>("id", e -> "one"))).build()).get();
         rawCursor.save(2, new Entity(), Map.of());
         assertThat(rawCursor.cursorOffset(1)).isEqualTo(1);
         assertThat(rawCursor.cursorOffset(3)).isEqualTo(1);
@@ -56,8 +56,10 @@ class CursorPaginationTest {
 
     @Test
     void createWithDefaultColumn() {
-        assertThatThrownBy(() -> CursorPagination.create(List.of()).get()).isInstanceOf(IllegalArgumentException.class);
-        CursorPagination.create(List.of(new Field<>("hello", e -> "one"))).get()
+        assertThatThrownBy(() -> CursorPagination.create(builder -> builder
+                .supportedFields(List.of()).build()).get()).isInstanceOf(IllegalArgumentException.class);
+        CursorPagination.create(builder -> builder
+                .supportedFields(List.of(new Field<>("hello", e -> "one"))).build()).get()
                 .save(0, new Entity(), Map.of());
     }
 
@@ -140,13 +142,15 @@ class CursorPaginationTest {
 
     @Test
     void duplicateColumn() {
-        assertThat(CursorPagination.create(List.of(new Field<>("id", e -> "one"),
-                new Field<>("id", e -> "two"))).get().columns()).hasSize(1);
+        assertThat(CursorPagination.create(builder -> builder
+                .supportedFields(List.of(new Field<>("id", e -> "one"),
+                new Field<>("id", e -> "two"))).build()).get().columns()).hasSize(1);
     }
 
     @Test
     void emptyColumn() {
-        assertThatThrownBy(() -> CursorPagination.create(List.of(new Field<>("", e -> "one"))))
+        assertThatThrownBy(() -> CursorPagination.create(builder -> builder
+                .supportedFields(List.of(new Field<>("", e -> "one"))).build()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

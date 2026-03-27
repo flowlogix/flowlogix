@@ -251,7 +251,7 @@ class ModelTest implements Serializable {
         when(cb.asc(any())).thenReturn(ascendingOrder);
         var descendingOrder = createOrder(false);
         when(cb.desc(any())).thenReturn(descendingOrder);
-        var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger);
+        var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger, false);
         assertThat(sortResult).hasSize(6);
         assertThat(sortResult.get(0).isAscending()).isFalse();
         assertThat(sortResult.get(1).isAscending()).isTrue();
@@ -293,7 +293,7 @@ class ModelTest implements Serializable {
         when(cb.asc(any())).thenReturn(ascendingOrder);
         var descendingOrder = createOrder(false);
         when(cb.desc(any())).thenReturn(descendingOrder);
-        var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger);
+        var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger, false);
         assertThat(sortResult).hasSize(2);
         assertThat(sortResult.get(0).isAscending()).isTrue();
         assertThat(sortResult.get(1).isAscending()).isTrue();

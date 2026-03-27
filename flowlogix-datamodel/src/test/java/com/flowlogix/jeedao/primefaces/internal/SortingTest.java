@@ -15,13 +15,16 @@
  */
 package com.flowlogix.jeedao.primefaces.internal;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.primefaces.model.SortMeta;
 import java.util.Map;
+import java.util.Optional;
 import static com.flowlogix.jeedao.primefaces.Accessors.mergeSortOrder;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,6 +33,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class SortingTest {
     @Mock
     Order order;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    EntityManager em;
 
     private final JPAModelImpl<Object> model = JPAModelImpl.builder()
             .entityClass(Object.class).build();
@@ -46,5 +51,12 @@ class SortingTest {
                         mergeSortOrder(SortMeta.builder().field("xxx").build(), null, false)),
                 null, null, true));
         JPAModelImpl.processApplicationSortOrder(true, mergeSortOrder(null, order, true), null);
+    }
+
+    @Test
+    void invalidPUReflection() {
+        var model = JPAModelImpl.<Record>builder().entityManager(() -> em)
+                .entityClass(Record.class).build();
+        assertThatThrownBy(() -> model.getPrimaryKey(Optional.empty())).isInstanceOf(ReflectiveOperationException.class);
     }
 }

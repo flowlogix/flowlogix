@@ -547,7 +547,7 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     @SneakyThrows(ReflectiveOperationException.class)
-    private Object getPrimaryKey(Optional<TT> entry) {
+    Object getPrimaryKey(Optional<TT> entry) {
         return jpaFinder.get().getEntityManager().get().getEntityManagerFactory().getPersistenceUnitUtil()
                 .getIdentifier(entry.orElse(ConstructorUtils.invokeConstructor(getEntityClass())));
     }

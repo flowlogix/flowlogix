@@ -20,8 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.primefaces.model.SortMeta;
 import java.util.Map;
 import static com.flowlogix.jeedao.primefaces.Accessors.mergeSortOrder;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,8 +42,9 @@ class SortingTest {
 
     @Test
     void cursorSupportedWithApplicationSort() {
-        assertThatThrownBy(() -> model.processSortOrder(Map.of("id", mergeSortOrder(null, order, false)),
-                null, null, true)).isInstanceOf(UnsupportedOperationException.class);
+        assertThatNoException().isThrownBy(() -> model.processSortOrder(Map.of("id",
+                        mergeSortOrder(SortMeta.builder().field("xxx").build(), null, false)),
+                null, null, true));
         JPAModelImpl.processApplicationSortOrder(true, mergeSortOrder(null, order, true), null);
     }
 }

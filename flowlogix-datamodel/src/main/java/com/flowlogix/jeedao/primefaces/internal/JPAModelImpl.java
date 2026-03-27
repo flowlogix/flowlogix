@@ -84,8 +84,9 @@ import org.primefaces.util.Constants;
  * @hidden
  * @param <TT>
  */
-@Builder
 @Slf4j
+@Builder
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class JPAModelImpl<TT> implements Serializable {
     private static final long serialVersionUID = 6L;
     /**

@@ -1,0 +1,47 @@
+/*
+ * Copyright (C) 2011-2026 Flow Logix, Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.flowlogix.jeedao.primefaces.internal;
+
+import jakarta.persistence.criteria.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.Map;
+import static com.flowlogix.jeedao.primefaces.Accessors.mergeSortOrder;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+@ExtendWith(MockitoExtension.class)
+class SortingTest {
+    @Mock
+    Order order;
+
+    private final JPAModelImpl<Object> model = JPAModelImpl.builder()
+            .entityClass(Object.class).build();
+
+    @Test
+    void sortOrderWithInvalidApplicationSort() {
+        assertThatThrownBy(() -> model.processSortOrder(Map.of("id", mergeSortOrder(null, null, false)),
+                null, null, true)).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void cursorSupportedWithApplicationSort() {
+        assertThatThrownBy(() -> model.processSortOrder(Map.of("id", mergeSortOrder(null, order, false)),
+                null, null, true)).isInstanceOf(UnsupportedOperationException.class);
+        JPAModelImpl.processApplicationSortOrder(true, mergeSortOrder(null, order, true), null);
+    }
+}

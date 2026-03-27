@@ -501,8 +501,8 @@ public class JPAModelImpl<TT> implements Serializable {
                 cb.lessThanOrEqualTo(objectExpression, iterBetween.next()));
     }
 
-    private List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta,
-                                         CriteriaBuilder cb, Root<TT> root, boolean cursorSupported) {
+    List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta,
+                                 CriteriaBuilder cb, Root<TT> root, boolean cursorSupported) {
         Deque<Order> sortMetaOrdering = new ArrayDeque<>();
         AtomicBoolean userSortRequested = new AtomicBoolean();
         sortMeta.values().forEach(order -> {
@@ -521,8 +521,8 @@ public class JPAModelImpl<TT> implements Serializable {
         return sortMetaOrdering.stream().toList();
     }
 
-    private static void processApplicationSortOrder(boolean cursorSupported, MergedSortOrder order,
-                                                    Deque<Order> sortMetaOrdering) {
+    static void processApplicationSortOrder(boolean cursorSupported, MergedSortOrder order,
+                                            Deque<Order> sortMetaOrdering) {
         if (order.isHighPriority()) {
             if (cursorSupported) {
                 log.warn("""

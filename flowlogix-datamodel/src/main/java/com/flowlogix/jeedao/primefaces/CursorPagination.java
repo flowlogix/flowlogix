@@ -20,6 +20,7 @@ import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.omnifaces.util.FunctionalInterfaces.SerializableFunction;
@@ -124,6 +125,14 @@ public interface CursorPagination<TT> extends Serializable {
     /// default is always true
     /// * `defaultDescendingSort`: a flag to indicate if the default sort order for the first supported field
     /// should be descending, default is false (ascending)
+    /// * `evictCursorCacheBehind`: a flag to indicate whether to evict the cursor cache behind the current offset,
+    /// defined by a window
+    /// * `evictCursorCacheAhead`: a flag to indicate whether to evict the cursor cache ahead the current offset,
+    /// defined by a window
+    /// * `behindCursorWindowSize`: specified how wide the window behind the current offset should be
+    /// for cursor cache eviction, default is 1000
+    /// * `aheadCursorWindowSize`: specified how wide the window ahead of the current offset should be
+    /// for cursor cache eviction, default is 1000
     @Builder
     class Config<TT> implements Serializable {
         @Serial
@@ -139,6 +148,12 @@ public interface CursorPagination<TT> extends Serializable {
         @NonNull @Builder.Default
         private Lazy.SerializableSupplier<Boolean> conditional = () -> true;
         private boolean defaultDescendingSort;
+        private boolean evictCursorCacheBehind;
+        private boolean evictCursorCacheAhead;
+        @SuppressWarnings("checkstyle:MagicNumber")
+        private @Builder.Default int behindCursorWindowSize = 1_000;
+        @SuppressWarnings("checkstyle:MagicNumber")
+        private @Builder.Default int aheadCursorWindowSize = 1_000;
     }
 
     /// Creates a default implementation of cursor pagination
@@ -149,7 +164,9 @@ public interface CursorPagination<TT> extends Serializable {
     static <TT> Lazy<CursorPagination<TT>> create(Function<Config.ConfigBuilder<TT>, Config<TT>> configConsumer) {
         var config = configConsumer.apply(new Config.ConfigBuilder<>());
         return new Lazy<>(() -> config.conditional.get()
-                ? new CursorData<>(config.supportedFields, config.defaultDescendingSort)
+                ? new CursorData<>(config.supportedFields, config.defaultDescendingSort,
+                config.evictCursorCacheBehind, config.evictCursorCacheAhead,
+                config.behindCursorWindowSize, config.aheadCursorWindowSize)
                 : new NoopCursorData<>());
     }
 
@@ -179,13 +196,19 @@ class CursorData<TT> implements CursorPagination<TT> {
 
     private final Map<String, SerializableFunction<TT, Comparable<?>>> columns;
     private final boolean isDescendingDefault;
+    private final boolean evictCursorCacheBehind;
+    private final boolean evictCursorCacheAhead;
+    private final int behindCursorWindowSize;
+    private final int aheadCursorWindowSize;
 
-    private final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
+    final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
     private Map<String, FilterMeta> cursorFilters;
     private Map<String, SortMeta> cursorSorts;
     private boolean isDescendingState;
 
-    CursorData(List<Field<TT>> columns, boolean isDescendingDefault) {
+    CursorData(List<Field<TT>> columns, boolean isDescendingDefault,
+               boolean evictCursorCacheBehind, boolean evictCursorCacheAhead,
+               int behindCursorWindowSize, int aheadCursorWindowSize) {
         if (columns.isEmpty()) {
             throw new IllegalArgumentException("Cursor Pagination requires at least one column");
         }
@@ -194,6 +217,10 @@ class CursorData<TT> implements CursorPagination<TT> {
                 (v1, v2) -> v1,
                 LinkedHashMap::new)));
         this.isDescendingDefault = isDescendingDefault;
+        this.evictCursorCacheBehind = evictCursorCacheBehind;
+        this.evictCursorCacheAhead = evictCursorCacheAhead;
+        this.behindCursorWindowSize = behindCursorWindowSize;
+        this.aheadCursorWindowSize = aheadCursorWindowSize;
     }
 
     @Override
@@ -205,6 +232,14 @@ class CursorData<TT> implements CursorPagination<TT> {
         var value = columns().get(requestedSort(sortMeta, columns, true)).apply(entity);
         log.debug("Saving cursor for offset {} and entity id {}", offset, value);
         cursorCache.put(offset, value);
+        if (evictCursorCacheBehind) {
+            // clear too far behind of the current offset
+            cursorCache.headMap(Math.max(0, offset - behindCursorWindowSize)).clear();
+        }
+        if (evictCursorCacheAhead) {
+            // clear too far ahead of the current offset
+            cursorCache.tailMap(offset + aheadCursorWindowSize + 1).clear();
+        }
     }
 
     @Override
@@ -265,10 +300,15 @@ class CursorData<TT> implements CursorPagination<TT> {
     private void initializeFilters(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
         if (cursorFilters == null) {
             cursorFilters = filters;
-            if (this.cursorSorts != null) {
-                throw new IllegalStateException("Cursor filters were not initialized, but sorts were - this should never happen");
-            }
+            checkUnexpectedInitializationState();
             cursorSorts = sortMeta;
+        }
+    }
+
+    @Generated
+    private void checkUnexpectedInitializationState() {
+        if (this.cursorSorts != null) {
+            throw new IllegalStateException("Cursor filters were not initialized, but sorts were - this should never happen");
         }
     }
 

@@ -56,6 +56,26 @@ class CursorPaginationTest {
     }
 
     @Test
+    void saveWithEvictionBehind() {
+        var rawCursor = CursorPagination.<Entity>create(builder ->
+                builder.supportedFields(List.of(new Field<>("id", e -> "one")))
+                        .evictCursorCacheBehind(true).behindCursorWindowSize(-1).build()).get();
+        rawCursor.save(2, new Entity(), Map.of());
+        CursorData<Entity> data = (CursorData<Entity>) rawCursor;
+        assertThat(data.cursorCache).isEmpty();
+    }
+
+    @Test
+    void saveWithEvictionAhead() {
+        var rawCursor = CursorPagination.<Entity>create(builder ->
+                builder.supportedFields(List.of(new Field<>("id", e -> "one")))
+                        .evictCursorCacheAhead(true).aheadCursorWindowSize(-1).build()).get();
+        rawCursor.save(2, new Entity(), Map.of());
+        CursorData<Entity> data = (CursorData<Entity>) rawCursor;
+        assertThat(data.cursorCache).isEmpty();
+    }
+
+    @Test
     void createWithDefaultColumn() {
         assertThatThrownBy(() -> CursorPagination.create(builder -> builder
                 .supportedFields(List.of()).build()).get()).isInstanceOf(IllegalArgumentException.class);

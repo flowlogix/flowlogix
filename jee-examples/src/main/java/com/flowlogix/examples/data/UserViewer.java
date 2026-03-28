@@ -46,7 +46,7 @@ import org.omnifaces.util.Lazy;
 @ViewScoped
 public class UserViewer implements Serializable {
     @Serial
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 2L;
 
     // @start region="simpleLazyDataModelUsage"
     // tag::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""

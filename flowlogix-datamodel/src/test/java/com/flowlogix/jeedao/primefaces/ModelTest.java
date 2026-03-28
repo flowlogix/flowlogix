@@ -103,7 +103,7 @@ class ModelTest implements Serializable {
                 .build();
         when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
         var fm = FilterMeta.builder().field("aaa").filterValue("hello").build();
-        impl.getFilters(Map.of("aaa", fm), cb, rootObject);
+        impl.getFilters(Map.of("aaa", fm), cb, rootObject, false, 0, null);
         verify(rootObject).get("test");
     }
 
@@ -116,7 +116,7 @@ class ModelTest implements Serializable {
                 .build();
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
         var fm = FilterMeta.builder().field("aaa").filterValue(5).build();
-        impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+        impl.getFilters(Map.of("aaa", fm), cb, rootInteger, false, 0, null);
         verify(rootInteger).get("aaa");
     }
 
@@ -161,7 +161,7 @@ class ModelTest implements Serializable {
         });
         var fm = FilterMeta.builder().field("aaa")
                 .filterValue(valueList).matchMode(MatchMode.IN).build();
-        impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+        impl.getFilters(Map.of("aaa", fm), cb, rootInteger, false, 0, null);
         verify(rootInteger).get("aaa");
         if (checkAbsence) {
             verify(integerPath, never()).in(any(List.class));
@@ -180,7 +180,7 @@ class ModelTest implements Serializable {
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
         var fm = FilterMeta.builder().field("aaa")
                 .filterValue(List.of(2, 3)).matchMode(MatchMode.BETWEEN).build();
-        impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+        impl.getFilters(Map.of("aaa", fm), cb, rootInteger, false, 0, null);
         verify(rootInteger).get("aaa");
     }
 
@@ -193,7 +193,7 @@ class ModelTest implements Serializable {
                 .build();
         when(rootInteger.get(any(String.class)).getJavaType()).thenAnswer(a -> Integer.class);
         var fm = FilterMeta.builder().field("aaa").matchMode(MatchMode.GREATER_THAN).filterValue(5L).build();
-        impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+        impl.getFilters(Map.of("aaa", fm), cb, rootInteger, false, 0, null);
         verify(rootInteger).get("aaa");
     }
 
@@ -215,14 +215,14 @@ class ModelTest implements Serializable {
         when(rootObject.get(any(String.class)).getJavaType()).thenAnswer(a -> String.class);
         verify(rootObject).get((String) null);
         var fm = FilterMeta.builder().field("ccc").filterValue("hello").build();
-        impl.getFilters(Map.of("bbb", fm), cb, rootObject);
+        impl.getFilters(Map.of("bbb", fm), cb, rootObject, false, 0, null);
         var fm2 = FilterMeta.of(null, null, false);
-        impl.getFilters(Map.of("bbb", fm2), cb, rootObject);
+        impl.getFilters(Map.of("bbb", fm2), cb, rootObject, false, 0, null);
         var fm3 = FilterMeta.builder().field(GLOBAL_FILTER_KEY).build();
-        impl.getFilters(Map.of("bbb", fm3), cb, rootObject);
+        impl.getFilters(Map.of("bbb", fm3), cb, rootObject, false, 0, null);
         clearFilters.set(true);
         impl.getFilters(Map.of("bbb", FilterMeta.builder().field(GLOBAL_FILTER_KEY)
-                .filterValue("bye").build()), cb, rootObject);
+                .filterValue("bye").build()), cb, rootObject, false, 0, null);
         verify(rootObject).get("ccc");
         verify(rootObject).get(GLOBAL_FILTER_KEY);
         verifyNoMoreInteractions(rootObject);
@@ -372,7 +372,7 @@ class ModelTest implements Serializable {
                 when(UIComponent.getCurrentComponent(any())).thenReturn(null);
                 when(Faces.getApplication().createConverter(Integer.class)).thenReturn(converter);
                 when(converter.getAsObject(any(), any(), eq("xxx"))).thenReturn("aaa");
-                impl.getFilters(Map.of("aaa", fm), cb, rootInteger);
+                impl.getFilters(Map.of("aaa", fm), cb, rootInteger, false, 0, null);
             }
         }
         verify(rootInteger).get("aaa");

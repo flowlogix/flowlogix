@@ -137,7 +137,7 @@ public class JPAModelImpl<TT> implements Serializable {
     @Default
     private final transient @Getter @NonNull UnaryOperator<List<TT>> resultEnricher = identity();
 
-    /// Add cursor pagination support
+    /// Adds cursor pagination support
     @Default
     private final @Getter @NonNull Lazy<CursorPagination<TT>> cursor = CursorPagination.noop();
 
@@ -256,10 +256,6 @@ public class JPAModelImpl<TT> implements Serializable {
         qc.root().alias(JPALazyDataModel.RESULT);
     }
 
-    public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
-        return getFilters(filters, cb, root, false, 0, null);
-    }
-
     public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root,
                                 boolean cursorSupported, int offset, Map<String, SortMeta> sortMeta) {
         FilterData predicates = new FilterDataMap();
@@ -282,6 +278,14 @@ public class JPAModelImpl<TT> implements Serializable {
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
 
+    /// @deprecated
+    /// Use {@link #getFilters(Map, CriteriaBuilder, Root, boolean, int, Map)} instead, which supports cursor pagination
+    @Generated
+    @Deprecated(since = "11.2")
+    public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
+        return getFilters(filters, cb, root, false, 0, null);
+    }
+
     public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root,
                                boolean cursorSupported) {
         var sortData = new SortData(sortCriteria);
@@ -289,9 +293,10 @@ public class JPAModelImpl<TT> implements Serializable {
         return processSortOrder(sortData.getSortOrder(), cb, root, cursorSupported);
     }
 
-    /// @deprecated - use {@link #getSort(Map, CriteriaBuilder, Root, boolean)} instead, which supports cursor pagination
+    /// @deprecated
+    /// Use {@link #getSort(Map, CriteriaBuilder, Root, boolean)} instead, which supports cursor pagination
     @Generated
-    @Deprecated(since = "11.1.2")
+    @Deprecated(since = "11.2")
     public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
         return getSort(sortCriteria, cb, root, false);
     }

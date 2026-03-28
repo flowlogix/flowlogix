@@ -43,15 +43,59 @@ import static com.flowlogix.jeedao.primefaces.CursorPagination.requestedSort;
 import static com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.resolveField0;
 
 /// Interface defining cursor pagination behavior for PrimeFaces JPA LazyDataModel
+/// @param <TT> Entity type for pagination
 public interface CursorPagination<TT> extends Serializable {
-    void save(int offset, TT entity, Map<String, SortMeta> sortMeta);
-    int cursorOffset(int offset);
-    Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root,
-                              Map<String, SortMeta> sortMeta);
-    Order defaultSort(CriteriaBuilder cb, Root<TT> root);
+    /// Checks if cursor pagination is supported for the given filters and sort metadata,
+    /// this method is called before every query execution and should return quickly.
+    /// Implementations can use this method to detect changes in filters or sort order
+    /// and clear cached cursor state as needed
+    /// @param filters the current filter metadata,
+    /// used to determine if cursor pagination is still valid based on supported filters
+    /// @param sortMeta the current sort metadata,
+    /// used to determine if cursor pagination is still valid based on supported sort fields and order
+    /// @return true if cursor pagination is supported and can be applied to the query with the
+    /// given filters and sort metadata, false if cursor pagination should not
     boolean isSupported(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta);
+
+    /// Returns columns that are supported for cursor pagination.
+    /// Implementation must preserve the order of the columns, as the default sort is applied to the first column.
+    /// @return a map of column names to functions that extract the comparable value from the entity for that column.
     Map<String, SerializableFunction<TT, Comparable<?>>> columns();
 
+    /// Calculate the adjusted offset based on cached cursor state
+    /// @return the adjusted offset to be used in the query based on the cached cursor state
+    /// @param offset the original offset requested by the client
+    int cursorOffset(int offset);
+
+    /// Compute the JPA predicate to apply to the query for cursor pagination based on the cached cursor state
+    /// @param offset the original offset requested by the client
+    /// @param cb the CriteriaBuilder to use for constructing the predicate
+    /// @param root the Root of the query, used to resolve the field for the predicate
+    /// @param sortMeta the current sort metadata, used to determine which field is being sorted on for predicate construction
+    /// @return the JPA Predicate to apply to the query for cursor pagination, or null if no predicate is needed
+    Predicate cursorPredicate(int offset, CriteriaBuilder cb, Root<TT> root,
+                              Map<String, SortMeta> sortMeta);
+
+    /// Caches the cursor value for the given offset and entity
+    /// @param offset the offset that was requested by the client
+    /// @param entity the entity being loaded at that offset, used to extract the cursor value
+    /// @param sortMeta the current sort metadata, used to determine which field is being sorted on for cursor extraction
+    void save(int offset, TT entity, Map<String, SortMeta> sortMeta);
+
+    /// Creates a JPA sort {@link Order} to apply to the query when no explicit sort is requested by the client,
+    /// based on the first supported column and configured sort direction
+    /// @param cb the CriteriaBuilder to use for constructing the Order
+    /// @param root the Root of the query, used to resolve the field for the Order
+    /// @return the JPA {@link Order} to apply to the query for default sorting when no explicit sort is requested by the client
+    Order defaultSort(CriteriaBuilder cb, Root<TT> root);
+
+    /// Used to configure columns for cursor pagination.
+    /// First column is always used by default if no sort order is specified by the client,
+    /// so it is recommended to put the most stable and unique column first (e.g. id or createdDate).
+    /// Any fields specified should be indexed, so cursor pagination can be most efficient.
+    /// @param fieldName the name of the column, used to match against requested sort fields from the client
+    /// @param fieldMethod a function that extracts the comparable value from the entity for that field,
+    /// used for caching cursor state and constructing predicates
     record Field<TT>(String fieldName, SerializableFunction<TT, Comparable<?>> fieldMethod) implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
@@ -64,23 +108,44 @@ public interface CursorPagination<TT> extends Serializable {
         }
     }
 
-    /// Returns a no-op implementation of CursorPagination that can be used when cursor pagination is not supported or desired
+    /// Returns a no-op implementation of CursorPagination that can be used when cursor pagination is not supported or desired.
+    /// This is the default behavior of {@link JPALazyDataModel}
+    /// @return a Lazy containing a no-op implementation of CursorPagination
     static <TT> Lazy<CursorPagination<TT>> noop() {
         return new Lazy<>(NoopCursorData::new);
     }
 
+    /// Configuration class for cursor pagination, used to create a CursorPagination instance
+    /// with specified supported fields and options.
+    /// The following are configuration fields:
+    /// * `supportedFields`: a list of fields that are supported for cursor pagination,
+    /// each field consists of a name and a method to extract the comparable value from the entity
+    /// * `conditional`: a supplier that determines whether cursor pagination should be enabled based on dynamic conditions,
+    /// default is always true
+    /// * `defaultDescendingSort`: a flag to indicate if the default sort order for the first supported field
+    /// should be descending, default is false (ascending)
     @Builder
     class Config<TT> implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
+        /**
+         * config builder, just for javadoc
+         * @hidden
+         * @param <TT>
+         */
+        public static class ConfigBuilder<TT> { }
 
-        @NonNull List<Field<TT>> supportedFields;
+        private @NonNull List<Field<TT>> supportedFields;
         @NonNull @Builder.Default
-        Lazy.SerializableSupplier<Boolean> conditional = () -> true;
-        boolean defaultDescendingSort;
+        private Lazy.SerializableSupplier<Boolean> conditional = () -> true;
+        private boolean defaultDescendingSort;
     }
 
     /// Creates a default implementation of cursor pagination
+    /// {@snippet class = "com.flowlogix.demo.jeedao.primefaces.CursorDataModel" region = "cursorUsage"}
+    /// @param configConsumer a function that accepts a ConfigBuilder and returns a {@link Config}
+    /// with the desired configuration for cursor pagination
+    /// @return a Lazy containing a CursorPagination instance configured via provided {@link Config}
     static <TT> Lazy<CursorPagination<TT>> create(Function<Config.ConfigBuilder<TT>, Config<TT>> configConsumer) {
         var config = configConsumer.apply(new Config.ConfigBuilder<>());
         return new Lazy<>(() -> config.conditional.get()
@@ -88,6 +153,16 @@ public interface CursorPagination<TT> extends Serializable {
                 : new NoopCursorData<>());
     }
 
+    /// Calculates the requested sort field from the sort metadata and supported columns,
+    /// with an option to fall back to the default column if no valid sort is requested.
+    /// @param sortMeta the current sort metadata, used to determine which field is being sorted on by the client
+    /// @param columns the supported columns for cursor pagination,
+    /// used to validate the requested sort field and determine the default field
+    /// @param useDefault flag to indicate whether to return the default column (first supported column)
+    /// if no valid sort field is requested by the client
+    /// @return the name of the requested sort field if it is valid and supported
+    /// otherwise the default column if useDefault is true,
+    /// or an empty string if no valid sort field is requested and useDefault is false
     static <TT> String requestedSort(Map<String, SortMeta> sortMeta,
                                      Map<String, SerializableFunction<TT, Comparable<?>>> columns,
                                      boolean useDefault) {
@@ -96,10 +171,11 @@ public interface CursorPagination<TT> extends Serializable {
     }
 }
 
+/// Default implementation of cursor pagination
 @Slf4j
 class CursorData<TT> implements CursorPagination<TT> {
     @Serial
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 1L;
 
     private final Map<String, SerializableFunction<TT, Comparable<?>>> columns;
     private final boolean isDescendingDefault;
@@ -141,14 +217,8 @@ class CursorData<TT> implements CursorPagination<TT> {
 
     @Override
     public boolean isSupported(@NonNull Map<String, FilterMeta> filters, @NonNull Map<String, SortMeta> sortMeta) {
-        if (cursorFilters == null) {
-            cursorFilters = filters;
-            cursorSorts = sortMeta;
-        }
-        if (!cursorFilters.equals(filters) || !cursorSorts.equals(sortMeta)) {
-            cursorFilters = filters;
-            cursorSorts = sortMeta;
-            cursorCache.clear();
+        initializeFilters(filters, sortMeta);
+        if (criteriaChanged(filters, sortMeta)) {
             return false;
         }
         var requestedSort = requestedSort(sortMeta, columns(), false);
@@ -190,6 +260,26 @@ class CursorData<TT> implements CursorPagination<TT> {
 
     static Supplier<Comparable<?>> valueForLogging(Map.Entry<Integer, Comparable<?>> entry) {
         return () -> Optional.ofNullable(entry).map(Map.Entry::getValue).orElse(null);
+    }
+
+    private void initializeFilters(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
+        if (cursorFilters == null) {
+            cursorFilters = filters;
+            if (this.cursorSorts != null) {
+                throw new IllegalStateException("Cursor filters were not initialized, but sorts were - this should never happen");
+            }
+            cursorSorts = sortMeta;
+        }
+    }
+
+    private boolean criteriaChanged(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
+        if (!cursorFilters.equals(filters) || !cursorSorts.equals(sortMeta)) {
+            cursorFilters = filters;
+            cursorSorts = sortMeta;
+            cursorCache.clear();
+            return true;
+        }
+        return false;
     }
 }
 

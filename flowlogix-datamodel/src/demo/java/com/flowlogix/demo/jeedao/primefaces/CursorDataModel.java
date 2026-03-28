@@ -28,8 +28,8 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.util.List;
 
-// @start region="cursorUsage"
-// tag::optimized[] // @replace regex='.*\n' replacement=""
+// @start region="cursor"
+// tag::cursor[] // @replace regex='.*\n' replacement=""
 @Named
 @ViewScoped
 public class CursorDataModel implements Serializable {
@@ -41,12 +41,10 @@ public class CursorDataModel implements Serializable {
     void initialize() {
         // configure cursor pagination by id field
         userModel.initialize(builder -> builder
-                .cursor(CursorPagination.create(config -> config
-                        .supportedFields(List.of(
-                                new Field<>(UserEntity_.id.getName(), UserEntity::getId)))
-                        .build()))
-                .build());
+                .cursor(CursorPagination.create(config -> config.supportedFields(List.of(
+                                new Field<>(UserEntity_.id.getName(), UserEntity::getId)
+                )).build())).build());
     }
 }
-// end::optimized[] // @replace regex='.*\n' replacement=""
+// end::cursor[] // @replace regex='.*\n' replacement=""
 // @end

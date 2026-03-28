@@ -142,7 +142,7 @@ public interface CursorPagination<TT> extends Serializable {
     }
 
     /// Creates a default implementation of cursor pagination
-    /// {@snippet class = "com.flowlogix.demo.jeedao.primefaces.CursorDataModel" region = "cursorUsage"}
+    /// {@snippet class = "com.flowlogix.demo.jeedao.primefaces.CursorDataModel" region = "cursor"}
     /// @param configConsumer a function that accepts a ConfigBuilder and returns a {@link Config}
     /// with the desired configuration for cursor pagination
     /// @return a Lazy containing a CursorPagination instance configured via provided {@link Config}

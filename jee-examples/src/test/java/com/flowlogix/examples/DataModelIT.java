@@ -23,16 +23,19 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitAjax;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -69,6 +72,17 @@ class DataModelIT {
     @FindBy(id = "model1:userIdHeader")
     private WebElement userIdHeader;
 
+    @FindBy(id = "parametersForm:defaultCursorPagination")
+    private WebElement defaultCursorPagination;
+
+    @FindBy(id = "parametersForm:forceEmptyResult")
+    private WebElement forceEmptyResult;
+
+    @BeforeEach
+    void setup() {
+        webDriver.manage().deleteAllCookies();
+    }
+
     @Test
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void checkPage() {
@@ -89,6 +103,42 @@ class DataModelIT {
         guardAjax(fullNameFilterInput).sendKeys(Keys.RETURN);
         waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Lovely Lady");
         assertThat(firstRowFullName.getText()).isEqualTo("Lovely Lady");
+        guardAjax(userIdHeader.findElement(By.className("ui-column-title"))).click();
+        assertThat(firstRowUserId.getText()).isEqualTo("jprimak");
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void checkPageWithCursorPagination() {
+        webDriver.get(baseURL.toString());
+        waitGui(webDriver).until(ExpectedConditions.titleIs("Index"));
+        guardAjax(defaultCursorPagination).click();
+        webDriver.get(baseURL + "view-users");
+        waitGui(webDriver).until(ExpectedConditions.titleIs("View Users"));
+        assertThat(webDriver.getTitle()).isEqualTo("View Users");
+
+        assertThat(firstRowUserId.getText()).isEqualTo("lprimak");
+        WebElement scrollable = firstTable.findElement(By.className("ui-datatable-scrollable-body"));
+        jsExecutor.executeScript("arguments[0].scroll(0, 500);", scrollable);
+        waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Lovely Daughter");
+        assertThat(firstRowFullName.getText()).isEqualTo("Lovely Daughter");
+        jsExecutor.executeScript("arguments[0].scroll(0, 0);", scrollable);
+        waitAjax(webDriver).until().element(firstRowFullName).text().equalTo("Lenny Primak");
+        assertThat(firstRowFullName.getText()).isEqualTo("Lenny Primak");
+    }
+
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void checkPageWithCursorPaginationAndEmptyResult() {
+        webDriver.get(baseURL.toString());
+        waitGui(webDriver).until(ExpectedConditions.titleIs("Index"));
+        guardAjax(defaultCursorPagination).click();
+        guardAjax(forceEmptyResult).click();
+        webDriver.get(baseURL + "view-users");
+        waitGui(webDriver).until(ExpectedConditions.titleIs("View Users"));
+        assertThat(webDriver.getTitle()).isEqualTo("View Users");
+
+        assertThatThrownBy(() -> firstRowUserId.getText()).isInstanceOf(NoSuchElementException.class);
     }
 
     @Deployment(name = DEPLOYMENT_DEV_MODE)

@@ -376,6 +376,7 @@ Developers can transform any XML file from the archive by using the generic `man
 === FlowLogix PrimeFaces DataTable Lazy Data Model backed by JPA
 .An easier alternative to PrimeFaces JPA Lazy Data model
 PrimeFaces provides a convenient https://www.javadoc.io/doc/org.primefaces/primefaces/latest/org/primefaces/model/JpaLazyDataModel.html[wrapper^] for the Lazy DataModel. However, FlowLogix `JPALazyDataModel` predates it and therefore has a big "head start" in ease of use, features and compactness. Biggest advantage is ability to `@Inject` the model via CDI. The model utilizes `JPAFinder` classes and methodology to make JPA lazy data model easier to use, with a lot less code and better design. The model not require inheritance and problems associated with it. In addition to its ease of use advantages, `JPALazyDataModel` is fully serializable, making its use trivial in clustered sessions, like the ones in Payara and Hazelcast. To make it even easier to use and configure, model's initialization lambdas do not have to be serializable and 'just work' out-of-the-box without paying any special attention to their context.
+
 [source,xhtml]
 .userviewer.xhtml
 ----
@@ -393,6 +394,27 @@ include::../../jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer
 https://github.com/flowlogix/flowlogix/tree/main/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
 
 Above we created a model with case-insensitive filtering. Model can be optionally initialized further inside `@PostConstruct` using `initialize()` method and builder pattern (see below)
+
+[[section-jpa-lazymodel-cursor-pagination]]
+==== Cursor Pagination (FlowLogix DataModel 11.2 or higher)
+When using `JPALazyDataModel` with large datasets, cursor pagination can be used instead of offset pagination for better performance. Cursor pagination is also available with infinite scroll. To use cursor pagination, add `cursor(CursorPagination.create(List<Field>, ...))` to the Model's initializer. Order of fields matter, as the first field considered the default cursor. When no sort criteria is specified by the user, the first field specified is used to sort the data, which is required for cursor pagination to work. When the user sorts by a different field, that field may be used as the cursor instead, but only if specified by supported fields. If a user sorts by a field that is unsupported by cursor pagination, the model falls back to offset pagination. Cursor pagination works best when the fields used for sorting are indexed in the database.
+
+===== How Cursor Pagination works
+Cursor pagination works by keeping track of the last seen record's unique identifier (the cursor) and using it as additional criteria to fetch the next set of records. This approach avoids performance issues associated with offset pagination, which can become slower as the offset increases. With cursor pagination, the database can efficiently retrieve the next set of records based on the last seen record, resulting in faster response times, especially for large datasets. Each time a new page of data is received, the last cursor value is cached. Take care of keeping the cursor values small, such as an integer, UUID or a short string to avoid using too much memory for the cursor cache. Cache eviction may be configured via `evictCursor*` and `*CursorWindowSize` parameters.
+
+NOTE: High-priority application sort is not supported with cursor pagination, and is ignored when cursor pagination is enabled. This is because cursor pagination requires the high-priority sort to be the same as the cursor field, and changing it would cause unexpected behavior.
+
+[source,java]
+.UserViewer.java - Cursor Pagination example
+----
+@Named
+@ViewScoped
+public class UserViewer implements Serializable {
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/CursorDataModel.java[tags=usage]
+----
+https://github.com/flowlogix/flowlogix/tree/main/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
+
+Above, cursor pagination is used, if the data is either unsorted or sorted by `UserEntity.id` field.
 
 [source,java]
 .UserViewer.java - Direct model creation
@@ -416,6 +438,7 @@ During direct creation, `JPALazyDataModel` only requires `entityClass` to work, 
 * sorter: Apply additional or replacement sort criteria
 * filter: Apply additional or replacement filter criteria
 * optimizer: Apply additional customizations to queries, such as JPA hints, works together with `JPAFinder`
+* cursor: Use cursor pagination instead of offset pagination for better performance with large datasets
 * resultEnricher: Apply transformation to the results of the query, such as adding or modifying resulting rows displayed by the model
 * converter: `Function` that converts String representation of a primary key into a primary key object. Needed only if the default is insufficient.
 * keyConverter: `Function` that converts an entity object into it's primary key in `String` form. Needed only if the default is insufficient.

@@ -50,6 +50,10 @@ import org.primefaces.model.SortMeta;
  * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.BasicDataModel" region = "basicUsage"}
  *
  * <p>
+ * <em>Cursor Pagination Example:</em>
+ * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.CursorDataModel" region = "cursor"}
+ *
+ * <p>
  * <em>Direct Creation Example:</em>
  * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.DirectCreationDataModel" region = "basicUsage"}
 

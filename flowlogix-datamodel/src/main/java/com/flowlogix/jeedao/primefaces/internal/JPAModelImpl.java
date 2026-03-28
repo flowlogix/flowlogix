@@ -18,6 +18,7 @@ package com.flowlogix.jeedao.primefaces.internal;
 import com.flowlogix.api.dao.JPAFinder.QueryCriteria;
 import com.flowlogix.api.dao.JPAFinderHelper;
 import com.flowlogix.jeedao.DaoHelper;
+import com.flowlogix.jeedao.primefaces.CursorPagination;
 import com.flowlogix.jeedao.primefaces.Filter;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Filter.FilterColumnData;
@@ -42,9 +43,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.convert.Converter;
 import jakarta.persistence.EntityManager;
@@ -54,6 +57,7 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Builder;
@@ -80,10 +84,11 @@ import org.primefaces.util.Constants;
  * @hidden
  * @param <TT>
  */
-@Builder
 @Slf4j
+@Builder
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class JPAModelImpl<TT> implements Serializable {
-    private static final long serialVersionUID = 5L;
+    private static final long serialVersionUID = 6L;
     /**
      * Return entity manager to operate on
      */
@@ -132,6 +137,10 @@ public class JPAModelImpl<TT> implements Serializable {
     @Default
     private final transient @Getter @NonNull UnaryOperator<List<TT>> resultEnricher = identity();
 
+    /// Adds cursor pagination support
+    @Default
+    private final @Getter @NonNull Lazy<CursorPagination<TT>> cursor = CursorPagination.noop();
+
     /**
      * Specifies whether String filters are case-sensitive
      */
@@ -161,7 +170,7 @@ public class JPAModelImpl<TT> implements Serializable {
      * @param <TT>
      */
     public record BuilderInitializer<TT>(@NonNull BuilderFunction<TT> builder,
-                                             PartialBuilderConsumer<TT> partialBuilder) implements Serializable { }
+                                         PartialBuilderConsumer<TT> partialBuilder) implements Serializable { }
 
     /**
      * @hidden
@@ -201,9 +210,17 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        return resultEnricher.apply(optimizer.apply(
-                jpaFinder.get().findRange(Integer.max(first, 0), Integer.max(first + pageSize, 1),
-                        qc -> addToCriteria(qc, filters, sortMeta))).getResultList());
+        int sanitizedFirst = Integer.max(first, 0);
+        boolean cursorSupported = cursor.get().isSupported(filters, sortMeta);
+        int cursorFirst = cursorSupported ? cursor.get().cursorOffset(sanitizedFirst) : sanitizedFirst;
+        List<TT> result = resultEnricher.apply(optimizer.apply(
+                jpaFinder.get().findRange(cursorFirst, Integer.max(cursorFirst + pageSize, 1),
+                        qc -> addToCriteria(qc, filters, sortMeta,
+                                cursorSupported, sanitizedFirst))).getResultList());
+        if (cursorSupported && !result.isEmpty()) {
+            cursor.get().save(sanitizedFirst + result.size(), result.get(result.size() - 1), sortMeta);
+        }
+        return result;
     }
 
     public Supplier<EntityManager> getEntityManager() {
@@ -220,11 +237,8 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     private JPAFinderHelper<TT> createJPAFinder() {
-        if (entityManager != null) {
-            return new DaoHelper<>(entityManager, entityClass);
-        } else {
-            return new DaoHelper<>(findEntityManager(entityManagerQualifiers), entityClass);
-        }
+        return new DaoHelper<>(Objects.requireNonNullElseGet(entityManager,
+                () -> findEntityManager(entityManagerQualifiers)), entityClass);
     }
 
     private Function<String, ?> createConverter() {
@@ -235,13 +249,15 @@ public class JPAModelImpl<TT> implements Serializable {
         return entry -> getPrimaryKey(Optional.of(entry)).toString();
     }
 
-    private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        qc.query().where(getFilters(filters, qc.builder(), qc.root()));
-        qc.query().orderBy(getSort(sortMeta, qc.builder(), qc.root()));
+    private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta,
+                               boolean cursorSupported, int offset) {
+        qc.query().where(getFilters(filters, qc.builder(), qc.root(), cursorSupported, offset, sortMeta));
+        qc.query().orderBy(getSort(sortMeta, qc.builder(), qc.root(), cursorSupported));
         qc.root().alias(JPALazyDataModel.RESULT);
     }
 
-    public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
+    public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root,
+                                boolean cursorSupported, int offset, Map<String, SortMeta> sortMeta) {
         FilterData predicates = new FilterDataMap();
         filters.values().forEach(filterMeta -> {
             if (filterMeta.isGlobalFilter()) {
@@ -254,14 +270,35 @@ public class JPAModelImpl<TT> implements Serializable {
             }
         });
         filter.filter(predicates, cb, root);
-        return cb.and(predicates.values().stream().map(FilterColumnData::getPredicate)
+        Stream<Predicate> filterPredicates = predicates.values().stream()
+                .map(FilterColumnData::getPredicate);
+        return cb.and(Stream.concat(filterPredicates, offset != 0 && cursorSupported
+                        ? Stream.of(cursor.get().cursorPredicate(offset, cb, root, sortMeta))
+                        : Stream.empty())
                 .filter(Objects::nonNull).toArray(Predicate[]::new));
     }
 
-    public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
+    /// @deprecated
+    /// Use {@link #getFilters(Map, CriteriaBuilder, Root, boolean, int, Map)} instead, which supports cursor pagination
+    @Generated
+    @Deprecated(since = "11.2")
+    public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
+        return getFilters(filters, cb, root, false, 0, null);
+    }
+
+    public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root,
+                               boolean cursorSupported) {
         var sortData = new SortData(sortCriteria);
         sorter.sort(sortData, cb, root);
-        return processSortOrder(sortData.getSortOrder(), cb, root);
+        return processSortOrder(sortData.getSortOrder(), cb, root, cursorSupported);
+    }
+
+    /// @deprecated
+    /// Use {@link #getSort(Map, CriteriaBuilder, Root, boolean)} instead, which supports cursor pagination
+    @Generated
+    @Deprecated(since = "11.2")
+    public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
+        return getSort(sortCriteria, cb, root, false);
     }
 
     /**
@@ -274,6 +311,11 @@ public class JPAModelImpl<TT> implements Serializable {
      * @param <YY> expression type
      */
     public <YY> Expression<YY> resolveField(Root<TT> root, String fieldName) {
+        return resolveField0(root, fieldName);
+    }
+
+    /// static version of {@link #resolveField}
+    public static <YY, TT> Expression<YY> resolveField0(Root<TT> root, String fieldName) {
         Join<?, ?> join = null;
         // traverse all dotted fields, and join each
         while (fieldName.contains(".")) {
@@ -464,31 +506,55 @@ public class JPAModelImpl<TT> implements Serializable {
                 cb.lessThanOrEqualTo(objectExpression, iterBetween.next()));
     }
 
-    @SuppressWarnings("MissingSwitchDefault")
-    private List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta, CriteriaBuilder cb, Root<TT> root) {
+    List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta,
+                                 CriteriaBuilder cb, Root<TT> root, boolean cursorSupported) {
         Deque<Order> sortMetaOrdering = new ArrayDeque<>();
+        AtomicBoolean userSortRequested = new AtomicBoolean();
         sortMeta.values().forEach(order -> {
             if (order.getRequestedSortMeta() != null) {
-                if (order.getRequestedSortMeta().getOrder() == SortOrder.ASCENDING) {
-                    sortMetaOrdering.add(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
-                } else if (order.getRequestedSortMeta().getOrder() == SortOrder.DESCENDING) {
-                    sortMetaOrdering.add(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
-                }
+                processUserSortOrder(cb, root, order).ifPresent(sortOrder -> {
+                    userSortRequested.set(true);
+                    sortMetaOrdering.add(sortOrder);
+                });
             } else if (order.getApplicationSort() != null) {
-                if (order.isHighPriority()) {
-                    sortMetaOrdering.addFirst(order.getApplicationSort());
-                } else {
-                    sortMetaOrdering.add(order.getApplicationSort());
-                }
+                processApplicationSortOrder(cursorSupported, order, sortMetaOrdering);
             } else {
                 throw new IllegalStateException("Neither application sort request, nor UI sort request is available");
             }
         });
+        if (cursorSupported && !userSortRequested.get()) {
+            sortMetaOrdering.addFirst(cursor.get().defaultSort(cb, root));
+        }
         return sortMetaOrdering.stream().toList();
     }
 
+    static void processApplicationSortOrder(boolean cursorSupported, MergedSortOrder order,
+                                            Deque<Order> sortMetaOrdering) {
+        if (order.isHighPriority()) {
+            if (cursorSupported) {
+                log.warn("""
+                        High priority application sort {} is not supported with cursor pagination,
+                        ignoring application sort for this query""",
+                        order.getApplicationSort());
+            } else {
+                sortMetaOrdering.addFirst(order.getApplicationSort());
+            }
+        } else {
+            sortMetaOrdering.add(order.getApplicationSort());
+        }
+    }
+
+    private Optional<Order> processUserSortOrder(CriteriaBuilder cb, Root<TT> root, MergedSortOrder order) {
+        if (order.getRequestedSortMeta().getOrder() == SortOrder.ASCENDING) {
+            return Optional.of(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
+        } else if (order.getRequestedSortMeta().getOrder() == SortOrder.DESCENDING) {
+            return Optional.of(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
+        }
+        return Optional.empty();
+    }
+
     @SneakyThrows(ReflectiveOperationException.class)
-    private Object getPrimaryKey(Optional<TT> entry) {
+    Object getPrimaryKey(Optional<TT> entry) {
         return jpaFinder.get().getEntityManager().get().getEntityManagerFactory().getPersistenceUnitUtil()
                 .getIdentifier(entry.orElse(ConstructorUtils.invokeConstructor(getEntityClass())));
     }

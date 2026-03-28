@@ -17,12 +17,18 @@ package com.flowlogix.examples.data;
 
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
+import com.flowlogix.examples.ui.LazyModelParameters;
+import com.flowlogix.jeedao.primefaces.CursorPagination;
+import com.flowlogix.jeedao.primefaces.CursorPagination.Field;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.jeedao.primefaces.LazyModelConfig;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
+import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -30,6 +36,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.Getter;
+import org.omnifaces.util.Lazy;
 
 /**
  *
@@ -38,7 +45,8 @@ import lombok.Getter;
 @Named
 @ViewScoped
 public class UserViewer implements Serializable {
-    private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 2L;
 
     // @start region="simpleLazyDataModelUsage"
     // tag::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
@@ -50,11 +58,17 @@ public class UserViewer implements Serializable {
     // end::simpleLazyDataModelUsage[] // @replace regex='.*\n' replacement=""
     // @end
 
-    /**
-     * Enable sort and filter with {@link jakarta.annotation.PostConstruct} annotation
-     */
+    @Inject
+    LazyModelParameters lazyModelParameters;
+
+    @PostConstruct
     void initialize() {
-        lazyModel.initialize(builder -> builder.sorter(UserViewer::sorter).filter(UserViewer::filter).build());
+        lazyModel.initialize(builder -> builder
+                .sorter(this::sorter)
+                .filter(this::filter)
+                .resultEnricher(this::forceEmptyResult)
+                .cursor(cursorPagination())
+                .build());
     }
 
     public String getUsers() {
@@ -63,12 +77,29 @@ public class UserViewer implements Serializable {
                 .map(UserEntity::getFullName).collect(Collectors.joining(", "));
     }
 
-    private static void sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
-        sortData.applicationSort(UserEntity_.address.getName(), sortMeta -> cb.asc(root.get(UserEntity_.address)));
+    private void sorter(SortData sortData, CriteriaBuilder cb, Root<UserEntity> root) {
+        if (lazyModelParameters.isSortingAndFiltering()) {
+            sortData.applicationSort(UserEntity_.address.getName(), sortMeta -> cb.asc(root.get(UserEntity_.address)));
+        }
     }
 
-    private static void filter(FilterData filterData, CriteriaBuilder cb, Root<UserEntity> root) {
-        filterData.replaceFilter(UserEntity_.zipCode.getName(),
-                (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value));
+    private void filter(FilterData filterData, CriteriaBuilder cb, Root<UserEntity> root) {
+        if (lazyModelParameters.isSortingAndFiltering()) {
+            filterData.replaceFilter(UserEntity_.zipCode.getName(),
+                    (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value));
+        }
+    }
+
+    private Lazy<CursorPagination<UserEntity>> cursorPagination() {
+        return CursorPagination.create(builder -> builder
+                .supportedFields(List.of(new Field<>(UserEntity_.id.getName(), UserEntity::getId)))
+                .conditional(() -> lazyModelParameters.isDefaultCursorPagination()).build());
+    }
+
+    private List<UserEntity> forceEmptyResult(List<UserEntity> users) {
+        if (lazyModelParameters.isForceEmptyResult()) {
+            return List.of();
+        }
+        return users;
     }
 }

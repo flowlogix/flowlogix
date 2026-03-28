@@ -33,6 +33,7 @@ import java.util.List;
 @Named
 @ViewScoped
 public class CursorDataModel implements Serializable {
+    // tag::usage[] // @replace regex='.*\n' replacement=""
     @Inject
     @Getter
     JPALazyDataModel<UserEntity> userModel;
@@ -46,5 +47,6 @@ public class CursorDataModel implements Serializable {
                 )).build())).build());
     }
 }
+// end::usage[] // @replace regex='.*\n' replacement=""
 // end::cursor[] // @replace regex='.*\n' replacement=""
 // @end

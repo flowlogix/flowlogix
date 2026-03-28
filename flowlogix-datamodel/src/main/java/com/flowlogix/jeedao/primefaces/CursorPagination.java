@@ -194,6 +194,7 @@ class CursorData<TT> implements CursorPagination<TT> {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
     private final Map<String, SerializableFunction<TT, Comparable<?>>> columns;
     private final boolean isDescendingDefault;
     private final boolean evictCursorCacheBehind;
@@ -201,7 +202,6 @@ class CursorData<TT> implements CursorPagination<TT> {
     private final int behindCursorWindowSize;
     private final int aheadCursorWindowSize;
 
-    final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
     private Map<String, FilterMeta> cursorFilters;
     private Map<String, SortMeta> cursorSorts;
     private boolean isDescendingState;

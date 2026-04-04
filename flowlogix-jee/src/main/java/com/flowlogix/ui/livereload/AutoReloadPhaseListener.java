@@ -90,7 +90,13 @@ public class AutoReloadPhaseListener implements PhaseListener {
                         const ws = new WebSocket('%s');
                         ws.onopen = () => ws.send('%s');
                         ws.onmessage = e => {
-                            if (e.data === 'reload') location.reload();
+                            if (e.data === 'reload') {
+                                if (typeof OmniFaces !== 'undefined' && typeof OmniFaces.Unload !== 'undefined') {
+                                    OmniFaces.Unload.disable()
+                                    console.log('OmniFaces @ViewScoped Unload Disabled')
+                                }
+                                location.reload();
+                            }
                             if (e.data === 'shutdown') ws.close();
                         };
                         ws.onclose = () => setTimeout(connectWS, 2000);

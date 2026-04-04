@@ -92,10 +92,14 @@ public class AutoReloadPhaseListener implements PhaseListener {
                         ws.onmessage = e => {
                             if (e.data === 'reload') {
                                 if (typeof OmniFaces !== 'undefined' && typeof OmniFaces.Unload !== 'undefined') {
+                                    window.dispatchEvent(new Event('beforeunload'));
+                                    console.log('OmniFaces @ViewScoped Unload triggered')
                                     OmniFaces.Unload.disable()
-                                    console.log('OmniFaces @ViewScoped Unload Disabled')
+                                    console.log('Further OmniFaces @ViewScoped Unload is Disabled')
+                                    setTimeout(() => { location.reload(); }, 50);
+                                } else {
+                                    location.reload();
                                 }
-                                location.reload();
                             }
                             if (e.data === 'shutdown') ws.close();
                         };

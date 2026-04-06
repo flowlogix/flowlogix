@@ -64,6 +64,7 @@ class DataModelBackendIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void qualifiedDataModel() {
         doQualifiedDataModel(models.getQualified().getUserModel());
+        doQualifiedDataModel(models.getQualified2().getUserModel());
     }
 
     @SuppressWarnings("MagicNumber")

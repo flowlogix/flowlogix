@@ -15,7 +15,9 @@
  */
 package com.flowlogix.jeedao.primefaces;
 
+import com.flowlogix.jeedao.EntityManagerSelector;
 import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
@@ -23,6 +25,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * CDI Injection Support, Do not use directly
@@ -35,6 +38,7 @@ class DataModelProducer {
     @Produces
     @Default
     @LazyModelConfig
+    @EntityManagerSelector(Any.class)
     static <TT> JPALazyDataModel<TT> produceDataModelWithConfig(InjectionPoint injectionPoint) {
         var parameterizedType = (ParameterizedType) injectionPoint.getType();
         @SuppressWarnings("unchecked")
@@ -42,12 +46,16 @@ class DataModelProducer {
         var config = injectionPoint.getQualifiers().stream()
                 .filter(c -> c.annotationType().isAssignableFrom(LazyModelConfig.class))
                 .map(LazyModelConfig.class::cast).findFirst().orElse(null);
+        var selector = injectionPoint.getQualifiers().stream()
+                .filter(c -> c.annotationType().isAssignableFrom(EntityManagerSelector.class))
+                .map(EntityManagerSelector.class::cast).findFirst().orElse(null);
         return new JPALazyDataModel<TT>().partialInitialize(builder -> {
             builder.entityClass(entityClass);
             if (config != null) {
                 builder.caseSensitiveFilter(!config.caseInsensitive());
                 builder.filterCaseConversion(config.filterCaseConversion());
-                builder.entityManagerQualifiers(List.of(config.entityManagerSelector()));
+                builder.entityManagerQualifiers(selector == null ? List.of(config.entityManagerSelector())
+                        : Stream.concat(Stream.of(config.entityManagerSelector()), Stream.of(selector.value())).toList());
                 builder.wildcardSupport(config.wildcardSupport());
             }
         });

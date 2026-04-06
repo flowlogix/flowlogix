@@ -34,6 +34,7 @@ import org.primefaces.model.FilterMeta;
 import org.primefaces.model.MatchMode;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 @PayaraServerLifecycle
@@ -64,6 +65,9 @@ class DataModelBackendIT {
     @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
     void qualifiedDataModel() {
         doQualifiedDataModel(models.getQualified().getUserModel());
+        doQualifiedDataModel(models.getQualified2().getUserModel());
+        assertThatThrownBy(() -> doQualifiedDataModel(models.getQualified3().getUserModel()))
+                .message().startsWith("Unable to find EntityManager");
     }
 
     @SuppressWarnings("MagicNumber")

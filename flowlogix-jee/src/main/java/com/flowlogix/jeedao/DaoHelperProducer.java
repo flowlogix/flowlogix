@@ -17,9 +17,9 @@ package com.flowlogix.jeedao;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
@@ -35,24 +35,15 @@ import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 @NoArgsConstructor
 class DaoHelperProducer {
     @Produces
-    public static <TT> DaoHelper<TT>
-    produceDaoHelper(InjectionPoint injectionPoint) {
-        return doProduceDaoHelper(injectionPoint, List.of());
-    }
-
-    @Produces
+    @Default
     @EntityManagerSelector(Any.class)
     public static <TT> DaoHelper<TT>
     produceDaoHelperEntityManagerSelector(InjectionPoint injectionPoint) {
         var selector = injectionPoint.getQualifiers().stream()
                 .filter(c -> c.annotationType().isAssignableFrom(EntityManagerSelector.class))
-                .map(EntityManagerSelector.class::cast).findFirst().get();
-        return doProduceDaoHelper(injectionPoint, Arrays.asList(selector.value()));
-    }
-
-    private static <TT> DaoHelper<TT>
-    doProduceDaoHelper(InjectionPoint injectionPoint, List<Class<? extends Annotation>> qualifiers) {
-        var entityManagerSupplier = findEntityManager(qualifiers);
+                .map(EntityManagerSelector.class::cast).findFirst().orElse(null);
+        var entityManagerSupplier = findEntityManager(
+                selector == null ? List.of() : Arrays.asList(selector.value()));
         var parameterizedType = (ParameterizedType) injectionPoint.getType();
         @SuppressWarnings("unchecked")
         var entityClass = (Class<TT>) parameterizedType.getActualTypeArguments()[0];

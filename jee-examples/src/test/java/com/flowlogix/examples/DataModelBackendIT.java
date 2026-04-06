@@ -67,7 +67,7 @@ class DataModelBackendIT {
         doQualifiedDataModel(models.getQualified().getUserModel());
         doQualifiedDataModel(models.getQualified2().getUserModel());
         assertThatThrownBy(() -> doQualifiedDataModel(models.getQualified3().getUserModel()))
-                .message().contains("Duplicate qualifiers");
+                .message().startsWith("Unable to find EntityManager");
     }
 
     @SuppressWarnings("MagicNumber")

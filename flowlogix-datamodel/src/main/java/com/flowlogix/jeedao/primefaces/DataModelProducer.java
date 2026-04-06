@@ -57,6 +57,8 @@ class DataModelProducer {
                 builder.entityManagerQualifiers(selector == null ? List.of(config.entityManagerSelector())
                         : Stream.concat(Stream.of(config.entityManagerSelector()), Stream.of(selector.value())).toList());
                 builder.wildcardSupport(config.wildcardSupport());
+            } else {
+                builder.entityManagerQualifiers(selector == null ? List.of() : List.of(selector.value()));
             }
         });
     }

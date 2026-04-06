@@ -197,7 +197,8 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
      */
     public static SerializableSupplier<EntityManager>
     findEntityManager(@NonNull List<Class<? extends Annotation>> qualifiers) {
-        var qualifierInstances = qualifiers.stream().map(value -> (Annotation) () -> value).toList();
+        var qualifierInstances = qualifiers.stream()
+                .map(value -> (Annotation & Serializable) () -> value).toList();
         return () -> Optional.ofNullable(Beans.getReference(EntityManager.class,
                 qualifierInstances.toArray(Annotation[]::new))).orElseThrow(() -> new IllegalStateException(
                 String.format("Unable to find EntityManager with qualifiers: %s",

@@ -92,7 +92,7 @@ public class UserViewer implements Serializable {
 
     private Lazy<CursorPagination<UserEntity>> cursorPagination() {
         return CursorPagination.create(builder -> builder
-                .supportedFields(List.of(new Field<>(UserEntity_.id.getName(), UserEntity::getId)))
+                .supportedFields(List.of(new Field<>(() -> UserEntity_.id.getName(), UserEntity::getId)))
                 .conditional(() -> lazyModelParameters.isDefaultCursorPagination()).build());
     }
 

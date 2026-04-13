@@ -94,17 +94,16 @@ public interface CursorPagination<TT> extends Serializable {
     /// First column is always used by default if no sort order is specified by the client,
     /// so it is recommended to put the most stable and unique column first (e.g. id or createdDate).
     /// Any fields specified should be indexed, so cursor pagination can be most efficient.
-    /// @param fieldName the name of the column, used to match against requested sort fields from the client
+    /// @param fieldName supplies the name of the column, used to match against requested sort fields from the client
     /// @param fieldMethod a function that extracts the comparable value from the entity for that field,
     /// used for caching cursor state and constructing predicates
-    record Field<TT>(String fieldName, SerializableFunction<TT, Comparable<?>> fieldMethod) implements Serializable {
+    record Field<TT>(Lazy.SerializableSupplier<String> fieldName,
+                     SerializableFunction<TT, Comparable<?>> fieldMethod) implements Serializable {
         @Serial
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
         public Field {
-            if (Objects.requireNonNull(fieldName, "fieldName cannot be null").isEmpty()) {
-                throw new IllegalArgumentException("fieldName cannot be empty");
-            }
+            Objects.requireNonNull(fieldName, "fieldName cannot be null");
             Objects.requireNonNull(fieldMethod, "fieldMethod cannot be null");
         }
     }
@@ -195,7 +194,7 @@ class CursorData<TT> implements CursorPagination<TT> {
     private static final long serialVersionUID = 1L;
 
     final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
-    private final Map<String, SerializableFunction<TT, Comparable<?>>> columns;
+    private final Lazy<Map<String, SerializableFunction<TT, Comparable<?>>>> columns;
     private final boolean isDescendingDefault;
     private final boolean evictCursorCacheBehind;
     private final boolean evictCursorCacheAhead;
@@ -212,10 +211,7 @@ class CursorData<TT> implements CursorPagination<TT> {
         if (columns.isEmpty()) {
             throw new IllegalArgumentException("Cursor Pagination requires at least one column");
         }
-        this.columns = Collections.unmodifiableMap(columns.stream()
-                .collect(Collectors.toMap(Field::fieldName, Field::fieldMethod,
-                (v1, v2) -> v1,
-                LinkedHashMap::new)));
+        this.columns = new Lazy<>(() -> createColumns(List.copyOf(columns)));
         this.isDescendingDefault = isDescendingDefault;
         this.evictCursorCacheBehind = evictCursorCacheBehind;
         this.evictCursorCacheAhead = evictCursorCacheAhead;
@@ -225,11 +221,11 @@ class CursorData<TT> implements CursorPagination<TT> {
 
     @Override
     public Map<String, SerializableFunction<TT, Comparable<?>>> columns() {
-        return columns;
+        return columns.get();
     }
 
     public void save(int offset, TT entity, Map<String, SortMeta> sortMeta) {
-        var value = columns().get(requestedSort(sortMeta, columns, true)).apply(entity);
+        var value = columns().get(requestedSort(sortMeta, columns(), true)).apply(entity);
         log.debug("Saving cursor for offset {} and entity id {}", offset, value);
         cursorCache.put(offset, value);
         if (evictCursorCacheBehind) {
@@ -320,6 +316,19 @@ class CursorData<TT> implements CursorPagination<TT> {
             return true;
         }
         return false;
+    }
+
+    private static <TT> Map<String, SerializableFunction<TT, Comparable<?>>> createColumns(List<Field<TT>> columns) {
+        return Collections.unmodifiableMap(columns.stream()
+                .collect(Collectors.toMap(field -> {
+                            String name = field.fieldName().get();
+                            if (Objects.requireNonNull(name, "Field name cannot be null").isEmpty()) {
+                                throw new IllegalArgumentException("Field name cannot be empty");
+                            }
+                            return name;
+                        }, Field::fieldMethod,
+                        (v1, v2) -> v1,
+                        LinkedHashMap::new)));
     }
 }
 

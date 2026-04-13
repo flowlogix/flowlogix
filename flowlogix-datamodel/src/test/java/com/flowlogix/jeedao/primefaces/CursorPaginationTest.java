@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class CursorPaginationTest {
     static class Entity { }
     CursorPagination<Entity> cursor = CursorPagination.<Entity>create(builder ->
-            builder.supportedFields(List.of(new Field<>("id", e -> "one")))
+            builder.supportedFields(List.of(new Field<>(() -> "id", e -> "one")))
                     .defaultDescendingSort(true).build()).get();
 
     @Mock
@@ -48,7 +48,7 @@ class CursorPaginationTest {
     @Test
     void save() {
         var rawCursor = CursorPagination.<Entity>create(builder ->
-                builder.supportedFields(List.of(new Field<>("id", e -> "one"))).build()).get();
+                builder.supportedFields(List.of(new Field<>(() -> "id", e -> "one"))).build()).get();
         rawCursor.save(2, new Entity(), Map.of());
         assertThat(rawCursor.cursorOffset(1)).isEqualTo(1);
         assertThat(rawCursor.cursorOffset(3)).isEqualTo(1);
@@ -58,7 +58,7 @@ class CursorPaginationTest {
     @Test
     void saveWithEvictionBehind() {
         var rawCursor = CursorPagination.<Entity>create(builder ->
-                builder.supportedFields(List.of(new Field<>("id", e -> "one")))
+                builder.supportedFields(List.of(new Field<>(() -> "id", e -> "one")))
                         .evictCursorCacheBehind(true).behindCursorWindowSize(-1).build()).get();
         rawCursor.save(2, new Entity(), Map.of());
         CursorData<Entity> data = (CursorData<Entity>) rawCursor;
@@ -68,7 +68,7 @@ class CursorPaginationTest {
     @Test
     void saveWithEvictionAhead() {
         var rawCursor = CursorPagination.<Entity>create(builder ->
-                builder.supportedFields(List.of(new Field<>("id", e -> "one")))
+                builder.supportedFields(List.of(new Field<>(() -> "id", e -> "one")))
                         .evictCursorCacheAhead(true).aheadCursorWindowSize(-1).build()).get();
         rawCursor.save(2, new Entity(), Map.of());
         CursorData<Entity> data = (CursorData<Entity>) rawCursor;
@@ -80,7 +80,7 @@ class CursorPaginationTest {
         assertThatThrownBy(() -> CursorPagination.create(builder -> builder
                 .supportedFields(List.of()).build()).get()).isInstanceOf(IllegalArgumentException.class);
         CursorPagination.create(builder -> builder
-                .supportedFields(List.of(new Field<>("hello", e -> "one"))).build()).get()
+                .supportedFields(List.of(new Field<>(() -> "hello", e -> "one"))).build()).get()
                 .save(0, new Entity(), Map.of());
     }
 
@@ -173,14 +173,14 @@ class CursorPaginationTest {
     @Test
     void duplicateColumn() {
         assertThat(CursorPagination.create(builder -> builder
-                .supportedFields(List.of(new Field<>("id", e -> "one"),
-                new Field<>("id", e -> "two"))).build()).get().columns()).hasSize(1);
+                .supportedFields(List.of(new Field<>(() -> "id", e -> "one"),
+                new Field<>(() -> "id", e -> "two"))).build()).get().columns()).hasSize(1);
     }
 
     @Test
     void emptyColumn() {
         assertThatThrownBy(() -> CursorPagination.create(builder -> builder
-                .supportedFields(List.of(new Field<>("", e -> "one"))).build()))
+                .supportedFields(List.of(new Field<>(() -> "", e -> "one"))).build()).get().columns())
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

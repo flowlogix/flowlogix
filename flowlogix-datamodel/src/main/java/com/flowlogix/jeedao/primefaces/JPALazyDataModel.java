@@ -181,6 +181,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     @Override
     @Transactional
     public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
+        cachedQuery = new CachedQuery(first, sortBy, filterBy);
         return impl.findRows(first, pageSize, filterBy, sortBy);
     }
 

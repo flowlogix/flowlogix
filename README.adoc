@@ -37,6 +37,8 @@ and https://javadoc.flowlogix.com/datamodel-apidocs[PrimeFaces Lazy Data Model^]
 
 === News
 
+- 4/24/2026: Version 11.4 was released, removing serialization requirements for Entity / Data objects in JPALazyDataModel, even with distributed sessions
+- 3/28/2026: Version 11.2 was released with Cursor Pagination for JPALazyDataModel
 - 11/18/2025: Version 11 has been released (Java 17-25+, Jakarta EE 11)
 - 9/18/2024: Version 10 has been released (Java 17+, Jakarta EE 10)
 - 3/3/2023: Documentation is here!

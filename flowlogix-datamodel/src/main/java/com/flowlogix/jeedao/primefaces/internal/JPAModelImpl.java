@@ -343,9 +343,10 @@ public class JPAModelImpl<TT> implements Serializable {
         return join == null ? root.get(fieldName) : join.get(fieldName);
     }
 
-    public void initializeData(int pageSize, JPALazyDataModel<TT> model) {
+    /// internal method for initializing data after deserialization
+    public void initializeData(int pageSize, JPALazyDataModel<TT> model, boolean uninitialized) {
         if (deserializedButNotInitialized) {
-            if (cachedQuery != null) {
+            if (cachedQuery != null && uninitialized) {
                 model.setWrappedData(findRows(cachedQuery.first, pageSize, cachedQuery.filterBy, cachedQuery.sortBy));
             }
             deserializedButNotInitialized = false;

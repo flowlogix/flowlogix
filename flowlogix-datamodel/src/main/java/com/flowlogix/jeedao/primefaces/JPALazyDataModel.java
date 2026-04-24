@@ -184,19 +184,19 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
 
     @Override
     public TT getRowData() {
-        initializeData(getPageSize(), this);
+        impl.initializeData(getPageSize(), this, data == null);
         return data.get(getRowIndex());
     }
 
     @Override
     public boolean isRowAvailable() {
-        initializeData(getPageSize(), this);
+        impl.initializeData(getPageSize(), this, data == null);
         return getRowIndex() >= 0 && getRowIndex() < data.size();
     }
 
     @Override
     public List<TT> getWrappedData() {
-        initializeData(getPageSize(), this);
+        impl.initializeData(getPageSize(), this, data == null);
         return data;
     }
 
@@ -209,7 +209,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
 
     @Override
     public void setRowIndex(int rowIndex) {
-        initializeData(getPageSize(), this);
+        impl.initializeData(getPageSize(), this, data == null);
         super.setRowIndex(rowIndex);
     }
 

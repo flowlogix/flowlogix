@@ -19,6 +19,7 @@ import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.BuilderInitializer;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
 import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -69,9 +70,11 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
      * and can be used with {@link #getResultField(String)} for result fields
      */
     public static final String RESULT = "result";
-    private static final long serialVersionUID = 4L;
+    @Serial
+    private static final long serialVersionUID = 5L;
     @Delegate
     private JPAModelImpl<TT> impl;
+    private transient List<TT> data;
     private transient PartialBuilderConsumer<TT> partialBuilder;
 
     /**
@@ -177,6 +180,37 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     @Override
     public int count(Map<String, FilterMeta> map) {
         return impl.count(map);
+    }
+
+    @Override
+    public TT getRowData() {
+        initializeData(getPageSize(), this);
+        return data.get(getRowIndex());
+    }
+
+    @Override
+    public boolean isRowAvailable() {
+        initializeData(getPageSize(), this);
+        return getRowIndex() >= 0 && getRowIndex() < data.size();
+    }
+
+    @Override
+    public List<TT> getWrappedData() {
+        initializeData(getPageSize(), this);
+        return data;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void setWrappedData(Object wrappedData) {
+        data = (List<TT>) wrappedData;
+        super.setWrappedData(data == null ? null : List.of());
+    }
+
+    @Override
+    public void setRowIndex(int rowIndex) {
+        initializeData(getPageSize(), this);
+        super.setRowIndex(rowIndex);
     }
 
     private JPALazyDataModel<TT> initialize(BuilderFunction<TT> builder, boolean resetPartialBuilder) {

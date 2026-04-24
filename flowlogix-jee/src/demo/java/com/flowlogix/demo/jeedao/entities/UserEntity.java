@@ -20,7 +20,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.PostPersist;
-import java.io.Serializable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -42,8 +41,7 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity implements Serializable {
-    private static final long serialVersionUID = 2L;
+public class UserEntity {
     @Id
     @GeneratedValue
     private Long id;

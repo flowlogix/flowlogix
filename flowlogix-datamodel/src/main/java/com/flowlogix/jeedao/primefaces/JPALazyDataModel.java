@@ -19,9 +19,6 @@ import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.BuilderInitializer;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
 import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
@@ -77,15 +74,8 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     private static final long serialVersionUID = 5L;
     @Delegate
     private JPAModelImpl<TT> impl;
-    private CachedQuery cachedQuery;
+    private transient List<TT> data;
     private transient PartialBuilderConsumer<TT> partialBuilder;
-    private transient boolean deserializedButNotInitialized;
-
-    private record CachedQuery(int first, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy)
-            implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
-    }
 
     /**
      * Prevent direct creation
@@ -181,7 +171,6 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     @Override
     @Transactional
     public List<TT> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
-        cachedQuery = new CachedQuery(first, sortBy, filterBy);
         return impl.findRows(first, pageSize, filterBy, sortBy);
     }
 
@@ -195,19 +184,28 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
 
     @Override
     public boolean isRowAvailable() {
-        initializeData();
-        return super.isRowAvailable();
+        initializeData(getPageSize(), this);
+        return getRowIndex() >= 0 && getRowCount() < data.size();
     }
 
     @Override
     public List<TT> getWrappedData() {
-        initializeData();
-        return super.getWrappedData();
+        initializeData(getPageSize(), this);
+        return data;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void setWrappedData(Object wrappedData) {
+        data = (List<TT>) wrappedData;
+        if (data != null && !data.isEmpty()) {
+            super.setWrappedData(List.of());
+        }
     }
 
     @Override
     public void setRowIndex(int rowIndex) {
-        initializeData();
+        initializeData(getPageSize(), this);
         super.setRowIndex(rowIndex);
     }
 
@@ -218,34 +216,5 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
             partialBuilder = null;
         }
         return this;
-    }
-
-    private void initializeData() {
-        if (deserializedButNotInitialized) {
-            if (cachedQuery != null) {
-                setWrappedData(impl.findRows(cachedQuery.first, getPageSize(), cachedQuery.filterBy, cachedQuery.sortBy));
-            }
-            deserializedButNotInitialized = false;
-        }
-    }
-
-    @Serial
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        deserializedButNotInitialized = true;
-        setRowCount(stream.readInt());
-        setPageSize(stream.readInt());
-        super.setRowIndex(stream.readInt());
-        impl = (JPAModelImpl<TT>) stream.readObject();
-        cachedQuery = (CachedQuery) stream.readObject();
-    }
-
-    @Serial
-    private void writeObject(ObjectOutputStream stream) throws IOException {
-        stream.writeInt(getRowCount());
-        stream.writeInt(getPageSize());
-        stream.writeInt(getRowIndex());
-        stream.writeObject(impl);
-        stream.writeObject(cachedQuery);
     }
 }

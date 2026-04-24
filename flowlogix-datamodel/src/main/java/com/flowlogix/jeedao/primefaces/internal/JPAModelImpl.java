@@ -31,6 +31,7 @@ import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.util.TypeConverter;
 import jakarta.persistence.criteria.Join;
 import java.io.ObjectStreamException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayDeque;
@@ -88,7 +89,18 @@ import org.primefaces.util.Constants;
 @Builder
 @SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class JPAModelImpl<TT> implements Serializable {
-    private static final long serialVersionUID = 6L;
+    @Serial
+    private static final long serialVersionUID = 7L;
+
+    private CachedQuery cachedQuery;
+    private transient boolean deserializedButNotInitialized;
+
+    private record CachedQuery(int first, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy)
+            implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+    }
+
     /**
      * Return entity manager to operate on
      */
@@ -220,6 +232,7 @@ public class JPAModelImpl<TT> implements Serializable {
         if (cursorSupported && !result.isEmpty()) {
             cursor.get().save(sanitizedFirst + result.size(), result.get(result.size() - 1), sortMeta);
         }
+        cachedQuery = new CachedQuery(first, sortMeta, filters);
         return result;
     }
 
@@ -328,6 +341,15 @@ public class JPAModelImpl<TT> implements Serializable {
             }
         }
         return join == null ? root.get(fieldName) : join.get(fieldName);
+    }
+
+    public void initializeData(int pageSize, JPALazyDataModel<TT> model) {
+        if (deserializedButNotInitialized) {
+            if (cachedQuery != null) {
+                model.setWrappedData(findRows(cachedQuery.first, pageSize, cachedQuery.filterBy, cachedQuery.sortBy));
+            }
+            deserializedButNotInitialized = false;
+        }
     }
 
     private FilterMetaResult processFilterMeta(CriteriaBuilder cb, Root<TT> root, String key, FilterMeta filterMeta) {
@@ -573,6 +595,7 @@ public class JPAModelImpl<TT> implements Serializable {
     Object readResolve() throws ObjectStreamException {
         var corrected = create(x_do_not_use_in_builder);
         corrected.x_do_not_use_in_builder = x_do_not_use_in_builder;
+        corrected.deserializedButNotInitialized = true;
         return corrected;
     }
 }

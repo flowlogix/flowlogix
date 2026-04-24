@@ -19,6 +19,10 @@ import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.BuilderInitializer;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder;
 import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -69,10 +73,19 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
      * and can be used with {@link #getResultField(String)} for result fields
      */
     public static final String RESULT = "result";
-    private static final long serialVersionUID = 4L;
+    @Serial
+    private static final long serialVersionUID = 5L;
     @Delegate
     private JPAModelImpl<TT> impl;
+    private CachedQuery cachedQuery;
     private transient PartialBuilderConsumer<TT> partialBuilder;
+    private transient boolean deserializedButNotInitialized;
+
+    private record CachedQuery(int first, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy)
+            implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+    }
 
     /**
      * Prevent direct creation
@@ -179,6 +192,24 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
         return impl.count(map);
     }
 
+    @Override
+    public boolean isRowAvailable() {
+        initializeData();
+        return super.isRowAvailable();
+    }
+
+    @Override
+    public List<TT> getWrappedData() {
+        initializeData();
+        return super.getWrappedData();
+    }
+
+    @Override
+    public void setRowIndex(int rowIndex) {
+        initializeData();
+        super.setRowIndex(rowIndex);
+    }
+
     private JPALazyDataModel<TT> initialize(BuilderFunction<TT> builder, boolean resetPartialBuilder) {
         impl = JPAModelImpl.create(new BuilderInitializer<>(builder, partialBuilder));
         impl.setX_do_not_use_in_builder(new BuilderInitializer<>(builder, partialBuilder));
@@ -186,5 +217,34 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
             partialBuilder = null;
         }
         return this;
+    }
+
+    private void initializeData() {
+        if (deserializedButNotInitialized) {
+            if (cachedQuery != null) {
+                setWrappedData(impl.findRows(cachedQuery.first, getPageSize(), cachedQuery.filterBy, cachedQuery.sortBy));
+            }
+            deserializedButNotInitialized = false;
+        }
+    }
+
+    @Serial
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        deserializedButNotInitialized = true;
+        setRowCount(stream.readInt());
+        setPageSize(stream.readInt());
+        super.setRowIndex(stream.readInt());
+        impl = (JPAModelImpl<TT>) stream.readObject();
+        cachedQuery = (CachedQuery) stream.readObject();
+    }
+
+    @Serial
+    private void writeObject(ObjectOutputStream stream) throws IOException {
+        stream.writeInt(getRowCount());
+        stream.writeInt(getPageSize());
+        stream.writeInt(getRowIndex());
+        stream.writeObject(impl);
+        stream.writeObject(cachedQuery);
     }
 }

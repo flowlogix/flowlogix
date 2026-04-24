@@ -21,7 +21,6 @@ import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder
 import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;

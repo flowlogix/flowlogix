@@ -503,4 +503,15 @@ class ModelTest implements Serializable {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> JPAModelImpl.create(null));
     }
+
+    @Test
+    void wrappedData() {
+        var model = new JPALazyDataModel<Integer>().initialize(builder -> builder
+                .entityClass(Integer.class).entityManager(() -> em).build());
+        model.setWrappedData(List.of(1, 2, 3));
+        model.setRowIndex(5);
+        assertThat(model.getWrappedData()).size().isEqualTo(3);
+        model.setWrappedData(null);
+        assertThat(model.getWrappedData()).isNull();
+    }
 }

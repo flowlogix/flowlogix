@@ -21,6 +21,7 @@ import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.JPAModelImplBuilder
 import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -204,9 +205,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     @SuppressWarnings("unchecked")
     public void setWrappedData(Object wrappedData) {
         data = (List<TT>) wrappedData;
-        if (data != null && !data.isEmpty()) {
-            super.setWrappedData(List.of());
-        }
+        super.setWrappedData(data == null ? null : List.of());
     }
 
     @Override

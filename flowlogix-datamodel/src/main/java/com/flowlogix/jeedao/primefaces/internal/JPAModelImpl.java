@@ -344,9 +344,9 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     /// internal method for initializing data after deserialization
-    public void initializeData(int pageSize, JPALazyDataModel<TT> model, boolean uninitialized) {
+    public void initializeData(int pageSize, JPALazyDataModel<TT> model, List<TT> data) {
         if (deserializedButNotInitialized) {
-            if (cachedQuery != null && uninitialized) {
+            if (cachedQuery != null && data == null) {
                 model.setWrappedData(findRows(cachedQuery.first, pageSize, cachedQuery.filterBy, cachedQuery.sortBy));
             }
             deserializedButNotInitialized = false;

@@ -595,6 +595,7 @@ public class JPAModelImpl<TT> implements Serializable {
     Object readResolve() throws ObjectStreamException {
         var corrected = create(x_do_not_use_in_builder);
         corrected.x_do_not_use_in_builder = x_do_not_use_in_builder;
+        corrected.cachedQuery = cachedQuery;
         corrected.deserializedButNotInitialized = true;
         return corrected;
     }

@@ -434,6 +434,9 @@ class ModelTest implements Serializable {
         model.findRows(0, 10, Map.of(), Map.of());
         var deserialized = serializeAndDeserialize(model);
         assertThat(deserialized.getWrappedData()).isEmpty();
+        deserialized = serializeAndDeserialize(model);
+        deserialized.setWrappedData(List.of(new MyEntity()));
+        assertThat(deserialized.getWrappedData()).hasSize(1);
     }
 
     @Test

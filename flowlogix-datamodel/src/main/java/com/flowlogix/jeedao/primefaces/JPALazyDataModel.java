@@ -183,9 +183,15 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     }
 
     @Override
+    public TT getRowData() {
+        initializeData(getPageSize(), this);
+        return data.get(getRowIndex());
+    }
+
+    @Override
     public boolean isRowAvailable() {
         initializeData(getPageSize(), this);
-        return getRowIndex() >= 0 && getRowCount() < data.size();
+        return getRowIndex() >= 0 && getRowIndex() < data.size();
     }
 
     @Override

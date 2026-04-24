@@ -416,6 +416,24 @@ class ModelTest implements Serializable {
                 .getIdentifier(any(MyEntity.class))).thenReturn(5L);
         var deserialized = serializeAndDeserialize(model);
         assertThat(deserialized.getRowKey(new MyEntity())).isEqualTo("5");
+        assertThat(deserialized.getWrappedData()).isNull();
+    }
+
+    @Test
+    void serializationWithCachedQuery() throws IOException, ClassNotFoundException {
+        JPALazyDataModel<MyEntity> model;
+        try (var mockedStatic = mockStatic(Beans.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+            mockedStatic.when(() -> Beans.getReference(eq(JPALazyDataModel.class), eq(InternalQualifierJPALazyModel.LITERAL)))
+                    .thenReturn(new JPALazyDataModel<>());
+            model = JPALazyDataModel.create(builder -> builder
+                    .entityManager(() -> em).entityClass(MyEntity.class)
+                    .build());
+        }
+        lenient().when(em.getEntityManagerFactory().getPersistenceUnitUtil()
+                .getIdentifier(any(MyEntity.class))).thenReturn(5L);
+        model.findRows(0, 10, Map.of(), Map.of());
+        var deserialized = serializeAndDeserialize(model);
+        assertThat(deserialized.getWrappedData()).isEmpty();
     }
 
     @Test

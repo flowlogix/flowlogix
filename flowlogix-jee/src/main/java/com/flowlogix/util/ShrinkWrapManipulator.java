@@ -230,6 +230,10 @@ public class ShrinkWrapManipulator {
     public static <TT extends Archive<TT>> TT packageTestRequirements(TT deployment) {
         if (deployment instanceof ClassContainer<?> containerDeployment) {
             optionalDeploymentOp(() -> containerDeployment
+                    .addClass("com.flowlogix.testcontainers.AppServerLifecycleExtension"));
+            optionalDeploymentOp(() -> containerDeployment
+                    .addClass("com.flowlogix.test.AppServerLifecycle"));
+            optionalDeploymentOp(() -> containerDeployment
                     .addClass("com.flowlogix.testcontainers.PayaraServerLifecycleExtension"));
             optionalDeploymentOp(() -> containerDeployment
                     .addClass("com.flowlogix.test.PayaraServerLifecycle"));

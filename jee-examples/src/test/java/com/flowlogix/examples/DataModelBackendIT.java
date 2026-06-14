@@ -23,7 +23,7 @@ import java.util.Map;
 import com.flowlogix.demo.jeedao.primefaces.DataModelWrapper;
 import com.flowlogix.demo.jeedao.primefaces.InjectedDataModel;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
-import com.flowlogix.test.PayaraServerLifecycle;
+import com.flowlogix.test.AppServerLifecycle;
 import com.flowlogix.util.SerializeTester;
 import jakarta.inject.Inject;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-@PayaraServerLifecycle
+@AppServerLifecycle
 class DataModelBackendIT {
     @Inject
     DataModelWrapper models;

@@ -18,7 +18,7 @@ package com.flowlogix.examples;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URL;
-import com.flowlogix.test.PayaraServerLifecycle;
+import com.flowlogix.test.AppServerLifecycle;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -45,9 +45,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  *
  * @author lprimak
  */
-@Tag("UserInterface")
 @RunAsClient
-@PayaraServerLifecycle
+@Tag("UserInterface")
+@AppServerLifecycle
 class DataModelIT {
     @Drone
     WebDriver webDriver;

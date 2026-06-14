@@ -16,7 +16,7 @@
 package com.flowlogix.examples;
 
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
-import com.flowlogix.test.PayaraServerLifecycle;
+import com.flowlogix.test.AppServerLifecycle;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
@@ -51,9 +51,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  * @author lprimak
  */
 @Slf4j
-@Tag("UserInterface")
 @RunAsClient
-@PayaraServerLifecycle
+@Tag("UserInterface")
+@AppServerLifecycle
 class ExceptionPageIT {
     static final String DEPLOYMENT_DEV_MODE = "DevMode";
     static final String DEPLOYMENT_PROD_MODE = "ProdMode";

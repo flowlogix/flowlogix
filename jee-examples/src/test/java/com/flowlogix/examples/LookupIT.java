@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
-import com.flowlogix.test.PayaraServerLifecycle;
+import com.flowlogix.test.AppServerLifecycle;
 import lombok.Lombok;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -43,7 +43,7 @@ import org.junit.jupiter.api.Timeout;
  *
  * @author lprimak
  */
-@PayaraServerLifecycle
+@AppServerLifecycle
 @SuppressWarnings("MagicNumber")
 class LookupIT {
     static final String DEPLOYMENT_NAME = "LookupIT";

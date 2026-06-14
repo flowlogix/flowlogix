@@ -221,7 +221,7 @@ public class ShrinkWrapManipulator {
 
     /**
      * Adds test requirements to the deployment
-     * Currently adds PayaraServerLifecycleExtension and org.assertj packages
+     * Currently adds AppServerLifecycleExtension and org.assertj packages
 
      * @param deployment to modify
      * @return the same deployment

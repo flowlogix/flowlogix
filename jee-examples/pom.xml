@@ -15,7 +15,7 @@
     </parent>
 
     <properties>
-        <payara.start.disable>${skipITs}</payara.start.disable>
+        <server.start.disable>${skipITs}</server.start.disable>
         <arquillian.graphene.version>3.0.1.Final</arquillian.graphene.version>
         <it.test.parallel>classes</it.test.parallel>
         <!-- con't copy test dependencies for skinny WARs -->
@@ -150,7 +150,7 @@
 
     <profiles>
         <profile>
-            <id>payara-docker</id>
+            <id>server-docker</id>
             <properties>
                 <testcontainers.skip>false</testcontainers.skip>
             </properties>

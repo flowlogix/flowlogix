@@ -14,6 +14,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
+<!DOCTYPE arquillian [
+        <!ENTITY dockerConfig "
+        <property name='adminHttps'>true</property>
+        <property name='ignoreCertificates'>true</property>
+        <property name='adminUser'>admin</property>
+        <property name='adminPassword'>admin</property>
+    ">
+]>
+
 <arquillian
     xmlns="http://jboss.org/schema/arquillian"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -27,6 +36,7 @@
         <property name="enableBidi">true</property>
         <property name="unhandledPromptBehaviour">ignore</property>
     </extension>
+    <container qualifier="payara"/>
     <container qualifier="payara-ssl" default="true">
         <configuration>
             <property name="ignoreCertificates">true</property>
@@ -34,10 +44,18 @@
     </container>
     <container qualifier="payara-docker">
         <configuration>
-            <property name="adminHttps">true</property>
+            &dockerConfig;
+        </configuration>
+    </container>
+    <container qualifier="glassfish"/>
+    <container qualifier="glassfish-ssl">
+        <configuration>
             <property name="ignoreCertificates">true</property>
-            <property name="adminUser">admin</property>
-            <property name="adminPassword">admin</property>
+        </configuration>
+    </container>
+    <container qualifier="glassfish-docker">
+        <configuration>
+            &dockerConfig;
         </configuration>
     </container>
 </arquillian>

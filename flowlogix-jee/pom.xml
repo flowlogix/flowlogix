@@ -68,7 +68,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <httpsPort>${payara.https.port}</httpsPort>
+                        <httpsPort>${server.https.port}</httpsPort>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

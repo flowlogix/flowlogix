@@ -279,20 +279,23 @@ The `infra-pom` module defines the following properties:
 | The version of Mockito to use.
 |===
 
-== `payara-pom` Variables
+== `payara-pom` and `glassfish-pom` Variables
 
-The `payara-pom` module defines the following properties:
+The `payara-pom` and `glassfish-pom` module define the following properties:
 
 |===
 | Variable | Description
 
-| `payara.start.disable`
+| `server.start.disable`
 | Whether to disable starting Payara.
 
-| `payara.start.skip`
+| `server.start.skip`
 | Whether to skip starting Payara.
 
 | `payara.version`
+| The version of Payara to use.
+
+| `glassfish.version`
 | The version of Payara to use.
 
 | `root.basedir`
@@ -307,16 +310,19 @@ The `payara-pom` module defines the following properties:
 | `payara.imageName`
 | The name of the Payara image to use.
 
-| `payara.asadmin.executable.suffix`
+| `glassfish.imageName`
+| The name of the GlassFish image to use.
+
+| `server.asadmin.executable.suffix`
 | The suffix for the `asadmin` executable.
 
-| `payara.asadmin.executable`
+| `server.asadmin.executable`
 | The path to the `asadmin` executable.
 
-| `payara.http.port`
+| `server.http.port`
 | The HTTP port for Payara.
 
-| `payara.https.port`
+| `server.https.port`
 | The HTTPS port for Payara.
 
 | `testcontainers.skip`

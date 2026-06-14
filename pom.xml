@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>124</version>
+        <version>126</version>
     </parent>
 
     <properties>
@@ -21,12 +21,12 @@
         <release.profiles>${release.profile},javadoc-release</release.profiles>
         <javadoc.title>${project.name}</javadoc.title>
         <javadoc.snippet.path>${snippet.path}:${maven.multiModuleProjectDirectory}/jee-examples/src/main/java</javadoc.snippet.path>
-        <payara.start.disable>true</payara.start.disable>
+        <server.start.disable>true</server.start.disable>
         <japicmp.skip>false</japicmp.skip>
         <!-- major version is "10" so have to supply it as such here -->
         <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
-        <depchain.version>122</depchain.version>
+        <depchain.version>123</depchain.version>
     </properties>
 
     <scm>

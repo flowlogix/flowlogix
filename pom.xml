@@ -112,6 +112,9 @@
                         <exclude>com/flowlogix/**/*IT</exclude>
                         <exclude>com/flowlogix/**/*IT$*</exclude>
                         <exclude>com/flowlogix/**/__EJB31_Generated*</exclude>
+                        <exclude>**/*$Proxy$*WeldClientProxy</exclude>
+                        <exclude>**/*$Proxy$*WeldSubclass</exclude>
+                        <exclude>**/*$MockitoMock$*</exclude>
                         <!-- cause too many coverage misses -->
                         <exclude>com/flowlogix/examples/**</exclude>
                         <exclude>com/flowlogix/demo/**</exclude>

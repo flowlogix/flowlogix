@@ -18,18 +18,16 @@ package com.flowlogix.examples;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_PROD_MODE;
 import static com.flowlogix.util.ShrinkWrapManipulator.toHttpsURL;
 import java.net.URL;
-import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
+import com.flowlogix.test.AppServerLifecycle;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
-import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
@@ -37,8 +35,7 @@ import org.openqa.selenium.WebDriverException;
  *
  * @author lprimak
  */
-@ExtendWith(PayaraServerLifecycleExtension.class)
-@ExtendWith(ArquillianExtension.class)
+@AppServerLifecycle
 @Tag("UserInterface")
 public class ShiroSSLFilterIT {
     @Drone

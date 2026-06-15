@@ -16,7 +16,8 @@
 package com.flowlogix.examples;
 
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
-import com.flowlogix.testcontainers.PayaraServerLifecycleExtension;
+import com.flowlogix.test.AppServerLifecycle;
+import com.flowlogix.testcontainers.AppServerLifecycleExtension;
 import com.flowlogix.util.ShrinkWrapManipulator;
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
 import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
@@ -37,7 +38,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitForHttp;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
-import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -47,7 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -58,8 +57,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  *
  * @author lprimak
  */
-@ExtendWith(PayaraServerLifecycleExtension.class)
-@ExtendWith(ArquillianExtension.class)
+@AppServerLifecycle
 @Tag("UserInterface")
 public class ExceptionPageIT {
     static final String DEPLOYMENT_DEV_MODE = "DevMode";
@@ -233,7 +231,7 @@ public class ExceptionPageIT {
         WebArchive archive = ShrinkWrap.create(MavenImporter.class, archiveName)
                 .loadPomFromFile("pom.xml").importBuildOutput()
                 .as(WebArchive.class)
-                .addClass(PayaraServerLifecycleExtension.class);
+                .addClass(AppServerLifecycleExtension.class).addClass(AppServerLifecycle.class);
         new ShrinkWrapManipulator().webXmlXPath(archive, getStandardActions());
         return archive;
     }

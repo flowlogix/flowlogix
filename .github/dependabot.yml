@@ -17,6 +17,8 @@ updates:
     schedule:
       interval: "daily"
     ignore:
+    - dependency-name: "org.apache.shiro:*"
+      update-types: ["version-update:semver-major"]
     - dependency-name: "org.omnifaces:omnifaces"
       update-types: ["version-update:semver-major"]
     - dependency-name: "org.eclipse.persistence:org.eclipse.persistence.jpa.modelgen.processor"

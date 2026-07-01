@@ -12,7 +12,7 @@
     <properties>
         <slf4j.version>2.0.18</slf4j.version>
         <omnifaces.version>3.14.21</omnifaces.version>
-        <shiro.version>2.2.1</shiro.version>
+        <shiro2.version>2.2.1</shiro2.version>
         <bytebuddy.version>1.18.10</bytebuddy.version>
     </properties>
 
@@ -72,12 +72,12 @@
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
-                <version>${shiro.version}</version>
+                <version>${shiro2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-web</artifactId>
-                <version>${shiro.version}</version>
+                <version>${shiro2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

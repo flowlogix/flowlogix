@@ -10,12 +10,21 @@ updates:
     open-pull-requests-limit: 50
     schedule:
       interval: "daily"
+    groups:
+      maven-dependencies:
+        patterns:
+          - '*'
+
   - package-ecosystem: "maven"
     target-branch: '5.x'
     directory: "/" # Location of package manifests
     open-pull-requests-limit: 50
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    groups:
+      maven-dependencies:
+        patterns:
+          - '*'
     ignore:
     - dependency-name: "org.apache.shiro:*"
       update-types: ["version-update:semver-major"]
@@ -38,9 +47,18 @@ updates:
     schedule:
       interval: 'daily'
     open-pull-requests-limit: 10
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - '*'
+
   - package-ecosystem: 'github-actions'
     target-branch: '5.x'
     directory: '/'
     schedule:
       interval: 'daily'
     open-pull-requests-limit: 10
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - '*'

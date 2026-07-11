@@ -8,7 +8,7 @@
 [[section-introduction-and-features]]
 == Introduction and Features of FlowLogix Jakarta EE Components
 .Why another utility or component library?
-FlowLogix provides a few remaining missing pieces in what is covered by Jakarta EE, PrimeFaces, OmniFaces, Apache Shiro and other very popular software.
+FlowLogix provides a few remaining missing pieces in what is covered by Jakarta EE, PrimeFaces, OmniFaces and other very popular software.
 
 .What are the features provided?
 FlowLogix Jakarta EE library fills in the last few gaps that are left over in PrimeFaces, OmniFaces and Jakarta EE itself, including:
@@ -18,13 +18,13 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Declares Jakarta Faces PROJECT_STAGE development mode automatically
 * Automatically uses minified versions of assets with Jakarta Faces
 * Provides easy and automatic initialization of OmniFaces' UnmappedResourceHandler
-* Easier-to-use, Injected JPA Lazy Data Model for PrimeFaces DataTable that supports clustered sessions
+* Easier-to-use, Injected JPA Lazy Data Model for PrimeFaces DataTable that supports cursor pagination and clustered sessions, without requiring Entities to be Serializable
 * Automatically includes PrimeFaces font mime types in your web applications, preventing warnings and extra entries in your web.xml
 * Convert strings to arbitrary types on a best-effort basis
 * Transforms names between javax and jakarta namespaces
 * Checks if objects are truly serializable by testing them
 * Easy Transform Streams to Strings
-* Simplify creation and manipulation of ShrinkWrap and Arquillian test archives including assets
+* Simplify creation and manipulation of ShrinkWrap and Arquillian test archives including assets, allowing for better integration tests
 
 [[section-architecture]]
 === Where does FlowLogix fit into your application architecture?

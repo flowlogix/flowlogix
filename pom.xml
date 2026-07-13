@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>130</version>
+        <version>131</version>
     </parent>
 
     <properties>
@@ -26,7 +26,7 @@
         <!-- major version is "10" so have to supply it as such here -->
         <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
-        <depchain.version>127</depchain.version>
+        <depchain.version>128</depchain.version>
     </properties>
 
     <scm>

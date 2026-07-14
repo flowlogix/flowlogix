@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>130</version>
+        <version>131</version>
     </parent>
 
     <properties>
@@ -21,7 +21,7 @@
         <checkstyle.suppressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle/suppressions.xml</checkstyle.suppressionsLocation>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
-        <depchain.version>127</depchain.version>
+        <depchain.version>128</depchain.version>
         <groovy.version>5.0.7</groovy.version>
     </properties>
 

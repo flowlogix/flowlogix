@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 /**
  * Enhanced JPA Finder interface that provides access to the entity manager,
- * the entity class, and the ability to build a {@link QueryCriteria} record
+ * the entity class, and the ability to build a {@link QueryCriteria} record.
  * <p>
  * Also contains convenience interface for use with {@link lombok.experimental.Delegate}
  *
@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  */
 public interface JPAFinderHelper<TT> extends JPAFinder<TT> {
     /**
-     * Entity Manager cannot be saved because it's not thread-safe
+     * Entity Manager cannot be saved because it's not thread-safe.
      * However, supplier can be returned
      *
      * @return {@link Supplier} of {@link EntityManager}
@@ -40,14 +40,14 @@ public interface JPAFinderHelper<TT> extends JPAFinder<TT> {
     Supplier<EntityManager> getEntityManager();
 
     /**
-     * Returns the entity class
+     * Returns the entity class.
      * @return entity class
      */
     Class<TT> getEntityClass();
 
     /**
      * Convenience method for building {@link QueryCriteria} record, which contains
-     * {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
+     * {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}.
      *
      * @return QueryCriteria of Entity Type
      */
@@ -55,7 +55,7 @@ public interface JPAFinderHelper<TT> extends JPAFinder<TT> {
 
     /**
      * Convenience method for building {@link QueryCriteria} record of any type,
-     * which contains {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}
+     * which contains {@link CriteriaBuilder}, {@link Root} and {@link CriteriaQuery}.
      *
      * @param  cls Type of Query Criteria
      * @return QueryCriteria of the same Entity Type as the parameter
@@ -64,7 +64,7 @@ public interface JPAFinderHelper<TT> extends JPAFinder<TT> {
 
     /**
      * Convenience interface for use with {@link lombok.experimental.Delegate} when forwarding methods
-     * of {@link EntityManager} so DaoHelper's own methods get exposed correctly
+     * of {@link EntityManager} so DaoHelper's own methods get exposed correctly.
      * <p>
      * {@snippet class = "com.flowlogix.demo.jeedao.ExampleDelegateDAO" region = "delegateDAO"}
      */

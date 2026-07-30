@@ -22,10 +22,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author lprimak
- */
 @WebServlet("/invalidatesession")
 public class InvalidateSessionServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;

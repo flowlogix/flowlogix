@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * Example entity, representing user ID
+ * Example entity, representing user ID.
  */
 @Entity
 @Data

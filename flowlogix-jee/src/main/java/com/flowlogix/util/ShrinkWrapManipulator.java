@@ -57,7 +57,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- * modifies xml files inside the archive according to xpath and function
+ * modifies xml files inside the archive according to xpath and function.
  * <p>
  * <em>Examples:</em>
  * {@snippet class="com.flowlogix.demo.util.ShrinkWrapDemo" region="productionMode"}
@@ -87,7 +87,7 @@ public class ShrinkWrapManipulator {
     final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
+     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file.
      *
      * @param archiveType
      * @return
@@ -98,7 +98,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
+     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file.
      *
      * @param archiveType
      * @param pomFilePath
@@ -110,7 +110,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
+     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file.
      *
      * @param archiveType
      * @param nameTransformer transforms the UUID to a more suitable name
@@ -123,7 +123,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file
+     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file.
      *
      * @param archiveType
      * @param nameTransformer transforms the UUID to a more suitable name
@@ -139,7 +139,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file
+     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file.
      *
      * @param archiveType
      * @param archiveName
@@ -151,7 +151,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file
+     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file.
      *
      * @param archiveType
      * @param archiveName
@@ -168,7 +168,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Logs the contents of the archive to the consumer
+     * Logs the contents of the archive to the consumer.
      *
      * @param archive to log
      * @param consumer to log the contents
@@ -181,7 +181,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Adds payara-web.xml to the archive with the specified class delegation
+     * Adds payara-web.xml to the archive with the specified class delegation.
      *
      * @param archive to modify
      * @param delegate whether to delegate or not
@@ -200,7 +200,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Adds SLF4J to the archive
+     * Adds SLF4J to the archive.
      *
      * @param archive to modify
      * @return the same archive
@@ -220,8 +220,8 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Adds test requirements to the deployment
-     * Currently adds AppServerLifecycleExtension and org.assertj packages
+     * Adds test requirements to the deployment,
+     * Currently adds AppServerLifecycleExtension and org.assertj packages.
 
      * @param deployment to modify
      * @return the same deployment
@@ -243,7 +243,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * modifies web.xml according to xpath and method
+     * modifies web.xml according to xpath and method.
      *
      * @param archive to modify
      * @param actions list of actions to perform
@@ -255,7 +255,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * modifies persistence.xml according to xpath and method
+     * modifies persistence.xml according to xpath and method.
      *
      * @param archive to modify
      * @param actions list of actions to perform
@@ -270,7 +270,7 @@ public class ShrinkWrapManipulator {
 
     /**
      * Transform http to https URL using {@code sslPort} system property,
-     * and default port 8181 if system property is not defined
+     * and default port 8181 if system property is not defined.
      *
      * @param httpUrl http URL
      * @return https URL
@@ -282,7 +282,7 @@ public class ShrinkWrapManipulator {
 
     /**
      * Transform http to https URL using the specified system property and default port,
-     * if the system property is not defined
+     * if the system property is not defined.
      *
      * @param httpUrl http URL
      * @param sslPortPropertyName
@@ -304,7 +304,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Constructs XPath for web.xml context param
+     * Constructs XPath for web.xml context param.
      *
      * @param paramName
      * @return XPath for web.xml context param
@@ -315,7 +315,7 @@ public class ShrinkWrapManipulator {
 
     /**
      * Parse XML file from the archive, perform actions to modify the file,
-     * and return a string representing the modified XML file
+     * and return a string representing the modified XML file.
 
      * @param archive to retrieve the xml file from
      * @param actions to perform on the xml file

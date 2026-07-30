@@ -27,7 +27,7 @@ import jakarta.servlet.annotation.WebListener;
 import org.omnifaces.resourcehandler.UnmappedResourceHandler;
 
 /**
- * aids in implementation of OmniFaces {@link UnmappedResourceHandler}
+ * aids in implementation of OmniFaces {@link UnmappedResourceHandler}.
  *
  * @author lprimak
  */

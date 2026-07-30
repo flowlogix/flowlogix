@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 
 /**
- * Mock out ViewScoped via RequestScoped
+ * Mock out ViewScoped via RequestScoped.
  */
 public class MockViewScope implements Context, Serializable {
     @Override

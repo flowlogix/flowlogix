@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 import static com.flowlogix.jeedao.primefaces.CursorPagination.requestedSort;
 import static com.flowlogix.jeedao.primefaces.internal.JPAModelImpl.resolveField0;
 
-/// Interface defining cursor pagination behavior for PrimeFaces JPA LazyDataModel
+/// Interface defining cursor pagination behavior for PrimeFaces JPA LazyDataModel.
 /// @param <TT> Entity type for pagination
 public interface CursorPagination<TT> extends Serializable {
     /// Checks if cursor pagination is supported for the given filters and sort metadata,
@@ -137,7 +137,7 @@ public interface CursorPagination<TT> extends Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
         /**
-         * config builder, just for javadoc
+         * config builder, just for javadoc.
          * @hidden
          * @param <TT>
          */

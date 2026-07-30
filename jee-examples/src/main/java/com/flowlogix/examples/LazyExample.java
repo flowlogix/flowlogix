@@ -19,7 +19,7 @@ import org.omnifaces.util.Lazy;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Demonstrates Lazy initialization utility, with double-checked locking
+ * Demonstrates Lazy initialization utility, with double-checked locking.
  *
  * @author lprimak
  */

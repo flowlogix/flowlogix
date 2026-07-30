@@ -80,7 +80,7 @@ import org.primefaces.model.SortOrder;
 import org.primefaces.util.Constants;
 
 /**
- * JPA DAO facade implementation for the PrimeFaces lazy table model
+ * JPA DAO facade implementation for the PrimeFaces lazy table model.
  * @author lprimak
  * @hidden
  * @param <TT>
@@ -102,40 +102,40 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     /**
-     * Return entity manager to operate on
+     * Return entity manager to operate on.
      */
     private final transient SerializableSupplier<EntityManager> entityManager;
     /**
-     * List of qualifiers to use when finding {@link EntityManager via CDI} (optional)
+     * List of qualifiers to use when finding {@link EntityManager via CDI} (optional).
      */
     @Default
     @Getter
     private final List<Class<? extends Annotation>> entityManagerQualifiers = List.of();
     /**
-     * entity class
+     * entity class.
      */
     private final @NonNull @Getter Class<TT> entityClass;
     private final Lazy<JPAFinderHelper<TT>> jpaFinder = new Lazy<>(this::createJPAFinder);
     /**
-     * convert String key into key object
+     * convert String key into key object.
      */
     private final transient Function<String, ?> converter;
     /**
-     * convert typed key to String
+     * convert typed key to String.
      */
     private final transient Function<TT, String> keyConverter;
     /**
-     * adds {@link Filter} object
+     * adds {@link Filter} object.
      */
     @Default
     private final transient @Getter @NonNull Filter<TT> filter = (a, b, c) -> { };
     /**
-     * adds {@link Sorter} object
+     * adds {@link Sorter} object.
      */
     @Default
     private final transient @Getter @NonNull Sorter<TT> sorter = (a, b, c) -> { };
     /**
-     * add optimizer hints here
+     * add optimizer hints here.
      * <p>
      * <em>Example:</em>
      * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.OptimizingDataModel" region = "optimizing"}
@@ -144,29 +144,29 @@ public class JPAModelImpl<TT> implements Serializable {
     private final transient @Getter @NonNull UnaryOperator<TypedQuery<TT>> optimizer = identity();
 
     /**
-     * enriches the resulting model, by adding rows or post-processing columns
+     * enriches the resulting model, by adding rows or post-processing columns.
      */
     @Default
     private final transient @Getter @NonNull UnaryOperator<List<TT>> resultEnricher = identity();
 
-    /// Adds cursor pagination support
+    /// Adds cursor pagination support.
     @Default
     private final @Getter @NonNull Lazy<CursorPagination<TT>> cursor = CursorPagination.noop();
 
     /**
-     * Specifies whether String filters are case-sensitive
+     * Specifies whether String filters are case-sensitive.
      */
     @Default
     private final @Getter boolean caseSensitiveFilter = true;
 
     /**
-     * to which case (upper / lower) to convert during case-insensitive query
+     * to which case (upper / lower) to convert during case-insensitive query.
      */
     @Default
     private final @Getter FilterCaseConversion filterCaseConversion = FilterCaseConversion.UPPER;
 
     /**
-     * Specifies whether wild cards are supported in string filters
+     * Specifies whether wild cards are supported in string filters.
      */
     @Default
     private final @Getter boolean wildcardSupport = false;
@@ -175,8 +175,8 @@ public class JPAModelImpl<TT> implements Serializable {
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
 
     /**
+     * Internal record, do not use.
      * @hidden
-     * Internal record, do not use
      * @param builder
      * @param partialBuilder
      * @param <TT>
@@ -185,8 +185,8 @@ public class JPAModelImpl<TT> implements Serializable {
                                          PartialBuilderConsumer<TT> partialBuilder) implements Serializable { }
 
     /**
+     * Internal variable, do not use in builder.
      * @hidden
-     * Internal variable, do not use in builder
      */
     @SuppressWarnings({"DeclarationOrder", "MemberName"})
     @Setter
@@ -195,7 +195,7 @@ public class JPAModelImpl<TT> implements Serializable {
     private static final class FilterDataMap extends HashMap<String, FilterColumnData> implements FilterData { }
 
     /**
-     * Private - do not use
+     * Private - do not use.
      *
      * @hidden
      * @param initializer
@@ -211,7 +211,7 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     /**
-     * partial builder, just for javadoc
+     * partial builder, just for javadoc.
      * @hidden
      * @param <TT>
      */
@@ -292,7 +292,7 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     /// @deprecated
-    /// Use {@link #getFilters(Map, CriteriaBuilder, Root, boolean, int, Map)} instead, which supports cursor pagination
+    /// Use {@link #getFilters(Map, CriteriaBuilder, Root, boolean, int, Map)} instead, which supports cursor pagination.
     @Generated
     @Deprecated(since = "11.2")
     public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root) {
@@ -307,7 +307,7 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     /// @deprecated
-    /// Use {@link #getSort(Map, CriteriaBuilder, Root, boolean)} instead, which supports cursor pagination
+    /// Use {@link #getSort(Map, CriteriaBuilder, Root, boolean)} instead, which supports cursor pagination.
     @Generated
     @Deprecated(since = "11.2")
     public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root) {
@@ -316,7 +316,7 @@ public class JPAModelImpl<TT> implements Serializable {
 
     /**
      * Recursively resolve field name, possibly by joining other tables,
-     * based on a dotted notation of the field
+     * based on a dotted notation of the field.
      *
      * @param root Criteria root
      * @param fieldName field name
@@ -343,7 +343,7 @@ public class JPAModelImpl<TT> implements Serializable {
         return join == null ? root.get(fieldName) : join.get(fieldName);
     }
 
-    /// internal method for initializing data after deserialization
+    /// internal method for initializing data after deserialization.
     public void initializeData(int pageSize, JPALazyDataModel<TT> model, List<TT> data) {
         if (deserializedButNotInitialized) {
             if (cachedQuery != null && data == null) {

@@ -31,7 +31,7 @@ import org.primefaces.model.SortMeta;
 import static org.primefaces.model.SortOrder.UNSORTED;
 
 /**
- * Sorter Hook
+ * Sorter Hook.
  * @param <TT> Entity Type
  * <p>
  * <em>Example:</em>
@@ -41,7 +41,7 @@ import static org.primefaces.model.SortOrder.UNSORTED;
 public interface Sorter<TT> {
     /**
      * Manipulates sort criteria requested from the UI and possibly adds
-     * or replaces it with application-based sort criteria
+     * or replaces it with application-based sort criteria.
      * <p>
      * <em>Example:</em>
      * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.SortingDataModel" region = "sorting"}
@@ -50,7 +50,7 @@ public interface Sorter<TT> {
      */
     class SortData {
         /**
-         * Sort based on fields, the map key is equivalent to {@link SortMeta#getField()}
+         * Sort based on fields, the map key is equivalent to {@link SortMeta#getField()}.
          */
         @Getter
         private final Map<String, MergedSortOrder> sortOrder = new LinkedHashMap<>();
@@ -61,7 +61,7 @@ public interface Sorter<TT> {
         }
 
         /**
-         * Replaces, or adds application sort criteria to the existing UI sort criteria
+         * Replaces, or adds application sort criteria to the existing UI sort criteria.
          * If the sort criteria is new, it is placed at the lowest sort order
          *
          * @param fieldName element to be replaced or added
@@ -73,7 +73,7 @@ public interface Sorter<TT> {
         }
 
         /**
-         * Replaces, or adds application sort criteria to the existing UI sort criteria
+         * Replaces, or adds application sort criteria to the existing UI sort criteria.
          * If the sort criteria is new, it is placed at either highest or lowest order,
          * depending on the highPriority parameter
          *
@@ -94,7 +94,7 @@ public interface Sorter<TT> {
         }
 
         /**
-         *  Helper method to apply application sort criteria based on the UI requested sort criteria
+         * Helper method to apply application sort criteria based on the UI requested sort criteria.
          *
          * @param sourceFieldName field to retrieve UI requested sort criteria from
          * @param fieldName     field to be replaced or added
@@ -110,7 +110,7 @@ public interface Sorter<TT> {
         }
 
         /**
-         *  Helper method to apply application sort criteria based on the UI requested sort criteria
+         * Helper method to apply application sort criteria based on the UI requested sort criteria.
          *
          * @param sourceFieldName field to retrieve UI requested sort criteria from
          * @param fieldName     field to be replaced or added
@@ -154,7 +154,7 @@ public interface Sorter<TT> {
     /**
      * Hook for sort criteria manipulation. Application can inspect or remove elements
      * from the {@link SortData#sortOrder} map and add your own sort order
-     * via {@link SortData#applicationSort(String, Function)} method
+     * via {@link SortData#applicationSort(String, Function)} method.
      *
      * @param sortData merged sort criteria
      * @param cb {@link CriteriaBuilder}

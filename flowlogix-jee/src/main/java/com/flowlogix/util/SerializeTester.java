@@ -24,7 +24,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * Serialization test mechanism
+ * Serialization test mechanism.
  * <p>
  * <em>Example:</em>
  * {@snippet class="com.flowlogix.demo.util.SerializeDemo" region="serialize"}

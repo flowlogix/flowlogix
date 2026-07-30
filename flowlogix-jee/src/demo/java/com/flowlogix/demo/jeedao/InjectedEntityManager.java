@@ -20,7 +20,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 /**
- * Demonstrates injecting {@link EntityManager}
+ * Demonstrates injecting {@link EntityManager}.
  */
 // @start region="injectedEntityManager"
 // tag::injectedEntityManager[] // @replace regex='.*\n' replacement=""

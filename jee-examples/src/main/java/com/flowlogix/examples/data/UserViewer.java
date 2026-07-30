@@ -38,10 +38,6 @@ import jakarta.persistence.criteria.Root;
 import lombok.Getter;
 import org.omnifaces.util.Lazy;
 
-/**
- *
- * @author lprimak
- */
 @Named
 @ViewScoped
 public class UserViewer implements Serializable {

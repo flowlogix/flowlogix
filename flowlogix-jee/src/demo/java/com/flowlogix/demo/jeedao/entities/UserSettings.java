@@ -29,7 +29,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * Example entity, representing user settings
+ * Example entity, representing user settings.
  */
 @Entity
 @Data

@@ -23,7 +23,7 @@ import jakarta.persistence.EntityManager;
 import lombok.experimental.Delegate;
 
 /**
- * Demonstrates injecting {@link JPAFinder} using default {@link EntityManager}
+ * Demonstrates injecting {@link JPAFinder} using default {@link EntityManager}.
  */
 // @start region="injectedExampleDAO"
 // tag::injectedExampleDAO[] // @replace regex='.*\n' replacement=""

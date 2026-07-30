@@ -39,7 +39,7 @@ import org.primefaces.model.SortMeta;
 
 /**
  * Easy implementation of PrimeFaces lazy data model using Lambdas, This is the main class in
- * {@link com.flowlogix.jeedao.primefaces} package
+ * {@link com.flowlogix.jeedao.primefaces} package.
  * <p>
  * An instance of this class is to be put into your {@link ViewScoped} or {@link SessionScoped} beans
  * The implementation is serializable and works with failover to a different server instances
@@ -67,7 +67,7 @@ import org.primefaces.model.SortMeta;
 public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     /**
      * Automatic field that's added to the JPA's root object
-     * and can be used with {@link #getResultField(String)} for result fields
+     * and can be used with {@link #getResultField(String)} for result fields.
      */
     public static final String RESULT = "result";
     @Serial
@@ -78,13 +78,13 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     private transient PartialBuilderConsumer<TT> partialBuilder;
 
     /**
-     * Prevent direct creation
+     * Prevent direct creation.
      */
     JPALazyDataModel() { }
 
     /**
      * Set up this particular instance of the data model
-     * with entity manager, class and key converter
+     * with entity manager, class and key converter.
      *
      * @param <TT> Value Type
      * @param builder serializable lambda for creation
@@ -97,7 +97,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     }
 
     /**
-     * used in case-insensitive queries to convert case to lower / upper case
+     * used in case-insensitive queries to convert case to lower / upper case.
      */
     @SuppressWarnings("checkstyle:JavadocVariable")
     public enum FilterCaseConversion {
@@ -113,7 +113,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     }
 
     /**
-     * Initialize JPA Lazy Data model. Used to set parameters to already-injected instance
+     * Initialize JPA Lazy Data model. Used to set parameters to already-injected instance.
      *
      * @param builder serializable lambda for creation
      * @return current instance for fluent operations
@@ -123,14 +123,14 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     }
 
     /**
-     * Serializable builder lambda to easily facilitate creation of {@link JPALazyDataModel}
+     * Serializable builder lambda to easily facilitate creation of {@link JPALazyDataModel}.
      * @param <TT> Entity Type
      */
     public interface BuilderFunction<TT> extends Function<JPAModelImplBuilder<TT>,
             JPAModelImpl<TT>>, Serializable { }
 
     /**
-     * Internal - do not use
+     * Internal - do not use.
      *
      * @hidden
      * @param <TT>
@@ -149,7 +149,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     }
 
     /**
-     * Overridden from {@link LazyDataModel#getRowKey(Object)}
+     * Overridden from {@link LazyDataModel#getRowKey(Object)}.
      */
     @Override
     public String getRowKey(TT key) {
@@ -157,7 +157,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     }
 
     /**
-     * Overridden from {@link LazyDataModel#getRowData(String)}
+     * Overridden from {@link LazyDataModel#getRowData(String)}.
      */
     @Override
     @Transactional
@@ -166,7 +166,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     }
 
     /**
-     * Overridden from {@link LazyDataModel#load(int, int, Map, Map)}
+     * Overridden from {@link LazyDataModel#load(int, int, Map, Map)}.
      */
     @Override
     @Transactional
@@ -175,7 +175,7 @@ public class JPALazyDataModel<TT> extends LazyDataModel<TT> {
     }
 
     /**
-     * Overridden from {@link LazyDataModel#count(Map)}
+     * Overridden from {@link LazyDataModel#count(Map)}.
      */
     @Override
     public int count(Map<String, FilterMeta> map) {

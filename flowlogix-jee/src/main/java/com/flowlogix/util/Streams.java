@@ -23,8 +23,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * Read String from Stream
- * Does not close the stream afterward
+ * Read String from Stream,
+ * Does not close the stream afterward.
  * <p>
  * <em>Example:</em>
  * {@snippet class="com.flowlogix.demo.util.ReadStringDemo" region="readStringFromStream"}
@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 @SuppressWarnings("HideUtilityClassConstructor")
 public class Streams {
     /**
-     * Converts InputStream to String
+     * Converts InputStream to String.
      *
      * @param stream Stream
      * @return Stream converted to String
@@ -46,7 +46,7 @@ public class Streams {
     }
 
     /**
-     * Converts InputStream to String
+     * Converts InputStream to String.
      *
      * @param stream Stream
      * @param charset Charset to convert with

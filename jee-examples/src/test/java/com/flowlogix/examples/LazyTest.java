@@ -18,11 +18,6 @@ package com.flowlogix.examples;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
-
-/**
- *
- * @author lprimak
- */
 class LazyTest {
     @Test
     void lazy() {

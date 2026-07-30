@@ -25,7 +25,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Optional Configuration annotation for {@link JPALazyDataModel}
+ * Optional Configuration annotation for {@link JPALazyDataModel}.
  * Use to make queries case-insensitive and pick an {@link jakarta.persistence.EntityManager}
  */
 @Qualifier
@@ -34,25 +34,25 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LazyModelConfig {
     /**
-     * case-sensitivity of queries
+     * case-sensitivity of queries.
      */
     @Nonbinding
     boolean caseInsensitive() default false;
 
     /**
-     * to which case (upper / lower) to convert during case-insensitive query
+     * to which case (upper / lower) to convert during case-insensitive query.
      */
     @Nonbinding
     FilterCaseConversion filterCaseConversion() default FilterCaseConversion.UPPER;
 
     /**
-     * wildcard support for filter queries
+     * wildcard support for filter queries.
      */
     @Nonbinding
     boolean wildcardSupport() default false;
 
     /**
-     * Override entity manager for the data model
+     * Override entity manager for the data model.
      */
     @Nonbinding
     Class<? extends Annotation> [] entityManagerSelector() default { };

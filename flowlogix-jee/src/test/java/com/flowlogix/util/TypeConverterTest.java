@@ -23,10 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import org.junit.jupiter.api.Test;
 
-/**
- *
- * @author lprimak
- */
 class TypeConverterTest {
     @Test
     @SuppressWarnings("MagicNumber")

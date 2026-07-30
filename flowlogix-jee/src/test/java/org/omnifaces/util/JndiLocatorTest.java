@@ -54,10 +54,6 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.when;
 import org.omnifaces.util.JNDIObjectLocator.JNDIObjectLocatorBuilder;
 
-/**
- *
- * @author lprimak
- */
 class JndiLocatorTest {
     private JNDIObjectLocator locator;
 

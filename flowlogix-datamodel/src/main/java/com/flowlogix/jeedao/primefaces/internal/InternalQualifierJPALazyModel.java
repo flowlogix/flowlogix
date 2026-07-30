@@ -23,6 +23,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * Hidden / Internal. Do not use.
  * @hidden
  */
 @Qualifier
@@ -31,7 +32,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InternalQualifierJPALazyModel {
     /**
-     * Instance of self
+     * Instance of self.
      */
     AnnotationLiteral<InternalQualifierJPALazyModel> LITERAL = new AnnotationLiteral<>() { };
 }

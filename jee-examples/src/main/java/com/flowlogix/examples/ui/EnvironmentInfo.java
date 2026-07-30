@@ -23,10 +23,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-/**
- *
- * @author lprimak
- */
 @Named
 @ApplicationScoped
 public class EnvironmentInfo {

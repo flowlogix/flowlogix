@@ -15,7 +15,7 @@
  */
 
 /**
- * This package contains Utility tests
+ * This package contains Utility tests.
  */
 @PackageMarker
 package com.flowlogix.util;

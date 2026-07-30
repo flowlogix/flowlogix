@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * This package contains the main API classes for the Flow Logix JPA DAO framework
+ * This package contains the main API classes for the Flow Logix JPA DAO framework.
  */
 package com.flowlogix.api.dao;

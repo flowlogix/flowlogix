@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Transform strings that start with javax package into jakarta strings,
- * if it's detected to be in jakarta environment
+ * if it's detected to be in jakarta environment.
  * <p>
  * <em>Examples:</em>
  * {@snippet class="com.flowlogix.demo.ui.JakartifyDemo" region="jakartifyServlet"}
@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 @SuppressWarnings("HideUtilityClassConstructor")
 public class JakartaTransformerUtils {
     /**
-     * Returns true is Jakarta environment is detected
+     * Returns true is Jakarta environment is detected.
      */
     @Getter
     @SuppressWarnings("ConstantName")
@@ -42,7 +42,7 @@ public class JakartaTransformerUtils {
 
     /**
      * Transform javax string into jakarta string, if it's detected to be in jakarta environment,
-     * otherwise returns original string
+     * otherwise returns original string.
      *
      * @param javaxString string that starts with javax package
      * @return string optionally transformed into Jakarta namespace

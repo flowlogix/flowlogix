@@ -19,6 +19,8 @@ The project is organized into the following modules:
 - `base-pom`: Minimal parent POM that can be used for any project. It is a good starting point for new projects. Produces no warnings with Maven 4.
 - `infra-pom`: An opinionated infrastructure POM that includes configurations for testing, code coverage, and dependency management.
 - `payara-pom`: A pre-configured environment for running integration tests with Payara Server.
+- `glassfish-pom`: A pre-configured environment for running integration tests with Payara Server.
+- `server-common`: Common base POM for Payara and GlassFish Servers.
 - `checkstyle`: Provides Checkstyle configurations to enforce a consistent code style.
 
 [[section-modules]]
@@ -33,13 +35,13 @@ The `infra-pom` module is an opinionated infrastructure POM that provides a robu
 - *Dependency Management*: Manages common dependencies, such as Jakarta EE, Lombok, and Mockito.
 - *Release Management*: Simplifies the release process with pre-configured profiles for deploying to various repositories.
 
-=== `payara-pom`
+=== `payara-pom` and `glassfish-pom`
 
-The `payara-pom` module provides a pre-configured environment for running integration tests with Payara Server. It offers several profiles to support different testing scenarios:
+The `payara-pom` and `glassfish-pom` modules provides a pre-configured environment for running integration tests with Payara or GlassFish Server. It offers several profiles to support different testing scenarios:
 
-- `payara-server-local`: For running tests against a local Payara Server instance.
-- `payara-server-remote`: For running tests against a remote Payara Server instance.
-- `payara-docker`: For running tests in a Docker container.
+- `server-local`: For running tests against a local Payara or GlassFish Server instance.
+- `server-remote`: For running tests against a remote Payara or GlassFish Server instance.
+- `server-docker`: For running tests in a Docker container.
 
 === `checkstyle`
 
@@ -85,12 +87,12 @@ This configuration ensures that the JaCoCo plugin only includes your main applic
 
 At this point, your CI/CD pipeline can generate the JaCoCo reports. You can see an example of this in the FlowLogix Jenkins Repository: link:https://github.com/flowlogix/jenkins/blob/main/UnitTests.groovy[UnitTests.groovy] that uses link:https://github.com/flowlogix/jenkins/blob/main/payara-lib/vars[Payara Jenkins Library]
 
-You can also run the tests and generate the report locally. To configure Payara or GlassFish for JaCoCo, download and run the initialization script link:https://github.com/flowlogix/base-pom/blob/main/payara-pom/jacoco-init.sh[jacoco-init.sh]:
+You can also run the tests and generate the report locally. To configure Payara or GlassFish for JaCoCo, download and run the initialization script link:https://github.com/flowlogix/base-pom/blob/main/server-common/jacoco-init.sh[jacoco-init.sh]:
 
 [source,shell]
 .Run the JaCoCo initialization script for Payara or GlassFish
 ----
-curl -sSL https://raw.githubusercontent.com/flowlogix/base-pom/main/payara-pom/jacoco-init.sh | bash -p
+curl -sSL https://raw.githubusercontent.com/flowlogix/base-pom/main/server-common/jacoco-init.sh | bash -p
 ----
 
 Now you can run the tests and generate the report with the following commands

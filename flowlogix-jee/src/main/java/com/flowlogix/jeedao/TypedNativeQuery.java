@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 
 /**
- * type-safe native query, avoids casts or unchecked warnings
+ * type-safe native query, avoids casts or unchecked warnings.
  * <p>
  * Example:
  * <pre>
@@ -38,6 +38,8 @@ public class TypedNativeQuery {
     private final @Delegate Query q;
 
     /**
+     * Gets a single result from native query in a type-safe way.
+     *
      * @param <TT> return type
      * @see Query#getSingleResult()
      * @return single result
@@ -48,6 +50,8 @@ public class TypedNativeQuery {
     }
 
     /**
+     * Gets a result set from native query in a type-safe way.
+     *
      * @param <TT> return type
      * @see Query#getResultList()
      * @return result list
@@ -58,6 +62,8 @@ public class TypedNativeQuery {
     }
 
     /**
+     * Gets result stream from a native query in a type-safe way.
+     *
      * @param <TT> return type
      * @see Query#getResultStream()
      * @return result stream

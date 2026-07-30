@@ -27,10 +27,6 @@ import static com.flowlogix.examples.ui.ResponseExceptionSupplier.RUN_BEFORE_RES
 import lombok.extern.slf4j.Slf4j;
 import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.wasViewExpired;
 
-/**
- *
- * @author lprimak
- */
 @Named
 @ViewScoped
 @Slf4j

@@ -68,10 +68,6 @@ import org.primefaces.model.FilterMeta;
 import org.primefaces.model.MatchMode;
 import org.primefaces.model.SortMeta;
 
-/**
- *
- * @author lprimak
- */
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:MethodCount"})
 class ModelTest implements Serializable {

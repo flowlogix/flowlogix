@@ -20,7 +20,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * dummy interface for {@code package-info.java}
- * so maven doesn't recompile every time
+ * so maven doesn't recompile every time.
  * @hidden
  * @author lprimak
  */

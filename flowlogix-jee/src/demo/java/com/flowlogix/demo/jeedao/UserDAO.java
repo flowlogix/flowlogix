@@ -27,7 +27,7 @@ import org.eclipse.persistence.config.QueryHints;
 import java.util.List;
 
 /**
- * Demonstrates enhanced queries
+ * Demonstrates enhanced queries.
  */
 @Stateless
 public class UserDAO {

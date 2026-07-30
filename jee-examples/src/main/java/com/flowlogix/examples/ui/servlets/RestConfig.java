@@ -18,10 +18,6 @@ package com.flowlogix.examples.ui.servlets;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
-/**
- *
- * @author lprimak
- */
 @ApplicationPath("api")
 public class RestConfig extends Application {
     // blank

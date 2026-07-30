@@ -25,10 +25,6 @@ import java.util.logging.Logger;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-/**
- *
- * @author lprimak
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LogCapture {
     private static final LogCapture INSTANCE = new LogCapture();

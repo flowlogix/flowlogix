@@ -76,7 +76,7 @@ public class MinimizedHandler extends DefaultResourceHandler {
     }
 
     /**
-     * for testing purposes only
+     * for testing purposes only.
      *
      * @param minimizedPrefix
      * @param minimizedExtensions

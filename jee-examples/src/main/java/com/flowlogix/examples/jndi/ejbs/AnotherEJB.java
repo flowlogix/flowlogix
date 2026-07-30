@@ -19,10 +19,6 @@ import jakarta.ejb.ConcurrencyManagement;
 import static jakarta.ejb.ConcurrencyManagementType.BEAN;
 import jakarta.ejb.Singleton;
 
-/**
- *
- * @author lprimak
- */
 @Singleton @ConcurrencyManagement(BEAN)
 public class AnotherEJB {
 

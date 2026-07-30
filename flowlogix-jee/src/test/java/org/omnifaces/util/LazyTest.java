@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
-/**
- *
- * @author lprimak
- */
 class LazyTest {
     private final AtomicInteger numCreations = new AtomicInteger();
 

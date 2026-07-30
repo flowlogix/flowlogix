@@ -15,7 +15,7 @@
  */
 
 /**
- * PrimeFaces JPA-backed {@link com.flowlogix.jeedao.primefaces.JPALazyDataModel}
+ * PrimeFaces JPA-backed {@link com.flowlogix.jeedao.primefaces.JPALazyDataModel}.
  */
 @PackageMarker
 package com.flowlogix.jeedao.primefaces;

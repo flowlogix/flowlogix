@@ -15,7 +15,7 @@
  */
 
 /**
- * Base package for all Flow Logix components
+ * Base package for all Flow Logix components.
  */
 @PackageMarker
 package com.flowlogix;

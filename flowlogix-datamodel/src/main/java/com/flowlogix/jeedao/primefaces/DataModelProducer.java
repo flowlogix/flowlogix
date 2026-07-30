@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * CDI Injection Support, Do not use directly
+ * CDI Injection Support, Do not use directly.
  * @hidden
  */
 @Dependent

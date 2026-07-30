@@ -22,7 +22,7 @@ import jakarta.enterprise.inject.spi.Extension;
 import java.io.Serializable;
 
 /**
- * Mock out ViewScoped via RequestScoped
+ * Mock out ViewScoped via RequestScoped.
  */
 public class MockViewScopeExtension implements Extension, Serializable {
     private static final MockViewScope SCOPE = new MockViewScope();

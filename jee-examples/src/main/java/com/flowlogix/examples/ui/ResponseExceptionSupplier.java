@@ -20,10 +20,6 @@ import jakarta.faces.event.PhaseId;
 import jakarta.faces.event.PhaseListener;
 import org.omnifaces.util.Faces;
 
-/**
- *
- * @author lprimak
- */
 public class ResponseExceptionSupplier implements PhaseListener {
     static final String RUN_BEFORE_RESPONSE = "com.flowlogix.response.runBefore";
     static final String CALL_RESPONSE_COMPLETE = "com.flowlogix.response.responseComplete";

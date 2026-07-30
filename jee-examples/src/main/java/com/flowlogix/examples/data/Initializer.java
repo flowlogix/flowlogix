@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.stream.Stream;
 import jakarta.transaction.Transactional;
 
-/**
- * @author lprimak
- */
 @ApplicationScoped
 @ActivateRequestContext
 @Transactional

@@ -24,7 +24,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Qualifier specify annotation that inject a particular {@link jakarta.persistence.EntityManager}
+ * Qualifier specify annotation that inject a particular {@link jakarta.persistence.EntityManager}.
  */
 @Qualifier
 @Documented

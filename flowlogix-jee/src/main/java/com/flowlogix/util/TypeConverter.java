@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Converts from any String to any type dynamically,
  * using {@code static valueOf(String input)} method of the target type,
- * or other methods with equivalent functionality
+ * or other methods with equivalent functionality.
  * <p>
  * Accepts database special values, such as {@literal inf, -inf, and nan}
  * <p>
@@ -116,6 +116,7 @@ public class TypeConverter {
     }
 
     /**
+     * Convert string to object given a type name.
      *
      * @param <TT> type of result objects
      * @param strValue input
@@ -137,7 +138,7 @@ public class TypeConverter {
     }
 
     /**
-     * Convert string to object given a type name
+     * Convert string to object given a type name.
      *
      * @param strValue
      * @param type
@@ -169,23 +170,24 @@ public class TypeConverter {
     }
 
     /**
-     * used by {@link TypeConverter#checkAndConvert(java.lang.String, java.lang.Class)}
+     * used by {@link TypeConverter#checkAndConvert(java.lang.String, java.lang.Class)}.
+     *
      * @param <TT> type of value
      */
     @RequiredArgsConstructor
     public static class CheckedValue<TT> {
         /**
-         * valid is true if conversion succeeded
+         * valid is true if conversion succeeded.
          */
         private final @Getter boolean valid;
         /**
-         * value of the converted object
+         * value of the converted object.
          */
         private final @Getter TT value;
     }
 
     /**
-     * Check if conversion will succeed
+     * Check if conversion will succeed.
      *
      * @param <TT> type of class
      * @param value
@@ -197,7 +199,7 @@ public class TypeConverter {
     }
 
     /**
-     * check if string representation of the converted value actually matches input
+     * check if string representation of the converted value actually matches input.
      *
      * @param <TT> type of class
      * @param value
@@ -218,6 +220,8 @@ public class TypeConverter {
     }
 
     /**
+     * Calls the static method of the given type with the given string value.
+     *
      * @param strValue
      * @param type
      * @return

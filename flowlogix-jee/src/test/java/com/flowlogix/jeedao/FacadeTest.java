@@ -38,10 +38,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-/**
- *
- * @author lprimak
- */
 class FacadeTest implements Serializable {
     private final EntityManager em = mock(EntityManager.class, withSettings().serializable()
             .defaultAnswer(RETURNS_DEEP_STUBS));

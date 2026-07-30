@@ -36,7 +36,7 @@ import org.omnifaces.util.Lazy.SerializableSupplier;
 import static java.lang.Math.toIntExact;
 
 /**
- * Lightweight wrapper around common JPA methods
+ * Lightweight wrapper around common JPA methods.
  * This is the primary class in the {@link com.flowlogix.jeedao} package
  * Implementation of {@link JPAFinder} interface
  *
@@ -46,11 +46,11 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     private static final long serialVersionUID = 5L;
 
     /**
-     * Return entity manager to operate on
+     * Return entity manager to operate on.
      */
     private final @NonNull SerializableSupplier<EntityManager> entityManager;
     /**
-     * entity class
+     * entity class.
      */
     private final @NonNull Class<TT> entityClass;
 
@@ -136,7 +136,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * Do not make this public because entity manager is not thread-safe
+     * Do not make this public because entity manager is not thread-safe.
      *
      * @return Entity Manager
      */
@@ -181,7 +181,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * Finds a reference to entity manager via CDI
+     * Finds a reference to entity manager via CDI.
      *
      * @return {@link SerializableSupplier} of default {@link EntityManager}
      */
@@ -190,7 +190,7 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     }
 
     /**
-     * Finds a reference to entity manager via CDI
+     * Finds a reference to entity manager via CDI.
      *
      * @param qualifiers for the entity manager, or empty list
      * @return {@link SerializableSupplier} of {@link EntityManager}

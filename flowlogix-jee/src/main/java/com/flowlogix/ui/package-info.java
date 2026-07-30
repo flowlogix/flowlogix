@@ -16,7 +16,7 @@
 
 /**
  * User Interface components including {@link com.flowlogix.ui.MinimizedHandler}
- * and {@link com.flowlogix.ui.UnmappedResourceHandlerMapper}
+ * and {@link com.flowlogix.ui.UnmappedResourceHandlerMapper}.
  */
 @PackageMarker
 package com.flowlogix.ui;

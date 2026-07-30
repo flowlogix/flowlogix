@@ -15,7 +15,7 @@
  */
 
 /**
- * Utilities including {@link com.flowlogix.util.TypeConverter} and {@link com.flowlogix.util.JakartaTransformerUtils}
+ * Utilities including {@link com.flowlogix.util.TypeConverter} and {@link com.flowlogix.util.JakartaTransformerUtils}..
  * <br>
  * Testing helpers including {@link com.flowlogix.util.ShrinkWrapManipulator} and {@link com.flowlogix.util.SerializeTester}
  */

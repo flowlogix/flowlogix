@@ -27,10 +27,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 
-/**
- *
- * @author lprimak
- */
 @WebServlet("/lastException")
 public class ExceptionServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;

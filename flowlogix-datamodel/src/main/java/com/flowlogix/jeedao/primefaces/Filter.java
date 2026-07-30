@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Filter Hook
+ * Filter Hook.
  * <p>
  * <em>Example:</em>
  * {@snippet class = "com.flowlogix.demo.jeedao.primefaces.FilteringDataModel" region = "filtering"}
@@ -35,11 +35,11 @@ import lombok.RequiredArgsConstructor;
 public interface Filter<TT> {
     /**
      * Interface that directly inherits from {@link Map} and adds
-     * {@link #replaceFilter(String, BiFunction)} method
+     * {@link #replaceFilter(String, BiFunction)} method.
      */
     interface FilterData extends Map<String, FilterColumnData> {
         /**
-         * Replacing a predicate in the filter list by field name
+         * Replacing a predicate in the filter list by field name.
          *
          * @param <TT> type of value
          * @param fieldName element to be replace
@@ -58,23 +58,23 @@ public interface Filter<TT> {
     }
 
     /**
-     * filter data this is what you replace with your own filter
+     * filter data this is what you replace with your own filter.
      */
     @RequiredArgsConstructor
     @Getter
     class FilterColumnData {
         /**
-         * filter field value
+         * filter field value.
          */
         private final Object filterValue;
         /**
-         * Existing or null predicate, can replace with custom
+         * Existing or null predicate, can replace with custom.
          */
         private final Predicate predicate;
     }
 
     /**
-     * hook to supply custom filter
+     * hook to supply custom filter.
      *
      * @param filterData user input
      * @param cb

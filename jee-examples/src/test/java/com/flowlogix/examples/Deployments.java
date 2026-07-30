@@ -21,10 +21,6 @@ import org.eu.ingwar.tools.arquillian.extension.suite.annotations.ArquillianSuit
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-/**
- *
- * @author lprimak
- */
 @ArquillianSuiteDeployment
 @SuppressWarnings("HideUtilityClassConstructor")
 class Deployments {

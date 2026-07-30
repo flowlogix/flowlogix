@@ -19,18 +19,19 @@ import com.flowlogix.examples.jndi.ejbs.NumberGetter;
 import org.omnifaces.util.JNDIObjectLocator;
 
 /**
- * Examples of JNDI object locator, ServiceLocator pattern
+ * Examples of JNDI object locator, ServiceLocator pattern.
  * Locator is thread-safe, caching and serializable
  *
  * @author lprimak
  */
 public class JndiExample {
     /**
-     * Create an object locator via builder interface
+     * Create an object locator via builder interface.
      */
     private final JNDIObjectLocator locator = JNDIObjectLocator.builder().build();
 
     /**
+     * Getter method. The returned locator is thread-safe, caching and serializable.
      * @return new thread-safe locator
      */
     JNDIObjectLocator getLocator() {
@@ -38,7 +39,7 @@ public class JndiExample {
     }
 
     /**
-     *
+     * Create an object locator with environment via builder interface.
      * @return new thread-safe locator with environment
      */
     JNDIObjectLocator createLocatorWithEnvironment() {
@@ -48,6 +49,7 @@ public class JndiExample {
     }
 
     /**
+     * Creates an object locator without caching.
      * @return new thread-safe locator with no caching
      */
     JNDIObjectLocator createLocatorWithNoCaching() {
@@ -55,7 +57,7 @@ public class JndiExample {
     }
 
     /**
-     * get a number via locator
+     * get a number via locator.
      * @return number
      */
     int getNumber() {

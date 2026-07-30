@@ -20,10 +20,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Startup;
 
-/**
- *
- * @author lprimak
- */
 @ApplicationScoped
 @SuppressWarnings("MagicNumber")
 public class LogCaptureSingleton {

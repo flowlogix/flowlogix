@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 
 /**
- * Enables CDI Injection of {@link JPAFinder} instances
+ * Enables CDI Injection of {@link JPAFinder} instances.
  */
 @Dependent
 @SuppressWarnings("HideUtilityClassConstructor")

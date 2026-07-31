@@ -38,10 +38,10 @@ public class FilteringDataModel implements Serializable {
     @PostConstruct
     void initialize() {
         // display only zip codes greater than the filter field
-        userModel.initialize(builder -> builder.filter((filters, cb, root) ->
-                        filters.replaceFilter(UserEntity_.zipCode.getName(),
-                        (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value)))
-                .build());
+        userModel.initialize(builder ->
+                builder.filter((filters, cb, root) -> filters.replaceFilter(UserEntity_.zipCode.getName(),
+                                (Predicate predicate, Integer value) -> cb.greaterThan(root.get(UserEntity_.zipCode), value)))
+                        .build());
     }
 }
 // end::filtering[] // @replace regex='.*\n' replacement=""

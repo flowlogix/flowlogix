@@ -41,10 +41,10 @@ public class CursorDataModel implements Serializable {
     @PostConstruct
     void initialize() {
         // configure cursor pagination by id field
-        userModel.initialize(builder -> builder
-                .cursor(CursorPagination.create(config -> config.supportedFields(List.of(
-                                new Field<>(() -> UserEntity_.id.getName(), UserEntity::getId)
-                )).build())).build());
+        userModel.initialize(builder ->
+                builder.cursor(CursorPagination.create(config -> config.supportedFields(
+                        List.of(new Field<>(() -> UserEntity_.id.getName(), UserEntity::getId)
+                        )).build())).build());
     }
 }
 // end::usage[] // @replace regex='.*\n' replacement=""

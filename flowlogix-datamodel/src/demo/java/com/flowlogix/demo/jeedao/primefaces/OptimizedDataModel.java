@@ -40,11 +40,12 @@ public class OptimizedDataModel implements Serializable {
     @PostConstruct
     void initialize() {
         // optimize query by batching relationship fetching
-        userModel.initialize(builder -> builder.optimizer(query -> query
-                        .setHint(QueryHints.BATCH, getResultField(UserEntity_.userSettings.getName()))
-                        .setHint(QueryHints.BATCH, getResultField(UserEntity_.alternateEmails.getName()))
-                        .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN))
-                .build());
+        userModel.initialize(builder ->
+                builder.optimizer(query -> query
+                                .setHint(QueryHints.BATCH, getResultField(UserEntity_.userSettings.getName()))
+                                .setHint(QueryHints.BATCH, getResultField(UserEntity_.alternateEmails.getName()))
+                                .setHint(QueryHints.BATCH_TYPE, BatchFetchType.IN))
+                        .build());
     }
 }
 // end::optimized[] // @replace regex='.*\n' replacement=""

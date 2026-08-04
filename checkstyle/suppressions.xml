@@ -24,6 +24,7 @@
 <suppressions>
     <suppress checks=".*" files="target/generated-sources/.*"/>
     <suppress checks=".*" files="target/generated-test-sources/.*"/>
+    <suppress checks="SummaryJavadoc" files=".*"/>
     <!-- do not require package-info.java -->
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]PackageMarker"/>
     <suppress checks="JavadocPackage" files="com[\\/]flowlogix[\\/]ui[\\/]*"/>

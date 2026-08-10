@@ -100,8 +100,10 @@ public class AutoReloadPhaseListener implements PhaseListener {
                                 } else {
                                     location.reload();
                                 }
-                            }
-                            if (e.data === 'shutdown') ws.close();
+                            } else if (e.data === 'error' && typeof flowlogix_showError === 'function') {
+                                flowlogix_showError('livereload-compile-error-message',
+                                'Compilation or deployment error occurred, please check maven and server logs for details.');
+                            } else if (e.data === 'shutdown') ws.close();
                         };
                         ws.onclose = () => setTimeout(connectWS, 2000);
                         ws.onerror = () => ws.close();

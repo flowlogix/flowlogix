@@ -90,6 +90,7 @@ public class AutoReloadPhaseListener implements PhaseListener {
                         const ws = new WebSocket('%s');
                         ws.onopen = () => ws.send('%s');
                         ws.onmessage = e => {
+                            const LIVERELOAD_ERROR_ID = 'livereload-error-message';
                             if (e.data === 'reload') {
                                 if (typeof OmniFaces !== 'undefined' && typeof OmniFaces.Unload !== 'undefined') {
                                     window.dispatchEvent(new Event('beforeunload'));
@@ -101,10 +102,10 @@ public class AutoReloadPhaseListener implements PhaseListener {
                                     location.reload();
                                 }
                             } else if (e.data === 'error' && typeof flowlogix_showError === 'function') {
-                                flowlogix_showError('livereload-compile-error-message',
+                                flowlogix_showError(LIVERELOAD_ERROR_ID,
                                 'Compilation or deployment error occurred, please check maven and server logs for details.');
                             } else if (e.data === 'test-failure' && typeof flowlogix_showError === 'function') {
-                                flowlogix_showError('livereload-test-failure-error-message',
+                                flowlogix_showError(LIVERELOAD_ERROR_ID,
                                 'Test failure(s) occurred, please check maven for details.');
                             } else if (e.data === 'shutdown') ws.close();
                         };

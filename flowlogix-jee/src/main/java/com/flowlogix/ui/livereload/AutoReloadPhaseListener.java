@@ -92,6 +92,7 @@ public class AutoReloadPhaseListener implements PhaseListener {
                         ws.onmessage = e => {
                             const LIVERELOAD_ERROR_ID = 'livereload-error-message';
                             if (e.data === 'reload') {
+                                ws.close();
                                 if (typeof OmniFaces !== 'undefined' && typeof OmniFaces.Unload !== 'undefined') {
                                     window.dispatchEvent(new Event('beforeunload'));
                                     console.log('OmniFaces @ViewScoped Unload triggered')

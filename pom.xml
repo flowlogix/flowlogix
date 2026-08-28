@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>136</version>
+        <version>138</version>
     </parent>
 
     <properties>
@@ -97,7 +97,7 @@
                     <dependency>
                         <groupId>org.apache.groovy</groupId>
                         <artifactId>groovy-all</artifactId>
-                        <version>5.1.0</version>
+                        <version>5.1.1</version>
                         <scope>runtime</scope>
                         <type>pom</type>
                     </dependency>

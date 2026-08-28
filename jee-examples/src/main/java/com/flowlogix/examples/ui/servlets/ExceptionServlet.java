@@ -20,11 +20,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.LogRecord;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 
 @WebServlet("/lastException")
@@ -32,8 +32,9 @@ public class ExceptionServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    @SuppressWarnings("EmptyBlock")
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    @SneakyThrows(IOException.class)
+    @SuppressWarnings("checkstyle:EmptyBlock")
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         PrintWriter out = resp.getWriter();
         resp.setContentType(TEXT_PLAIN);
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());

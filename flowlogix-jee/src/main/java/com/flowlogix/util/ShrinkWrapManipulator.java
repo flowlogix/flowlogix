@@ -379,10 +379,10 @@ public class ShrinkWrapManipulator {
                     // first one is the maven rc-3 and later
                     // second one is the pre-rc-3 logger
                     new ByteArrayInputStream("""
-                            org.apache.maven.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
-                            org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
+                            org.apache.maven.impl.resolver.DefaultArtifactDescriptorReader.level=SEVERE
+                            org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader.level=SEVERE
                             """.getBytes()),
-                    key -> (oldValue, newValue) -> newValue);
+                    key -> (oldValue, newValue) -> newValue != null ? newValue : oldValue);
         }
     }
 

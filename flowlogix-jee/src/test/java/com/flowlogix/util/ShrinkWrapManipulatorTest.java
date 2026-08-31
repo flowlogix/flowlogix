@@ -43,6 +43,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
@@ -146,6 +148,39 @@ class ShrinkWrapManipulatorTest {
         ShrinkWrapManipulator.removeMavenWarningsFromLogging();
         assertThat(changed).isFalse();
         System.setProperty("com.flowlogix.maven.resolver.warn", Boolean.FALSE.toString());
+    }
+
+    @Test
+    void createDeploymentPreservesUnrelatedLoggingConfig() {
+        var unrelatedLogger = java.util.logging.Logger.getLogger("com.flowlogix.unrelated.test.logger");
+        var rootLogger = java.util.logging.Logger.getLogger("");
+        Handler testHandler = new Handler() {
+            @Override
+            public void publish(java.util.logging.LogRecord record) { }
+            @Override
+            public void flush() { }
+            @Override
+            public void close() { }
+        };
+        Level previousLevel = unrelatedLogger.getLevel();
+        try {
+            ShrinkWrapManipulator.resetMavenWarningsRemovalFlag();
+            unrelatedLogger.setLevel(Level.FINEST);
+            rootLogger.addHandler(testHandler);
+            try (var shrinkWrap = mockStatic(ShrinkWrap.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+                shrinkWrap.when(() -> ShrinkWrap.create(eq(MavenImporter.class),
+                        notNull(String.class))).thenReturn(mavenImporter);
+                when(mavenImporter.loadPomFromFile(any(File.class)).importBuildOutput()
+                        .as(any())).thenReturn(javaArchive);
+                ShrinkWrapManipulator.createDeployment(JavaArchive.class);
+            }
+            assertThat(unrelatedLogger.getLevel()).isEqualTo(Level.FINEST);
+            assertThat(rootLogger.getHandlers()).contains(testHandler);
+        } finally {
+            unrelatedLogger.setLevel(previousLevel);
+            rootLogger.removeHandler(testHandler);
+            ShrinkWrapManipulator.resetMavenWarningsRemovalFlag();
+        }
     }
 
     @Test

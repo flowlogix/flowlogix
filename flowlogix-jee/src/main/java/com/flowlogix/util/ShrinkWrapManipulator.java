@@ -26,6 +26,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -79,7 +80,8 @@ public class ShrinkWrapManipulator {
     }
 
     static final String DEFAULT_SSL_PROPERTY = "httpsPort";
-    static boolean mavenWarningsRemoved;
+    @SuppressWarnings("checkstyle:ConstantName")
+    static final AtomicBoolean mavenWarningsRemoved = new AtomicBoolean();
     @SuppressWarnings("checkstyle:ConstantName")
     private static final Supplier<Path> defaultPomFilePath = () -> Path.of("pom.xml");
 
@@ -371,20 +373,20 @@ public class ShrinkWrapManipulator {
 
     @SneakyThrows(IOException.class)
     static void removeMavenWarningsFromLogging() {
-        if (!mavenWarningsRemoved && !Boolean.getBoolean("com.flowlogix.maven.resolver.warn")) {
-            mavenWarningsRemoved = true;
-            LogManager.getLogManager().readConfiguration(
+        if (!mavenWarningsRemoved.get() && !Boolean.getBoolean("com.flowlogix.maven.resolver.warn")) {
+            mavenWarningsRemoved.set(true);
+            LogManager.getLogManager().updateConfiguration(
                     // first one is the maven rc-3 and later
                     // second one is the pre-rc-3 logger
                     new ByteArrayInputStream("""
                             org.apache.maven.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
                             org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader=SEVERE
-                            """
-                            .getBytes()));
+                            """.getBytes()),
+                    key -> (oldValue, newValue) -> newValue);
         }
     }
 
     static void resetMavenWarningsRemovalFlag() {
-        mavenWarningsRemoved = false;
+        mavenWarningsRemoved.set(false);
     }
 }

@@ -23,11 +23,14 @@ import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
 import com.flowlogix.jeedao.primefaces.internal.InternalQualifierJPALazyModel;
+import com.flowlogix.jeedao.primefaces.internal.JoinResolver;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.convert.Converter;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
+import jakarta.persistence.metamodel.PluralAttribute;
 import jakarta.persistence.criteria.Path;
 import java.io.IOException;
 import java.io.Serializable;
@@ -37,6 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Test;
@@ -49,10 +53,12 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -315,7 +321,7 @@ class ModelTest implements Serializable {
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
                 .build();
-        when(rootInteger.<Integer, Integer>join(any(String.class))).thenReturn(integerJoin);
+        when(rootInteger.<Integer, Integer>join(any(String.class), any(JoinType.class))).thenReturn(integerJoin);
         when(rootInteger.<Integer>get("a")).thenReturn(integerPath);
         assertThat(impl.resolveField(rootInteger, "a")).isEqualTo(integerPath);
         verify(rootInteger).get("a");
@@ -328,13 +334,120 @@ class ModelTest implements Serializable {
                 .entityClass(Integer.class)
                 .converter(Long::valueOf)
                 .build();
-        when(rootInteger.<Integer, Integer>join(any(String.class))).thenReturn(integerJoin);
-        when(integerJoin.<Integer, Integer>join(any(String.class))).thenReturn(integerJoin);
+        when(rootInteger.<Integer, Integer>join(any(String.class), any(JoinType.class))).thenReturn(integerJoin);
+        when(integerJoin.<Integer, Integer>join(any(String.class), any(JoinType.class))).thenReturn(integerJoin);
         when(integerJoin.<Integer>get("c")).thenReturn(integerPath);
         assertThat(impl.resolveField(rootInteger, "a.b.c")).isEqualTo(integerPath);
-        verify(rootInteger).join("a");
-        verify(integerJoin).join("b");
+        verify(rootInteger).join("a", JoinType.LEFT);
+        verify(integerJoin).join("b", JoinType.LEFT);
         verify(integerJoin).get("c");
+    }
+
+    @Test
+    void resolveStaticJoinFieldUsesInnerJoins() {
+        when(rootInteger.<Integer, Integer>join(any(String.class), any(JoinType.class))).thenReturn(integerJoin);
+        when(integerJoin.<Integer>get("b")).thenReturn(integerPath);
+        assertThat(JPAModelImpl.<Integer, Integer>resolveField0(rootInteger, "a.b")).isEqualTo(integerPath);
+        verify(rootInteger).join("a", JoinType.INNER);
+        verify(integerJoin).get("b");
+    }
+
+    @Test
+    void resolveJoinFieldCachesJoins() {
+        var impl = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        when(rootInteger.<Integer, Integer>join(any(String.class), any(JoinType.class))).thenReturn(integerJoin);
+        when(integerJoin.<Integer, Integer>join(any(String.class), any(JoinType.class))).thenReturn(integerJoin);
+        when(integerJoin.<Integer>get(any(String.class))).thenReturn(integerPath);
+        var resolver = JoinResolver.of(rootInteger, JoinType.LEFT);
+        assertThat(impl.resolveField(resolver, "a.b.c")).isEqualTo(integerPath);
+        assertThat(impl.resolveField(resolver, "a.b.d")).isEqualTo(integerPath);
+        assertThat(impl.resolveField(resolver, "a.b.c")).isEqualTo(integerPath);
+        verify(rootInteger).join("a", JoinType.LEFT);
+        verify(integerJoin).join("b", JoinType.LEFT);
+        verify(integerJoin, times(2)).get("c");
+        verify(integerJoin).get("d");
+        verifyNoMoreInteractions(rootInteger);
+    }
+
+    @Test
+    void filterAndSortOnSameAssociationProduceSingleJoin() {
+        var impl = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        doReturn(integerJoin).when(rootInteger).join(any(String.class), any(JoinType.class));
+        doReturn(integerPath).when(integerJoin).get("city");
+        when(integerPath.getJavaType()).thenAnswer(a -> String.class);
+        lenient().when(em.getCriteriaBuilder().createQuery(Integer.class).from(Integer.class))
+                .thenReturn(rootInteger);
+        var fm = FilterMeta.builder().field("address.city").filterValue("hello").build();
+        var sm = SortMeta.builder().field("address.city").order(ASCENDING).build();
+        impl.findRows(0, 10, Map.of("address.city", fm), Map.of("address.city", sm));
+        verify(rootInteger).join("address", JoinType.LEFT);
+    }
+
+    @Test
+    void pluralJoinResultsInDistinctQuery() {
+        var impl = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        doReturn(integerJoin).when(rootInteger).join(any(String.class), any(JoinType.class));
+        doReturn(integerPath).when(integerJoin).get("email");
+        when(integerJoin.getModel()).thenAnswer(a -> pluralAttribute());
+        when(integerPath.getJavaType()).thenAnswer(a -> String.class);
+        lenient().when(em.getCriteriaBuilder().createQuery(Integer.class).from(Integer.class))
+                .thenReturn(rootInteger);
+        var fm = FilterMeta.builder().field("emails.email").filterValue("hello").build();
+        impl.findRows(0, 10, Map.of("emails.email", fm), Map.of());
+        verify(em.getCriteriaBuilder().createQuery(Integer.class)).distinct(true);
+    }
+
+    @Test
+    void pluralJoinResultsInCountDistinctQuery() {
+        var impl = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        doReturn(integerJoin).when(rootInteger).join(any(String.class), any(JoinType.class));
+        doReturn(integerPath).when(integerJoin).get("email");
+        when(integerJoin.getModel()).thenAnswer(a -> pluralAttribute());
+        when(integerPath.getJavaType()).thenAnswer(a -> String.class);
+        lenient().when(em.getCriteriaBuilder().createQuery(Long.class).from(Integer.class))
+                .thenReturn(rootInteger);
+        lenient().when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(1L);
+        var fm = FilterMeta.builder().field("emails.email").filterValue("hello").build();
+        impl.count(Map.of("emails.email", fm));
+        verify(em.getCriteriaBuilder()).countDistinct(any(Root.class));
+    }
+
+    @Test
+    void innerJoinOptOut() {
+        var impl = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .joinType(JoinType.INNER)
+                .converter(Long::valueOf)
+                .build();
+        @SuppressWarnings("unchecked")
+        Join<Integer, Integer> secondJoin = mock(Join.class, withSettings().strictness(Strictness.LENIENT));
+        when(rootInteger.<Integer, Integer>join(any(String.class), any(JoinType.class))).thenReturn(integerJoin);
+        when(integerJoin.<Integer, Integer>join(any(String.class), any(JoinType.class))).thenReturn(secondJoin);
+        when(secondJoin.<Integer>get("c")).thenReturn(integerPath);
+        assertThat(impl.resolveField(rootInteger, "a.b.c")).isEqualTo(integerPath);
+        verify(rootInteger).join("a", JoinType.INNER);
+        verify(integerJoin).join("b", JoinType.INNER);
+    }
+
+    private static PluralAttribute<?, ?, ?> pluralAttribute() {
+        return mock(PluralAttribute.class);
     }
 
     @Test

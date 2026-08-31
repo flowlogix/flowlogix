@@ -435,6 +435,7 @@ During direct creation, `JPALazyDataModel` only requires `entityClass` to work, 
 * caseSensitiveFilter: Specifies if filtering of String values are case-sensitive (boolean). Default is `true`.
 * filterCaseConversion: either `UPPER` or `LOWER`. Specifies whether to convert queries to upper or lower case during case-insensitive filter queries. Default is `UPPER`
 * wildcardSupport: Specifies whether wildcards are supported in `EXACT` and other String queries (boolean). Default is false.
+* joinType: Specifies the `jakarta.persistence.criteria.JoinType` used when resolving dotted (nested) field references in filters and sort criteria. Default is `LEFT`, so entities with null to-one associations are still returned when sorting or filtering on columns of those associations. Set to `INNER` (or use `@LazyModelConfig(innerJoins = true)`) only for applications that deliberately rely on inner join semantics.
 * sorter: Apply additional or replacement sort criteria
 * filter: Apply additional or replacement filter criteria
 * optimizer: Apply additional customizations to queries, such as JPA hints, works together with `JPAFinder`
@@ -442,6 +443,8 @@ During direct creation, `JPALazyDataModel` only requires `entityClass` to work, 
 * resultEnricher: Apply transformation to the results of the query, such as adding or modifying resulting rows displayed by the model
 * converter: `Function` that converts String representation of a primary key into a primary key object. Needed only if the default is insufficient.
 * keyConverter: `Function` that converts an entity object into it's primary key in `String` form. Needed only if the default is insufficient.
+
+NOTE: Dotted (nested) field references, such as `address.city`, share a single `LEFT` join per query between filter, sort and count criteria, and filtering over a to-many association uses `DISTINCT` (and `COUNT(DISTINCT ...)` for the count query), so each matching entity is returned exactly once and `count()` always agrees with the paged rows.
 
 Let's use custom criteria to add address to the default sort:
 [source,java]

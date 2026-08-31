@@ -17,6 +17,7 @@ package com.flowlogix.jeedao.primefaces.internal;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Test;
@@ -49,17 +50,17 @@ class SortingTest {
     @Test
     void sortOrderWithInvalidApplicationSort() {
         assertThatThrownBy(() -> model.processSortOrder(Map.of("id", mergeSortOrder(null, null, false)),
-                null, null, true)).isInstanceOf(IllegalStateException.class);
+                null, null, null, true)).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void cursorSupportedWithApplicationSort() {
         assertThatNoException().isThrownBy(() -> model.processSortOrder(Map.of("id",
                         mergeSortOrder(SortMeta.builder().order(SortOrder.DESCENDING).field("xxx").build(), null, false)),
-                cb, root, true));
+                cb, root, JoinResolver.of(root, JoinType.LEFT), true));
         assertThatThrownBy(() -> model.processSortOrder(Map.of("id",
                         mergeSortOrder(SortMeta.builder().field("xxx").build(), null, false)),
-                cb, root, true)).isInstanceOf(UnsupportedOperationException.class);
+                cb, root, JoinResolver.of(root, JoinType.LEFT), true)).isInstanceOf(UnsupportedOperationException.class);
         JPAModelImpl.processApplicationSortOrder(true, mergeSortOrder(null, order, true), null);
     }
 

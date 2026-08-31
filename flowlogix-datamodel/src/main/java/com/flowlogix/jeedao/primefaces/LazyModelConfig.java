@@ -52,6 +52,16 @@ public @interface LazyModelConfig {
     boolean wildcardSupport() default false;
 
     /**
+     * Use inner joins instead of left joins when resolving dotted (nested)
+     * field references in filters and sort criteria. Left joins (the default)
+     * keep entities with null to-one associations in the result when sorting
+     * or filtering on columns of those associations. Set to {@code true} only
+     * for applications that deliberately rely on inner join semantics.
+     */
+    @Nonbinding
+    boolean innerJoins() default false;
+
+    /**
      * Override entity manager for the data model.
      */
     @Nonbinding

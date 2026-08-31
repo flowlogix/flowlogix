@@ -16,6 +16,7 @@
 package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.EntityManagerSelector;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Default;
@@ -57,6 +58,7 @@ class DataModelProducer {
                 builder.entityManagerQualifiers(selector == null ? List.of(config.entityManagerSelector())
                         : Stream.concat(Stream.of(config.entityManagerSelector()), Stream.of(selector.value())).toList());
                 builder.wildcardSupport(config.wildcardSupport());
+                builder.joinType(config.innerJoins() ? JoinType.INNER : JoinType.LEFT);
             } else {
                 builder.entityManagerQualifiers(selector == null ? List.of() : List.of(selector.value()));
             }

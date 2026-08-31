@@ -46,6 +46,7 @@ import java.util.function.Consumer;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -156,11 +157,17 @@ class ShrinkWrapManipulatorTest {
         var rootLogger = java.util.logging.Logger.getLogger("");
         Handler testHandler = new Handler() {
             @Override
-            public void publish(java.util.logging.LogRecord record) { }
+            public void publish(LogRecord rec) {
+                // intentionally left blank, we don't want to actually log anything during the test
+            }
             @Override
-            public void flush() { }
+            public void flush() {
+                // intentionally left blank, we don't want to actually log anything during the test
+            }
             @Override
-            public void close() { }
+            public void close() {
+                // intentionally left blank, we don't want to actually log anything during the test
+            }
         };
         Level previousLevel = unrelatedLogger.getLevel();
         try {

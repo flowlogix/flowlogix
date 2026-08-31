@@ -193,7 +193,7 @@ class CursorData<TT> implements CursorPagination<TT> {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
+    final NavigableMap<Integer, List<Comparable<?>>> cursorCache = new TreeMap<>();
     private final Lazy<Map<String, SerializableFunction<TT, Comparable<?>>>> columns;
     private final boolean isDescendingDefault;
     private final boolean evictCursorCacheBehind;
@@ -225,9 +225,9 @@ class CursorData<TT> implements CursorPagination<TT> {
     }
 
     public void save(int offset, TT entity, Map<String, SortMeta> sortMeta) {
-        var value = columns().get(requestedSort(sortMeta, columns(), true)).apply(entity);
-        log.debug("Saving cursor for offset {} and entity id {}", offset, value);
-        cursorCache.put(offset, value);
+        var values = cursorFields(sortMeta).stream().map(field -> (Comparable<?>) columns().get(field).apply(entity)).toList();
+        log.debug("Saving cursor for offset {} and entity id {}", offset, values);
+        cursorCache.put(offset, values);
         if (evictCursorCacheBehind) {
             // clear too far behind of the current offset
             cursorCache.headMap(Math.max(0, offset - behindCursorWindowSize)).clear();
@@ -278,9 +278,9 @@ class CursorData<TT> implements CursorPagination<TT> {
         boolean descending = Optional.ofNullable(sortMeta.get(currentColumn))
                 .map(order -> order.getOrder().isDescending())
                 .orElse(isDescendingDefault);
-        return Optional.ofNullable(floor).map(entry -> descending
-                        ? cb.lessThan(resolveField0(root, currentColumn), (Comparable) entry.getValue())
-                        : cb.greaterThan(resolveField0(root, currentColumn), (Comparable) entry.getValue())).orElse(null);
+        return Optional.ofNullable(floor).map(entry ->
+                buildValueBasedPagingPredicate(cb, root, cursorFields(sortMeta), entry.getValue(), descending, 0))
+                .orElse(null);
     }
 
     @Override
@@ -289,8 +289,31 @@ class CursorData<TT> implements CursorPagination<TT> {
         return isDescendingDefault ? cb.desc(resolveField0(root, sortField)) : cb.asc(resolveField0(root, sortField));
     }
 
-    static Supplier<Comparable<?>> valueForLogging(Map.Entry<Integer, Comparable<?>> entry) {
+    static Supplier<Object> valueForLogging(Map.Entry<Integer, ?> entry) {
         return () -> Optional.ofNullable(entry).map(Map.Entry::getValue).orElse(null);
+    }
+
+    private List<String> cursorFields(Map<String, SortMeta> sortMeta) {
+        String defaultColumn = columns().keySet().iterator().next();
+        String currentColumn = requestedSort(sortMeta, columns(), true);
+        return currentColumn.equals(defaultColumn) ? List.of(currentColumn) : List.of(currentColumn, defaultColumn);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private Predicate buildValueBasedPagingPredicate(CriteriaBuilder cb, Root<TT> root,
+                                                     List<String> fields, List<Comparable<?>> values,
+                                                     boolean descending, int fieldIndex) {
+        String field = fields.get(fieldIndex);
+        Comparable<?> value = values.get(fieldIndex);
+        Predicate comparison = descending
+                ? cb.lessThan(resolveField0(root, field), (Comparable) value)
+                : cb.greaterThan(resolveField0(root, field), (Comparable) value);
+        if (fieldIndex == fields.size() - 1) {
+            return comparison;
+        }
+        return cb.or(comparison,
+                cb.and(cb.equal(resolveField0(root, field), value),
+                        buildValueBasedPagingPredicate(cb, root, fields, values, descending, fieldIndex + 1)));
     }
 
     private void initializeFilters(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {

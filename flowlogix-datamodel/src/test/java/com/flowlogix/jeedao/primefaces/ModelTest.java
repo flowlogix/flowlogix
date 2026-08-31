@@ -295,6 +295,52 @@ class ModelTest implements Serializable {
         assertThat(sortResult.get(1).isAscending()).isTrue();
     }
 
+    @Test
+    void sortAddsCursorTieBreakerAscending() {
+        var impl = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .cursor(CursorPagination.create(builder -> builder.supportedFields(List.of(
+                        new CursorPagination.Field<>(() -> "id", value -> value),
+                        new CursorPagination.Field<>(() -> "lastName", value -> value))).build()))
+                .converter(Long::valueOf)
+                .build();
+
+        var uiSortCriteria = Map.of("lastName", SortMeta.builder().field("lastName").order(ASCENDING).build());
+        when(rootInteger.get(any(String.class))).thenAnswer(a -> integerPath);
+        var ascendingOrder = createOrder(true);
+        when(cb.asc(any())).thenReturn(ascendingOrder);
+
+        var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger, true);
+
+        assertThat(sortResult).hasSize(2).allMatch(Order::isAscending);
+        verify(rootInteger).get("lastName");
+        verify(rootInteger).get("id");
+    }
+
+    @Test
+    void sortAddsCursorTieBreakerDescending() {
+        var impl = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .cursor(CursorPagination.create(builder -> builder.supportedFields(List.of(
+                        new CursorPagination.Field<>(() -> "id", value -> value),
+                        new CursorPagination.Field<>(() -> "lastName", value -> value))).build()))
+                .converter(Long::valueOf)
+                .build();
+
+        var uiSortCriteria = Map.of("lastName", SortMeta.builder().field("lastName").order(DESCENDING).build());
+        when(rootInteger.get(any(String.class))).thenAnswer(a -> integerPath);
+        var descendingOrder = createOrder(false);
+        when(cb.desc(any())).thenReturn(descendingOrder);
+
+        var sortResult = impl.getSort(uiSortCriteria, cb, rootInteger, true);
+
+        assertThat(sortResult).hasSize(2).allMatch(order -> !order.isAscending());
+        verify(rootInteger).get("lastName");
+        verify(rootInteger).get("id");
+    }
+
     private static void replacingSorter(SortData sortData, CriteriaBuilder cb, Root<Integer> root) {
         sortData.applicationSort("uuu", sortMeta -> {
             assertFalse(sortMeta.isEmpty());

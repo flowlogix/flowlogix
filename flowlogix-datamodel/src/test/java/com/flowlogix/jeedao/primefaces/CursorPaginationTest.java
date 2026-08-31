@@ -17,6 +17,8 @@ package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.primefaces.CursorPagination.Field;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,13 +31,36 @@ import java.util.List;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CursorPaginationTest {
-    static class Entity { }
+    static class Entity {
+        private final String id;
+        private final String lastName;
+
+        Entity() {
+            this("1", "A");
+        }
+
+        Entity(String id, String lastName) {
+            this.id = id;
+            this.lastName = lastName;
+        }
+
+        String getId() {
+            return id;
+        }
+
+        String getLastName() {
+            return lastName;
+        }
+    }
     CursorPagination<Entity> cursor = CursorPagination.<Entity>create(builder ->
             builder.supportedFields(List.of(new Field<>(() -> "id", e -> "one")))
                     .defaultDescendingSort(true).build()).get();
@@ -132,6 +157,67 @@ class CursorPaginationTest {
 
         verify(root, times(4)).get("id");
         verifyNoMoreInteractions(cb, root);
+    }
+
+    @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void saveAndPredicateWithTieBreakerAscending() {
+        var rawCursor = CursorPagination.<Entity>create(builder -> builder.supportedFields(List.of(
+                new Field<>(() -> "id", Entity::getId),
+                new Field<>(() -> "lastName", Entity::getLastName))).build()).get();
+        var sort = Map.of("lastName", SortMeta.builder().field("lastName").order(SortOrder.ASCENDING).build());
+        rawCursor.save(3, new Entity("7", "C"), sort);
+        assertThat(((CursorData<Entity>) rawCursor).cursorCache).containsEntry(3, List.of("C", "7"));
+
+        var builder = mock(CriteriaBuilder.class);
+        var entityRoot = mock(Root.class);
+        var lastNamePath = mock(Path.class);
+        var idPath = mock(Path.class);
+        var greaterLastName = mock(Predicate.class);
+        var equalLastName = mock(Predicate.class);
+        var greaterId = mock(Predicate.class);
+        var andPredicate = mock(Predicate.class);
+        var orPredicate = mock(Predicate.class);
+
+        when(entityRoot.get("lastName")).thenReturn(lastNamePath);
+        when(entityRoot.get("id")).thenReturn(idPath);
+        when(builder.greaterThan(lastNamePath, "C")).thenReturn(greaterLastName);
+        when(builder.equal(lastNamePath, "C")).thenReturn(equalLastName);
+        when(builder.greaterThan(idPath, "7")).thenReturn(greaterId);
+        when(builder.and(equalLastName, greaterId)).thenReturn(andPredicate);
+        when(builder.or(greaterLastName, andPredicate)).thenReturn(orPredicate);
+
+        assertThat(rawCursor.cursorPredicate(4, builder, entityRoot, sort)).isSameAs(orPredicate);
+    }
+
+    @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void predicateWithTieBreakerDescending() {
+        var rawCursor = CursorPagination.<Entity>create(builder -> builder.supportedFields(List.of(
+                new Field<>(() -> "id", Entity::getId),
+                new Field<>(() -> "lastName", Entity::getLastName))).build()).get();
+        var sort = Map.of("lastName", SortMeta.builder().field("lastName").order(SortOrder.DESCENDING).build());
+        rawCursor.save(3, new Entity("7", "C"), sort);
+
+        var builder = mock(CriteriaBuilder.class);
+        var entityRoot = mock(Root.class);
+        var lastNamePath = mock(Path.class);
+        var idPath = mock(Path.class);
+        var lessLastName = mock(Predicate.class);
+        var equalLastName = mock(Predicate.class);
+        var lessId = mock(Predicate.class);
+        var andPredicate = mock(Predicate.class);
+        var orPredicate = mock(Predicate.class);
+
+        when(entityRoot.get("lastName")).thenReturn(lastNamePath);
+        when(entityRoot.get("id")).thenReturn(idPath);
+        when(builder.lessThan(lastNamePath, "C")).thenReturn(lessLastName);
+        when(builder.equal(lastNamePath, "C")).thenReturn(equalLastName);
+        when(builder.lessThan(idPath, "7")).thenReturn(lessId);
+        when(builder.and(equalLastName, lessId)).thenReturn(andPredicate);
+        when(builder.or(lessLastName, andPredicate)).thenReturn(orPredicate);
+
+        assertThat(rawCursor.cursorPredicate(4, builder, entityRoot, sort)).isSameAs(orPredicate);
     }
 
     @Test

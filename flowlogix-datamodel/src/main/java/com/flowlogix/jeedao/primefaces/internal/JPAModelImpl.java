@@ -62,6 +62,7 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Builder;
+import static com.flowlogix.jeedao.primefaces.CursorPagination.requestedSort;
 import static com.flowlogix.jeedao.DaoHelper.findEntityManager;
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.PartialBuilderConsumer;
 import static java.lang.Math.toIntExact;
@@ -303,7 +304,7 @@ public class JPAModelImpl<TT> implements Serializable {
                                boolean cursorSupported) {
         var sortData = new SortData(sortCriteria);
         sorter.sort(sortData, cb, root);
-        return processSortOrder(sortData.getSortOrder(), cb, root, cursorSupported);
+        return processSortOrder(sortData.getSortOrder(), sortCriteria, cb, root, cursorSupported);
     }
 
     /// @deprecated
@@ -529,7 +530,7 @@ public class JPAModelImpl<TT> implements Serializable {
                 cb.lessThanOrEqualTo(objectExpression, iterBetween.next()));
     }
 
-    List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta,
+    List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta, Map<String, SortMeta> requestedSortMeta,
                                  CriteriaBuilder cb, Root<TT> root, boolean cursorSupported) {
         Deque<Order> sortMetaOrdering = new ArrayDeque<>();
         AtomicBoolean userSortRequested = new AtomicBoolean();
@@ -547,6 +548,8 @@ public class JPAModelImpl<TT> implements Serializable {
         });
         if (cursorSupported && !userSortRequested.get()) {
             sortMetaOrdering.addFirst(cursor.get().defaultSort(cb, root));
+        } else if (cursorSupported) {
+            addCursorTiebreakSort(sortMetaOrdering, requestedSortMeta, cb, root);
         }
         return sortMetaOrdering.stream().toList();
     }
@@ -574,6 +577,21 @@ public class JPAModelImpl<TT> implements Serializable {
             return Optional.of(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
         }
         return Optional.empty();
+    }
+
+    private void addCursorTiebreakSort(Deque<Order> sortMetaOrdering, Map<String, SortMeta> requestedSortMeta,
+                                       CriteriaBuilder cb, Root<TT> root) {
+        var cursorColumns = cursor.get().columns();
+        String currentField = requestedSort(requestedSortMeta, cursorColumns, true);
+        String tiebreakField = requestedSort(Map.of(), cursorColumns, true);
+        if (currentField.equals(tiebreakField)) {
+            return;
+        }
+        boolean descending = Optional.ofNullable(requestedSortMeta.get(currentField))
+                .map(order -> order.getOrder().isDescending())
+                .orElse(false);
+        sortMetaOrdering.add(descending ? cb.desc(resolveField(root, tiebreakField))
+                : cb.asc(resolveField(root, tiebreakField)));
     }
 
     @SneakyThrows(ReflectiveOperationException.class)

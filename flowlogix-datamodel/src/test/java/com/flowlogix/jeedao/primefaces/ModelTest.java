@@ -31,10 +31,16 @@ import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
+import jakarta.inject.Qualifier;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -48,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -71,6 +78,12 @@ import org.primefaces.model.SortMeta;
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"checkstyle:MagicNumber", "checkstyle:MethodCount"})
 class ModelTest implements Serializable {
+    @Qualifier
+    @Documented
+    @Inherited
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface TestQualifier { }
+
     @Mock(answer = Answers.RETURNS_DEEP_STUBS, serializable = true)
     EntityManager em;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -433,6 +446,23 @@ class ModelTest implements Serializable {
         deserialized = serializeAndDeserialize(model);
         deserialized.setWrappedData(List.of(new MyEntity()));
         assertThat(deserialized.getWrappedData()).hasSize(1);
+    }
+
+    @Test
+    void serializationWithQualifiedEntityManager() throws IOException, ClassNotFoundException {
+        try (var mockedStatic = mockStatic(Beans.class)) {
+            mockedStatic.when(() -> Beans.getReference(eq(EntityManager.class),
+                    argThat((Annotation annotation) -> annotation.annotationType().equals(TestQualifier.class))))
+                    .thenReturn(em);
+            lenient().when(em.getEntityManagerFactory().getPersistenceUnitUtil()
+                    .getIdentifier(any(MyEntity.class))).thenReturn(5L);
+            var model = new JPALazyDataModel<MyEntity>().initialize(builder -> builder
+                    .entityClass(MyEntity.class)
+                    .entityManagerQualifiers(List.of(TestQualifier.class))
+                    .build());
+            var deserialized = serializeAndDeserialize(model);
+            assertThat(deserialized.getRowKey(new MyEntity())).isEqualTo("5");
+        }
     }
 
     @Test

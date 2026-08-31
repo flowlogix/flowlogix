@@ -18,9 +18,15 @@ package com.flowlogix.jeedao;
 import com.flowlogix.util.SerializeTester;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import jakarta.inject.Qualifier;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -31,6 +37,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 import org.junit.jupiter.api.Test;
 import org.omnifaces.util.Beans;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -41,6 +48,21 @@ import static org.mockito.Mockito.withSettings;
 class FacadeTest implements Serializable {
     private final EntityManager em = mock(EntityManager.class, withSettings().serializable()
             .defaultAnswer(RETURNS_DEEP_STUBS));
+
+    @Qualifier
+    @Documented
+    @Inherited
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface TestQualifier { }
+
+    @Qualifier
+    @Documented
+    @Inherited
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface TestQualifierWithMember {
+        String value();
+    }
+
     class MyControl implements Serializable {
         @Delegate
         final DaoHelper<Integer> facade = DaoHelper.<Integer>builder()
@@ -94,6 +116,12 @@ class FacadeTest implements Serializable {
     }
 
     @Test
+    void findEntityManagerQualifierWithMembers() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> DaoHelper.findEntityManager(List.of(TestQualifierWithMember.class)).get());
+    }
+
+    @Test
     @SuppressWarnings({"unchecked", "MagicNumber"})
     void nativeQuery() {
         var query = mock(Query.class);
@@ -136,6 +164,18 @@ class FacadeTest implements Serializable {
         assertThat(mc.facade.em()).isNotNull();
         assertThat(mc.find(1L)).isEqualTo(5);
         assertThat(mc.find(2L)).isNull();
+    }
+
+    @Test
+    void serializeQualifiedDaoHelper() throws IOException, ClassNotFoundException {
+        try (var mockedStatic = mockStatic(Beans.class)) {
+            mockedStatic.when(() -> Beans.getReference(eq(EntityManager.class),
+                    argThat((Annotation annotation) -> annotation.annotationType().equals(TestQualifier.class))))
+                    .thenReturn(em);
+            var helper = new DaoHelper<>(DaoHelper.findEntityManager(List.of(TestQualifier.class)), Integer.class);
+            var deserialized = SerializeTester.serializeAndDeserialize(helper);
+            assertThat(deserialized.em()).isSameAs(em);
+        }
     }
 
     @Test

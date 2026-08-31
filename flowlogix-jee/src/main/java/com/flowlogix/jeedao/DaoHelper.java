@@ -17,6 +17,7 @@ package com.flowlogix.jeedao;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.util.Objects;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -192,17 +193,51 @@ public final class DaoHelper<TT> implements JPANativeQuery<TT>, Serializable {
     /**
      * Finds a reference to entity manager via CDI.
      *
-     * @param qualifiers for the entity manager, or empty list
+     * @param qualifiers for the entity manager, or empty list. Qualifiers supplied by class
+     *                   must not declare annotation members.
      * @return {@link SerializableSupplier} of {@link EntityManager}
      */
     public static SerializableSupplier<EntityManager>
     findEntityManager(@NonNull List<Class<? extends Annotation>> qualifiers) {
-        var qualifierInstances = qualifiers.stream()
-                .map(value -> (Annotation & Serializable) () -> value).toList();
+        var qualifierTypes = List.copyOf(qualifiers);
         return () -> Optional.ofNullable(Beans.getReference(EntityManager.class,
-                qualifierInstances.toArray(Annotation[]::new))).orElseThrow(() -> new IllegalStateException(
+                qualifierTypes.stream().map(MarkerQualifierLiteral::new).toArray(Annotation[]::new)))
+                .orElseThrow(() -> new IllegalStateException(
                 String.format("Unable to find EntityManager with qualifiers: %s",
-                        qualifierInstances.stream().map(Annotation::annotationType).toList())));
+                        qualifierTypes)));
+    }
+
+    private static final class MarkerQualifierLiteral implements Annotation, Serializable {
+        private static final long serialVersionUID = 1L;
+        private final Class<? extends Annotation> annotationType;
+
+        MarkerQualifierLiteral(Class<? extends Annotation> annotationType) {
+            this.annotationType = Objects.requireNonNull(annotationType);
+            if (annotationType.getDeclaredMethods().length != 0) {
+                throw new IllegalArgumentException(String.format(
+                        "Only memberless qualifier annotations are supported: %s", annotationType.getName()));
+            }
+        }
+
+        @Override
+        public Class<? extends Annotation> annotationType() {
+            return annotationType;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Annotation annotation && annotationType.equals(annotation.annotationType());
+        }
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("@%s()", annotationType.getName());
+        }
     }
 
 

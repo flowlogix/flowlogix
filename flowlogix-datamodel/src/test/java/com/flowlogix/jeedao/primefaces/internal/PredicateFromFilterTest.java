@@ -287,26 +287,26 @@ class PredicateFromFilterTest {
     void betweenSingleElement() {
         model.predicateFromFilterComparable(cb, stringExpression, FilterMeta.builder().field("aaa")
                 .matchMode(BETWEEN).build(), null, List.of("abc"));
-        verify(cb).greaterThanOrEqualTo(eq(stringExpression), eq("abc"));
+        verify(cb).greaterThanOrEqualTo(stringExpression, "abc");
         verifyNoMoreInteractions(cb, stringExpression);
     }
 
     @Test
     void notBetweenLowerBoundOnly() {
-        when(cb.greaterThanOrEqualTo(eq(stringExpression), eq("abc"))).thenReturn(predicate);
+        when(cb.greaterThanOrEqualTo(stringExpression, "abc")).thenReturn(predicate);
         model.predicateFromFilterComparable(cb, stringExpression, FilterMeta.builder().field("aaa")
                 .matchMode(MatchMode.NOT_BETWEEN).build(), null, Arrays.asList("abc", null));
-        verify(cb).greaterThanOrEqualTo(eq(stringExpression), eq("abc"));
+        verify(cb).greaterThanOrEqualTo(stringExpression, "abc");
         verify(predicate).not();
         verifyNoMoreInteractions(cb, stringExpression, predicate);
     }
 
     @Test
     void notBetweenUpperBoundOnly() {
-        when(cb.lessThanOrEqualTo(eq(stringExpression), eq("def"))).thenReturn(predicate);
+        when(cb.lessThanOrEqualTo(stringExpression, "def")).thenReturn(predicate);
         model.predicateFromFilterComparable(cb, stringExpression, FilterMeta.builder().field("aaa")
                 .matchMode(MatchMode.NOT_BETWEEN).build(), null, Arrays.asList(null, "def"));
-        verify(cb).lessThanOrEqualTo(eq(stringExpression), eq("def"));
+        verify(cb).lessThanOrEqualTo(stringExpression, "def");
         verify(predicate).not();
         verifyNoMoreInteractions(cb, stringExpression, predicate);
     }
@@ -321,10 +321,10 @@ class PredicateFromFilterTest {
 
     @Test
     void notBetweenSingleElement() {
-        when(cb.greaterThanOrEqualTo(eq(stringExpression), eq("abc"))).thenReturn(predicate);
+        when(cb.greaterThanOrEqualTo(stringExpression, "abc")).thenReturn(predicate);
         model.predicateFromFilterComparable(cb, stringExpression, FilterMeta.builder().field("aaa")
                 .matchMode(MatchMode.NOT_BETWEEN).build(), null, List.of("abc"));
-        verify(cb).greaterThanOrEqualTo(eq(stringExpression), eq("abc"));
+        verify(cb).greaterThanOrEqualTo(stringExpression, "abc");
         verify(predicate).not();
         verifyNoMoreInteractions(cb, stringExpression, predicate);
     }

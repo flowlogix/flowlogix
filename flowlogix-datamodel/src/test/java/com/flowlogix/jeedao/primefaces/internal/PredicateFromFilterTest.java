@@ -263,7 +263,7 @@ class PredicateFromFilterTest {
     void betweenLowerBoundOnly() {
         model.predicateFromFilterComparable(cb, stringExpression, FilterMeta.builder().field("aaa")
                 .matchMode(BETWEEN).build(), null, Arrays.asList("abc", null));
-        verify(cb).greaterThanOrEqualTo(eq(stringExpression), eq("abc"));
+        verify(cb).greaterThanOrEqualTo(stringExpression, "abc");
         verifyNoMoreInteractions(cb, stringExpression);
     }
 
@@ -271,7 +271,7 @@ class PredicateFromFilterTest {
     void betweenUpperBoundOnly() {
         model.predicateFromFilterComparable(cb, stringExpression, FilterMeta.builder().field("aaa")
                 .matchMode(BETWEEN).build(), null, Arrays.asList(null, "def"));
-        verify(cb).lessThanOrEqualTo(eq(stringExpression), eq("def"));
+        verify(cb).lessThanOrEqualTo(stringExpression, "def");
         verifyNoMoreInteractions(cb, stringExpression);
     }
 

@@ -29,7 +29,7 @@ import com.flowlogix.jeedao.primefaces.Sorter;
 import com.flowlogix.jeedao.primefaces.Sorter.MergedSortOrder;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.util.TypeConverter;
-import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import java.io.ObjectStreamException;
 import java.io.Serial;
 import java.io.Serializable;
@@ -87,7 +87,7 @@ import org.primefaces.util.Constants;
  */
 @Slf4j
 @Builder
-@SuppressWarnings("checkstyle:ClassFanOutComplexity")
+@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:MethodCount"})
 public class JPAModelImpl<TT> implements Serializable {
     @Serial
     private static final long serialVersionUID = 7L;
@@ -171,6 +171,16 @@ public class JPAModelImpl<TT> implements Serializable {
     @Default
     private final @Getter boolean wildcardSupport = false;
 
+    /**
+     * Join type used when resolving dotted (nested) field references for
+     * filters, sort criteria and cursor predicates. Defaults to {@link JoinType#LEFT}
+     * so that entities with null to-one associations are not silently dropped
+     * when filtering or sorting on columns of those associations.
+     * Set to {@link JoinType#INNER} to restore the legacy behavior.
+     */
+    @Default
+    private final @Getter @NonNull JoinType joinType = JoinType.LEFT;
+
     private final Lazy<Function<String, ?>> defaultConverter = new Lazy<>(this::createConverter);
     private final Lazy<Function<TT, String>> defaultKeyConverter = new Lazy<>(this::createKeyConverter);
 
@@ -218,7 +228,13 @@ public class JPAModelImpl<TT> implements Serializable {
     public static class JPAModelImplBuilder<TT> { }
 
     public int count(Map<String, FilterMeta> filters) {
-        return toIntExact(jpaFinder.get().count(cqc -> cqc.query().where(getFilters(filters, cqc.builder(), cqc.root()))));
+        return toIntExact(jpaFinder.get().count(cqc -> {
+            var resolver = JoinResolver.of(cqc.root(), joinType);
+            cqc.query().where(getFilters(filters, cqc.builder(), cqc.root(), resolver, false, 0, null));
+            if (resolver.isPluralJoin()) {
+                cqc.query().select(cqc.builder().countDistinct(cqc.root()));
+            }
+        }));
     }
 
     public List<TT> findRows(int first, int pageSize, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
@@ -264,20 +280,30 @@ public class JPAModelImpl<TT> implements Serializable {
 
     private void addToCriteria(QueryCriteria<TT> qc, Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta,
                                boolean cursorSupported, int offset) {
-        qc.query().where(getFilters(filters, qc.builder(), qc.root(), cursorSupported, offset, sortMeta));
-        qc.query().orderBy(getSort(sortMeta, qc.builder(), qc.root(), cursorSupported));
+        var resolver = JoinResolver.of(qc.root(), joinType);
+        qc.query().where(getFilters(filters, qc.builder(), qc.root(), resolver, cursorSupported, offset, sortMeta));
+        qc.query().orderBy(getSort(sortMeta, qc.builder(), qc.root(), resolver, cursorSupported));
+        if (resolver.isPluralJoin()) {
+            qc.query().distinct(true);
+        }
         qc.root().alias(JPALazyDataModel.RESULT);
     }
 
     public Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root,
                                 boolean cursorSupported, int offset, Map<String, SortMeta> sortMeta) {
+        return getFilters(filters, cb, root, JoinResolver.of(root, joinType), cursorSupported, offset, sortMeta);
+    }
+
+    Predicate getFilters(Map<String, FilterMeta> filters, CriteriaBuilder cb, Root<TT> root,
+                         JoinResolver<TT> resolver, boolean cursorSupported, int offset,
+                         Map<String, SortMeta> sortMeta) {
         FilterData predicates = new FilterDataMap();
         filters.values().forEach(filterMeta -> {
             if (filterMeta.isGlobalFilter()) {
                 predicates.put(filterMeta.getField(), new FilterColumnData(filterMeta.getFilterValue(), null));
             } else {
                 if (filterMeta.getFilterValue() != null) {
-                    var filterMetas = processFilterMeta(cb, root, filterMeta.getField(), filterMeta);
+                    var filterMetas = processFilterMeta(cb, resolver, filterMeta.getField(), filterMeta);
                     predicates.put(filterMeta.getField(), new FilterColumnData(filterMetas.value(), filterMetas.cond()));
                 }
             }
@@ -301,9 +327,14 @@ public class JPAModelImpl<TT> implements Serializable {
 
     public List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root,
                                boolean cursorSupported) {
+        return getSort(sortCriteria, cb, root, JoinResolver.of(root, joinType), cursorSupported);
+    }
+
+    List<Order> getSort(Map<String, SortMeta> sortCriteria, CriteriaBuilder cb, Root<TT> root,
+                        JoinResolver<TT> resolver, boolean cursorSupported) {
         var sortData = new SortData(sortCriteria);
         sorter.sort(sortData, cb, root);
-        return processSortOrder(sortData.getSortOrder(), cb, root, cursorSupported);
+        return processSortOrder(sortData.getSortOrder(), cb, root, resolver, cursorSupported);
     }
 
     /// @deprecated
@@ -317,6 +348,7 @@ public class JPAModelImpl<TT> implements Serializable {
     /**
      * Recursively resolve field name, possibly by joining other tables,
      * based on a dotted notation of the field.
+     * Uses the {@link #getJoinType() configured join type} for created joins.
      *
      * @param root Criteria root
      * @param fieldName field name
@@ -324,23 +356,61 @@ public class JPAModelImpl<TT> implements Serializable {
      * @param <YY> expression type
      */
     public <YY> Expression<YY> resolveField(Root<TT> root, String fieldName) {
-        return resolveField0(root, fieldName);
+        return resolveField0(root, fieldName, joinType);
     }
 
-    /// static version of {@link #resolveField}
+    /**
+     * static version of {@link #resolveField}, using inner joins for backwards compatibility.
+     *
+     * @param root Criteria root
+     * @param fieldName field name
+     * @return expression
+     * @param <YY> expression type
+     * @param <TT> entity type
+     */
     public static <YY, TT> Expression<YY> resolveField0(Root<TT> root, String fieldName) {
-        Join<?, ?> join = null;
-        // traverse all dotted fields, and join each
-        while (fieldName.contains(".")) {
-            String partial = fieldName.substring(0, fieldName.indexOf("."));
-            fieldName = fieldName.substring(partial.length() + 1);
-            if (join == null) {
-                join = root.join(partial);
-            } else {
-                join = join.join(partial);
-            }
-        }
-        return join == null ? root.get(fieldName) : join.get(fieldName);
+        return resolveField0(root, fieldName, JoinType.INNER);
+    }
+
+    /**
+     * static version of {@link #resolveField}, using the given join type.
+     *
+     * @param root Criteria root
+     * @param fieldName field name
+     * @param joinType join type to use for created joins
+     * @return expression
+     * @param <YY> expression type
+     * @param <TT> entity type
+     */
+    public static <YY, TT> Expression<YY> resolveField0(Root<TT> root, String fieldName, JoinType joinType) {
+        return resolveField0(JoinResolver.of(root, joinType), fieldName);
+    }
+
+    /**
+     * static version of {@link #resolveField}, using the given per-query join resolver,
+     * so that joins are shared between all dotted field references of the same query.
+     *
+     * @param resolver per-query join resolver
+     * @param fieldName field name
+     * @return expression
+     * @param <YY> expression type
+     * @param <TT> entity type
+     */
+    public static <YY, TT> Expression<YY> resolveField0(JoinResolver<TT> resolver, String fieldName) {
+        return resolver.resolve(fieldName);
+    }
+
+    /**
+     * Resolves field name using the given per-query join resolver, so that joins
+     * are shared between filters, sort criteria and cursor predicates of the same query.
+     *
+     * @param resolver per-query join resolver
+     * @param fieldName field name
+     * @return expression
+     * @param <YY> expression type
+     */
+    public <YY> Expression<YY> resolveField(JoinResolver<TT> resolver, String fieldName) {
+        return resolver.resolve(fieldName);
     }
 
     /// internal method for initializing data after deserialization.
@@ -353,11 +423,12 @@ public class JPAModelImpl<TT> implements Serializable {
         }
     }
 
-    private FilterMetaResult processFilterMeta(CriteriaBuilder cb, Root<TT> root, String key, FilterMeta filterMeta) {
+    private FilterMetaResult processFilterMeta(CriteriaBuilder cb, JoinResolver<TT> resolver,
+                                               String key, FilterMeta filterMeta) {
         Predicate cond = null;
         Object value = Objects.requireNonNullElse(filterMeta.getFilterValue(), Constants.EMPTY_STRING);
         try {
-            var field = resolveField(root, key);
+            var field = resolver.<Object>resolve(key);
             Class<?> fieldType = field.getJavaType();
             Class<?> filterType = value.getClass();
             boolean compositeFilterType = filterType.isArray() || Collection.class.isAssignableFrom(filterType);
@@ -530,12 +601,13 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta,
-                                 CriteriaBuilder cb, Root<TT> root, boolean cursorSupported) {
+                                 CriteriaBuilder cb, Root<TT> root,
+                                 JoinResolver<TT> resolver, boolean cursorSupported) {
         Deque<Order> sortMetaOrdering = new ArrayDeque<>();
         AtomicBoolean userSortRequested = new AtomicBoolean();
         sortMeta.values().forEach(order -> {
             if (order.getRequestedSortMeta() != null) {
-                processUserSortOrder(cb, root, order).ifPresent(sortOrder -> {
+                processUserSortOrder(cb, resolver, order).ifPresent(sortOrder -> {
                     userSortRequested.set(true);
                     sortMetaOrdering.add(sortOrder);
                 });
@@ -567,11 +639,12 @@ public class JPAModelImpl<TT> implements Serializable {
         }
     }
 
-    private Optional<Order> processUserSortOrder(CriteriaBuilder cb, Root<TT> root, MergedSortOrder order) {
+    private Optional<Order> processUserSortOrder(CriteriaBuilder cb, JoinResolver<TT> resolver,
+                                                 MergedSortOrder order) {
         if (order.getRequestedSortMeta().getOrder() == SortOrder.ASCENDING) {
-            return Optional.of(cb.asc(resolveField(root, order.getRequestedSortMeta().getField())));
+            return Optional.of(cb.asc(resolver.resolve(order.getRequestedSortMeta().getField())));
         } else if (order.getRequestedSortMeta().getOrder() == SortOrder.DESCENDING) {
-            return Optional.of(cb.desc(resolveField(root, order.getRequestedSortMeta().getField())));
+            return Optional.of(cb.desc(resolver.resolve(order.getRequestedSortMeta().getField())));
         }
         return Optional.empty();
     }

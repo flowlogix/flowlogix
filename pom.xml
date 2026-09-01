@@ -166,6 +166,9 @@
                 <configuration>
                     <parameter>
                         <oldVersionPattern>${japicmp.old.version.pattern}</oldVersionPattern>
+                        <excludes>
+                            <exclude>com.flowlogix.jeedao.primefaces.LazyModelConfig#innerJoins()</exclude>
+                        </excludes>
                     </parameter>
                 </configuration>
             </plugin>

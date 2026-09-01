@@ -571,26 +571,19 @@ public class JPAModelImpl<TT> implements Serializable {
         return null;
     }
 
-    @SuppressWarnings("MissingSwitchDefault")
     <TC extends Comparable<? super TC>> Predicate predicateFromFilterComparable(CriteriaBuilder cb,
             Expression<TC> objectExpression, FilterMeta filter, TC filterValue, Object filterValueCollection) {
         @SuppressWarnings("unchecked")
         Lazy<Collection<TC>> filterValueAsCollection = new Lazy<>(() -> (Collection<TC>) filterValueCollection);
-        switch (filter.getMatchMode()) {
-            case LESS_THAN:
-                return cb.lessThan(objectExpression, filterValue);
-            case LESS_THAN_EQUALS:
-                return cb.lessThanOrEqualTo(objectExpression, filterValue);
-            case GREATER_THAN:
-                return cb.greaterThan(objectExpression, filterValue);
-            case GREATER_THAN_EQUALS:
-                return cb.greaterThanOrEqualTo(objectExpression, filterValue);
-            case BETWEEN:
-                return between(cb, objectExpression, filterValueAsCollection);
-            case NOT_BETWEEN:
-                return between(cb, objectExpression, filterValueAsCollection).not();
-        }
-        return null;
+        return switch (filter.getMatchMode()) {
+            case LESS_THAN -> cb.lessThan(objectExpression, filterValue);
+            case LESS_THAN_EQUALS -> cb.lessThanOrEqualTo(objectExpression, filterValue);
+            case GREATER_THAN -> cb.greaterThan(objectExpression, filterValue);
+            case GREATER_THAN_EQUALS -> cb.greaterThanOrEqualTo(objectExpression, filterValue);
+            case BETWEEN -> between(cb, objectExpression, filterValueAsCollection);
+            case NOT_BETWEEN -> between(cb, objectExpression, filterValueAsCollection).not();
+            default -> null;
+        };
     }
 
     private <TC extends Comparable<? super TC>> Predicate between(CriteriaBuilder cb,

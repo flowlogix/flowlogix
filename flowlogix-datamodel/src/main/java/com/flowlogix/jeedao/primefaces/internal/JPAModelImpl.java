@@ -28,6 +28,7 @@ import com.flowlogix.jeedao.primefaces.JPALazyDataModel.FilterCaseConversion;
 import com.flowlogix.jeedao.primefaces.Sorter;
 import com.flowlogix.jeedao.primefaces.Sorter.MergedSortOrder;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
+import com.flowlogix.jeedao.primefaces.internal.JoinResolver.ResolverException;
 import com.flowlogix.util.TypeConverter;
 import jakarta.persistence.criteria.JoinType;
 import java.io.ObjectStreamException;
@@ -396,6 +397,7 @@ public class JPAModelImpl<TT> implements Serializable {
      * @param <YY> expression type
      * @param <TT> entity type
      */
+    @SneakyThrows(ResolverException.class)
     public static <YY, TT> Expression<YY> resolveField0(JoinResolver<TT> resolver, String fieldName) {
         return resolver.resolve(fieldName);
     }
@@ -409,6 +411,7 @@ public class JPAModelImpl<TT> implements Serializable {
      * @return expression
      * @param <YY> expression type
      */
+    @SneakyThrows(ResolverException.class)
     public <YY> Expression<YY> resolveField(JoinResolver<TT> resolver, String fieldName) {
         return resolver.resolve(fieldName);
     }
@@ -428,7 +431,7 @@ public class JPAModelImpl<TT> implements Serializable {
         Predicate cond = null;
         Object value = Objects.requireNonNullElse(filterMeta.getFilterValue(), Constants.EMPTY_STRING);
         try {
-            var field = resolver.<Object>resolve(key);
+            var field = resolver.resolve(key);
             Class<?> fieldType = field.getJavaType();
             Class<?> filterType = value.getClass();
             boolean compositeFilterType = filterType.isArray() || Collection.class.isAssignableFrom(filterType);
@@ -443,7 +446,14 @@ public class JPAModelImpl<TT> implements Serializable {
                     cond = predicateFromFilterOrComparable(cb, field, filterMeta, value, fieldType, false);
                 }
             }
-        } catch (IllegalArgumentException e) { /* ignore possibly extra filter columns */ }
+        } catch (IllegalArgumentException e) {
+            // unconvertible filter value: match nothing instead of silently dropping the restriction
+            log.debug("unable to convert filter value {} for field {}", value, key, e);
+            cond = cb.disjunction();
+        } catch (ResolverException e) {
+            // ignore possibly extra filter columns, cond = null already (we want this)
+            log.debug("unable to resolve field {} for filter", key, e);
+        }
         return new FilterMetaResult(cond, value);
     }
 
@@ -632,6 +642,7 @@ public class JPAModelImpl<TT> implements Serializable {
         }
     }
 
+    @SneakyThrows(ResolverException.class)
     private Optional<Order> processUserSortOrder(CriteriaBuilder cb, JoinResolver<TT> resolver,
                                                  MergedSortOrder order) {
         if (order.getRequestedSortMeta().getOrder() == SortOrder.ASCENDING) {

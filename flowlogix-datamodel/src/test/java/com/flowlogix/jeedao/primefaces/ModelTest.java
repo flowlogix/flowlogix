@@ -168,6 +168,7 @@ class ModelTest implements Serializable {
         verify(rootInteger).get("aaa");
         if (checkAbsence) {
             verify(integerPath, never()).in(any(List.class));
+            verify(cb).disjunction();
         } else {
             verify(integerPath).in(any(List.class));
         }
@@ -670,5 +671,40 @@ class ModelTest implements Serializable {
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> impl.getStringToKeyConverter().apply("5"))
                 .withMessageContaining("Unable to determine primary key type from metamodel");
+    }
+
+    @Test
+    void unconvertibleInFilterElementMatchesNothing() {
+        var impl = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        when(rootInteger.get(any(String.class))).thenAnswer(a -> integerPath);
+        when(integerPath.getJavaType()).thenAnswer(a -> Integer.class);
+        var disjunction = mock(Predicate.class);
+        when(cb.disjunction()).thenReturn(disjunction);
+        var fm = FilterMeta.builder().field("aaa")
+                .filterValue(List.of("1", "abc")).matchMode(MatchMode.IN).build();
+        impl.getFilters(Map.of("aaa", fm), cb, rootInteger, false, 0, null);
+        verify(rootInteger).get("aaa");
+        verify(integerPath, never()).in(any(List.class));
+        verify(cb).disjunction();
+        verify(cb).and(disjunction);
+    }
+
+    @Test
+    void unknownFilterColumnProducesNoPredicate() {
+        var impl = JPAModelImpl.<Integer>builder()
+                .entityManager(() -> em)
+                .entityClass(Integer.class)
+                .converter(Long::valueOf)
+                .build();
+        when(rootInteger.get(any(String.class))).thenThrow(new IllegalArgumentException("no such field"));
+        var fm = FilterMeta.builder().field("unknown").filterValue("hello").build();
+        impl.getFilters(Map.of("unknown", fm), cb, rootInteger, false, 0, null);
+        verify(rootInteger).get("unknown");
+        verify(cb, never()).disjunction();
+        verify(cb).and();
     }
 }

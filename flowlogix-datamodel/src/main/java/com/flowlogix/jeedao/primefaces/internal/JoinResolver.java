@@ -43,6 +43,12 @@ public final class JoinResolver<TT> {
     @Getter
     private boolean pluralJoin;
 
+    static final class ResolverException extends Exception {
+        ResolverException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
     /**
      * Creates a resolver for the given query root, using the given join type
      * for all joins created while resolving dotted field paths.
@@ -66,22 +72,26 @@ public final class JoinResolver<TT> {
      * @return expression
      * @param <YY> expression type
      */
-    public <YY> Expression<YY> resolve(String fieldName) {
+    public <YY> Expression<YY> resolve(String fieldName) throws ResolverException {
         StringBuilder prefix = new StringBuilder();
         From<?, ?> from = root;
-        while (fieldName.contains(".")) {
-            String partial = fieldName.substring(0, fieldName.indexOf('.'));
-            fieldName = fieldName.substring(partial.length() + 1);
-            prefix.append(prefix.isEmpty() ? partial : "." + partial);
-            String key = prefix.toString();
-            Join<?, ?> join = joins.get(key);
-            if (join == null) {
-                join = from.join(partial, joinType);
-                joins.put(key, join);
-                pluralJoin |= join.getModel() instanceof PluralAttribute;
+        try {
+            while (fieldName.contains(".")) {
+                String partial = fieldName.substring(0, fieldName.indexOf('.'));
+                fieldName = fieldName.substring(partial.length() + 1);
+                prefix.append(prefix.isEmpty() ? partial : "." + partial);
+                String key = prefix.toString();
+                Join<?, ?> join = joins.get(key);
+                if (join == null) {
+                    join = from.join(partial, joinType);
+                    joins.put(key, join);
+                    pluralJoin |= join.getModel() instanceof PluralAttribute;
+                }
+                from = join;
             }
-            from = join;
+            return from.get(fieldName);
+        } catch (IllegalArgumentException e) {
+            throw new ResolverException("Failed to resolve field name: " + prefix + "." + fieldName, e);
         }
-        return from.get(fieldName);
     }
 }

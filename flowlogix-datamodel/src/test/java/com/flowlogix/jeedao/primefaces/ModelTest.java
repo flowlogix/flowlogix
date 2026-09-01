@@ -492,9 +492,20 @@ class ModelTest implements Serializable {
     public static class MyEntity {
         final Long id;
         public MyEntity() {
-            this.id = 1L;
+            this.id = null;
         }
         public MyEntity(long id) {
+            this.id = id;
+        }
+    }
+
+    @SuppressWarnings("checkstyle:RedundantModifier")
+    public static class ProtectedConstructorEntity {
+        final Long id;
+        protected ProtectedConstructorEntity() {
+            this.id = null;
+        }
+        public ProtectedConstructorEntity(long id) {
             this.id = id;
         }
     }
@@ -505,10 +516,31 @@ class ModelTest implements Serializable {
                 .entityManager(() -> em)
                 .entityClass(MyEntity.class)
                 .build();
+        when(em.getMetamodel().entity(MyEntity.class).getIdType().getJavaType()).thenAnswer(invocation -> Long.class);
         when(em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(any(MyEntity.class)))
                 .thenAnswer(entry -> entry.<MyEntity>getArgument(0).id);
         assertThat(impl.getStringToKeyConverter().apply("5")).isEqualTo(5L);
         assertThat(impl.getKeyConverter().apply(new MyEntity(10L))).isEqualTo("10");
+    }
+
+    @Test
+    void defaultConvertersWithProtectedConstructor() {
+        JPALazyDataModel<ProtectedConstructorEntity> model;
+        try (var mockedStatic = mockStatic(Beans.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))) {
+            mockedStatic.when(() -> Beans.getReference(eq(JPALazyDataModel.class), eq(InternalQualifierJPALazyModel.LITERAL)))
+                    .thenReturn(new JPALazyDataModel<>());
+            model = JPALazyDataModel.create(builder -> builder
+                    .entityManager(() -> em)
+                    .entityClass(ProtectedConstructorEntity.class)
+                    .build());
+        }
+        when(em.getMetamodel().entity(ProtectedConstructorEntity.class).getIdType().getJavaType())
+                .thenAnswer(invocation -> Long.class);
+        var entity = new ProtectedConstructorEntity(5L);
+        when(em.find(ProtectedConstructorEntity.class, 5L)).thenReturn(entity);
+
+        assertThat(model.getRowData("5")).isSameAs(entity);
+        verify(em).find(ProtectedConstructorEntity.class, 5L);
     }
 
     @Test
@@ -625,5 +657,17 @@ class ModelTest implements Serializable {
         assertThat(model.getWrappedData()).size().isEqualTo(3);
         model.setWrappedData(null);
         assertThat(model.getWrappedData()).isNull();
+    }
+
+    @Test
+    void defaultConvertersWithMissingIdType() {
+        var impl = JPAModelImpl.<MyEntity>builder()
+                .entityManager(() -> em)
+                .entityClass(MyEntity.class)
+                .build();
+        when(em.getMetamodel().entity(MyEntity.class).getIdType()).thenReturn(null);
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> impl.getStringToKeyConverter().apply("5"))
+                .withMessageContaining("Unable to determine primary key type from metamodel");
     }
 }

@@ -488,7 +488,7 @@ public class JPAModelImpl<TT> implements Serializable {
                 value = Arrays.asList((Object[]) value);
             }
             List<?> listValue = (List<?>) value;
-            value = listValue.stream().map(raw -> fieldType.isAssignableFrom(raw.getClass())
+            value = listValue.stream().map(raw -> raw == null || fieldType.isAssignableFrom(raw.getClass())
                     ? raw : Optional.ofNullable(convert(raw, fieldType)).orElseThrow(() ->
                     new IllegalArgumentException(String.format("Can't convert filter: %s to %s",
                             raw, fieldType)))).toList();
@@ -591,7 +591,8 @@ public class JPAModelImpl<TT> implements Serializable {
             case GREATER_THAN -> cb.greaterThan(objectExpression, filterValue);
             case GREATER_THAN_EQUALS -> cb.greaterThanOrEqualTo(objectExpression, filterValue);
             case BETWEEN -> between(cb, objectExpression, filterValueAsCollection);
-            case NOT_BETWEEN -> between(cb, objectExpression, filterValueAsCollection).not();
+            case NOT_BETWEEN -> Optional.ofNullable(between(cb, objectExpression, filterValueAsCollection))
+                    .map(Predicate::not).orElse(null);
             default -> null;
         };
     }
@@ -599,8 +600,11 @@ public class JPAModelImpl<TT> implements Serializable {
     private <TC extends Comparable<? super TC>> Predicate between(CriteriaBuilder cb,
             Expression<TC> objectExpression, Lazy<Collection<TC>> filterValueAsCollection) {
         Iterator<TC> iterBetween = filterValueAsCollection.get().iterator();
-        return cb.and(cb.greaterThanOrEqualTo(objectExpression, iterBetween.next()),
-                cb.lessThanOrEqualTo(objectExpression, iterBetween.next()));
+        TC lower = iterBetween.hasNext() ? iterBetween.next() : null;
+        TC upper = iterBetween.hasNext() ? iterBetween.next() : null;
+        return Stream.of(Optional.ofNullable(lower).map(l -> cb.greaterThanOrEqualTo(objectExpression, l)),
+                Optional.ofNullable(upper).map(u -> cb.lessThanOrEqualTo(objectExpression, u)))
+                .flatMap(Optional::stream).reduce(cb::and).orElse(null);
     }
 
     List<Order> processSortOrder(Map<String, MergedSortOrder> sortMeta,

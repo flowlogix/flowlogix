@@ -18,9 +18,12 @@ package com.flowlogix.jeedao;
 import com.flowlogix.util.SerializeTester;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import jakarta.inject.Qualifier;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -136,6 +139,19 @@ class FacadeTest implements Serializable {
         assertThat(mc.facade.em()).isNotNull();
         assertThat(mc.find(1L)).isEqualTo(5);
         assertThat(mc.find(2L)).isNull();
+    }
+
+    @Test
+    void serializeWithQualifiers() throws IOException, ClassNotFoundException {
+        var helper = new DaoHelper<>(DaoHelper.findEntityManager(List.of(MyQualifier.class)), Object.class);
+        var deserialized = SerializeTester.serializeAndDeserialize(helper);
+        assertThat(deserialized).isNotNull();
+        assertThat(deserialized.getEntityClass()).isEqualTo(Object.class);
+    }
+
+    @Qualifier
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface MyQualifier {
     }
 
     @Test

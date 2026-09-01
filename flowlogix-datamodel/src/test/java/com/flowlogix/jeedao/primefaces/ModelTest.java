@@ -46,6 +46,7 @@ import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentMatchers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -422,7 +423,7 @@ class ModelTest implements Serializable {
         when(integerPath.getJavaType()).thenAnswer(a -> String.class);
         lenient().when(em.getCriteriaBuilder().createQuery(Long.class).from(Integer.class))
                 .thenReturn(rootInteger);
-        lenient().when(em.createQuery(any(CriteriaQuery.class)).getSingleResult()).thenReturn(1L);
+        lenient().when(em.createQuery(ArgumentMatchers.<CriteriaQuery<Long>>any()).getSingleResult()).thenReturn(1L);
         var fm = FilterMeta.builder().field("emails.email").filterValue("hello").build();
         impl.count(Map.of("emails.email", fm));
         verify(em.getCriteriaBuilder()).countDistinct(any(Root.class));

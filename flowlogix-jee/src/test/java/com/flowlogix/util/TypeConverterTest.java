@@ -19,9 +19,14 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TypeConverterTest {
     @Test
@@ -123,6 +128,20 @@ class TypeConverterTest {
     void checkType() {
         assertThat(TypeConverter.checkType("true", boolean.class)).isTrue();
         assertThat(TypeConverter.checkType("5", boolean.class)).isFalse();
+    }
+
+    static Stream<Class<?>> garbageTypes() {
+        return Stream.of(Double.class, double.class, Float.class, float.class,
+                Integer.class, int.class, short.class, Long.class, long.class,
+                Boolean.class, boolean.class, BigInteger.class, BigDecimal.class,
+                LocalDate.class, LocalTime.class, LocalDateTime.class, MyEnum.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("garbageTypes")
+    void garbageInputIsInvalidNotThrown(Class<?> type) {
+        assertThat(TypeConverter.checkType("not-a-date", type)).isFalse();
+        assertThat(TypeConverter.checkAndConvert("not-a-date", type).isValid()).isFalse();
     }
 
     @Test

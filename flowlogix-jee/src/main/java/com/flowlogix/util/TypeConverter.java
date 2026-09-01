@@ -22,6 +22,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -210,10 +211,10 @@ public class TypeConverter {
         TT cv = null;
         try {
             cv = TypeConverter.valueOf(value, type);
-            if (value.equals(cv.toString())) {
+            if (cv != null && value.equals(cv.toString())) {
                 return new CheckedValue<>(true, cv);
             }
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | DateTimeException e) {
             log.debug("Conversion failed", e);
         }
         return new CheckedValue<>(false, cv);

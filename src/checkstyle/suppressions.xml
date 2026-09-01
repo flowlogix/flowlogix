@@ -40,5 +40,5 @@
     <suppress checks="JavadocType" files="JPALazyDataModel.java" lines="135"/>
 
     <suppress checks="JavadocVariable" lines="49-52" files="com.flowlogix.util.ShrinkWrapManipulator"/>
-    <suppress checks="ConstantName" lines="60-63" files="com.flowlogix.util.TypeConverter"/>
+    <suppress checks="ConstantName" lines="61-64" files="com.flowlogix.util.TypeConverter"/>
 </suppressions>

@@ -545,4 +545,16 @@ class ModelTest implements Serializable {
         model.setWrappedData(null);
         assertThat(model.getWrappedData()).isNull();
     }
+
+    @Test
+    void defaultConvertersWithMissingIdType() {
+        var impl = JPAModelImpl.<MyEntity>builder()
+                .entityManager(() -> em)
+                .entityClass(MyEntity.class)
+                .build();
+        when(em.getMetamodel().entity(MyEntity.class).getIdType()).thenReturn(null);
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> impl.getStringToKeyConverter().apply("5"))
+                .withMessageContaining("Unable to determine primary key type from metamodel");
+    }
 }

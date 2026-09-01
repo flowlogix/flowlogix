@@ -24,6 +24,8 @@ import jakarta.persistence.metamodel.PluralAttribute;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * Resolves dotted field paths into criteria expressions, caching created joins
@@ -33,17 +35,13 @@ import lombok.Getter;
  * @param <TT> entity type
  * @hidden
  */
+@RequiredArgsConstructor(access = PRIVATE)
 public final class JoinResolver<TT> {
     private final Root<TT> root;
     private final JoinType joinType;
     private final Map<String, Join<?, ?>> joins = new HashMap<>();
     @Getter
     private boolean pluralJoin;
-
-    private JoinResolver(Root<TT> root, JoinType joinType) {
-        this.root = root;
-        this.joinType = joinType;
-    }
 
     /**
      * Creates a resolver for the given query root, using the given join type
@@ -68,7 +66,6 @@ public final class JoinResolver<TT> {
      * @return expression
      * @param <YY> expression type
      */
-    @SuppressWarnings("unchecked")
     public <YY> Expression<YY> resolve(String fieldName) {
         StringBuilder prefix = new StringBuilder();
         From<?, ?> from = root;
@@ -85,6 +82,6 @@ public final class JoinResolver<TT> {
             }
             from = join;
         }
-        return (Expression<YY>) from.get(fieldName);
+        return from.get(fieldName);
     }
 }

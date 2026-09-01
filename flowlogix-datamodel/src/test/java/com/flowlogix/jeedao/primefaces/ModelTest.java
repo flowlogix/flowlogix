@@ -148,7 +148,7 @@ class ModelTest implements Serializable {
         collectionFilter(List.of("abc", "def"), true);
     }
 
-    private <TT> void collectionFilter(Object valueList, boolean checkAbsence) {
+    private void collectionFilter(Object valueList, boolean checkAbsence) {
         var impl = JPAModelImpl.<Integer>builder()
                 .entityManager(() -> em)
                 .entityClass(Integer.class)

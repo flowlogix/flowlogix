@@ -221,7 +221,7 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     /**
-     * partial builder, just for javadoc.
+     * partial builder, just for Javadoc.
      * @hidden
      * @param <TT>
      */
@@ -669,6 +669,7 @@ public class JPAModelImpl<TT> implements Serializable {
      * @return new, corrected object
      * @throws ObjectStreamException
      */
+    @Serial
     Object readResolve() throws ObjectStreamException {
         var corrected = create(x_do_not_use_in_builder);
         corrected.x_do_not_use_in_builder = x_do_not_use_in_builder;

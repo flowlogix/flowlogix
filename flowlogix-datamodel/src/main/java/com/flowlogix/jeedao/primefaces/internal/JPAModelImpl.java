@@ -583,7 +583,10 @@ public class JPAModelImpl<TT> implements Serializable {
     }
 
     private Class<?> getPrimaryKeyClass() {
-        return getPrimaryKey(Optional.empty()).getClass();
+        return Optional.ofNullable(jpaFinder.get().getEntityManager().get().getMetamodel().entity(getEntityClass())
+                        .getIdType()).orElseThrow(() ->
+                        new IllegalStateException("Unable to determine primary key type from metamodel for " + getEntityClass()))
+                .getJavaType();
     }
 
     /**

@@ -16,6 +16,7 @@
 package com.flowlogix.jeedao.primefaces;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -83,16 +84,27 @@ public interface CursorPagination<TT> extends Serializable {
     /// @param sortMeta the current sort metadata, used to determine which field is being sorted on for cursor extraction
     void save(int offset, TT entity, Map<String, SortMeta> sortMeta);
 
-    /// Creates a JPA sort {@link Order} to apply to the query when no explicit sort is requested by the client,
-    /// based on the first supported column and configured sort direction
+    /// Creates the JPA sort {@link Order}s to apply to the query when no explicit sort is requested by the client,
+    /// based on the first supported column and configured sort direction.
+    /// The first column is always appended as a unique tiebreaker, so the ordering is total
+    /// and cursor pagination never skips or repeats rows when the sort column contains duplicates.
     /// @param cb the CriteriaBuilder to use for constructing the Order
     /// @param root the Root of the query, used to resolve the field for the Order
-    /// @return the JPA {@link Order} to apply to the query for default sorting when no explicit sort is requested by the client
-    Order defaultSort(CriteriaBuilder cb, Root<TT> root);
+    /// @return the JPA {@link Order}s to apply to the query for default sorting when no explicit sort is requested by the client
+    List<Order> defaultSort(CriteriaBuilder cb, Root<TT> root);
+
+    /// Creates the JPA sort {@link Order} to append after the client-requested sort,
+    /// based on the first supported column, so the ordering is total and cursor pagination
+    /// never skips or repeats rows when the requested sort column contains duplicates.
+    /// @param cb the CriteriaBuilder to use for constructing the Order
+    /// @param root the Root of the query, used to resolve the field for the Order
+    /// @return the JPA {@link Order} to append as a unique tiebreaker after the client-requested sort
+    Order tiebreakerSort(CriteriaBuilder cb, Root<TT> root);
 
     /// Used to configure columns for cursor pagination.
     /// First column is always used by default if no sort order is specified by the client,
-    /// so it is recommended to put the most stable and unique column first (e.g. id or createdDate).
+    /// and is always appended as a tiebreaker to every cursor query's ordering,
+    /// so it must be stable and unique (e.g. id or createdDate).
     /// Any fields specified should be indexed, so cursor pagination can be most efficient.
     /// @param fieldName supplies the name of the column, used to match against requested sort fields from the client
     /// @param fieldMethod a function that extracts the comparable value from the entity for that field,
@@ -193,7 +205,7 @@ class CursorData<TT> implements CursorPagination<TT> {
     @Serial
     private static final long serialVersionUID = 2L;
 
-    final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
+    final NavigableMap<Integer, CursorValue> cursorCache = new TreeMap<>();
     private final Lazy<Map<String, SerializableFunction<TT, Comparable<?>>>> columns;
     private final boolean isDescendingDefault;
     private final boolean evictCursorCacheBehind;
@@ -224,8 +236,9 @@ class CursorData<TT> implements CursorPagination<TT> {
     }
 
     public void save(int offset, TT entity, Map<String, SortMeta> sortMeta) {
-        var value = columns().get(requestedSort(sortMeta, columns(), true)).apply(entity);
-        log.debug("Saving cursor for offset {} and entity id {}", offset, value);
+        var value = new CursorValue(columns().get(requestedSort(sortMeta, columns(), true)).apply(entity),
+                columns().get(tiebreakerColumn()).apply(entity));
+        log.debug("Saving cursor for offset {} and value {}", offset, value);
         cursorCache.put(offset, value);
         if (evictCursorCacheBehind) {
             // clear too far behind of the current offset
@@ -273,19 +286,47 @@ class CursorData<TT> implements CursorPagination<TT> {
         boolean descending = Optional.ofNullable(sortMeta.get(currentColumn))
                 .map(order -> order.getOrder().isDescending())
                 .orElse(isDescendingDefault);
-        return Optional.ofNullable(floor).map(entry -> descending
-                        ? cb.lessThan(resolveField0(root, currentColumn), (Comparable) entry.getValue())
-                        : cb.greaterThan(resolveField0(root, currentColumn), (Comparable) entry.getValue())).orElse(null);
+        return Optional.ofNullable(floor).map(entry -> {
+            var sortField = (Expression) resolveField0(root, currentColumn);
+            var tiebreakerField = (Expression) resolveField0(root, tiebreakerColumn());
+            Comparable sortValue = entry.getValue().sortValue();
+            Comparable tiebreakerValue = entry.getValue().tiebreakerValue();
+            if (currentColumn.equals(tiebreakerColumn())) {
+                return descending ? cb.lessThan(sortField, sortValue) : cb.greaterThan(sortField, sortValue);
+            }
+            var tieComparison = descending ? cb.lessThan(tiebreakerField, tiebreakerValue)
+                    : cb.greaterThan(tiebreakerField, tiebreakerValue);
+            var sortComparison = descending ? cb.lessThan(sortField, sortValue) : cb.greaterThan(sortField, sortValue);
+            return cb.or(sortComparison, cb.and(cb.equal(sortField, sortValue), tieComparison));
+        }).orElse(null);
     }
 
     @Override
-    public Order defaultSort(CriteriaBuilder cb, Root<TT> root) {
+    public List<Order> defaultSort(CriteriaBuilder cb, Root<TT> root) {
         var sortField = requestedSort(Map.of(), columns(), true);
-        return isDescendingDefault ? cb.desc(resolveField0(root, sortField)) : cb.asc(resolveField0(root, sortField));
+        return Collections.singletonList(isDescendingDefault
+                ? cb.desc(resolveField0(root, sortField)) : cb.asc(resolveField0(root, sortField)));
     }
 
-    static Supplier<Comparable<?>> valueForLogging(Map.Entry<Integer, Comparable<?>> entry) {
-        return () -> Optional.ofNullable(entry).map(Map.Entry::getValue).orElse(null);
+    @Override
+    public Order tiebreakerSort(CriteriaBuilder cb, Root<TT> root) {
+        return cb.asc(resolveField0(root, tiebreakerColumn()));
+    }
+
+    private String tiebreakerColumn() {
+        return columns().keySet().iterator().next();
+    }
+
+    static Supplier<Comparable<?>> valueForLogging(Map.Entry<Integer, CursorValue> entry) {
+        return () -> Optional.ofNullable(entry).map(Map.Entry::getValue).map(CursorValue::sortValue).orElse(null);
+    }
+
+    /// Cached cursor position: the value of the requested sort column on the last row of the page,
+    /// plus the value of the unique tiebreaker column (first configured column) on the same row,
+    /// so rows whose sort value equals the boundary value are not skipped or repeated
+    record CursorValue(Comparable<?> sortValue, Comparable<?> tiebreakerValue) implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
     }
 
     private void initializeFilters(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
@@ -367,8 +408,14 @@ class NoopCursorData<TT> implements CursorPagination<TT> {
     }
 
     @Override
-    public Order defaultSort(CriteriaBuilder cb, Root<TT> root) {
+    public List<Order> defaultSort(CriteriaBuilder cb, Root<TT> root) {
         throw new UnsupportedOperationException("NoopCursorData does not support default sorting");
+    }
+
+    @Override
+    public Order tiebreakerSort(CriteriaBuilder cb, Root<TT> root) {
+        // no tiebreaker needed when cursor pagination is not in effect, null is filtered out downstream
+        return null;
     }
 
     @Override

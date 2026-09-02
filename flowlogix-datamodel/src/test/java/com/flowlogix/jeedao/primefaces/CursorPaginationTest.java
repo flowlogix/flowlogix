@@ -17,6 +17,7 @@ package com.flowlogix.jeedao.primefaces;
 
 import com.flowlogix.jeedao.primefaces.CursorPagination.Field;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -135,14 +138,45 @@ class CursorPaginationTest {
                 .order(SortOrder.DESCENDING).build()))).isNull();
         verify(cb).lessThan(root.get("id"), "one");
 
-        verify(root, times(4)).get("id");
+        verify(root, times(6)).get("id");
         verifyNoMoreInteractions(cb, root);
     }
 
     @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
+    void predicateWithDuplicatesUsesTiebreaker() {
+        record Row(int id, String lastName) { }
+        var rowCursor = CursorPagination.<Row>create(builder -> builder.supportedFields(
+                List.of(new Field<>(() -> "id", Row::id),
+                        new Field<>(() -> "lastName", Row::lastName))).build()).get();
+        var sort = Map.of("lastName", SortMeta.builder().field("lastName").build());
+        rowCursor.save(3, new Row(7, "C"), sort);
+
+        @SuppressWarnings("unchecked")
+        Root<Row> rowRoot = mock(Root.class, org.mockito.Answers.RETURNS_DEEP_STUBS);
+        assertThat(rowCursor.cursorPredicate(3, cb, rowRoot, sort)).isNull();
+        verify(cb).greaterThan(rowRoot.get("lastName"), "C");
+        verify(cb).equal(rowRoot.get("lastName"), "C");
+        verify(cb).greaterThan(rowRoot.get("id"), 7);
+        verify(cb).and(any(), any());
+        verify(cb).or(any(), any());
+        verify(rowRoot, times(3)).get("lastName");
+        verify(rowRoot, times(2)).get("id");
+        verifyNoMoreInteractions(cb, rowRoot);
+    }
+
+    @Test
     void defaultSort() {
-        assertThat(cursor.defaultSort(cb, root)).isNull();
+        assertThat(cursor.defaultSort(cb, root)).containsExactly((Order) null);
         verify(cb).desc(root.get("id"));
+        verify(root, times(2)).get("id");
+        verifyNoMoreInteractions(cb, root);
+    }
+
+    @Test
+    void tiebreakerSort() {
+        assertThat(cursor.tiebreakerSort(cb, root)).isNull();
+        verify(cb).asc(root.get("id"));
         verify(root, times(2)).get("id");
         verifyNoMoreInteractions(cb, root);
     }
@@ -173,6 +207,7 @@ class CursorPaginationTest {
         assertThat(noop.isSupported(null, null)).isFalse();
         assertThatThrownBy(() -> noop.save(0, null, Map.of())).isInstanceOf(UnsupportedOperationException.class);
         assertThatThrownBy(() -> noop.defaultSort(null, null)).isInstanceOf(UnsupportedOperationException.class);
+        assertThat(noop.tiebreakerSort(null, null)).isNull();
     }
 
     @Test

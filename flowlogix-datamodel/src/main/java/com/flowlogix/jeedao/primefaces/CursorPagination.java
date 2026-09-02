@@ -287,8 +287,8 @@ class CursorData<TT> implements CursorPagination<TT> {
                 .map(order -> order.getOrder().isDescending())
                 .orElse(isDescendingDefault);
         return Optional.ofNullable(floor).map(entry -> {
-            var sortField = (Expression) resolveField0(root, currentColumn);
-            var tiebreakerField = (Expression) resolveField0(root, tiebreakerColumn());
+            Expression sortField = resolveField0(root, currentColumn);
+            Expression tiebreakerField = resolveField0(root, tiebreakerColumn());
             Comparable sortValue = entry.getValue().sortValue();
             Comparable tiebreakerValue = entry.getValue().tiebreakerValue();
             if (currentColumn.equals(tiebreakerColumn())) {

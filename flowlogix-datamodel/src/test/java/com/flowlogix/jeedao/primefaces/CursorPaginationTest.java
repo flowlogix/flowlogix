@@ -256,7 +256,7 @@ class CursorPaginationTest {
                 new Row(4, "D", 40), new Row(5, "E", 50), new Row(6, "F", 60),
                 new Row(7, "G", 70), new Row(8, "H", 80), new Row(9, "I", 90),
                 new Row(10, "J", 95));
-        var cursor = CursorPagination.<Row>create(builder -> builder.supportedFields(
+        var cursorPagination = CursorPagination.<Row>create(builder -> builder.supportedFields(
                 List.of(new Field<>(() -> "lastName", Row::lastName))).build()).get();
         var sort = Map.of("lastName", SortMeta.builder()
                 .field("lastName").order(SortOrder.ASCENDING).build());
@@ -264,23 +264,23 @@ class CursorPaginationTest {
         // page forward with a wide filter
         var wideFilter = Map.of("age", FilterMeta.builder()
                 .field("age").filterValue(0).matchMode(MatchMode.GREATER_THAN).build());
-        assertThat(cursor.isSupported(wideFilter, sort)).isTrue();
+        assertThat(cursorPagination.isSupported(wideFilter, sort)).isTrue();
         var page1 = rows.stream().filter(row -> row.age() > 0).limit(3).toList();
-        page1.forEach(row -> cursor.save(rows.indexOf(row) + 1, row, sort));
-        assertThat(cursor.isSupported(wideFilter, sort)).isTrue();
-        assertThat(cursor.cursorOffset(3)).isZero();
+        page1.forEach(row -> cursorPagination.save(rows.indexOf(row) + 1, row, sort));
+        assertThat(cursorPagination.isSupported(wideFilter, sort)).isTrue();
+        assertThat(cursorPagination.cursorOffset(3)).isZero();
 
         // narrow the filter, cursor cache must be discarded
         var narrowFilter = Map.of("age", FilterMeta.builder()
                 .field("age").filterValue(90).matchMode(MatchMode.GREATER_THAN).build());
-        assertThat(cursor.isSupported(narrowFilter, sort)).isFalse();
-        assertThat(cursor.isSupported(narrowFilter, sort)).isTrue();
+        assertThat(cursorPagination.isSupported(narrowFilter, sort)).isFalse();
+        assertThat(cursorPagination.isSupported(narrowFilter, sort)).isTrue();
         var narrowed = rows.stream().filter(row -> row.age() > 90).toList();
         var narrowedPage1 = narrowed.subList(0, 1);
-        narrowedPage1.forEach(row -> cursor.save(1, row, sort));
-        assertThat(cursor.isSupported(narrowFilter, sort)).isTrue();
+        narrowedPage1.forEach(row -> cursorPagination.save(1, row, sort));
+        assertThat(cursorPagination.isSupported(narrowFilter, sort)).isTrue();
         // page 2 starts after the only matching row, so it must be empty
-        var narrowedPage2 = narrowed.subList(Math.min(1 + cursor.cursorOffset(1), narrowed.size()), narrowed.size());
+        var narrowedPage2 = narrowed.subList(Math.min(1 + cursorPagination.cursorOffset(1), narrowed.size()), narrowed.size());
         assertThat(narrowedPage2).isEmpty();
     }
 }

@@ -191,7 +191,7 @@ public interface CursorPagination<TT> extends Serializable {
 @Slf4j
 class CursorData<TT> implements CursorPagination<TT> {
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     final NavigableMap<Integer, Comparable<?>> cursorCache = new TreeMap<>();
     private final Lazy<Map<String, SerializableFunction<TT, Comparable<?>>>> columns;

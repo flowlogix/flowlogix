@@ -35,7 +35,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class Initializer {
     /** sort column has duplicates spanning a page boundary: A B C C C D E F G H. */
-    public static final String[] LAST_NAMES = {"A", "B", "C", "C", "C", "D", "E", "F", "G", "H"};
+    public static final List<String> LAST_NAMES = List.of("A", "B", "C", "C", "C", "D", "E", "F", "G", "H");
 
     @Inject
     @EntityManagerSelector(AnotherEntityManager.class)
@@ -64,9 +64,9 @@ public class Initializer {
                             .address("Beastly Court").zipCode(68502).build()
             ).forEach(helper.getEntityManager().get()::merge);
 
-            for (int i = 0; i < LAST_NAMES.length; i++) {
+            for (int i = 0; i < LAST_NAMES.size(); i++) {
                 helper.getEntityManager().get().merge(LastNameEntity.builder()
-                        .userId("dup" + i).fullName(LAST_NAMES[i]).zipCode(68501).build());
+                        .userId("dup" + i).fullName(LAST_NAMES.get(i)).zipCode(68501).build());
             }
         }
     }

@@ -313,7 +313,7 @@ class DataModelBackendIT {
         var filter = Map.of(UserEntity_.zipCode.getName(), FilterMeta.builder()
                 .field(UserEntity_.zipCode.getName()).filterValue(68500)
                 .matchMode(MatchMode.GREATER_THAN).build());
-        assertThat(model.count(filter)).isEqualTo(LAST_NAMES.length);
+        assertThat(model.count(filter)).isEqualTo(LAST_NAMES.size());
         pageForwardAndVerifyEveryRowOnce(model, filter, SortOrder.ASCENDING);
         pageForwardAndVerifyEveryRowOnce(model, filter, SortOrder.DESCENDING);
     }

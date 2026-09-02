@@ -16,12 +16,18 @@
 package com.flowlogix.examples;
 
 import com.flowlogix.demo.jeedao.NonDefault;
+import com.flowlogix.demo.jeedao.entities.LastNameEntity;
+import com.flowlogix.demo.jeedao.entities.LastNameEntity_;
 import com.flowlogix.demo.jeedao.entities.UserEntity;
 import com.flowlogix.demo.jeedao.entities.UserEntity_;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import com.flowlogix.demo.jeedao.primefaces.DataModelWrapper;
 import com.flowlogix.demo.jeedao.primefaces.InjectedDataModel;
+import com.flowlogix.jeedao.primefaces.CursorPagination;
+import com.flowlogix.jeedao.primefaces.CursorPagination.Field;
 import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.test.AppServerLifecycle;
 import com.flowlogix.util.SerializeTester;
@@ -32,7 +38,10 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.MatchMode;
+import org.primefaces.model.SortMeta;
+import org.primefaces.model.SortOrder;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
+import static com.flowlogix.examples.data.Initializer.LAST_NAMES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -289,6 +298,41 @@ class DataModelBackendIT {
         doFilteringDataModel(filtering);
     }
 
+    @Test
+    @OperateOnDeployment(DEPLOYMENT_DEV_MODE)
+    void cursorPaginationWithDuplicateSortValues() {
+        var model = JPALazyDataModel.<LastNameEntity>create(builder -> builder
+                .entityManager(() -> injectedModel.getInjectedModel().getEntityManager().get())
+                .entityClass(LastNameEntity.class)
+                .cursor(CursorPagination.create(config -> config.supportedFields(
+                        List.of(new Field<>(() -> LastNameEntity_.id.getName(), LastNameEntity::getId),
+                                new Field<>(() -> LastNameEntity_.fullName.getName(), LastNameEntity::getFullName)))
+                        .build()))
+                .build());
+        @SuppressWarnings("checkstyle:MagicNumber")
+        var filter = Map.of(UserEntity_.zipCode.getName(), FilterMeta.builder()
+                .field(UserEntity_.zipCode.getName()).filterValue(68500)
+                .matchMode(MatchMode.GREATER_THAN).build());
+        assertThat(model.count(filter)).isEqualTo(LAST_NAMES.size());
+        pageForwardAndVerifyEveryRowOnce(model, filter, SortOrder.ASCENDING);
+        pageForwardAndVerifyEveryRowOnce(model, filter, SortOrder.DESCENDING);
+    }
+
+    @SuppressWarnings("checkstyle:MagicNumber")
+    private void pageForwardAndVerifyEveryRowOnce(JPALazyDataModel<LastNameEntity> model,
+                                                  Map<String, FilterMeta> filter, SortOrder order) {
+        var sort = Map.of(LastNameEntity_.fullName.getName(), SortMeta.builder()
+                .field(LastNameEntity_.fullName.getName()).order(order).build());
+        List<Long> seenIds = new ArrayList<>();
+        for (int offset = 0; offset <= model.count(filter); offset += 3) {
+            model.findRows(offset, 3, filter, sort)
+                    .forEach(row -> seenIds.add(row.getId()));
+        }
+        assertThat(seenIds).as("every row exactly once, %s", order)
+                .hasSize(10).doesNotHaveDuplicates();
+    }
+
+    @SuppressWarnings("unused")
     @Deployment(name = DEPLOYMENT_DEV_MODE)
     static WebArchive createDeployment() {
         return ExceptionPageIT.createDeploymentDev();

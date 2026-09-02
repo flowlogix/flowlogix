@@ -16,6 +16,7 @@
 package com.flowlogix.examples.data;
 
 import com.flowlogix.demo.jeedao.entities.AlternateEmails;
+import com.flowlogix.demo.jeedao.entities.LastNameEntity;
 import com.flowlogix.demo.jeedao.entities.UserSettings;
 import com.flowlogix.jeedao.DaoHelper;
 import com.flowlogix.jeedao.EntityManagerSelector;
@@ -33,6 +34,9 @@ import jakarta.transaction.Transactional;
 @ActivateRequestContext
 @Transactional
 public class Initializer {
+    /** sort column has duplicates spanning a page boundary: A B C C C D E F G H. */
+    public static final List<String> LAST_NAMES = List.of("A", "B", "C", "C", "C", "D", "E", "F", "G", "H");
+
     @Inject
     @EntityManagerSelector(AnotherEntityManager.class)
     DaoHelper<UserEntity> helper;
@@ -59,6 +63,11 @@ public class Initializer {
                     UserEntity.builder().userId("cousin").fullName("Cool Cousin")
                             .address("Beastly Court").zipCode(68502).build()
             ).forEach(helper.getEntityManager().get()::merge);
+
+            for (int i = 0; i < LAST_NAMES.size(); i++) {
+                helper.getEntityManager().get().merge(LastNameEntity.builder()
+                        .userId("dup" + i).fullName(LAST_NAMES.get(i)).zipCode(68501).build());
+            }
         }
     }
 }

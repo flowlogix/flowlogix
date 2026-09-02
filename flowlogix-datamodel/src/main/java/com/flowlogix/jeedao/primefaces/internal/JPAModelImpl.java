@@ -625,7 +625,17 @@ public class JPAModelImpl<TT> implements Serializable {
             }
         });
         if (cursorSupported && !userSortRequested.get()) {
-            sortMetaOrdering.addFirst(cursor.get().defaultSort(cb, root));
+            // default sort must lead the ordering, ahead of any application sorts,
+            // because the cursor predicate is built on the default column
+            var defaultOrders = cursor.get().defaultSort(cb, root);
+            for (var it = defaultOrders.listIterator(defaultOrders.size()); it.hasPrevious(); ) {
+                sortMetaOrdering.addFirst(it.previous());
+            }
+        }
+        if (cursorSupported) {
+            // append the unique tiebreaker column so the ordering is total,
+            // otherwise rows whose sort value equals the cursor boundary value would be skipped or repeated
+            Optional.ofNullable(cursor.get().tiebreakerSort(cb, root)).ifPresent(sortMetaOrdering::addLast);
         }
         return sortMetaOrdering.stream().toList();
     }

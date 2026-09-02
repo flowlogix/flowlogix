@@ -129,6 +129,7 @@
                                     <includes>
                                         com/flowlogix/demo/jeedao/entities/AlternateEmails*.class,
                                         com/flowlogix/demo/jeedao/entities/UserEntity*.class,
+                                        com/flowlogix/demo/jeedao/entities/LastNameEntity*.class,
                                         com/flowlogix/demo/jeedao/entities/UserSettings*.class,
                                         com/flowlogix/demo/viewscoped/ViewScoped.class
                                     </includes>

@@ -403,3 +403,103 @@ When using `JPALazyDataModel` with large datasets, cursor pagination can be used
 Cursor pagination works by keeping track of the last seen record's position (the cursor) and using it as additional criteria to fetch the next set of records. This approach avoids performance issues associated with offset pagination, which can become slower as the offset increases. With cursor pagination, the database can efficiently retrieve the next set of records based on the last seen record, resulting in faster response times, especially for large datasets. Each time a new page of data is received, the last cursor value is cached. Take care of keeping the cursor values small, such as an integer, UUID or a short string to avoid using too much memory for the cursor cache. Cache eviction may be configured via `evictCursor*` and `*CursorWindowSize` parameters.
 
 The cursor position is an ordering tuple: the value of the requested sort column on the last row of the page, plus the value of the first configured field on the same row. The first configured field must be stable and unique (e.g. `id` or `createdDate`), because it is appended as an ascending tiebreaker to every cursor query's `ORDER BY`, making the ordering total. The cursor predicate is then lexicographic: `sort > value OR (sort = value AND tiebreaker > tiebreakerValue)`, reversed for descending, so rows whose sort value equals the page boundary value are never skipped or repeated, even when the sort column contains duplicates spanning a page boundary.
+
+NOTE: High-priority application sort is not supported with cursor pagination, and is ignored when cursor pagination is enabled. This is because cursor pagination requires the high-priority sort to be the same as the cursor field, and changing it would cause unexpected behavior.
+
+[source,java]
+.UserViewer.java - Cursor Pagination example
+----
+@Named
+@ViewScoped
+public class UserViewer implements Serializable {
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/CursorDataModel.java[tags=usage]
+----
+https://github.com/flowlogix/flowlogix/tree/main/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
+
+Above, cursor pagination is used, if the data is either unsorted or sorted by `UserEntity.id` field.
+
+[source,java]
+.UserViewer.java - Direct model creation
+----
+@Named
+@ViewScoped
+public class UserViewer implements Serializable {
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/DirectCreationDataModel.java[tags=basicUsage]
+}
+----
+https://github.com/flowlogix/flowlogix/tree/main/jee-examples/src/main/java/com/flowlogix/examples/data/UserViewer.java[Full Demo on GitHub^]
+
+Above, we create the model without injection.
+During direct creation, `JPALazyDataModel` only requires `entityClass` to work, everything else is optional:
+
+* entityManager: Provide entity manager `Supplier`. Default is injected via CDI
+* entityManagerQualifiers: Provides a list of qualifier annotations to select the correct EntityManager for injection
+* caseSensitiveFilter: Specifies if filtering of String values are case-sensitive (boolean). Default is `true`.
+* filterCaseConversion: either `UPPER` or `LOWER`. Specifies whether to convert queries to upper or lower case during case-insensitive filter queries. Default is `UPPER`
+* wildcardSupport: Specifies whether wildcards are supported in `EXACT` and other String queries (boolean). Default is false.
+* joinType: Specifies the `jakarta.persistence.criteria.JoinType` used when resolving dotted (nested) field references in filters and sort criteria. Default is `LEFT`, so entities with null to-one associations are still returned when sorting or filtering on columns of those associations. Set to `INNER` (or use `@LazyModelConfig(innerJoins = true)`) only for applications that deliberately rely on inner join semantics.
+* sorter: Apply additional or replacement sort criteria
+* filter: Apply additional or replacement filter criteria
+* optimizer: Apply additional customizations to queries, such as JPA hints, works together with `JPAFinder`
+* cursor: Use cursor pagination instead of offset pagination for better performance with large datasets
+* resultEnricher: Apply transformation to the results of the query, such as adding or modifying resulting rows displayed by the model
+* converter: `Function` that converts String representation of a primary key into a primary key object. Needed only if the default is insufficient.
+* keyConverter: `Function` that converts an entity object into it's primary key in `String` form. Needed only if the default is insufficient.
+
+NOTE: Dotted (nested) field references, such as `address.city`, share a single `LEFT` join per query between filter, sort and count criteria, and filtering over a to-many association uses `DISTINCT` (and `COUNT(DISTINCT ...)` for the count query), so each matching entity is returned exactly once and `count()` always agrees with the paged rows.
+
+Let's use custom criteria to add address to the default sort:
+[source,java]
+.Add sorting by zip code
+----
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[tags=sorting]
+----
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/SortingDataModel.java[Full Demo on GitHub^]
+
+Let's use custom filter criteria using `replaceFilter` convenience method. Here we make sure that only zip codes greater than that in the filter are returned:
+[source,java]
+.Show only zip codes greater than filtered field
+----
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[tags=filtering]
+----
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/FilteringDataModel.java[Full Demo on GitHub^]
+
+Optimizer hints can be used to fetch dependent entity relationships in batches. The `UnaryOperator` should return the same `TypedQuery` instance it was passed in the _Fluent_ manner:
+[source,java]
+.Batch query of dependent entities using `IN` query
+----
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[tags=optimized]
+----
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/OptimizedDataModel.java[Full Demo on GitHub^]
+
+Results Enricher can be used to post-process the results of the query:
+[source,java]
+.Add a new row to the results
+----
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/EnrichedDataModel.java[tags=enriched]
+----
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/EnrichedDataModel.java[Full Demo on GitHub^]
+
+Let's select a specific entity manager for this particular data model, by using a CDI qualifier:
+[source,java]
+.Using `@LazyModelConfig(entityManagerSelector)` to use a specific persistence unit
+----
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[tags=qualifier]
+----
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/QualifiedDataModel.java[Full Demo on GitHub^]
+
+`JPALazyDataModel` needs to convert a String representation of the entity's primary key into the actual entity primary key object. This is a requirement for PrimeFaces' `LazyDataModel.getRowKey(String)` method. Default converter is provided. However, if it's insufficient, `converter` builder method is provided to override the default.
+
+`JPALazyDataModel` needs to convert an entity instance to a String that represents its primary key. This is a requirement for PrimeFaces' `LazyDataModel.getRowKey(TT)` method. Default converter is provided. However, if it's insufficient, `keyConverter` builder method is provided to override the default.
+[source,java]
+.Use binary value as a primary key representation, using converters
+----
+include::../../flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/ConverterDataModel.java[tags=converter]
+----
+https://github.com/flowlogix/flowlogix/tree/main/flowlogix-datamodel/src/demo/java/com/flowlogix/demo/jeedao/primefaces/ConverterDataModel.java[Full Demo on GitHub^]
+
+== API Reference
+FlowLogix features a full API references:
+
+link:https://javadoc.io/doc/com.flowlogix/flowlogix-jee[Jakarta EE Components API Reference^] +
+link:https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel[PrimeFaces JPA Lazy Data Model API Reference^]

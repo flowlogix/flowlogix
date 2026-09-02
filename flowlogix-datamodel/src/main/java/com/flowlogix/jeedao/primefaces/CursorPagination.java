@@ -201,9 +201,8 @@ class CursorData<TT> implements CursorPagination<TT> {
     private final int behindCursorWindowSize;
     private final int aheadCursorWindowSize;
 
-    private Map<String, FilterMeta> cursorFilters;
-    private Map<String, SortMeta> cursorSorts;
-    private boolean isDescendingState;
+    private Map<String, FilterSnapshot> cursorFilters;
+    private Map<String, SortSnapshot> cursorSorts;
 
     CursorData(List<Field<TT>> columns, boolean isDescendingDefault,
                boolean evictCursorCacheBehind, boolean evictCursorCacheAhead,
@@ -258,10 +257,6 @@ class CursorData<TT> implements CursorPagination<TT> {
                             .addArgument(columns()::keySet).addArgument(sortMeta::keySet).log();
             cursorCache.clear();
             return false;
-        } else if (isDescendingState != Optional.ofNullable(sortMeta.get(requestedSort))
-                .map(sort -> sort.getOrder().isDescending()).orElse(false)) {
-            isDescendingState = !isDescendingState;
-            cursorCache.clear();
         }
 
         return true;
@@ -295,9 +290,9 @@ class CursorData<TT> implements CursorPagination<TT> {
 
     private void initializeFilters(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
         if (cursorFilters == null) {
-            cursorFilters = filters;
+            cursorFilters = snapshotFilters(filters);
             checkUnexpectedInitializationState();
-            cursorSorts = sortMeta;
+            cursorSorts = snapshotSorts(sortMeta);
         }
     }
 
@@ -309,13 +304,40 @@ class CursorData<TT> implements CursorPagination<TT> {
     }
 
     private boolean criteriaChanged(Map<String, FilterMeta> filters, Map<String, SortMeta> sortMeta) {
-        if (!cursorFilters.equals(filters) || !cursorSorts.equals(sortMeta)) {
-            cursorFilters = filters;
-            cursorSorts = sortMeta;
+        var filterSnapshot = snapshotFilters(filters);
+        var sortSnapshot = snapshotSorts(sortMeta);
+        if (!cursorFilters.equals(filterSnapshot) || !cursorSorts.equals(sortSnapshot)) {
+            cursorFilters = filterSnapshot;
+            cursorSorts = sortSnapshot;
             cursorCache.clear();
             return true;
         }
         return false;
+    }
+
+    private static Map<String, FilterSnapshot> snapshotFilters(Map<String, FilterMeta> filters) {
+        return filters.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                entry -> new FilterSnapshot(entry.getValue().getField(),
+                        entry.getValue().getFilterValue(), entry.getValue().getMatchMode())));
+    }
+
+    private static Map<String, SortSnapshot> snapshotSorts(Map<String, SortMeta> sortMeta) {
+        return sortMeta.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                entry -> new SortSnapshot(entry.getValue().getField(), entry.getValue().getOrder())));
+    }
+
+    /// Immutable snapshot of the filter criteria that cursor pagination depends on,
+    /// used instead of {@link FilterMeta#equals} which only compares the field
+    record FilterSnapshot(String field, Object value, Object matchMode) implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+    }
+
+    /// Immutable snapshot of the sort criteria that cursor pagination depends on,
+    /// used instead of {@link SortMeta#equals} which only compares the field
+    record SortSnapshot(String field, Object order) implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
     }
 
     private static <TT> Map<String, SerializableFunction<TT, Comparable<?>>> createColumns(List<Field<TT>> columns) {

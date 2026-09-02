@@ -23,8 +23,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.primefaces.model.FilterMeta;
+import org.primefaces.model.MatchMode;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -114,6 +116,9 @@ class CursorPaginationTest {
     void descending() {
         assertThat(cursor.isSupported(Map.of(), Map.of("id", SortMeta.builder().field("id")
                 .order(SortOrder.DESCENDING).build()))).isTrue();
+        // sort order flip is a criteria change, cursor cache is discarded
+        assertThat(cursor.isSupported(Map.of(), Map.of("id", SortMeta.builder().field("id")
+                .build()))).isFalse();
         assertThat(cursor.isSupported(Map.of(), Map.of("id", SortMeta.builder().field("id")
                 .build()))).isTrue();
     }
@@ -182,5 +187,100 @@ class CursorPaginationTest {
         assertThatThrownBy(() -> CursorPagination.create(builder -> builder
                 .supportedFields(List.of(new Field<>(() -> "", e -> "one"))).build()).get().columns())
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
+    void filterValueChangeClearsCursorCache() {
+        var rawCursor = CursorPagination.<Entity>create(builder ->
+                builder.supportedFields(List.of(new Field<>(() -> "id", e -> "one"))).build()).get();
+        assertThat(rawCursor.isSupported(Map.of("age", FilterMeta.builder()
+                .field("age").filterValue(0).matchMode(MatchMode.GREATER_THAN).build()), Map.of())).isTrue();
+        rawCursor.save(3, new Entity(), Map.of());
+        CursorData<Entity> data = (CursorData<Entity>) rawCursor;
+        assertThat(data.cursorCache).isNotEmpty();
+        assertThat(rawCursor.isSupported(Map.of("age", FilterMeta.builder()
+                .field("age").filterValue(90).matchMode(MatchMode.GREATER_THAN).build()), Map.of())).isFalse();
+        assertThat(data.cursorCache).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
+    void filterMatchModeChangeClearsCursorCache() {
+        var rawCursor = CursorPagination.<Entity>create(builder ->
+                builder.supportedFields(List.of(new Field<>(() -> "id", e -> "one"))).build()).get();
+        assertThat(rawCursor.isSupported(Map.of("age", FilterMeta.builder()
+                .field("age").filterValue(5).matchMode(MatchMode.GREATER_THAN).build()), Map.of())).isTrue();
+        rawCursor.save(3, new Entity(), Map.of());
+        assertThat(rawCursor.isSupported(Map.of("age", FilterMeta.builder()
+                .field("age").filterValue(5).matchMode(MatchMode.LESS_THAN).build()), Map.of())).isFalse();
+        assertThat(((CursorData<Entity>) rawCursor).cursorCache).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
+    void inPlaceFilterMutationClearsCursorCache() {
+        var rawCursor = CursorPagination.<Entity>create(builder ->
+                builder.supportedFields(List.of(new Field<>(() -> "id", e -> "one"))).build()).get();
+        var filterMeta = FilterMeta.builder()
+                .field("age").filterValue(0).matchMode(MatchMode.GREATER_THAN).build();
+        var filters = new HashMap<String, FilterMeta>();
+        filters.put("age", filterMeta);
+        assertThat(rawCursor.isSupported(filters, Map.of())).isTrue();
+        rawCursor.save(3, new Entity(), Map.of());
+        filterMeta.setFilterValue(90);
+        assertThat(rawCursor.isSupported(filters, Map.of())).isFalse();
+        assertThat(((CursorData<Entity>) rawCursor).cursorCache).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
+    void sortOrderChangeClearsCursorCache() {
+        var rawCursor = CursorPagination.<Entity>create(builder ->
+                builder.supportedFields(List.of(new Field<>(() -> "id", e -> "one"))).build()).get();
+        assertThat(rawCursor.isSupported(Map.of(), Map.of("id", SortMeta.builder()
+                .field("id").order(SortOrder.ASCENDING).build()))).isTrue();
+        rawCursor.save(3, new Entity(), Map.of("id", SortMeta.builder()
+                .field("id").order(SortOrder.ASCENDING).build()));
+        assertThat(rawCursor.isSupported(Map.of(), Map.of("id", SortMeta.builder()
+                .field("id").order(SortOrder.DESCENDING).build()))).isFalse();
+        assertThat(((CursorData<Entity>) rawCursor).cursorCache).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
+    void pagesDoNotOverlapAfterFilterNarrowing() {
+        record Row(int id, String lastName, int age) { }
+        var rows = List.of(
+                new Row(1, "A", 10), new Row(2, "B", 20), new Row(3, "C", 30),
+                new Row(4, "D", 40), new Row(5, "E", 50), new Row(6, "F", 60),
+                new Row(7, "G", 70), new Row(8, "H", 80), new Row(9, "I", 90),
+                new Row(10, "J", 95));
+        var cursor = CursorPagination.<Row>create(builder -> builder.supportedFields(
+                List.of(new Field<>(() -> "lastName", Row::lastName))).build()).get();
+        var sort = Map.of("lastName", SortMeta.builder()
+                .field("lastName").order(SortOrder.ASCENDING).build());
+
+        // page forward with a wide filter
+        var wideFilter = Map.of("age", FilterMeta.builder()
+                .field("age").filterValue(0).matchMode(MatchMode.GREATER_THAN).build());
+        assertThat(cursor.isSupported(wideFilter, sort)).isTrue();
+        var page1 = rows.stream().filter(row -> row.age() > 0).limit(3).toList();
+        page1.forEach(row -> cursor.save(rows.indexOf(row) + 1, row, sort));
+        assertThat(cursor.isSupported(wideFilter, sort)).isTrue();
+        assertThat(cursor.cursorOffset(3)).isZero();
+
+        // narrow the filter, cursor cache must be discarded
+        var narrowFilter = Map.of("age", FilterMeta.builder()
+                .field("age").filterValue(90).matchMode(MatchMode.GREATER_THAN).build());
+        assertThat(cursor.isSupported(narrowFilter, sort)).isFalse();
+        assertThat(cursor.isSupported(narrowFilter, sort)).isTrue();
+        var narrowed = rows.stream().filter(row -> row.age() > 90).toList();
+        var narrowedPage1 = narrowed.subList(0, 1);
+        narrowedPage1.forEach(row -> cursor.save(1, row, sort));
+        assertThat(cursor.isSupported(narrowFilter, sort)).isTrue();
+        // page 2 starts after the only matching row, so it must be empty
+        var narrowedPage2 = narrowed.subList(Math.min(1 + cursor.cursorOffset(1), narrowed.size()), narrowed.size());
+        assertThat(narrowedPage2).isEmpty();
     }
 }

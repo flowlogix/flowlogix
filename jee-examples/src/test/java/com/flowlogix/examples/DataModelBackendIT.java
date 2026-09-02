@@ -310,7 +310,7 @@ class DataModelBackendIT {
                         .build()))
                 .build());
         @SuppressWarnings("checkstyle:MagicNumber")
-        var filter = Map.<String, FilterMeta>of(UserEntity_.zipCode.getName(), FilterMeta.builder()
+        var filter = Map.of(UserEntity_.zipCode.getName(), FilterMeta.builder()
                 .field(UserEntity_.zipCode.getName()).filterValue(68500)
                 .matchMode(MatchMode.GREATER_THAN).build());
         assertThat(model.count(filter)).isEqualTo(LAST_NAMES.length);
@@ -332,6 +332,7 @@ class DataModelBackendIT {
                 .hasSize(10).doesNotHaveDuplicates();
     }
 
+    @SuppressWarnings("unused")
     @Deployment(name = DEPLOYMENT_DEV_MODE)
     static WebArchive createDeployment() {
         return ExceptionPageIT.createDeploymentDev();

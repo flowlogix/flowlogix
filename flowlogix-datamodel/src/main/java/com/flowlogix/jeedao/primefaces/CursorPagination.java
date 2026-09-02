@@ -294,8 +294,9 @@ class CursorData<TT> implements CursorPagination<TT> {
             if (currentColumn.equals(tiebreakerColumn())) {
                 return descending ? cb.lessThan(sortField, sortValue) : cb.greaterThan(sortField, sortValue);
             }
-            var tieComparison = descending ? cb.lessThan(tiebreakerField, tiebreakerValue)
-                    : cb.greaterThan(tiebreakerField, tiebreakerValue);
+            // the tiebreaker is always ordered ascending (see tiebreakerSort),
+            // so the tie branch is always "greater than", independent of the sort direction
+            var tieComparison = cb.greaterThan(tiebreakerField, tiebreakerValue);
             var sortComparison = descending ? cb.lessThan(sortField, sortValue) : cb.greaterThan(sortField, sortValue);
             return cb.or(sortComparison, cb.and(cb.equal(sortField, sortValue), tieComparison));
         }).orElse(null);

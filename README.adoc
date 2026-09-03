@@ -15,8 +15,12 @@ image:https://img.shields.io/github/license/flowlogix/flowlogix?style=plastic[li
 image:https://www.bestpractices.dev/projects/8431/badge[link="https://www.bestpractices.dev/projects/8431"]
 image:https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/com/flowlogix/badge.json[link="https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/com/flowlogix/README.md"]
 
-== Quick Start
-link:https://start.flowlogix.com[Generate your project^]
+== Quick Start (only JDK is required)
+link:https://start.flowlogix.com[Generate your project^] and run it in seconds:
+[source,shell]
+----
+./mvnw package server:dev
+----
 
 === Documentation and Features
 link:https://docs.flowlogix.com[Developer's Guide^] is here.

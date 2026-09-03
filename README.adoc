@@ -15,6 +15,12 @@ image:https://img.shields.io/github/license/flowlogix/flowlogix?style=plastic[li
 image:https://www.bestpractices.dev/projects/8431/badge[link="https://www.bestpractices.dev/projects/8431"]
 image:https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/com/flowlogix/badge.json[link="https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/com/flowlogix/README.md"]
 
+== Quick Start
+link:https://start.flowlogix.com[Generate your project^]
+
+=== Documentation and Features
+link:https://docs.flowlogix.com[Developer's Guide^] is here.
+
 === Current Projects
 
 - Jakarta EE Lazy Data Model for PrimeFaces DataTable image:https://javadoc.io/badge2/com.flowlogix/flowlogix-datamodel/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-datamodel",window=_blank]
@@ -22,9 +28,6 @@ image:https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-
 - Jakarta EE JPAFinder Composable Criteria Queries image:https://javadoc.io/badge2/com.flowlogix/flowlogix-jee/javadoc.svg[link="https://javadoc.io/doc/com.flowlogix/flowlogix-jee",window=_blank]
 - Jakarta EE JSF JavaScript Minimized resource handler
 - Utilities (String / Object Type Converter, Stream reader)
-
-=== Documentation and Features
-link:https://docs.flowlogix.com[Developer's Guide^] is here.
 
 === Maven Central Coordinates
 

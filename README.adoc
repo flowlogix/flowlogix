@@ -63,4 +63,4 @@ link:wiki/TapestryLibrary[Flow Logix Tapestry Library]? +
 Makes Tapestry work easily with JEE/EJBs, GWT, Shiro Security and JEE Servers like Glassfish. While writing applications in Tapestry, the common components were itching to be housed in it's own library. This is it. This library is what you would write while developing Tapestry 5 applications. +
 a.k.a 'Web Stuff'
 
-image:https://static.scarf.sh/a.png?x-pxid=d8c39487-b1ab-48e5-88c6-8e4b3b6b41ae&page=README.md[,0,0]
+image:https://static.scarf.sh/a.png?x-pxid=d8c39487-b1ab-48e5-88c6-8e4b3b6b41ae&page=README-ee-components.md[,0,0]

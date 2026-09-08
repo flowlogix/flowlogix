@@ -30,6 +30,8 @@ updates:
       update-types: ["version-update:semver-major"]
     - dependency-name: "org.omnifaces:omnifaces"
       update-types: ["version-update:semver-major"]
+    - dependency-name: "org.primefaces:primefaces"
+      update-types: ["version-update:semver-major"]
     - dependency-name: "org.eclipse.persistence:org.eclipse.persistence.jpa.modelgen.processor"
       update-types: ["version-update:semver-major"]
     - dependency-name: "jakarta.platform:jakarta.jakartaee-api"

@@ -22,7 +22,7 @@
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
         <depchain.version>131</depchain.version>
-        <groovy.version>5.1.1</groovy.version>
+        <groovy.version>5.1.2</groovy.version>
     </properties>
 
     <scm>
@@ -290,7 +290,7 @@
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
-                    <version>10.0.0</version>
+                    <version>10.0.1</version>
                     <configuration>
                         <useNativeGit>false</useNativeGit>
                         <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>

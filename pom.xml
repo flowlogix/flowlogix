@@ -6,12 +6,16 @@
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
     <url>https://docs.flowlogix.com</url>
+    <organization>
+        <name>Flow Logix, Inc.</name>
+        <url>https://www.flowlogix.com</url>
+    </organization>
     <inceptionYear>2011</inceptionYear>
 
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>140</version>
+        <version>141</version>
     </parent>
 
     <properties>
@@ -26,6 +30,7 @@
         <!-- major version is "10" so have to supply it as such here -->
         <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
+        <flowlogix.bom.version>47</flowlogix.bom.version>
         <depchain.version>131</depchain.version>
     </properties>
 

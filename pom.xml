@@ -6,12 +6,16 @@
     <name>Flow Logix Root</name>
     <description>Flow Logix Jakarta EE Components Root POM</description>
     <url>https://docs.flowlogix.com</url>
+    <organization>
+        <name>Flow Logix, Inc.</name>
+        <url>https://www.flowlogix.com</url>
+    </organization>
     <inceptionYear>2011</inceptionYear>
 
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>140</version>
+        <version>141</version>
     </parent>
 
     <properties>
@@ -21,6 +25,7 @@
         <checkstyle.suppressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle/suppressions.xml</checkstyle.suppressionsLocation>
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
+        <flowlogix.bom.version>47</flowlogix.bom.version>
         <depchain.version>131</depchain.version>
         <groovy.version>5.1.2</groovy.version>
     </properties>

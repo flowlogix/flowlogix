@@ -347,6 +347,13 @@
                 <version>${eclipselink.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>com.flowlogix</groupId>
+                <artifactId>flowlogix-bom</artifactId>
+                <version>${flowlogix.bom.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

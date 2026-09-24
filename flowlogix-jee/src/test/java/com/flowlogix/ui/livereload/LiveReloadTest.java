@@ -27,11 +27,9 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.omnifaces.util.Faces;
-import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.HTTPS_SCHEME;
-import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.X_FORWARDED_PROTO;
-import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.MyResponseWriter.toHttpsURL;
-import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.getResponseCharacterEncoding;
-import static com.flowlogix.ui.livereload.AutoReloadPhaseListener.getResponseContentType;
+import static com.flowlogix.ui.livereload.AutoReloadViewHandler.MyResponseWriter.HTTPS_SCHEME;
+import static com.flowlogix.ui.livereload.AutoReloadViewHandler.MyResponseWriter.X_FORWARDED_PROTO;
+import static com.flowlogix.ui.livereload.AutoReloadViewHandler.MyResponseWriter.toHttpsURL;
 import static com.flowlogix.ui.livereload.Configurator.DISABLE_CACHE_PARAM;
 import static com.flowlogix.ui.livereload.Configurator.FACELETS_REFRESH_PERIOD_PARAM;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +62,7 @@ class LiveReloadTest {
             facesMock.when(Faces::getRequestContextPath).thenReturn("noslash");
             facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
 
-            new AutoReloadPhaseListener.MyResponseWriter(responseWriter, facesContext)
+            new AutoReloadViewHandler.MyResponseWriter(responseWriter, facesContext)
                     .endElement("body");
             facesMock.verify(Faces::getRequestContextPath, times(2));
             verify(facesContext).getResponseWriter();
@@ -99,28 +97,6 @@ class LiveReloadTest {
             when(httpServletRequest.getHeader(X_FORWARDED_PROTO)).thenReturn(HTTPS_SCHEME);
             assertThat(toHttpsURL("http://example.com/path")).isEqualTo("https://example.com/path");
         }
-    }
-
-    @Test
-    void responseContentType() {
-        assertThat(getResponseContentType(facesContext)).isEqualTo("text/html");
-    }
-
-    @Test
-    void responseNonHtmlContentType() {
-        when(facesContext.getExternalContext().getRequestContentType()).thenReturn("application/xml");
-        assertThat(getResponseContentType(facesContext)).isEqualTo("application/xml");
-    }
-
-    @Test
-    void responseEncoding() {
-        assertThat(getResponseCharacterEncoding(facesContext)).isEqualTo("UTF-8");
-    }
-
-    @Test
-    void responseNonStandardEncoding() {
-        when(facesContext.getExternalContext().getRequestCharacterEncoding()).thenReturn("UTF-22");
-        assertThat(getResponseCharacterEncoding(facesContext)).isEqualTo("UTF-22");
     }
 
     @Nested

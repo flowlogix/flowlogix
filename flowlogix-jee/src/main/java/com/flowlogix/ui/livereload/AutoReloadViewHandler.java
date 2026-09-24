@@ -15,54 +15,42 @@
  */
 package com.flowlogix.ui.livereload;
 
+import jakarta.faces.application.ViewHandler;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.FacesContextWrapper;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.context.ResponseWriterWrapper;
-import jakarta.faces.event.PhaseEvent;
-import jakarta.faces.event.PhaseId;
-import jakarta.faces.event.PhaseListener;
-import lombok.SneakyThrows;
+import jakarta.faces.application.ViewHandlerWrapper;
+import jakarta.faces.component.UIViewRoot;
 import org.omnifaces.util.Faces;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
-public class AutoReloadPhaseListener implements PhaseListener {
-    @Override
-    public PhaseId getPhaseId() {
-        return PhaseId.RENDER_RESPONSE;
+public class AutoReloadViewHandler extends ViewHandlerWrapper {
+    public AutoReloadViewHandler(ViewHandler wrapped) {
+        super(wrapped);
     }
 
     @Override
-    @SneakyThrows(IOException.class)
-    public void beforePhase(PhaseEvent event) {
+    public void renderView(FacesContext context, UIViewRoot viewToRender) throws IOException {
         if (!Faces.isDevelopment() || Faces.isAjaxRequest()) {
+            super.renderView(context, viewToRender);
             return;
         }
 
-        FacesContext context = event.getFacesContext();
-        context.getExternalContext().setResponseCharacterEncoding(getResponseCharacterEncoding(context));
-        context.getExternalContext().setResponseContentType(getResponseContentType(context));
-
-        ResponseWriter originalWriter = context.getRenderKit().createResponseWriter(
-                context.getExternalContext().getResponseOutputWriter(),
-                null,
-                context.getExternalContext().getRequestCharacterEncoding()
-        );
-
-        event.getFacesContext().setResponseWriter(
-                new MyResponseWriter(originalWriter, event.getFacesContext()));
+        super.renderView(new AutoReloadFacesContext(context), viewToRender);
     }
 
-    static String getResponseCharacterEncoding(FacesContext context) {
-        String requestEncoding = context.getExternalContext().getRequestCharacterEncoding();
-        return requestEncoding != null ? requestEncoding : StandardCharsets.UTF_8.name();
-    }
+    private static final class AutoReloadFacesContext extends FacesContextWrapper {
+        private AutoReloadFacesContext(FacesContext wrapped) {
+            super(wrapped);
+        }
 
-    static String getResponseContentType(FacesContext context) {
-        String requestContentType = context.getExternalContext().getRequestContentType();
-        return requestContentType != null ? requestContentType : "text/html";
+        @Override
+        public void setResponseWriter(ResponseWriter responseWriter) {
+            super.setResponseWriter(new MyResponseWriter(responseWriter, this));
+        }
     }
 
     static class MyResponseWriter extends ResponseWriterWrapper {

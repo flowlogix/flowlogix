@@ -90,9 +90,9 @@ public class AutoReloadViewHandler extends ViewHandlerWrapper {
                                     console.log('OmniFaces @ViewScoped Unload triggered')
                                     OmniFaces.Unload.disable()
                                     console.log('Further OmniFaces @ViewScoped Unload is Disabled')
-                                    setTimeout(() => { location.reload(); }, 50);
+                                    setTimeout(() => { location.replace(location.href); }, 50);
                                 } else {
-                                    location.reload();
+                                    location.replace(location.href);
                                 }
                             } else if (e.data === 'error' && typeof flowlogix_showError === 'function') {
                                 flowlogix_showError(LIVERELOAD_ERROR_ID,

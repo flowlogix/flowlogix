@@ -119,6 +119,23 @@ class LiveReloadTest {
     }
 
     @Test
+    void fallbackDeploymentKeyUsesContextPathWhenRealPathIsInvalid() throws Exception {
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            facesMock.when(Faces::getRequestContextPath).thenReturn("/context");
+            facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
+            facesMock.when(() -> Faces.getRealPath("/")).thenReturn("\u0000bad");
+
+            new AutoReloadViewHandler.MyResponseWriter(responseWriter, facesContext)
+                    .endElement("body");
+
+            ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
+            verify(facesContext.getResponseWriter()).write(scriptCaptor.capture());
+            assertThat(scriptCaptor.getValue()).contains("ws.send('context');");
+            facesMock.verify(Faces::getRequestContextPath, times(2));
+        }
+    }
+
+    @Test
     void convertToHttpsWhenNotNeeded() {
         try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
             facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);

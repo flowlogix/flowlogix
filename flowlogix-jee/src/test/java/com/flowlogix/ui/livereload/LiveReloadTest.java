@@ -15,6 +15,8 @@
  */
 package com.flowlogix.ui.livereload;
 
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.servlet.ServletContext;
@@ -28,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.omnifaces.util.Faces;
+import java.io.IOException;
 import static com.flowlogix.ui.livereload.AutoReloadViewHandler.MyResponseWriter.HTTPS_SCHEME;
 import static com.flowlogix.ui.livereload.AutoReloadViewHandler.MyResponseWriter.X_FORWARDED_PROTO;
 import static com.flowlogix.ui.livereload.AutoReloadViewHandler.MyResponseWriter.toHttpsURL;
@@ -56,6 +59,10 @@ class LiveReloadTest {
     ResponseWriter responseWriter;
     @Mock(answer = RETURNS_DEEP_STUBS)
     HttpServletRequest httpServletRequest;
+    @Mock
+    ViewHandler viewHandler;
+    @Mock
+    UIViewRoot viewRoot;
 
     @Test
     void requestContextPathNoBeginningSlash() throws Exception {
@@ -136,6 +143,89 @@ class LiveReloadTest {
             when(httpServletRequest.getHeader(X_FORWARDED_PROTO)).thenReturn(HTTPS_SCHEME);
             assertThat(toHttpsURL("http://example.com/path")).isEqualTo("https://example.com/path");
         }
+    }
+
+    /**
+     * The response content type belongs to the view handler, which negotiates it and applies
+     * {@code <f:view contentType>}. Live reload only decorates the writer it produces.
+     */
+    @Test
+    void responseContentTypeIsLeftToTheViewHandler() throws IOException {
+        renderView();
+
+        verify(facesContext.getExternalContext(), never()).setResponseContentType(anyString());
+        verify(facesContext.getExternalContext(), never()).setResponseCharacterEncoding(anyString());
+    }
+
+    /**
+     * The writer the view handler creates is decorated rather than replaced, so that the content type,
+     * encoding and buffer size it applies while creating that writer all survive.
+     */
+    @Test
+    void viewHandlerResponseWriterIsWrapped() throws IOException {
+        renderView().setResponseWriter(responseWriter);
+
+        ArgumentCaptor<ResponseWriter> wrapped = ArgumentCaptor.forClass(ResponseWriter.class);
+        verify(facesContext).setResponseWriter(wrapped.capture());
+        assertThat(wrapped.getValue()).isInstanceOf(AutoReloadViewHandler.MyResponseWriter.class);
+    }
+
+    /**
+     * Renderers swap the response writer while rendering and then put the original back, handing an
+     * already decorated writer back to the context. Decorating it a second time injects the script
+     * twice and opens two WebSocket connections per page.
+     */
+    @Test
+    void alreadyDecoratedResponseWriterIsNotDecoratedAgain() throws IOException {
+        FacesContext rendered = renderView();
+        rendered.setResponseWriter(responseWriter);
+
+        ArgumentCaptor<ResponseWriter> decorated = ArgumentCaptor.forClass(ResponseWriter.class);
+        verify(facesContext).setResponseWriter(decorated.capture());
+
+        // what MenuRenderer does after rendering the options of a select menu
+        rendered.setResponseWriter(decorated.getValue());
+
+        ArgumentCaptor<ResponseWriter> bothCalls = ArgumentCaptor.forClass(ResponseWriter.class);
+        verify(facesContext, times(2)).setResponseWriter(bothCalls.capture());
+        assertThat(bothCalls.getAllValues().get(1)).isSameAs(bothCalls.getAllValues().get(0));
+    }
+
+    /**
+     * Reloading resubmits the POST that produced the page, against view state the redeployment has
+     * already discarded, so the client navigates to the same URL instead.
+     */
+    @Test
+    void navigatesRatherThanReloading() throws Exception {
+        assertThat(injectedScript())
+                .contains("location.replace(location.href)")
+                .doesNotContain("location.reload()");
+    }
+
+    private FacesContext renderView() throws IOException {
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            facesMock.when(Faces::isDevelopment).thenReturn(true);
+            facesMock.when(Faces::isAjaxRequest).thenReturn(false);
+            new AutoReloadViewHandler(viewHandler).renderView(facesContext, viewRoot);
+        }
+
+        ArgumentCaptor<FacesContext> rendered = ArgumentCaptor.forClass(FacesContext.class);
+        verify(viewHandler).renderView(rendered.capture(), eq(viewRoot));
+        return rendered.getValue();
+    }
+
+    private String injectedScript() throws IOException {
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            facesMock.when(Faces::getRequestContextPath).thenReturn("/context");
+            facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
+            facesMock.when(() -> Faces.getRealPath("/")).thenReturn("/opt/payara/deployments/finalName/");
+
+            new AutoReloadViewHandler.MyResponseWriter(responseWriter, facesContext).endElement("body");
+        }
+
+        ArgumentCaptor<String> script = ArgumentCaptor.forClass(String.class);
+        verify(facesContext.getResponseWriter()).write(script.capture());
+        return script.getValue();
     }
 
     @Nested

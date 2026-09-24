@@ -53,7 +53,8 @@ public class AutoReloadViewHandler extends ViewHandlerWrapper {
 
         @Override
         public void setResponseWriter(ResponseWriter responseWriter) {
-            super.setResponseWriter(new MyResponseWriter(responseWriter, this));
+            super.setResponseWriter(responseWriter instanceof MyResponseWriter ? responseWriter
+                    : new MyResponseWriter(responseWriter, this));
         }
     }
 

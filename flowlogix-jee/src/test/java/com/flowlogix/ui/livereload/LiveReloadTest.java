@@ -92,6 +92,26 @@ class LiveReloadTest {
     }
 
     @Test
+    void injectsLiveReloadErrorFallback() throws Exception {
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            facesMock.when(Faces::getRequestContextPath).thenReturn("/context");
+            facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
+            facesMock.when(() -> Faces.getRealPath("/")).thenReturn("/opt/payara/deployments/finalName/");
+
+            new AutoReloadViewHandler.MyResponseWriter(responseWriter, facesContext)
+                    .endElement("body");
+
+            ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
+            verify(facesContext.getResponseWriter()).write(scriptCaptor.capture());
+            assertThat(scriptCaptor.getValue())
+                    .contains("console.error(message);")
+                    .contains("window.flowlogixLiveReloadAlertShown")
+                    .contains("alert(")
+                    .contains("FlowLogix error banner helper script is not loaded.");
+        }
+    }
+
+    @Test
     void convertToHttpsWhenNotNeeded() {
         try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
             facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);

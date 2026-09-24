@@ -78,33 +78,45 @@ public class AutoReloadViewHandler extends ViewHandlerWrapper {
             if ("body".equalsIgnoreCase(name)) {
                 String script = """
                     <script>
-                        function connectWS() {
-                        const ws = new WebSocket('%s');
-                        ws.onopen = () => ws.send('%s');
-                        ws.onmessage = e => {
-                            const LIVERELOAD_ERROR_ID = 'livereload-error-message';
-                            if (e.data === 'reload') {
-                                ws.close();
-                                if (typeof OmniFaces !== 'undefined' && typeof OmniFaces.Unload !== 'undefined') {
-                                    window.dispatchEvent(new Event('beforeunload'));
-                                    console.log('OmniFaces @ViewScoped Unload triggered')
-                                    OmniFaces.Unload.disable()
-                                    console.log('Further OmniFaces @ViewScoped Unload is Disabled')
-                                    setTimeout(() => { location.replace(location.href); }, 50);
-                                } else {
-                                    location.replace(location.href);
-                                }
-                            } else if (e.data === 'error' && typeof flowlogix_showError === 'function') {
-                                flowlogix_showError(LIVERELOAD_ERROR_ID,
-                                'Compilation or deployment error occurred, please check maven and server logs for details.');
-                            } else if (e.data === 'test-failure' && typeof flowlogix_showError === 'function') {
-                                flowlogix_showError(LIVERELOAD_ERROR_ID,
-                                'Test failure(s) occurred, please check maven for details.');
-                            } else if (e.data === 'shutdown') ws.close();
-                        };
-                        ws.onclose = () => setTimeout(connectWS, 2000);
-                        ws.onerror = () => ws.close();
+                        function reportLiveReloadError(message) {
+                            console.error(message);
+                            if (typeof flowlogix_showError === 'function') {
+                                flowlogix_showError('livereload-error-message', message);
+                            } else if (!window.flowlogixLiveReloadAlertShown) {
+                                window.flowlogixLiveReloadAlertShown = true;
+                                alert(message + ' FlowLogix error banner helper script is not loaded.');
+                            }
                         }
+
+                        function connectWS() {
+                            const ws = new WebSocket('%s');
+                            ws.onopen = () => ws.send('%s');
+                            ws.onmessage = e => {
+                                if (e.data === 'reload') {
+                                    ws.close();
+                                    if (typeof OmniFaces !== 'undefined' && typeof OmniFaces.Unload !== 'undefined') {
+                                        window.dispatchEvent(new Event('beforeunload'));
+                                        console.log('OmniFaces @ViewScoped Unload triggered');
+                                        OmniFaces.Unload.disable();
+                                        console.log('Further OmniFaces @ViewScoped Unload is Disabled');
+                                        setTimeout(() => { location.replace(location.href); }, 50);
+                                    } else {
+                                        location.replace(location.href);
+                                    }
+                                } else if (e.data === 'error') {
+                                    reportLiveReloadError(
+                                        'Compilation or deployment error occurred, '
+                                            + 'please check maven and server logs for details.');
+                                } else if (e.data === 'test-failure') {
+                                    reportLiveReloadError('Test failure(s) occurred, please check maven for details.');
+                                } else if (e.data === 'shutdown') {
+                                    ws.close();
+                                }
+                            };
+                            ws.onclose = () => setTimeout(connectWS, 2000);
+                            ws.onerror = () => ws.close();
+                        }
+
                         connectWS();
                     </script>
                     """.formatted(toHttpsURL(Faces.getRequestDomainURL())

@@ -22,9 +22,13 @@ import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.context.ResponseWriterWrapper;
 import jakarta.faces.application.ViewHandlerWrapper;
 import jakarta.faces.component.UIViewRoot;
+import org.apache.commons.lang3.StringUtils;
 import org.omnifaces.util.Faces;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class AutoReloadViewHandler extends ViewHandlerWrapper {
@@ -104,13 +108,28 @@ public class AutoReloadViewHandler extends ViewHandlerWrapper {
                         connectWS();
                     </script>
                     """.formatted(toHttpsURL(Faces.getRequestDomainURL())
-                                + "/flowlogix-livereload/livereload",
-                        Faces.getRequestContextPath().startsWith("/")
-                                ? Faces.getRequestContextPath().substring(1)
-                                : Faces.getRequestContextPath());
+                                + "/flowlogix-livereload/livereload", getDeploymentKey());
                 facesContext.getResponseWriter().write(script);
             }
             getWrapped().endElement(name);
+        }
+
+        private static String getContextPathKey() {
+            return Faces.getRequestContextPath().startsWith("/")
+                    ? Faces.getRequestContextPath().substring(1)
+                    : Faces.getRequestContextPath();
+        }
+
+        private String getDeploymentKey() {
+            try {
+                return Optional.ofNullable(Faces.getRealPath("/"))
+                        .filter(StringUtils::isNotBlank)
+                        .map(path -> Path.of(path).normalize().getFileName())
+                        .map(Path::toString)
+                        .orElseGet(MyResponseWriter::getContextPathKey);
+            } catch (InvalidPathException ignored) {
+                return getContextPathKey();
+            }
         }
 
         static String toHttpsURL(String url) {

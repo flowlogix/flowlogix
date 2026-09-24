@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -61,6 +62,7 @@ class LiveReloadTest {
         try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
             facesMock.when(Faces::getRequestContextPath).thenReturn("noslash");
             facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
+            facesMock.when(() -> Faces.getRealPath("/")).thenReturn(null);
 
             new AutoReloadViewHandler.MyResponseWriter(responseWriter, facesContext)
                     .endElement("body");
@@ -69,6 +71,23 @@ class LiveReloadTest {
             verify(facesContext.getResponseWriter()).write(anyString());
             verify(responseWriter).endElement("body");
             verifyNoMoreInteractions(responseWriter, facesContext);
+        }
+    }
+
+    @Test
+    void sendDeploymentKey() throws Exception {
+        try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
+            facesMock.when(Faces::getRequestContextPath).thenReturn("/context");
+            facesMock.when(Faces::getRequest).thenReturn(httpServletRequest);
+            facesMock.when(() -> Faces.getRealPath("/")).thenReturn("/opt/payara/deployments/finalName/");
+
+            new AutoReloadViewHandler.MyResponseWriter(responseWriter, facesContext)
+                    .endElement("body");
+
+            ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
+            verify(facesContext.getResponseWriter()).write(scriptCaptor.capture());
+            assertThat(scriptCaptor.getValue())
+                    .contains("ws.send('finalName');");
         }
     }
 

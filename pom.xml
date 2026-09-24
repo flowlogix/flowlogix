@@ -185,6 +185,7 @@
                         <oldVersionPattern>${japicmp.old.version.pattern}</oldVersionPattern>
                         <excludes>
                             <exclude>com.flowlogix.jeedao.primefaces.LazyModelConfig#innerJoins()</exclude>
+                            <exclude>com.flowlogix.ui.livereload.AutoReloadPhaseListener</exclude>
                         </excludes>
                     </parameter>
                 </configuration>

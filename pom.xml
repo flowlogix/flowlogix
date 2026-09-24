@@ -30,7 +30,7 @@
         <!-- major version is "10" so have to supply it as such here -->
         <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
-        <flowlogix.bom.version>47</flowlogix.bom.version>
+        <flowlogix.bom.version>48</flowlogix.bom.version>
         <depchain.version>131</depchain.version>
     </properties>
 

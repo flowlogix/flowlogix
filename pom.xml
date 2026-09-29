@@ -15,7 +15,7 @@
     <parent>
         <groupId>com.flowlogix</groupId>
         <artifactId>payara-pom</artifactId>
-        <version>142</version>
+        <version>143</version>
     </parent>
 
     <properties>
@@ -27,7 +27,7 @@
         <japicmp.skip>false</japicmp.skip>
         <flowlogix.bom.version>47</flowlogix.bom.version>
         <depchain.version>131</depchain.version>
-        <groovy.version>5.1.2</groovy.version>
+        <groovy.version>6.0.0</groovy.version>
     </properties>
 
     <scm>

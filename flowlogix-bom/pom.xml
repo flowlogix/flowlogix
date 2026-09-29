@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
     <properties>
-        <slf4j.version>2.0.19</slf4j.version>
-        <omnifaces.version>3.14.24</omnifaces.version>
+        <slf4j.version>2.0.20</slf4j.version>
+        <omnifaces.version>3.14.25</omnifaces.version>
         <shiro2.version>2.2.1</shiro2.version>
         <bytebuddy.version>1.18.14</bytebuddy.version>
     </properties>

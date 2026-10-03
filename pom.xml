@@ -43,6 +43,7 @@
     <modules>
         <module>flowlogix-jee</module>
         <module>flowlogix-datamodel</module>
+        <module>starter-cli</module>
     </modules>
 
     <dependencies>

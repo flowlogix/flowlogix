@@ -17,11 +17,30 @@ package com.flowlogix.jeedao.primefaces;
 
 import jakarta.persistence.criteria.Order;
 import lombok.Generated;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.primefaces.model.SortMeta;
+import static lombok.AccessLevel.PROTECTED;
 
 @Generated
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class Accessors {
+    public static class MyEntity {
+        final Long id;
+        public MyEntity() {
+            this.id = null;
+        }
+        public MyEntity(long id) {
+            this.id = id;
+        }
+    }
+
+    @RequiredArgsConstructor
+    @NoArgsConstructor(force = true, access = PROTECTED)
+    public static class ProtectedConstructorEntity {
+        final Long id;
+    }
+
     public static Sorter.MergedSortOrder mergeSortOrder(SortMeta sm, Order as, boolean hp) {
         return new Sorter.MergedSortOrder(sm, as, hp);
     }

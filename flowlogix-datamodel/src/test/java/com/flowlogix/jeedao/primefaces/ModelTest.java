@@ -17,9 +17,10 @@ package com.flowlogix.jeedao.primefaces;
 
 import static com.flowlogix.jeedao.primefaces.JPALazyDataModel.RESULT;
 import static com.flowlogix.util.SerializeTester.serializeAndDeserialize;
-import static lombok.AccessLevel.PROTECTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import com.flowlogix.jeedao.primefaces.Accessors.MyEntity;
+import com.flowlogix.jeedao.primefaces.Accessors.ProtectedConstructorEntity;
 import com.flowlogix.jeedao.primefaces.Filter.FilterData;
 import com.flowlogix.jeedao.primefaces.Sorter.SortData;
 import com.flowlogix.jeedao.primefaces.internal.JPAModelImpl;
@@ -44,8 +45,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -491,24 +490,6 @@ class ModelTest implements Serializable {
         }
         verify(rootInteger).get("aaa");
         verify(converter).getAsObject(any(), any(), eq("xxx"));
-    }
-
-    @SuppressWarnings("checkstyle:RedundantModifier")
-    public static class MyEntity {
-        final Long id;
-        public MyEntity() {
-            this.id = null;
-        }
-        public MyEntity(long id) {
-            this.id = id;
-        }
-    }
-
-    @RequiredArgsConstructor
-    @NoArgsConstructor(force = true, access = PROTECTED)
-    @SuppressWarnings("checkstyle:RedundantModifier")
-    public static class ProtectedConstructorEntity {
-        final Long id;
     }
 
     @Test

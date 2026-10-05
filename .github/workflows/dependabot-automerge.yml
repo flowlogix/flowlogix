@@ -9,7 +9,7 @@ on:
 
 jobs:
   call-automerge:
-    uses: flowlogix/base-pom/.github/workflows/dependabot-automerge.yml@543817f2c114207d291a4401da90efa40736547b # v143
+    uses: flowlogix/base-pom/.github/workflows/dependabot-automerge.yml@2c2abd7b3d0edf30fd17327ba4ba994869d238f7 # v144
     with:
       branches: 'main,5.x'
     permissions:

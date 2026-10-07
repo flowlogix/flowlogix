@@ -26,7 +26,8 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Adds Type-safe Native SQL query with JPA via generics
 * Declares Jakarta Faces PROJECT_STAGE development mode automatically
 * Automatically uses minified versions of assets with Jakarta Faces
-* Provides easy and automatic initialization of OmniFaces' UnmappedResourceHandler
+* Provides easy way to set `jakarta.faces.FACELETS_BUFFER_SIZE` only in development mode
+* Provides easy and automatic initialization of OmniFaces' https://showcase.omnifaces.org/resourcehandlers/UnmappedResourceHandler[UnmappedResourceHandler]
 * Easier-to-use, Injected JPA Lazy Data Model for PrimeFaces DataTable that supports cursor pagination and clustered sessions, without requiring Entities to be Serializable
 * Automatically includes PrimeFaces font mime types in your web applications, preventing warnings and extra entries in your web.xml
 * Convert strings to arbitrary types on a best-effort basis
@@ -239,6 +240,11 @@ The above example changes resolution from `mycss.css` -> `mycss.min.css` to `myc
 </context-param>
 ----
 
+[[section-additional-configuration]]
+=== Additional configuration for Jakarta Faces
+==== Dynamic configuration of `jakarta.faces.FACELETS_REFRESH_PERIOD`
+By default, Jakarta Faces caches Facelets templates for 2 seconds in development mode, and indefinitely in production mode. FlowLogix automatically disables this caching by setting the value to zero in development mode. This is critical for live reload, since it disables caching of Facelets templates completely. This behavior can be overridden by setting the below context parameter in `web.xml`:
+
 [source,xml]
 .Disable caching of resources, this setting has any effect in development mode only
 ----
@@ -246,6 +252,20 @@ The above example changes resolution from `mycss.css` -> `mycss.min.css` to `myc
 <context-param>
     <param-name>com.flowlogix.faces.DISABLE_CACHE</param-name>
     <param-value>false</param-value>
+</context-param>
+----
+
+==== Dynamic configuration of `jakarta.faces.FACELETS_BUFFER_SIZE`
+By default, Jakarta Faces uses a 1 KB Facelets buffer. In development mode, this is often too small: if an error occurs in a Facelets template, the buffer fills up before the error page can be rendered, so the browser shows a blank or incomplete page instead of the error.
+
+FlowLogix can raise the buffer size for you. This is opt-in and applies only in Development mode. To enable it, set the following context parameter in `web.xml`. The value is in kilobytes.
+
+[source,xml]
+.Set the Facelets buffer size to 64 KB in development mode
+----
+<context-param>
+    <param-name>com.flowlogix.set-facelet-buffer-size</param-name>
+    <param-value>64</param-value>
 </context-param>
 ----
 

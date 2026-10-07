@@ -37,4 +37,8 @@
         <param-name>org.omnifaces.FACES_VIEWS_SCAN_PATHS</param-name>
         <param-value>/*.xhtml</param-value>
     </context-param>
+    <context-param>
+        <param-name>com.flowlogix.set-facelet-buffer-size</param-name>
+        <param-value>64</param-value>
+    </context-param>
 </web-app>

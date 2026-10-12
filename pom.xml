@@ -31,7 +31,7 @@
         <japicmp.old.version.pattern>\d+</japicmp.old.version.pattern>
 
         <flowlogix.bom.version>51</flowlogix.bom.version>
-        <depchain.version>132</depchain.version>
+        <depchain.version>133</depchain.version>
     </properties>
 
     <scm>

@@ -26,7 +26,7 @@
         <payara.start.disable>true</payara.start.disable>
         <japicmp.skip>false</japicmp.skip>
         <flowlogix.bom.version>47</flowlogix.bom.version>
-        <depchain.version>132</depchain.version>
+        <depchain.version>133</depchain.version>
         <groovy.version>6.0.0</groovy.version>
     </properties>
 

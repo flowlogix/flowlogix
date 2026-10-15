@@ -381,6 +381,7 @@ public class ShrinkWrapManipulator {
                     new ByteArrayInputStream("""
                             org.apache.maven.impl.resolver.DefaultArtifactDescriptorReader.level=SEVERE
                             org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader.level=SEVERE
+                            org.eu.ingwar.tools.arquillian.extension.suite.level=WARNING
                             """.getBytes()),
                     key -> (oldValue, newValue) -> newValue != null ? newValue : oldValue);
         }

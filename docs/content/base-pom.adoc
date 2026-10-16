@@ -22,6 +22,7 @@ The project is organized into the following modules:
 - `glassfish-pom`: A pre-configured environment for running integration tests with Payara Server.
 - `server-common`: Common base POM for Payara and GlassFish Servers.
 - `checkstyle`: Provides Checkstyle configurations to enforce a consistent code style.
+- `scripts`: Helper scripts for setting up repositories and JaCoCo code coverage (not a Maven module).
 
 [[section-modules]]
 == Modules
@@ -57,6 +58,35 @@ The project provides GitHub Actions for other projects. The workflows are define
 - Wait for external checks (e.g., Jenkins, Snyk) to complete.
 - Merge the pull request if all checks pass.
 
+=== Setting up a repository for Dependabot auto-merge and Jenkins
+The link:https://github.com/flowlogix/base-pom/tree/main/scripts[scripts] directory contains helper scripts to set up a GitHub repository for the Dependabot auto-merge workflow and Jenkins builds. The scripts require `jq`, and `setup-repository.sh` also requires Python 3 with link:https://pypi.org/project/PyNaCl/[PyNaCl] (`pip3 install pynacl`).
+Both scripts prompt for input, so download them first rather than piping them into `bash`.
+
+First, create a fine-grained personal access token with link:https://github.com/flowlogix/base-pom/blob/main/scripts/create-automerge-token.sh[create-automerge-token.sh].
+GitHub has no API for creating fine-grained tokens, so the script opens the token creation page in your browser with the name, expiration and permissions pre-filled.
+Pass an organization name to create the token for that organization instead of your personal account.
+Under _Repository access_, select _All repositories_, then click _Generate token_.
+
+[source,shell]
+.Create the auto-merge token (optionally for an organization)
+----
+curl -sSLO https://raw.githubusercontent.com/flowlogix/base-pom/main/scripts/create-automerge-token.sh
+bash -p create-automerge-token.sh [org]
+----
+
+Next, configure the repository with link:https://github.com/flowlogix/base-pom/blob/main/scripts/setup-repository.sh[setup-repository.sh].
+The script prompts for the GitHub token and an optional webhook secret. It then:
+
+- Creates a webhook to the FlowLogix Jenkins server (`push`, `pull_request`, `check_run`, `issue_comment` and `repository` events), if a webhook secret is entered.
+- Stores the token as the `GH_AUTOMERGE_TOKEN` Dependabot secret, which is used by the `dependabot-automerge.yml` workflow.
+
+[source,shell]
+.Set up the repository (replace gh_user/my_repo with your repository)
+----
+curl -sSLO https://raw.githubusercontent.com/flowlogix/base-pom/main/scripts/setup-repository.sh
+bash -p setup-repository.sh gh_user/my_repo
+----
+
 === Configuring JaCoCo code coverage
 The JaCoCo code coverage is configured to merge both unit tests and integration tests into a single report to get a complete picture of the full code coverage. This includes integration tests done in Application Servers.
 
@@ -87,12 +117,12 @@ This configuration ensures that the JaCoCo plugin only includes your main applic
 
 At this point, your CI/CD pipeline can generate the JaCoCo reports. You can see an example of this in the FlowLogix Jenkins Repository: link:https://github.com/flowlogix/jenkins/blob/main/UnitTests.groovy[UnitTests.groovy] that uses link:https://github.com/flowlogix/jenkins/blob/main/payara-lib/vars[Payara Jenkins Library]
 
-You can also run the tests and generate the report locally. To configure Payara or GlassFish for JaCoCo, download and run the initialization script link:https://github.com/flowlogix/base-pom/blob/main/server-common/jacoco-init.sh[jacoco-init.sh]:
+You can also run the tests and generate the report locally. To configure Payara or GlassFish for JaCoCo, download and run the initialization script link:https://github.com/flowlogix/base-pom/blob/main/scripts/jacoco-init.sh[jacoco-init.sh]:
 
 [source,shell]
 .Run the JaCoCo initialization script for Payara or GlassFish
 ----
-curl -sSL https://raw.githubusercontent.com/flowlogix/base-pom/main/server-common/jacoco-init.sh | bash -p
+curl -sSL https://raw.githubusercontent.com/flowlogix/base-pom/main/scripts/jacoco-init.sh | bash -p
 ----
 
 Now you can run the tests and generate the report with the following commands

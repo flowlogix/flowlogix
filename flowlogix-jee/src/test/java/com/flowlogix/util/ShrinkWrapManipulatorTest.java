@@ -34,11 +34,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,7 +51,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
-import java.util.logging.StreamHandler;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -154,16 +156,34 @@ class ShrinkWrapManipulatorTest {
     }
 
     @Test
-    void consoleLoggingRedirectedToStdout() {
+    void consoleLoggingSplitByLevel() {
         var rootLogger = java.util.logging.Logger.getLogger("");
         Handler[] originalHandlers = rootLogger.getHandlers();
+        PrintStream originalOut = System.out;
+        PrintStream originalErr = System.err;
+        var out = new ByteArrayOutputStream();
+        var err = new ByteArrayOutputStream();
         try {
             ShrinkWrapManipulator.resetMavenWarningsRemovalFlag();
+            System.setOut(new PrintStream(out, true, StandardCharsets.UTF_8));
+            System.setErr(new PrintStream(err, true, StandardCharsets.UTF_8));
+            List.of(originalHandlers).forEach(rootLogger::removeHandler);
             rootLogger.addHandler(new ConsoleHandler());
             ShrinkWrapManipulator.removeMavenWarningsFromLogging();
-            assertThat(rootLogger.getHandlers()).noneMatch(ConsoleHandler.class::isInstance);
-            assertThat(rootLogger.getHandlers()).anyMatch(StreamHandler.class::isInstance);
+            assertThat(rootLogger.getHandlers()).hasSize(1).noneMatch(ConsoleHandler.class::isInstance);
+
+            rootLogger.info("info-message");
+            rootLogger.warning("warning-message");
+            rootLogger.severe("severe-message");
+            List.of(rootLogger.getHandlers()).forEach(Handler::flush);
+
+            assertThat(out.toString(StandardCharsets.UTF_8)).contains("info-message")
+                    .doesNotContain("warning-message", "severe-message");
+            assertThat(err.toString(StandardCharsets.UTF_8)).contains("warning-message", "severe-message")
+                    .doesNotContain("info-message");
         } finally {
+            System.setOut(originalOut);
+            System.setErr(originalErr);
             List.of(rootLogger.getHandlers()).forEach(rootLogger::removeHandler);
             List.of(originalHandlers).forEach(rootLogger::addHandler);
             ShrinkWrapManipulator.resetMavenWarningsRemovalFlag();

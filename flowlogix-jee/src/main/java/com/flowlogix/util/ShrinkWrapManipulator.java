@@ -18,6 +18,7 @@ package com.flowlogix.util;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -28,13 +29,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
-import java.util.logging.StreamHandler;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,6 +50,7 @@ import javax.xml.xpath.XPathFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -393,34 +396,48 @@ public class ShrinkWrapManipulator {
 
     /**
      * JUL {@link ConsoleHandler} always writes to {@code System.err}, which Maven reports as errors.
-     * Replace root console handlers with equivalent handlers that write to {@code System.out}.
+     * Replace root console handlers with handlers that write records below {@link Level#WARNING}
+     * to {@code System.out}, while {@code WARNING} and {@code SEVERE} still go to {@code System.err}.
      */
     private static void redirectConsoleLoggingToStdout() {
         var rootLogger = java.util.logging.Logger.getLogger("");
         for (Handler handler : rootLogger.getHandlers()) {
             if (handler instanceof ConsoleHandler) {
                 rootLogger.removeHandler(handler);
-                rootLogger.addHandler(new StdoutHandler(handler));
+                rootLogger.addHandler(new ConsoleStreamHandler(handler,
+                        level -> level.intValue() >= Level.WARNING.intValue()
+                                ? System.err : System.out));
             }
         }
     }
 
-    private static final class StdoutHandler extends StreamHandler {
-        StdoutHandler(Handler consoleHandler) {
-            super(System.out, consoleHandler.getFormatter());
-            setLevel(consoleHandler.getLevel());
-            setFilter(consoleHandler.getFilter());
+    /**
+     * Level, filter and formatter come from the original console handler via {@link Delegate}.
+     */
+    @RequiredArgsConstructor
+    private static final class ConsoleStreamHandler extends Handler {
+        @Delegate
+        private final Handler consoleHandler;
+        private final Function<Level, PrintStream> streamSelector;
+
+        @Override
+        public void publish(LogRecord logRecord) {
+            if (isLoggable(logRecord)) {
+                var stream = streamSelector.apply(logRecord.getLevel());
+                stream.print(getFormatter().format(logRecord));
+                stream.flush();
+            }
         }
 
         @Override
-        public synchronized void publish(LogRecord logRecord) {
-            super.publish(logRecord);
-            flush();
+        public void flush() {
+            System.out.flush();
+            System.err.flush();
         }
 
         @Override
-        public synchronized void close() {
-            // do not close System.out
+        public void close() {
+            // do not close System.out / System.err
             flush();
         }
     }

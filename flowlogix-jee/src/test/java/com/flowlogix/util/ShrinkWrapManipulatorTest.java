@@ -43,10 +43,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
+import java.util.logging.StreamHandler;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -149,6 +151,23 @@ class ShrinkWrapManipulatorTest {
         ShrinkWrapManipulator.removeMavenWarningsFromLogging();
         assertThat(changed).isFalse();
         System.setProperty("com.flowlogix.maven.resolver.warn", Boolean.FALSE.toString());
+    }
+
+    @Test
+    void consoleLoggingRedirectedToStdout() {
+        var rootLogger = java.util.logging.Logger.getLogger("");
+        Handler[] originalHandlers = rootLogger.getHandlers();
+        try {
+            ShrinkWrapManipulator.resetMavenWarningsRemovalFlag();
+            rootLogger.addHandler(new ConsoleHandler());
+            ShrinkWrapManipulator.removeMavenWarningsFromLogging();
+            assertThat(rootLogger.getHandlers()).noneMatch(ConsoleHandler.class::isInstance);
+            assertThat(rootLogger.getHandlers()).anyMatch(StreamHandler.class::isInstance);
+        } finally {
+            List.of(rootLogger.getHandlers()).forEach(rootLogger::removeHandler);
+            List.of(originalHandlers).forEach(rootLogger::addHandler);
+            ShrinkWrapManipulator.resetMavenWarningsRemovalFlag();
+        }
     }
 
     @Test
@@ -360,7 +379,7 @@ class ShrinkWrapManipulatorTest {
     }
 
     @Test
-    void persistenceXmlPath() throws ParserConfigurationException, IOException, SAXException {
+    void persistenceXmlPath() throws ParserConfigurationException {
         try (var docBuilder = mockStatic(DocumentBuilderFactory.class)) {
             docBuilder.when(DocumentBuilderFactory::newInstance).thenReturn(documentBuilderFactory);
             when(documentBuilderFactory.newDocumentBuilder()).thenReturn(documentBuilder);

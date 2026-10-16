@@ -30,7 +30,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.StreamHandler;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -89,10 +93,10 @@ public class ShrinkWrapManipulator {
     final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file.
+     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file.
      *
-     * @param archiveType
-     * @return
+     * @param archiveType Archive type to create
+     * @return new archive
      * @param <TT> ShrinkWrap archive type
      */
     public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType) {
@@ -100,11 +104,11 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file.
+     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file.
      *
-     * @param archiveType
-     * @param pomFilePath
-     * @return
+     * @param archiveType Archive type to create
+     * @param pomFilePath Path to the Maven POM file
+     * @return new archive
      * @param <TT> ShrinkWrap archive type
      */
     public static <TT extends Archive<TT>> TT createDeployment(Class<TT> archiveType, Path pomFilePath) {
@@ -112,9 +116,9 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file.
+     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file.
      *
-     * @param archiveType
+     * @param archiveType Archive type to create
      * @param nameTransformer transforms the UUID to a more suitable name
      * @return new archive
      * @param <TT> ShrinkWrap archive type
@@ -125,11 +129,11 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Simple method to create ShrinkWrap (Arquillian archive from existing maven POM file.
+     * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file.
      *
-     * @param archiveType
+     * @param archiveType Archive type to create
      * @param nameTransformer transforms the UUID to a more suitable name
-     * @param pomFilePath
+     * @param pomFilePath Path to the Maven POM file
      * @return new archive
      * @param <TT> ShrinkWrap archive type
      */
@@ -143,8 +147,8 @@ public class ShrinkWrapManipulator {
     /**
      * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file.
      *
-     * @param archiveType
-     * @param archiveName
+     * @param archiveType Archive type to create
+     * @param archiveName Name of the archive
      * @return new archive
      * @param <TT> ShrinkWrap archive type
      */
@@ -155,9 +159,9 @@ public class ShrinkWrapManipulator {
     /**
      * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file.
      *
-     * @param archiveType
-     * @param archiveName
-     * @param pomFilePath
+     * @param archiveType Archive type to create
+     * @param archiveName Name of the archive
+     * @param pomFilePath Path to the Maven POM file
      * @return new archive
      * @param <TT> ShrinkWrap archive type
      */
@@ -287,8 +291,8 @@ public class ShrinkWrapManipulator {
      * if the system property is not defined.
      *
      * @param httpUrl http URL
-     * @param sslPortPropertyName
-     * @param defaultPort
+     * @param sslPortPropertyName Name of the system property for the SSL port
+     * @param defaultPort Default port to use if the system property is not defined
      * @return https URL
      */
     @SneakyThrows({URISyntaxException.class, MalformedURLException.class})
@@ -308,7 +312,7 @@ public class ShrinkWrapManipulator {
     /**
      * Constructs XPath for web.xml context param.
      *
-     * @param paramName
+     * @param paramName context param name
      * @return XPath for web.xml context param
      */
     public static String getContextParamValue(String paramName) {
@@ -319,10 +323,10 @@ public class ShrinkWrapManipulator {
      * Parse XML file from the archive, perform actions to modify the file,
      * and return a string representing the modified XML file.
 
-     * @param archive to retrieve the xml file from
-     * @param actions to perform on the xml file
-     * @param xmlFileName xml file name to retrive from the archive
-     * @return string representation of the modified xml file
+     * @param archive to retrieve the XML file from
+     * @param actions to perform on the XML file
+     * @param xmlFileName XML file name to retrieve from the archive
+     * @return string representation of the modified XML file
      */
     @SneakyThrows
     public <TT extends Archive<TT>> String manipulateXml(Archive<TT> archive, List<Action> actions, String xmlFileName) {
@@ -381,9 +385,43 @@ public class ShrinkWrapManipulator {
                     new ByteArrayInputStream("""
                             org.apache.maven.impl.resolver.DefaultArtifactDescriptorReader.level=SEVERE
                             org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader.level=SEVERE
-                            org.eu.ingwar.tools.arquillian.extension.suite.level=WARNING
                             """.getBytes()),
                     key -> (oldValue, newValue) -> newValue != null ? newValue : oldValue);
+            redirectConsoleLoggingToStdout();
+        }
+    }
+
+    /**
+     * JUL {@link ConsoleHandler} always writes to {@code System.err}, which Maven reports as errors.
+     * Replace root console handlers with equivalent handlers that write to {@code System.out}.
+     */
+    private static void redirectConsoleLoggingToStdout() {
+        var rootLogger = java.util.logging.Logger.getLogger("");
+        for (Handler handler : rootLogger.getHandlers()) {
+            if (handler instanceof ConsoleHandler) {
+                rootLogger.removeHandler(handler);
+                rootLogger.addHandler(new StdoutHandler(handler));
+            }
+        }
+    }
+
+    private static final class StdoutHandler extends StreamHandler {
+        StdoutHandler(Handler consoleHandler) {
+            super(System.out, consoleHandler.getFormatter());
+            setLevel(consoleHandler.getLevel());
+            setFilter(consoleHandler.getFilter());
+        }
+
+        @Override
+        public synchronized void publish(LogRecord logRecord) {
+            super.publish(logRecord);
+            flush();
+        }
+
+        @Override
+        public synchronized void close() {
+            // do not close System.out
+            flush();
         }
     }
 

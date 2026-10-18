@@ -30,7 +30,7 @@ import static jakarta.interceptor.Interceptor.Priority.APPLICATION;
 @RequestScoped
 @Priority(APPLICATION + 1)
 public class EntityManagerProducer {
-    @Getter(onMethod = @__({@Produces, @NotDefault}))
+    @Getter(onMethod_ = {@Produces, @NotDefault})
     @PersistenceContext(unitName = "nonDefault")
     EntityManager entityManager;
 }

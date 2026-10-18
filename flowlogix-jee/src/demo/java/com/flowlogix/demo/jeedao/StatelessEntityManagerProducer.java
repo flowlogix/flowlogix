@@ -33,7 +33,7 @@ import static jakarta.interceptor.Interceptor.Priority.APPLICATION;
 @Priority(APPLICATION + 1)
 @TransactionAttribute(SUPPORTS)
 public class StatelessEntityManagerProducer {
-    @Getter(onMethod = @__({@Produces, @NonDefault}))
+    @Getter(onMethod_ = {@Produces, @NonDefault})
     @PersistenceContext(unitName = "nonDefault")
     EntityManager entityManager;
 }

@@ -13,6 +13,7 @@ jobs:
     with:
       branches: 'main,5.x'
     permissions:
+      checks: read
       pull-requests: write
       contents: write
     secrets:

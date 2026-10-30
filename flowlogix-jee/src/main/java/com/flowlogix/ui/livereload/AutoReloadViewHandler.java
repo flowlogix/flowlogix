@@ -61,7 +61,8 @@ public class AutoReloadViewHandler extends ViewHandlerWrapper {
     static class MyResponseWriter extends ResponseWriterWrapper {
         static final String HTTPS_SCHEME = "https";
         static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
-        static final Pattern HTTP_TO_HTTPS = Pattern.compile("^\\s*http(.*)");
+        private static final Pattern HTTP_TO_HTTPS = Pattern.compile("^\\s*http(.*)");
+        private static final String SCRIPT_TAG = "script";
         private final FacesContext facesContext;
 
         MyResponseWriter(ResponseWriter wrapped, FacesContext context) {
@@ -78,51 +79,53 @@ public class AutoReloadViewHandler extends ViewHandlerWrapper {
         public void endElement(String name) throws IOException {
             if ("body".equalsIgnoreCase(name)) {
                 String script = """
-                    <script>
-                        function reportLiveReloadError(message) {
-                            console.error(message);
-                            if (typeof flowlogix_showError === 'function') {
-                                flowlogix_showError('livereload-error-message', message);
-                            } else if (!window.flowlogixLiveReloadAlertShown) {
-                                window.flowlogixLiveReloadAlertShown = true;
-                                alert(message + ' FlowLogix error banner helper script is not loaded.');
-                            }
+                    function reportLiveReloadError(message) {
+                        console.error(message);
+                        if (typeof flowlogix_showError === 'function') {
+                            flowlogix_showError('livereload-error-message', message);
+                        } else if (!window.flowlogixLiveReloadAlertShown) {
+                            window.flowlogixLiveReloadAlertShown = true;
+                            alert(message + ' FlowLogix error banner helper script is not loaded.');
                         }
+                    }
 
-                        function connectWS() {
-                            const ws = new WebSocket('%s');
-                            ws.onopen = () => ws.send('%s');
-                            ws.onmessage = e => {
-                                if (e.data === 'reload') {
-                                    ws.close();
-                                    if (typeof OmniFaces !== 'undefined' && typeof OmniFaces.Unload !== 'undefined') {
-                                        window.dispatchEvent(new Event('beforeunload'));
-                                        console.log('OmniFaces @ViewScoped Unload triggered');
-                                        OmniFaces.Unload.disable();
-                                        console.log('Further OmniFaces @ViewScoped Unload is Disabled');
-                                        setTimeout(() => { location.replace(location.href); }, 50);
-                                    } else {
-                                        location.replace(location.href);
-                                    }
-                                } else if (e.data === 'error') {
-                                    reportLiveReloadError(
-                                        'Compilation or deployment error occurred, '
-                                            + 'please check maven and server logs for details.');
-                                } else if (e.data === 'test-failure') {
-                                    reportLiveReloadError('Test failure(s) occurred, please check maven for details.');
-                                } else if (e.data === 'shutdown') {
-                                    ws.close();
+                    function connectWS() {
+                        const ws = new WebSocket('%s');
+                        ws.onopen = () => ws.send('%s');
+                        ws.onmessage = e => {
+                            if (e.data === 'reload') {
+                                ws.close();
+                                if (typeof OmniFaces !== 'undefined' && typeof OmniFaces.Unload !== 'undefined') {
+                                    window.dispatchEvent(new Event('beforeunload'));
+                                    console.log('OmniFaces @ViewScoped Unload triggered');
+                                    OmniFaces.Unload.disable();
+                                    console.log('Further OmniFaces @ViewScoped Unload is Disabled');
+                                    setTimeout(() => { location.replace(location.href); }, 50);
+                                } else {
+                                    location.replace(location.href);
                                 }
-                            };
-                            ws.onclose = () => setTimeout(connectWS, 2000);
-                            ws.onerror = () => ws.close();
-                        }
+                            } else if (e.data === 'error') {
+                                reportLiveReloadError(
+                                    'Compilation or deployment error occurred, '
+                                        + 'please check maven and server logs for details.');
+                            } else if (e.data === 'test-failure') {
+                                reportLiveReloadError('Test failure(s) occurred, please check maven for details.');
+                            } else if (e.data === 'shutdown') {
+                                ws.close();
+                            }
+                        };
+                        ws.onclose = () => setTimeout(connectWS, 2000);
+                        ws.onerror = () => ws.close();
+                    }
 
-                        connectWS();
-                    </script>
+                    connectWS();
                     """.formatted(toHttpsURL(Faces.getRequestDomainURL())
                                 + "/flowlogix-livereload/livereload", getDeploymentKey());
-                facesContext.getResponseWriter().write(script);
+                ResponseWriter writer = facesContext.getResponseWriter();
+                writer.startElement(SCRIPT_TAG, null);
+                writer.writeAttribute("type", "text/javascript", null);
+                writer.writeText(script, null);
+                writer.endElement(SCRIPT_TAG);
             }
             getWrapped().endElement(name);
         }

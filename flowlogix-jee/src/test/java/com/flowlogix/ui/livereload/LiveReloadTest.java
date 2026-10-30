@@ -40,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -75,8 +76,13 @@ class LiveReloadTest {
                     .endElement("body");
             facesMock.verify(Faces::getRequestContextPath, times(2));
             verify(facesContext).getResponseWriter();
-            verify(facesContext.getResponseWriter()).write(anyString());
-            verify(responseWriter).endElement("body");
+            ResponseWriter writer = facesContext.getResponseWriter();
+            var ordered = inOrder(writer, responseWriter);
+            ordered.verify(writer).startElement("script", null);
+            ordered.verify(writer).writeAttribute("type", "text/javascript", null);
+            ordered.verify(writer).writeText(anyString(), eq(null));
+            ordered.verify(writer).endElement("script");
+            ordered.verify(responseWriter).endElement("body");
             verifyNoMoreInteractions(responseWriter, facesContext);
         }
     }
@@ -92,7 +98,7 @@ class LiveReloadTest {
                     .endElement("body");
 
             ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
-            verify(facesContext.getResponseWriter()).write(scriptCaptor.capture());
+            verify(facesContext.getResponseWriter()).writeText(scriptCaptor.capture(), eq(null));
             assertThat(scriptCaptor.getValue())
                     .contains("ws.send('finalName');");
         }
@@ -109,7 +115,7 @@ class LiveReloadTest {
                     .endElement("body");
 
             ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
-            verify(facesContext.getResponseWriter()).write(scriptCaptor.capture());
+            verify(facesContext.getResponseWriter()).writeText(scriptCaptor.capture(), eq(null));
             assertThat(scriptCaptor.getValue())
                     .contains("console.error(message);")
                     .contains("window.flowlogixLiveReloadAlertShown")
@@ -129,7 +135,7 @@ class LiveReloadTest {
                     .endElement("body");
 
             ArgumentCaptor<String> scriptCaptor = ArgumentCaptor.forClass(String.class);
-            verify(facesContext.getResponseWriter()).write(scriptCaptor.capture());
+            verify(facesContext.getResponseWriter()).writeText(scriptCaptor.capture(), eq(null));
             assertThat(scriptCaptor.getValue()).contains("ws.send('context');");
             facesMock.verify(Faces::getRequestContextPath, times(2));
         }
@@ -219,6 +225,13 @@ class LiveReloadTest {
                 .doesNotContain("location.reload()");
     }
 
+    @Test
+    void scriptContentIsWrittenWithoutMarkupOrEscapedOperators() throws IOException {
+        assertThat(injectedScript())
+                .contains("&&")
+                .doesNotContain("<script", "</script>", "&amp;");
+    }
+
     private FacesContext renderView() throws IOException {
         try (MockedStatic<Faces> facesMock = mockStatic(Faces.class)) {
             facesMock.when(Faces::isDevelopment).thenReturn(true);
@@ -241,7 +254,7 @@ class LiveReloadTest {
         }
 
         ArgumentCaptor<String> script = ArgumentCaptor.forClass(String.class);
-        verify(facesContext.getResponseWriter()).write(script.capture());
+        verify(facesContext.getResponseWriter()).writeText(script.capture(), eq(null));
         return script.getValue();
     }
 

@@ -36,7 +36,7 @@ public class UserDAO {
     JPANativeQuery<UserEntity> jpaFinder;
     // @start region="daoParameters"
     // tag::daoParameters[] // @replace regex='.*\n' replacement=""
-    public record CountAndList(long count, List<UserEntity> list) { };
+    public record CountAndList(long count, List<UserEntity> list) { }
     public CountAndList countAndList(String userName) {
         // add "where fullName = 'userName'" clause
         QueryEnhancement<UserEntity> enhancement = (partial, criteria) -> criteria

@@ -16,18 +16,25 @@
 package com.flowlogix.util;
 
 import org.jboss.arquillian.config.descriptor.api.ArquillianDescriptor;
+import org.jboss.arquillian.container.test.spi.client.deployment.DeploymentScenarioGenerator;
 import org.jboss.arquillian.core.api.annotation.Observes;
 import org.jboss.arquillian.core.spi.LoadableExtension;
 
 /**
- * Suppresses the Maven warnings from Arquillian Suite extension
- * that are mistakenly printed to the console when running Arquillian tests.
+ * FlowLogix Arquillian extension.
+ * <ul>
+ * <li>Suppresses the Maven warnings from Arquillian Suite extension
+ * that are mistakenly printed to the console when running Arquillian tests.</li>
+ * <li>Automatically creates deployments from the Maven project,
+ * see {@link MavenDeploymentScenarioGenerator}.</li>
+ * </ul>
  */
 @SuppressWarnings("unused")
-class ArquillianSuiteLogSuppressionExtension implements LoadableExtension {
+class FlowLogixArquillianExtension implements LoadableExtension {
     @Override
     public void register(ExtensionBuilder builder) {
-        builder.observer(ArquillianSuiteLogSuppressionExtension.class);
+        builder.observer(FlowLogixArquillianExtension.class);
+        builder.service(DeploymentScenarioGenerator.class, MavenDeploymentScenarioGenerator.class);
     }
 
     void removeMavenWarnings(@Observes(precedence = 50) ArquillianDescriptor descriptor) {

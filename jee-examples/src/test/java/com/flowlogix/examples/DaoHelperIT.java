@@ -19,9 +19,7 @@ import com.flowlogix.demo.jeedao.DaoHelperDemo;
 import com.flowlogix.demo.jeedao.UserDAO;
 import com.flowlogix.test.AppServerLifecycle;
 import jakarta.inject.Inject;
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,10 +55,5 @@ class DaoHelperIT {
                         select * from userentity
                         where zipcode = 68502 order by userid limit 2""")
                 .getUserId()).isEqualTo("anya");
-    }
-
-    @Deployment(name = DEPLOYMENT_DEV_MODE)
-    static WebArchive createDeployment() {
-        return ExceptionPageIT.createDeploymentDev();
     }
 }

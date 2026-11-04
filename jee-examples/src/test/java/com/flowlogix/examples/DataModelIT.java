@@ -19,7 +19,6 @@ import static com.flowlogix.examples.ExceptionPageIT.DEPLOYMENT_DEV_MODE;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URL;
 import com.flowlogix.test.AppServerLifecycle;
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.drone.api.annotation.Drone;
@@ -27,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.waitAjax;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -135,10 +133,5 @@ class DataModelIT {
         assertThat(webDriver.getTitle()).isEqualTo("View Users");
 
         assertThatThrownBy(() -> firstRowUserId.getText()).isInstanceOf(NoSuchElementException.class);
-    }
-
-    @Deployment(name = DEPLOYMENT_DEV_MODE)
-    static WebArchive createDeployment() {
-        return ExceptionPageIT.createDeploymentDev();
     }
 }

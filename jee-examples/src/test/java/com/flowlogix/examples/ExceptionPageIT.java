@@ -216,11 +216,9 @@ class ExceptionPageIT {
     }
 
     static WebArchive createDeployment(String suffix) {
-        WebArchive archive = ShrinkWrapManipulator.createDeployment(WebArchive.class,
-                        name -> StringUtils.isBlank(suffix) ? name : String.format("%s-%s", name, suffix))
-                .addClass(DaoHelperIT.class)
-                .addClass(DataModelBackendIT.class);
-        return logArchiveContents(archive, log::debug);
+        WebArchive archive = ShrinkWrapManipulator.createDeployment(
+                name -> StringUtils.isBlank(suffix) ? name : String.format("%s-%s", name, suffix));
+        return logArchiveContents(archive.addClass(DaoHelperIT.class).addClass(DataModelBackendIT.class), log::debug);
     }
 
     @Deployment(name = DEPLOYMENT_PROD_MODE)

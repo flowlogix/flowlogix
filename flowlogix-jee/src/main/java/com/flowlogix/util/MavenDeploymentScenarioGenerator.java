@@ -15,21 +15,19 @@
  */
 package com.flowlogix.util;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jboss.arquillian.container.spi.client.deployment.DeploymentDescription;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.DeploymentConfiguration;
-import org.jboss.arquillian.container.test.api.DeploymentConfiguration.DeploymentContentBuilder;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.arquillian.container.test.impl.client.deployment.AbstractDeploymentScenarioGenerator;
+import org.jboss.arquillian.container.test.spi.client.deployment.DeploymentScenarioGenerator;
 import org.jboss.arquillian.test.spi.TestClass;
 import org.jboss.shrinkwrap.api.Archive;
+import static java.util.function.Predicate.not;
 
 /**
  * Creates plain deployments from the Maven project for deployments that the test class
@@ -42,31 +40,23 @@ import org.jboss.shrinkwrap.api.Archive;
  * <p>
  * Registered by the Arquillian extension, so no explicit configuration is needed.
  */
-public class MavenDeploymentScenarioGenerator extends AbstractDeploymentScenarioGenerator {
+public class MavenDeploymentScenarioGenerator implements DeploymentScenarioGenerator {
     @Override
-    protected List<DeploymentConfiguration> generateDeploymentContent(TestClass testClass) {
-        Set<String> declared = new HashSet<>();
-        for (Method method : testClass.getMethods(Deployment.class)) {
-            declared.add(method.getAnnotation(Deployment.class).name());
-        }
+    public List<DeploymentDescription> generate(TestClass testClass) {
+        Set<String> declared = Arrays.stream(testClass.getMethods(Deployment.class))
+                .map(method -> method.getAnnotation(Deployment.class).name())
+                .collect(Collectors.toSet());
         Set<String> missing = Stream.concat(
                         Arrays.stream(testClass.getJavaClass().getDeclaredMethods()),
                         Arrays.stream(testClass.getJavaClass().getDeclaredFields()))
-                .map(element -> element.getAnnotation(OperateOnDeployment.class))
-                .filter(Objects::nonNull)
+                .flatMap(element -> Stream.ofNullable(element.getAnnotation(OperateOnDeployment.class)))
                 .map(OperateOnDeployment::value)
-                .filter(name -> !declared.contains(name))
-                .collect(Collectors.toSet());
+                .filter(not(declared::contains))
+                .collect(Collectors.toCollection(HashSet::new));
         if (missing.isEmpty() && declared.isEmpty()) {
-            return List.of(createConfiguration(null));
+            missing.add("_DEFAULT_");
         }
-        return missing.stream().map(MavenDeploymentScenarioGenerator::createConfiguration).toList();
-    }
-
-    private static DeploymentConfiguration createConfiguration(String name) {
-        var builder = new DeploymentContentBuilder((Archive<?>) ShrinkWrapManipulator.createDeployment())
-                .withDeployment();
-        // without a name, Arquillian's default deployment name applies
-        return (name == null ? builder : builder.withName(name)).build().get();
+        return missing.stream().map(name -> new DeploymentDescription(name,
+                (Archive<?>) ShrinkWrapManipulator.createDeployment())).toList();
     }
 }

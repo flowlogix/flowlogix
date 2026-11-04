@@ -105,6 +105,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <httpsPort>${server.https.port}</httpsPort>
+                        <org.jboss.shrinkwrap.resolver.maven.ignoreDecryptionProblems>true</org.jboss.shrinkwrap.resolver.maven.ignoreDecryptionProblems>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

@@ -32,9 +32,7 @@ import com.flowlogix.jeedao.primefaces.JPALazyDataModel;
 import com.flowlogix.test.AppServerLifecycle;
 import com.flowlogix.util.SerializeTester;
 import jakarta.inject.Inject;
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.jupiter.api.Test;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.MatchMode;
@@ -330,11 +328,5 @@ class DataModelBackendIT {
         }
         assertThat(seenIds).as("every row exactly once, %s", order)
                 .hasSize(10).doesNotHaveDuplicates();
-    }
-
-    @SuppressWarnings("unused")
-    @Deployment(name = DEPLOYMENT_DEV_MODE)
-    static WebArchive createDeployment() {
-        return ExceptionPageIT.createDeploymentDev();
     }
 }

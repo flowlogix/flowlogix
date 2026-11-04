@@ -23,15 +23,14 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static com.flowlogix.util.JakartaTransformerUtils.jakartify;
 import static com.flowlogix.util.ShrinkWrapManipulator.getContextParamValue;
 
-@SuppressWarnings({"HideUtilityClassConstructor", "unused"})
 @Slf4j
+@SuppressWarnings({"HideUtilityClassConstructor", "unused"})
 public class ShrinkWrapDemo {
     // @Deployment
     // @start region="deployMaven"
     // tag::deployMaven[] // @replace regex='.*\n' replacement=""
     static WebArchive deployMaven() {
-        return ShrinkWrapManipulator.logArchiveContents(
-                ShrinkWrapManipulator.createDeployment(WebArchive.class),
+        return ShrinkWrapManipulator.logArchiveContents(ShrinkWrapManipulator.<WebArchive>createDeployment(),
                 contents -> log.info("Archive Contents: {}", contents));
     }
     // end::deployMaven[] // @replace regex='.*\n' replacement=""
@@ -41,9 +40,8 @@ public class ShrinkWrapDemo {
     // @start region="deployMavenSuffix"
     // tag::deployMavenSuffix[] // @replace regex='.*\n' replacement=""
     static WebArchive deployMavenSuffix() {
-        return ShrinkWrapManipulator.logArchiveContents(
-                ShrinkWrapManipulator.createDeployment(WebArchive.class,
-                        name -> name + "-prod"),
+        WebArchive archive = ShrinkWrapManipulator.createDeployment(name -> name + "-prod");
+        return ShrinkWrapManipulator.logArchiveContents(archive,
                 contents -> log.info("Archive Contents: {}", contents));
     }
     // end::deployMavenSuffix[] // @replace regex='.*\n' replacement=""

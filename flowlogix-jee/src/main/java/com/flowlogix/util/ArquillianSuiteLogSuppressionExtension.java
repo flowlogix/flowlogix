@@ -16,6 +16,7 @@
 package com.flowlogix.util;
 
 import org.jboss.arquillian.config.descriptor.api.ArquillianDescriptor;
+import org.jboss.arquillian.container.test.spi.client.deployment.DeploymentScenarioGenerator;
 import org.jboss.arquillian.core.api.annotation.Observes;
 import org.jboss.arquillian.core.spi.LoadableExtension;
 
@@ -28,6 +29,7 @@ class ArquillianSuiteLogSuppressionExtension implements LoadableExtension {
     @Override
     public void register(ExtensionBuilder builder) {
         builder.observer(ArquillianSuiteLogSuppressionExtension.class);
+        builder.service(DeploymentScenarioGenerator.class, MavenDeploymentScenarioGenerator.class);
     }
 
     void removeMavenWarnings(@Observes(precedence = 50) ArquillianDescriptor descriptor) {

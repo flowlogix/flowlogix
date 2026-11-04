@@ -57,8 +57,13 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.container.ClassContainer;
 import org.jboss.shrinkwrap.api.container.ResourceContainer;
+import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.ResourceAdapterArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
+import org.jboss.shrinkwrap.resolver.impl.maven.MavenWorkingSessionContainer;
 import org.omnifaces.util.Lazy;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
@@ -94,6 +99,91 @@ public class ShrinkWrapManipulator {
 
     final Lazy<DocumentBuilder> builder = new Lazy<>(this::createDocumentBuilder);
     final Lazy<Transformer> transformer = new Lazy<>(this::createTransformer);
+
+    /**
+     * Creates ShrinkWrap (Arquillian) archive from the existing {@code pom.xml},
+     * with the archive type automatically determined by the POM's {@code <packaging>}:
+     * {@code war} - {@link WebArchive}, {@code jar} and {@code ejb} - {@link JavaArchive},
+     * {@code ear} - {@link EnterpriseArchive}, {@code rar} - {@link ResourceAdapterArchive}.
+     * The return type is inferred from the caller, a mismatch results in {@link ClassCastException}.
+     *
+     * @return new archive
+     * @param <TT> ShrinkWrap archive type
+     * @throws IllegalStateException if the packaging is not supported
+     */
+    public static <TT extends Archive<TT>> TT createDeployment() {
+        return createDeployment(name -> name, defaultPomFilePath.get());
+    }
+
+    /**
+     * Same as {@link #createDeployment()}, with the specified name transformer.
+     *
+     * @param nameTransformer transforms the UUID to a more suitable name
+     * @return new archive
+     * @param <TT> ShrinkWrap archive type
+     * @throws IllegalStateException if the packaging is not supported
+     */
+    public static <TT extends Archive<TT>> TT createDeployment(UnaryOperator<String> nameTransformer) {
+        return createDeployment(nameTransformer, defaultPomFilePath.get());
+    }
+
+    /**
+     * Same as {@link #createDeployment()}, with the specified name transformer and POM file.
+     *
+     * @param nameTransformer transforms the UUID to a more suitable name
+     * @param pomFilePath Path to the Maven POM file
+     * @return new archive
+     * @param <TT> ShrinkWrap archive type
+     * @throws IllegalStateException if the packaging is not supported
+     */
+    public static <TT extends Archive<TT>> TT createDeployment(UnaryOperator<String> nameTransformer,
+                                                               Path pomFilePath) {
+        Class<TT> archiveType = inferArchiveType(pomFilePath);
+        return createDeployment(archiveType, nameTransformer, pomFilePath);
+    }
+
+    /**
+     * Same as {@link #createDeployment()}, with the specified archive name and POM file.
+     *
+     * @param archiveName Name of the archive
+     * @param pomFilePath Path to the Maven POM file
+     * @return new archive
+     * @param <TT> ShrinkWrap archive type
+     * @throws IllegalStateException if the packaging is not supported
+     */
+    public static <TT extends Archive<TT>> TT createDeployment(@NonNull String archiveName, Path pomFilePath) {
+        Class<TT> archiveType = inferArchiveType(pomFilePath);
+        return createDeployment(archiveType, archiveName, pomFilePath);
+    }
+
+    /**
+     * Determines the archive type from the packaging of the Maven POM file.
+     *
+     * @param pomFilePath Path to the Maven POM file
+     * @return archive type
+     * @throws IllegalStateException if the packaging is not supported
+     */
+    public static Class<? extends Archive<?>> detectArchiveType(Path pomFilePath) {
+        removeMavenWarningsFromLogging();
+        if (!(Maven.configureResolver().loadPomFromFile(pomFilePath.toFile())
+                instanceof MavenWorkingSessionContainer container)) {
+            throw new IllegalStateException("Unsupported Maven resolver implementation");
+        }
+        var packaging = container.getMavenWorkingSession().getParsedPomFile().getPackagingType();
+        return switch (packaging.getId()) {
+            case "war" -> WebArchive.class;
+            case "jar", "ejb" -> JavaArchive.class;
+            case "ear" -> EnterpriseArchive.class;
+            case "rar" -> ResourceAdapterArchive.class;
+            default -> throw new IllegalStateException(String.format(
+                    "Cannot create deployment: unsupported packaging '%s' in %s", packaging, pomFilePath));
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <TT extends Archive<TT>> Class<TT> inferArchiveType(Path pomFilePath) {
+        return (Class<TT>) detectArchiveType(pomFilePath);
+    }
 
     /**
      * Simple method to create ShrinkWrap (Arquillian) archive from existing maven POM file.

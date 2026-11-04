@@ -34,6 +34,7 @@ FlowLogix Jakarta EE library fills in the last few gaps that are left over in Pr
 * Transforms names between javax and jakarta namespaces
 * Checks if objects are truly serializable by testing them
 * Easy Transform Streams to Strings
+* Completely automate creation of ShrinkWrap and Arquillian tests, without any configuration or boilerplate code
 * Simplify creation and manipulation of ShrinkWrap and Arquillian test archives including assets, allowing for better integration tests
 
 [[section-architecture]]
@@ -351,6 +352,10 @@ A more complete method `toHttpURL(url, sslPortPropertyName, defaultPort)` is ava
 ----
 $ mvn verify -DhttpsPort=8282
 ----
+The archive type is determined automatically from the POM's `<packaging>` (`war`, `jar`, `ejb`, `ear`, `rar`). The `createDeployment(Class)` variants are still available to specify the type explicitly.
+
+NOTE: If a test class (or the `@ArquillianSuiteDeployment` class) has no `@Deployment` method, FlowLogix creates the deployment automatically from the maven POM file. One deployment is created for each `@OperateOnDeployment` name that has no matching `@Deployment` method, or a single default one if there are none. The method below is only needed if the deployment must be customized.
+
 .Creating ShrinkWrap (Arquillian) tests easily from maven POM file
 [source,java]
 ----

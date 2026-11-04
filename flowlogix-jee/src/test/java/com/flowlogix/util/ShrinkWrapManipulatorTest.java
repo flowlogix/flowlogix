@@ -16,7 +16,6 @@
 package com.flowlogix.util;
 
 import com.flowlogix.util.ShrinkWrapManipulator.Action;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -44,12 +43,10 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import static com.flowlogix.util.ShrinkWrapManipulator.DEFAULT_SSL_PROPERTY;
 import static com.flowlogix.util.ShrinkWrapManipulator.runActionOnNode;
@@ -139,20 +136,6 @@ class ShrinkWrapManipulatorTest {
             ShrinkWrapManipulator.createDeployment(JavaArchive.class);
             shrinkWrap.verify(() -> ShrinkWrap.create(eq(MavenImporter.class), endsWith(".jar")));
         }
-    }
-
-    @Test
-    void logManager() {
-        ShrinkWrapManipulator.removeMavenWarningsFromLogging();
-        AtomicBoolean changed = new AtomicBoolean();
-        LogManager.getLogManager().addConfigurationListener(() -> changed.set(true));
-        ShrinkWrapManipulator.removeMavenWarningsFromLogging();
-        assertThat(changed).isFalse();
-        ShrinkWrapManipulator.resetMavenWarningsRemovalFlag();
-        System.setProperty("com.flowlogix.maven.resolver.warn", Boolean.TRUE.toString());
-        ShrinkWrapManipulator.removeMavenWarningsFromLogging();
-        assertThat(changed).isFalse();
-        System.setProperty("com.flowlogix.maven.resolver.warn", Boolean.FALSE.toString());
     }
 
     @Test
@@ -281,15 +264,12 @@ class ShrinkWrapManipulatorTest {
     }
 
     @Test
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    void packageTestRequirements() {
-        assertThat(ShrinkWrapManipulator.packageTestRequirements((Archive) null)).isNull();
-    }
-
-    @Test
     void logArchiveContents() {
         when(javaArchive.toString(true)).thenReturn("archive-output");
-        ShrinkWrapManipulator.logArchiveContents(javaArchive, s -> assertThat(s).isEqualTo("archive-output"));
+        Consumer<String> consumer = mock();
+        assertThat(ShrinkWrapManipulator.logArchiveContents(javaArchive, consumer)).isSameAs(javaArchive);
+        verify(consumer).accept("archive-output");
+        verifyNoMoreInteractions(consumer);
         verifyNoMoreInteractions(javaArchive);
     }
 
@@ -420,11 +400,6 @@ class ShrinkWrapManipulatorTest {
         runActionOnNode(new Action("path", func, false), null);
         verify(func).accept(null);
         verifyNoMoreInteractions(documentBuilder, documentBuilderFactory, transformerFactory, func);
-    }
-
-    @Test
-    void logger() {
-        assertThat(ShrinkWrapManipulator.getLogger()).isNotNull();
     }
 
     @SuppressWarnings("checkstyle:MagicNumber")

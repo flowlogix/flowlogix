@@ -356,6 +356,17 @@ The archive type is determined automatically from the POM's `<packaging>` (`war`
 
 NOTE: If a test class (or the `@ArquillianSuiteDeployment` class) has no `@Deployment` method, FlowLogix creates the deployment automatically from the maven POM file. One deployment is created for each `@OperateOnDeployment` name that has no matching `@Deployment` method, or a single default one if there are none. The method below is only needed if the deployment must be customized.
 
+To package SLF4J in automatically generated WAR deployments, opt in through `arquillian.xml`:
+
+[source,xml]
+----
+<extension qualifier="flowlogix">
+    <property name="packageSlf4j">true</property>
+</extension>
+----
+
+This defaults to `false` and leaves explicit `@Deployment` archives unchanged. Enabling it calls `ShrinkWrapManipulator.packageSlf4j()`, which packages the SLF4J APIs. The provider implementation and its dependencies must be available in the deployment, which is the default with the FlowLogix base-pom and depchain.
+
 .Creating ShrinkWrap (Arquillian) tests easily from maven POM file
 [source,java]
 ----

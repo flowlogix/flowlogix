@@ -18,6 +18,9 @@ package com.flowlogix.util;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.List;
+import org.jboss.arquillian.config.descriptor.api.ArquillianDescriptor;
+import org.jboss.arquillian.config.descriptor.api.ExtensionDef;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -55,6 +58,7 @@ class AutomaticDeploymentTest {
         try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
             manipulator.when(() -> ShrinkWrapManipulator.getMavenSessionContainer(pom)).thenReturn(container);
             manipulator.when(() -> ShrinkWrapManipulator.detectArchiveType(pom)).thenCallRealMethod();
+            manipulator.when(() -> ShrinkWrapManipulator.archiveType(packaging)).thenCallRealMethod();
             assertThat(ShrinkWrapManipulator.detectArchiveType(pom).getSimpleName()).isEqualTo(expectedType);
         }
     }
@@ -67,6 +71,7 @@ class AutomaticDeploymentTest {
         try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
             manipulator.when(() -> ShrinkWrapManipulator.getMavenSessionContainer(pom)).thenReturn(container);
             manipulator.when(() -> ShrinkWrapManipulator.detectArchiveType(pom)).thenCallRealMethod();
+            manipulator.when(() -> ShrinkWrapManipulator.archiveType("pom")).thenCallRealMethod();
             assertThatExceptionOfType(IllegalStateException.class)
                     .isThrownBy(() -> ShrinkWrapManipulator.detectArchiveType(pom))
                     .withMessageContaining("unsupported packaging");
@@ -173,19 +178,21 @@ class AutomaticDeploymentTest {
         try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
             manipulator.when(() -> ShrinkWrapManipulator.createDeployment()).thenReturn(archive);
             manipulator.when(() -> ShrinkWrapManipulator.addTestClasses(archive)).thenReturn(archive);
-            var deployments = new MavenDeploymentScenarioGenerator().generate(new TestClass(EmptySuite.class));
+            var deployments = generator().generate(new TestClass(EmptySuite.class));
             assertThat(deployments).singleElement().satisfies(deployment -> {
                 assertThat(deployment.getName()).isEqualTo("_DEFAULT_");
                 assertThat(deployment.getArchive()).isSameAs(archive);
             });
+            manipulator.verify(() -> ShrinkWrapManipulator.createDeployment());
             manipulator.verify(() -> ShrinkWrapManipulator.addTestClasses(archive));
+            manipulator.verifyNoMoreInteractions();
         }
     }
 
     @Test
     void explicitDeploymentIsNotModified() {
         try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
-            assertThat(new MavenDeploymentScenarioGenerator().generate(new TestClass(ExplicitDeployment.class)))
+            assertThat(generator("true").generate(new TestClass(ExplicitDeployment.class)))
                     .isEmpty();
             manipulator.verifyNoInteractions();
         }
@@ -197,13 +204,42 @@ class AutomaticDeploymentTest {
         try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
             manipulator.when(() -> ShrinkWrapManipulator.createDeployment()).thenReturn(archive);
             manipulator.when(() -> ShrinkWrapManipulator.addTestClasses(archive)).thenReturn(archive);
-            var deployments = new MavenDeploymentScenarioGenerator().generate(new TestClass(MixedDeployments.class));
+            var deployments = generator().generate(new TestClass(MixedDeployments.class));
             assertThat(deployments).singleElement().satisfies(deployment -> {
                 assertThat(deployment.getName()).isEqualTo("missing");
                 assertThat(deployment.getArchive()).isSameAs(archive);
             });
             manipulator.verify(() -> ShrinkWrapManipulator.addTestClasses(archive));
         }
+    }
+
+    @Test
+    void slf4jOptInPackagesGeneratedWar() {
+        var archive = mock(WebArchive.class);
+        try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
+            manipulator.when(() -> ShrinkWrapManipulator.createDeployment()).thenReturn(archive);
+            manipulator.when(() -> ShrinkWrapManipulator.packageSlf4j(archive)).thenReturn(archive);
+            manipulator.when(() -> ShrinkWrapManipulator.addTestClasses(archive)).thenReturn(archive);
+            assertThat(generator("true").generate(new TestClass(EmptySuite.class)))
+                    .singleElement().satisfies(deployment -> assertThat(deployment.getArchive()).isSameAs(archive));
+            manipulator.verify(() -> ShrinkWrapManipulator.packageSlf4j(archive));
+            manipulator.verify(() -> ShrinkWrapManipulator.addTestClasses(archive));
+        }
+    }
+
+    private static MavenDeploymentScenarioGenerator generator(String... setting) {
+        var descriptor = mock(ArquillianDescriptor.class);
+        if (setting.length == 0) {
+            when(descriptor.getExtensions()).thenReturn(List.of());
+        } else {
+            var extension = mock(ExtensionDef.class);
+            when(extension.getExtensionName()).thenReturn("flowlogix");
+            when(extension.getExtensionProperty("packageSlf4j")).thenReturn(setting[0]);
+            when(descriptor.getExtensions()).thenReturn(List.of(extension));
+        }
+        var generator = new MavenDeploymentScenarioGenerator();
+        generator.descriptor = () -> descriptor;
+        return generator;
     }
 
     static class EmptySuite {

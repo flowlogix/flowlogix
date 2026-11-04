@@ -174,13 +174,17 @@ public class ShrinkWrapManipulator {
         removeMavenWarningsFromLogging();
         MavenWorkingSessionContainer container = getMavenSessionContainer(pomFilePath);
         var packaging = container.getMavenWorkingSession().getParsedPomFile().getPackagingType();
-        return switch (packaging.getId()) {
+        return archiveType(packaging.getId());
+    }
+
+    public static Class<? extends Archive<?>> archiveType(String packaging) {
+        return switch (packaging) {
             case "war" -> WebArchive.class;
             case "jar", "ejb" -> JavaArchive.class;
             case "ear" -> EnterpriseArchive.class;
             case "rar" -> ResourceAdapterArchive.class;
             default -> throw new IllegalStateException(String.format(
-                    "Cannot create deployment: unsupported packaging '%s' in %s", packaging, pomFilePath));
+                    "Cannot create deployment: unsupported packaging '%s'", packaging));
         };
     }
 

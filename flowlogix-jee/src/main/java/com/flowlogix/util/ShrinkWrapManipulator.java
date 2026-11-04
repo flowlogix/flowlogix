@@ -26,12 +26,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -53,7 +55,9 @@ import lombok.SneakyThrows;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.Filters;
+import org.jboss.shrinkwrap.api.ArchivePath;
+import org.jboss.shrinkwrap.api.Filter;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.container.ClassContainer;
@@ -275,7 +279,7 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Adds all compiled test classes using the default POM location.
+     * Adds compiled test classes using the default POM location, excluding client-only tests.
      * Test resources and additional test dependencies are not imported.
      *
      * @param archive archive to modify
@@ -287,7 +291,11 @@ public class ShrinkWrapManipulator {
     }
 
     /**
-     * Adds all compiled test classes from the POM's configured test-output directory.
+     * Adds compiled test classes from the POM's configured test-output directory.
+     * Classes with class-level {@code @RunAsClient}, their subclasses and nested classes are excluded.
+     * Method-level {@code @RunAsClient} does not exclude the declaring class.
+     * Classes are loaded through the context classloader without static initialization;
+     * class-loading failures propagate to the caller.
      * EARs receive a library JAR; other supported archives use their resource location.
      * Test resources and additional test dependencies are not imported.
      *
@@ -300,7 +308,8 @@ public class ShrinkWrapManipulator {
         var testOutput = getMavenSessionContainer(pomFilePath)
                 .getMavenWorkingSession().getParsedPomFile().getTestOutputDirectory();
         var testClasses = ShrinkWrap.create(ExplodedImporter.class).importDirectory(testOutput).as(JavaArchive.class);
-        var classesOnly = Filters.include(".*\\.class");
+        var classLoader = Thread.currentThread().getContextClassLoader();
+        Filter<ArchivePath> classesOnly = path -> isInContainerTestClass(path, classLoader);
         if (archive instanceof EnterpriseArchive enterpriseArchive) {
             enterpriseArchive.addAsLibrary(ShrinkWrap.create(JavaArchive.class).merge(testClasses, classesOnly));
         } else if (archive instanceof ResourceContainer<?> resources) {
@@ -309,6 +318,19 @@ public class ShrinkWrapManipulator {
             throw new IllegalStateException("Cannot add test classes to archive " + archive.getName());
         }
         return archive;
+    }
+
+    static boolean isInContainerTestClass(ArchivePath path, ClassLoader classLoader) {
+        return Stream.of(path.get()).filter(name -> name.endsWith(".class"))
+                .map(name -> name.replaceFirst("^/", "").replaceFirst("\\.class$", "").replace('/', '.'))
+                .map(name -> loadTestClass(name, classLoader)).anyMatch(type ->
+                        Stream.<Class<?>>iterate(type, Objects::nonNull, Class::getEnclosingClass)
+                                .noneMatch(enclosing -> enclosing.isAnnotationPresent(RunAsClient.class)));
+    }
+
+    @SneakyThrows(ClassNotFoundException.class)
+    static Class<?> loadTestClass(String name, ClassLoader classLoader) {
+        return Class.forName(name, false, classLoader);
     }
 
     /**

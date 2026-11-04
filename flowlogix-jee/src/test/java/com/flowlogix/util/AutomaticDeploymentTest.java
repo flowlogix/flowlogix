@@ -20,10 +20,10 @@ import java.nio.file.Path;
 import java.util.Map;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.spi.TestClass;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.Filter;
-import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -34,6 +34,7 @@ import org.jboss.shrinkwrap.resolver.impl.maven.MavenWorkingSessionContainer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -85,34 +86,84 @@ class AutomaticDeploymentTest {
         var path = mock(ArchivePath.class);
         var node = mock(Node.class);
         var asset = new StringAsset("class bytes");
+        when(path.get()).thenReturn("/" + EmptySuite.class.getName().replace('.', '/') + ".class");
         when(node.getAsset()).thenReturn(asset);
         when(classes.getContent(any())).thenReturn(Map.of(path, node));
         var archive = mock(WebArchive.class);
-        Filter<ArchivePath> classesOnly = entry -> entry.get().endsWith(".class");
         try (var manipulator = mockStatic(ShrinkWrapManipulator.class);
-                var shrinkWrap = mockStatic(ShrinkWrap.class);
-                var filters = mockStatic(Filters.class)) {
+                var shrinkWrap = mockStatic(ShrinkWrap.class)) {
             manipulator.when(() -> ShrinkWrapManipulator.getMavenSessionContainer(pom)).thenReturn(container);
             manipulator.when(() -> ShrinkWrapManipulator.addTestClasses(archive, pom)).thenCallRealMethod();
+            manipulator.when(() -> ShrinkWrapManipulator.isInContainerTestClass(any(), any())).thenCallRealMethod();
+            manipulator.when(() -> ShrinkWrapManipulator.loadTestClass(any(), any())).thenCallRealMethod();
             shrinkWrap.when(() -> ShrinkWrap.create(ExplodedImporter.class)).thenReturn(importer);
-            filters.when(() -> Filters.include(".*\\.class")).thenReturn(classesOnly);
 
             assertThat(ShrinkWrapManipulator.addTestClasses(archive, pom)).isSameAs(archive);
             verify(archive).addAsResource(asset, path);
-            verify(classes).getContent(classesOnly);
-            filters.verify(() -> Filters.include(".*\\.class"));
+            ArgumentCaptor<Filter<ArchivePath>> filtersUsed = ArgumentCaptor.captor();
+            verify(classes).getContent(filtersUsed.capture());
+            assertThat(filtersUsed.getValue().include(path)).isTrue();
+            assertThat(filtersUsed.getValue().include(classPath(ClientTest.class))).isFalse();
         }
     }
 
     @Test
-    void defaultTestClassesOverloadUsesDefaultPom() {
-        var archive = mock(WebArchive.class);
-        var pom = ShrinkWrapManipulator.defaultPomFilePath.get();
-        try (var manipulator = mockStatic(ShrinkWrapManipulator.class)) {
-            manipulator.when(() -> ShrinkWrapManipulator.addTestClasses(archive)).thenCallRealMethod();
-            manipulator.when(() -> ShrinkWrapManipulator.addTestClasses(archive, pom)).thenReturn(archive);
-            assertThat(ShrinkWrapManipulator.addTestClasses(archive)).isSameAs(archive);
-            manipulator.verify(() -> ShrinkWrapManipulator.addTestClasses(archive, pom));
+    void excludesClientTestsAndTheirNestedClasses() {
+        Filter<ArchivePath> filter = path -> ShrinkWrapManipulator.isInContainerTestClass(
+                path, getClass().getClassLoader());
+        for (var type : new Class<?>[] {ClientTest.class, ClientChild.class, ClientTest.Nested.class}) {
+            assertThat(filter.include(classPath(type))).as(type.getName()).isFalse();
+        }
+        for (var type : new Class<?>[] {EmptySuite.class, MixedTest.class, MixedTest.Nested.class}) {
+            assertThat(filter.include(classPath(type))).as(type.getName()).isTrue();
+        }
+    }
+
+    @Test
+    void doesNotInitializeTestClasses() {
+        Filter<ArchivePath> filter = path -> ShrinkWrapManipulator.isInContainerTestClass(
+                path, getClass().getClassLoader());
+        assertThat(filter.include(classPath(UninitializedTest.class))).isTrue();
+    }
+
+    private static ArchivePath classPath(Class<?> type) {
+        var path = mock(ArchivePath.class);
+        when(path.get()).thenReturn("/" + type.getName().replace('.', '/') + ".class");
+        return path;
+    }
+
+    @Test
+    void excludesResourcesWithoutLoadingClasses() {
+        var path = mock(ArchivePath.class);
+        when(path.get()).thenReturn("/META-INF/beans.xml");
+        assertThat(ShrinkWrapManipulator.isInContainerTestClass(path, getClass().getClassLoader())).isFalse();
+    }
+
+    @RunAsClient
+    static class ClientTest {
+        static class Nested {
+        }
+    }
+
+    static class ClientChild extends ClientTest {
+    }
+
+    static class MixedTest {
+        @RunAsClient
+        void clientMethod() {
+        }
+
+        static class Nested {
+        }
+    }
+
+    static class UninitializedTest {
+        static {
+            failInitialization();
+        }
+
+        private static void failInitialization() {
+            throw new IllegalStateException("Test class must not be initialized");
         }
     }
 

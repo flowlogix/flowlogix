@@ -26,6 +26,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.spi.client.deployment.DeploymentScenarioGenerator;
 import org.jboss.arquillian.test.spi.TestClass;
+import org.jboss.shrinkwrap.api.Archive;
 import static com.flowlogix.util.ShrinkWrapManipulator.addTestClasses;
 import static java.util.function.Predicate.not;
 
@@ -36,7 +37,8 @@ import static java.util.function.Predicate.not;
  * {@link Deployment} method, or a single default one if the test class references no deployments at all.
  * The archive type is determined from the POM's packaging,
  * see {@link ShrinkWrapManipulator#createDeployment()}.
- * All compiled test classes are included so shared suite deployments can run tests in-container.
+ * Compiled test classes are included so shared suite deployments can run tests in-container,
+ * excluding client-only tests as described in {@link ShrinkWrapManipulator#addTestClasses(Archive)}.
  * Test resources and additional test dependencies are not imported.
  * Deployments that need customization still need an explicit {@link Deployment} method.
  * <p>

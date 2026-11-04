@@ -50,8 +50,7 @@ public class MavenDeploymentScenarioGenerator implements DeploymentScenarioGener
                         Arrays.stream(testClass.getJavaClass().getDeclaredMethods()),
                         Arrays.stream(testClass.getJavaClass().getDeclaredFields()))
                 .flatMap(element -> Stream.ofNullable(element.getAnnotation(OperateOnDeployment.class)))
-                .map(OperateOnDeployment::value)
-                .filter(not(declared::contains))
+                .map(OperateOnDeployment::value).filter(not(declared::contains))
                 .collect(Collectors.toCollection(HashSet::new));
         if (missing.isEmpty() && declared.isEmpty()) {
             missing.add("_DEFAULT_");

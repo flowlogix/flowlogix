@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: adopt-parent-existing
+expected_outcome: |
+  pom.xml gets the parent com.flowlogix:payara-pom at the latest release, looked up during the run
+  (Maven Central metadata or versions:update-parent) rather than typed from memory or set to
+  LATEST. Plugin versions the parent manages are removed. The final message says which minimum
+  JDK the parent enforces and what the project's maven.compiler.release is now.
+context:
+  scaffold_script: place-files.sh

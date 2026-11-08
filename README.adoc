@@ -22,6 +22,9 @@ link:https://start.flowlogix.com[Generate your project^] and run it in seconds:
 ./mvnw package server:dev
 ----
 
+Using an AI coding agent? `npx skills add flowlogix/flowlogix` installs the link:skills[Flow Logix agent skills^]
+for creating a project and maintaining its build.
+
 === Documentation and Features
 link:https://docs.flowlogix.com[Developer's Guide^] is here.
 

@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class StarterUrl {
-    private static final String DEFAULT_ENDPOINT = "https://start.flowlogix.com/sg/download/";
+    private static final String DEFAULT_ENDPOINT = "https://start.flowlogix.com/sg/api/generate/";
     private static final String ARCHIVE_TYPE = "application/octet-stream";
     private static final String DEFAULT_ARTIFACT = "starter";
 

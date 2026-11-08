@@ -117,7 +117,7 @@ Needs only `curl` and `unzip`; Maven runs server-side. The endpoint takes parame
 parameters** on the path (`;name=value`), not a query string:
 
 ```
-https://start.flowlogix.com/sg/download/;group=com.acme;artifact=orders;package=com.acme.orders;packagingType=jar
+https://start.flowlogix.com/sg/api/generate/;group=com.acme;artifact=orders;package=com.acme.orders;packagingType=jar
 ```
 
 Build it with the bundled script, which runs from source with no build, percent-encodes values
@@ -140,7 +140,7 @@ unzip -q orders.zip && rm orders.zip && chmod +x orders/mvnw
 answers `400` with a plain-text reason (bad value) or `500` with Maven's output.
 
 The shortest forms in the project READMEs also work:
-`curl -sSL https://start.flowlogix.com/download -o starter.zip`.
+`curl -sSL https://start.flowlogix.com/generate -o starter.zip`.
 
 ### Route 3: mvn archetype:generate
 

@@ -34,7 +34,7 @@ flowlogix-starter [options]
 | `--projectVersion <value>` | the archetype's `version` (renamed: `--version` prints the CLI's version) |
 | `--useShiro[=<true\|false>]` and the other `use*` flags | bare flag means `true` |
 | `-o, --output-dir <dir>` | where the project directory is created; `.` by default |
-| `--generator-url <url>` | generator to call; `https://start.flowlogix.com/sg/download/` by default |
+| `--generator-url <url>` | generator to call; `https://start.flowlogix.com/sg/api/generate/` by default |
 | `--dry-run` | print the equivalent curl command and exit |
 | `-h, --help`, `-V, --version` | |
 

@@ -1,6 +1,6 @@
 ---
 name: flowlogix-new-project
-description: Creates new Jakarta EE projects with the Flow Logix starter — the start.flowlogix.com generator, the flowlogix-starter CLI or the com.flowlogix.archetypes:starter Maven archetype — on Payara, GlassFish or no application server, with options such as Shiro, OmniFaces, PrimeFaces, a JPA lazy data model and Arquillian tests. Use this skill whenever the user wants to scaffold, generate or bootstrap a new Jakarta EE, Payara or GlassFish project, mentions Flow Logix, start.flowlogix.com, flowlogix-starter or the starter archetype, or describes an app and asks which starter options fit it.
+description: Creates new Jakarta EE projects with JStarter, the Jakarta EE Starter by Flow Logix — the start.flowlogix.com generator, the jstarter CLI or the com.flowlogix.archetypes:starter Maven archetype — on Payara, GlassFish or no application server, with options such as Shiro, OmniFaces, PrimeFaces, a JPA lazy data model and Arquillian tests. Use this skill whenever the user wants to scaffold, generate or bootstrap a new Jakarta EE, Payara or GlassFish project, mentions Flow Logix, JStarter, jstarter, start.flowlogix.com or the starter archetype, or describes an app and asks which starter options fit it.
 license: Apache-2.0
 compatibility: Works with any agent that supports Agent Skills and can run shell commands. Needs curl and unzip with network access to start.flowlogix.com, or Maven with access to Maven Central; a JDK 17+ for the bundled script; and, to build the generated project, a JDK at least the parent POM's maven.compiler.release (25 as of 2026-10).
 metadata:
@@ -9,8 +9,9 @@ metadata:
 
 # Creating a Flow Logix project
 
-The starter is the Maven archetype `com.flowlogix.archetypes:starter`. start.flowlogix.com runs it
-server-side and returns the project as a zip. The web page, the `flowlogix-starter` CLI and the
+JStarter is the Jakarta EE Starter by Flow Logix. The generator uses the Maven archetype
+`com.flowlogix.archetypes:starter`. start.flowlogix.com runs it server-side and returns the project
+as a zip. The web page, the `jstarter` CLI and the
 download endpoint accept the same parameters, so the same choices produce the same project. The
 project builds on a Flow Logix parent POM; changing that build later is the `flowlogix-base-pom`
 skill's job.
@@ -64,7 +65,7 @@ full-featured app). Read the defaults from the source when you need them, which 
 bare `mvn archetype:generate` uses the archetype's defaults, so pass every property) and to tell the
 user what was chosen:
 
-- installed CLI: `flowlogix-starter --help` shows each option's default, `--dry-run` every value sent;
+- installed CLI: `jstarter --help` shows each option's default, `--dry-run` every value sent;
 - generator: `DEFAULTS` in
   https://raw.githubusercontent.com/flowlogix/apps/main/starter-generator/common/src/main/java/com/flowlogix/starter/common/StarterParameters.java;
   a property it doesn't list takes the archetype's default;
@@ -107,7 +108,7 @@ where you are running, say so and give the user the exact command to run themsel
 
 ### Route 1: the CLI
 
-`flowlogix-starter` on PATH (or its `quarkus-run.jar`) validates input, refuses to overwrite an
+`jstarter` on PATH (or its `quarkus-run.jar`) validates input, refuses to overwrite an
 existing directory, unpacks and makes `mvnw` executable. Read `references/cli.md` for its options,
 examples and exit codes.
 

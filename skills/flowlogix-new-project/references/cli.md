@@ -1,12 +1,13 @@
-# CLI: flowlogix-starter
+# CLI: JStarter
 
-A command line client of start.flowlogix.com (Quarkus + picocli). It sends the options to the
-generator, so the generator alone decides which values are valid and the result matches the web
-page. Source: github.com/flowlogix/apps → `starter-generator/cli` (artifact `starter-cli`).
+JStarter is the Jakarta EE Starter by Flow Logix, a command line client of start.flowlogix.com
+(Quarkus + picocli). It sends the options to the generator, so the generator alone decides which
+values are valid and the result matches the web page. Source: github.com/flowlogix/apps →
+`starter-generator/cli` (artifact `starter-cli`).
 
 ## Getting it
 
-Check first: `command -v flowlogix-starter`. If it isn't installed, it can be built from source
+Check first: `command -v jstarter`. If it isn't installed, it can be built from source
 (needs a JDK and network access to GitHub and Maven Central):
 
 ```shell
@@ -21,7 +22,7 @@ the same project. Prefer the CLI when it is already installed, or when the user 
 ## Usage
 
 ```
-flowlogix-starter [options]
+jstarter [options]
 ```
 
 | Option | Meaning |
@@ -49,16 +50,16 @@ A bare boolean flag means `true`, so turning a feature **off** always needs an e
 
 ```shell
 # All defaults, in ./orders
-flowlogix-starter -g com.acme -a orders
+jstarter -g com.acme -a orders
 
 # Backend jar on the minimal infra parent, no UI libraries, into ~/src
-flowlogix-starter -g com.acme -a billing -p com.acme.billing \
+jstarter -g com.acme -a billing -p com.acme.billing \
   --baseType=infra --packagingType=jar \
   --usePrimeFaces=false --useLazyModel=false --useArquillianGraphene=false \
   -o ~/src
 
 # Show the request without calling the generator (useful when the generator can't be reached from here)
-flowlogix-starter -g com.acme -a orders --dry-run
+jstarter -g com.acme -a orders --dry-run
 ```
 
 On success it prints the created path and `cd <dir> && ./mvnw verify`; run that to confirm.

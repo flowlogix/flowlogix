@@ -32,7 +32,7 @@ import org.apache.shiro.authz.annotation.RequiresUser;
  */
 public class ShiroSecurityExtension implements Extension {
     @ShiroSecureAnnotation
-    static class ShiroSecureAnnotated { };
+    static class ShiroSecureAnnotated { }
 
     public <T> void addSecurity(@Observes @WithAnnotations({
         RequiresAuthentication.class, RequiresGuest.class, RequiresPermissions.class,

@@ -13,7 +13,7 @@
         <slf4j.version>2.0.20</slf4j.version>
         <omnifaces.version>3.14.28</omnifaces.version>
         <shiro2.version>2.2.1</shiro2.version>
-        <bytebuddy.version>1.18.16</bytebuddy.version>
+        <bytebuddy.version>1.18.17</bytebuddy.version>
     </properties>
 
     <parent>
@@ -97,7 +97,7 @@
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
-                <version>1.23.2</version>
+                <version>1.24.1</version>
             </dependency>
 
             <!-- Optional, Non-Transitive dependencies -->

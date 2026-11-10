@@ -68,7 +68,7 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
         public boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
             return FormAuthenticationFilter.super.preHandle(request, response);
         }
-    };
+    }
 
     public FormAuthenticationFilter() {
         delegate = new AuthenticationFilterDelegate(new Methods());

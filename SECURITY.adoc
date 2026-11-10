@@ -2,6 +2,12 @@
 
 We accept private security reports.
 
+== Supported Versions
+
+Security fixes are provided for the current release line only (11.x).
+Version 5.x (pre-Jakarta) is in maintenance mode and does not receive security fixes.
+Fixes for older versions are available through commercial support from Flow Logix, Inc.
+
 == Reporting a Vulnerability
 
 If you discover a security vulnerability, please report it to us privately. We will work with you to ensure that the issue is resolved promptly.

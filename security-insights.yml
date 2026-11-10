@@ -1,0 +1,98 @@
+header:
+  schema-version: 2.2.0
+  last-reviewed: 2026-11-09
+  last-updated: 2026-11-09
+  url: https://raw.githubusercontent.com/flowlogix/flowlogix/main/security-insights.yml
+
+project:
+  name: Flow Logix Jakarta EE Components
+  homepage: https://docs.flowlogix.com
+  administrators:
+    - name: Lenny Primak
+      primary: true
+      affiliation: Flow Logix, Inc.
+      email: lenny@flowlogix.com
+  repositories:
+    - name: flowlogix
+      comment: Main source repository for the Flow Logix Jakarta EE components and PrimeFaces lazy data model.
+      url: https://github.com/flowlogix/flowlogix
+  documentation:
+    detailed-guide: https://docs.flowlogix.com
+    quickstart-guide: https://github.com/flowlogix/flowlogix#quick-start-only-jdk-is-required
+    release-process: https://github.com/flowlogix/flowlogix/blob/main/CONTRIBUTING.adoc#release-process
+    support-policy: https://github.com/flowlogix/flowlogix/blob/main/SECURITY.adoc#supported-versions
+  vulnerability-reporting:
+    reports-accepted: true
+    bug-bounty-available: false
+    policy: https://github.com/flowlogix/flowlogix/blob/main/SECURITY.adoc
+    contact:
+      name: Flow Logix Security
+      primary: true
+      affiliation: Flow Logix, Inc.
+      email: security@flowlogix.com
+    comment: >-
+      Report vulnerabilities privately to security@flowlogix.com or through GitHub private
+      vulnerability reporting at https://github.com/flowlogix/flowlogix/security/advisories/new
+      Do not open public issues or pull requests for undisclosed vulnerabilities.
+
+repository:
+  url: https://github.com/flowlogix/flowlogix
+  status: active
+  accepts-change-request: true
+  accepts-automated-change-request: true
+  core-team:
+    - name: Lenny Primak
+      primary: true
+      affiliation: Flow Logix, Inc.
+      email: lenny@flowlogix.com
+  license:
+    expression: Apache-2.0
+    url: https://github.com/flowlogix/flowlogix/blob/main/LICENSE
+  documentation:
+    contributing-guide: https://github.com/flowlogix/flowlogix/blob/main/CONTRIBUTING.adoc
+    security-policy: https://github.com/flowlogix/flowlogix/blob/main/SECURITY.adoc
+    governance: https://github.com/flowlogix/flowlogix/blob/main/GOVERNANCE.adoc
+    dependency-management-policy: https://github.com/flowlogix/flowlogix/blob/main/CONTRIBUTING.adoc#dependency-policy
+    review-policy: https://github.com/flowlogix/flowlogix/blob/main/CONTRIBUTING.adoc#requirements-for-acceptable-contributions
+  release:
+    automated-pipeline: true
+    changelog: https://github.com/flowlogix/flowlogix/releases
+    distribution-points:
+      - uri: https://central.sonatype.com/search?q=com.flowlogix
+        comment: Release artifacts on Maven Central, built and published by the Flow Logix Jenkins CI server.
+  security:
+    assessments:
+      self:
+        name: Flow Logix Security Self-Assessment
+        comment: OSPS self-assessment of the Flow Logix libraries.
+        date: 2026-11-09
+        evidence: https://github.com/flowlogix/flowlogix/blob/main/SECURITY-SELF-ASSESSMENT.md
+    tools:
+      - name: CodeQL
+        type: SAST
+        version: latest
+        rulesets:
+          - default
+        integration:
+          adhoc: true
+          ci: true
+          release: true
+        results:
+          ci:
+            name: CodeQL code scanning alerts
+            location: https://github.com/flowlogix/flowlogix/security/code-scanning
+            predicate-uri: https://github.com/github/codeql-action
+      - name: Dependabot
+        type: SCA
+        version: latest
+        rulesets:
+          - default
+        integration:
+          adhoc: true
+          ci: false
+          release: true
+        results:
+          adhoc:
+            name: Dependabot alerts and update pull requests
+            location: https://github.com/flowlogix/flowlogix/security/dependabot
+            predicate-uri: https://docs.github.com/en/code-security/dependabot

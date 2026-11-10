@@ -1,0 +1,44 @@
+= Contributing to Flow Logix
+
+== Discussions and defect reports
+
+* Ask questions and discuss ideas in https://github.com/flowlogix/flowlogix/discussions[GitHub Discussions].
+* Report defects as https://github.com/flowlogix/flowlogix/issues[GitHub Issues], with steps to reproduce.
+* Do *not* report security vulnerabilities in public issues. See link:SECURITY.adoc[SECURITY.adoc].
+
+== Building from source
+
+Only a JDK is required. The Maven wrapper is included:
+
+[source,shell]
+----
+./mvnw package
+----
+
+== Making changes
+
+Fork the repository and open a pull request against `main`.
+Keep changes focused, and include tests for new behavior.
+
+== Requirements for acceptable contributions
+
+* The project maintainers review every pull request before it is merged.
+* The build and tests on the https://jenkins.flowlogix.com/job/flowlogix-ee-integration/[Flow Logix Jenkins] CI server must pass.
+* Contributions are licensed under the link:LICENSE[Apache License 2.0],
+  and by submitting a pull request you confirm you have the right to contribute the code under that license.
+* Do not include secrets, credentials or generated binaries.
+
+== Dependency policy
+
+* Dependencies must be under an open source license compatible with the Apache License 2.0.
+* Dependencies are kept current by https://docs.github.com/en/code-security/dependabot[Dependabot] pull requests,
+  which must pass the build before they are merged.
+* Known-vulnerable dependencies are updated or replaced as soon as a fixed version is available.
+
+== Release process
+
+Releases are built on the https://jenkins.flowlogix.com/job/flowlogix-ee-integration/[Flow Logix Jenkins] server from the `main` branch
+using the Maven release profiles configured in the root `pom.xml`, and published to
+https://central.sonatype.com/search?q=com.flowlogix[Maven Central].
+Snapshot builds of the current head are published automatically by the same Jenkins server.
+Release notes are published as https://github.com/flowlogix/flowlogix/releases[GitHub releases].

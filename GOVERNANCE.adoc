@@ -1,0 +1,19 @@
+= Project Governance
+
+== Roles
+
+* *Maintainers* have write access to the repository, review and merge pull requests, and make releases.
+  Currently, the lead maintainer is https://github.com/lprimak[Lenny Primak] of Flow Logix, Inc.
+* *Contributors* are anyone who submits issues, pull requests or documentation.
+  See link:CONTRIBUTING.adoc[CONTRIBUTING.adoc].
+
+== Decision making
+
+Day-to-day decisions are made by the maintainers through issues and pull requests.
+Significant changes, such as ending support for a version line, are discussed publicly in
+https://github.com/flowlogix/flowlogix/discussions[GitHub Discussions] before being decided by the maintainers.
+
+== Becoming a maintainer
+
+Contributors with a sustained record of high-quality contributions may be invited by the existing maintainers.
+Access is granted by the repository owner and is reviewed periodically.

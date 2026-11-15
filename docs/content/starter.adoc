@@ -1,0 +1,33 @@
+:jbake-title: Jakarta EE Project Starter
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-keywords: flowlogix starter project generator jakarta ee
+
+:toc:
+
+[[section-introduction]]
+== A standards-based project, ready to build on
+
+Start with a simple, batteries-included Jakarta EE project instead of spending
+time assembling a Maven structure and wiring common integrations by hand. The
+generated project uses standard Java, Jakarta EE, and Maven conventions, with
+boilerplate kept to a minimum. It is a foundation for any developer building a
+Jakarta EE application, not just projects using Flow Logix products.
+
+Open link:https://start.flowlogix.com[the project starter^], choose the project
+settings, and select **Generate Project**. You can set Maven coordinates and a
+Java package, select a base POM and packaging type, and include integrations
+such as Apache Shiro, OmniFaces, or PrimeFaces. All fields are optional, with
+working defaults for a quick start.
+
+[[section-run]]
+== Run your generated project
+
+From the generated project directory, run:
+
+[source,shell]
+----
+./mvnw package server:dev
+----
+
+Only a JDK is required to build and run the generated project.

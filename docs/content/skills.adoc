@@ -1,0 +1,31 @@
+:jbake-title: Flow Logix Agent Skills
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-keywords: flowlogix agent skills ai coding
+
+:toc:
+
+[[section-introduction]]
+== Give your coding agent project context
+
+Without project-specific guidance, an AI coding agent may need repeated
+instructions about how to create a project and maintain its build. Flow Logix
+skills give the agent reusable guidance for those tasks, so you can spend less
+time re-explaining setup and more time on your application.
+
+The skills are maintained in the
+link:https://github.com/flowlogix/skills[flowlogix/skills repository^].
+
+[[section-installation]]
+== Install the skills
+
+From your project directory, run:
+
+[source,shell]
+----
+npx skills add flowlogix/skills
+----
+
+Then ask your coding agent to create a project or maintain its build. The
+starter creates a simple, standards-based Jakarta EE application for general
+use, not just a Flow Logix product.

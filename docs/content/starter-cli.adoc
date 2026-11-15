@@ -1,0 +1,69 @@
+:jbake-title: Flow Logix Starter CLI
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-keywords: flowlogix starter cli project generator jakarta ee
+
+:toc:
+
+[[section-introduction]]
+== Create a standards-based project from the command line
+
+The `jstarter` command-line client generates the same simple, batteries-included
+Jakarta EE project as the
+link:https://docs.flowlogix.com/starter[web starter^]. The generated application follows standard Java, Jakarta EE, and Maven
+conventions. It is suitable as a starting point for any application, not just
+projects using Flow Logix products.
+
+Use the CLI when you prefer a terminal workflow or want to create projects from
+scripts. It downloads and unpacks the project locally, avoiding manual setup of
+the Maven build and selected integrations.
+
+[[section-build]]
+== Build and run the CLI
+
+The CLI is part of the
+link:https://github.com/flowlogix/apps[Flow Logix web applications repository^].
+Clone the repository and build it from its root:
+
+[source,shell]
+----
+git clone https://github.com/flowlogix/apps.git
+cd apps
+./mvnw package
+----
+
+Then display the available options and server-provided defaults:
+
+[source,shell]
+----
+java -jar starter-generator/cli/target/quarkus-app/quarkus-run.jar --help
+----
+
+[[section-options]]
+== Generate a project
+
+For example, create an `inventory` project for GlassFish under `~/projects`:
+
+[source,shell]
+----
+java -jar starter-generator/cli/target/quarkus-app/quarkus-run.jar \
+  --group com.acme \
+  --artifact inventory \
+  --baseType glassfish \
+  --output-dir ~/projects
+----
+
+The CLI creates `~/projects/inventory`. Its next-step output shows how to verify
+the generated project with `./mvnw verify`.
+
+The main options are:
+
+* `-g, --group` sets the Maven group ID. The default is `com.example`.
+* `-a, --artifact` sets the Maven artifact ID and project directory name. The default is `starter`.
+* `-p, --package` sets the base Java package. The default is `com.example.starter`.
+* `-o, --output-dir` sets the parent directory for the generated project. The default is the current directory.
+* `--baseType` and other archetype properties configure the generated project. Use `--help` to display the current options and defaults.
+
+Use `--dry-run` to inspect the equivalent `curl` request without generating a
+project. Use `--json` to get the output directory and next command as JSON,
+making it easier to integrate generation into scripts.

@@ -11,7 +11,7 @@
 
     <properties>
         <slf4j.version>2.0.20</slf4j.version>
-        <omnifaces.version>3.14.28</omnifaces.version>
+        <omnifaces.version>3.14.29</omnifaces.version>
         <shiro2.version>2.2.1</shiro2.version>
         <bytebuddy.version>1.18.17</bytebuddy.version>
     </properties>
@@ -45,12 +45,12 @@
             <dependency>
                 <groupId>org.primefaces</groupId>
                 <artifactId>primefaces</artifactId>
-                <version>15.0.19</version>
+                <version>15.0.20</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.21.0</version>
+                <version>3.22.0</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>

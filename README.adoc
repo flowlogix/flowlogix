@@ -48,6 +48,12 @@ Snapshots^] are automatically released by Jenkins for the current head +
 Snapshot Javadocs are available for https://javadoc.flowlogix.com/jee-apidocs[Jakarta EE Components^]
 and https://javadoc.flowlogix.com/datamodel-apidocs[PrimeFaces Lazy Data Model^]
 
+=== Credentials
+
+link:https://www.credly.com/badges/56f64713-d104-4720-8afe-b7b5d083f47b[image:https://images.credly.com/images/cda2302b-7758-428e-a02b-62d1428481be/twitter_thumb_201604_blob[Security Slam 2026 CRA Readiness Badge,150]]
+
+link:https://www.credly.com/badges/56f64713-d104-4720-8afe-b7b5d083f47b[Security Slam 2026 CRA Readiness Badge] issued by The Linux Foundation to Flow Logix.
+
 === News
 
 - 4/24/2026: Version 11.4 was released, removing serialization requirements for Entity / Data objects in JPALazyDataModel, even with distributed sessions

@@ -19,8 +19,9 @@ The project is organized into the following modules:
 - `base-pom`: Minimal parent POM that can be used for any project. It is a good starting point for new projects. Produces no warnings with Maven 4.
 - `infra-pom`: An opinionated infrastructure POM that includes configurations for testing, code coverage, and dependency management.
 - `payara-pom`: A pre-configured environment for running integration tests with Payara Server.
-- `glassfish-pom`: A pre-configured environment for running integration tests with Payara Server.
+- `glassfish-pom`: A pre-configured environment for running integration tests with GlassFish Server.
 - `server-common`: Common base POM for Payara and GlassFish Servers.
+- `quarkus-pom`: A pre-configured environment for building and running Quarkus applications.
 - `checkstyle`: Provides Checkstyle configurations to enforce a consistent code style.
 - `scripts`: Helper scripts for setting up repositories and JaCoCo code coverage (not a Maven module).
 
@@ -43,6 +44,14 @@ The `payara-pom` and `glassfish-pom` modules provides a pre-configured environme
 - `server-local`: For running tests against a local Payara or GlassFish Server instance.
 - `server-remote`: For running tests against a remote Payara or GlassFish Server instance.
 - `server-docker`: For running tests in a Docker container.
+
+=== `quarkus-pom`
+
+The `quarkus-pom` module builds on `infra-pom` and configures a project for Quarkus:
+
+- *Quarkus Maven Plugin*: Registered as an extension, so projects can use `quarkus` packaging and goals such as `quarkus:dev`.
+- *Jakarta EE*: Adds the Jakarta EE Web API and imports the Jakarta EE BOM.
+- *Native Image*: The `native` profile, activated with `-Dnative`, builds a native executable.
 
 === `checkstyle`
 

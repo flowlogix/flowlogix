@@ -16,7 +16,8 @@ Jakarta EE application, not just projects using Flow Logix products.
 
 Open link:https://start.flowlogix.com[the project starter^], choose the project
 settings, and select **Generate Project**. You can set Maven coordinates and a
-Java package, select a base POM and packaging type, and include integrations
+Java package, select a base POM (such as Payara, GlassFish, or Quarkus) and
+packaging type, and include integrations
 such as Apache Shiro, OmniFaces, or PrimeFaces. All fields are optional, with
 working defaults for a quick start.
 
@@ -28,6 +29,13 @@ From the generated project directory, run:
 [source,shell]
 ----
 ./mvnw package server:dev
+----
+
+For a project generated with the Quarkus base POM, run:
+
+[source,shell]
+----
+./mvnw quarkus:dev
 ----
 
 Only a JDK is required to build and run the generated project.

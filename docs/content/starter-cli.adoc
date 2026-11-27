@@ -18,25 +18,15 @@ Use the CLI when you prefer a terminal workflow or want to create projects from
 scripts. It downloads and unpacks the project locally, avoiding manual setup of
 the Maven build and selected integrations.
 
-[[section-build]]
-== Build and run the CLI
+[[section-install]]
+== Install the CLI
 
-The CLI is part of the
-link:https://github.com/flowlogix/apps[Flow Logix web applications repository^].
-Clone the repository and build it from its root:
-
-[source,shell]
-----
-git clone https://github.com/flowlogix/apps.git
-cd apps
-./mvnw package
-----
-
+Install `jstarter` with SDKMAN!, Homebrew or another supported package manager.
 Then display the available options and server-provided defaults:
 
 [source,shell]
 ----
-java -jar starter-generator/cli/target/quarkus-app/quarkus-run.jar --help
+jstarter --help
 ----
 
 [[section-options]]
@@ -46,7 +36,7 @@ For example, create an `inventory` project for GlassFish under `~/projects`:
 
 [source,shell]
 ----
-java -jar starter-generator/cli/target/quarkus-app/quarkus-run.jar \
+jstarter \
   --group com.acme \
   --artifact inventory \
   --baseType glassfish \

@@ -149,7 +149,7 @@ mvn -N -Pcoverage initialize jacoco:dump jacoco:merge jacoco:report -DjacocoPort
 [[section-variables]]
 == `infra-pom` Variables
 
-The `infra-pom` module defines the following properties:
+The `infra-pom` module defines the following properties. Where a plugin has its own standard property, it is listed in parentheses; either name can be used in your POM or with `-D`.
 
 |===
 | Variable | Description
@@ -184,13 +184,13 @@ The `infra-pom` module defines the following properties:
 | `drone.browser`
 | The browser to use for Drone tests.
 
-| `jacocoAddress`
+| `jacocoAddress` (`jacoco.address`)
 | The address for the JaCoCo agent.
 
-| `jacocoPort`
+| `jacocoPort` (`jacoco.port`)
 | The port for the JaCoCo agent.
 
-| `jacocoReset`
+| `jacocoReset` (`jacoco.reset`)
 | Whether to reset the JaCoCo agent.
 
 | `jacoco.classDumpDir`
@@ -203,21 +203,21 @@ The `infra-pom` module defines the following properties:
 | The Failsafe options for JDK 11.
 
 | `mockito.agentOptions`
-| The agent options for Mockito.
+| The agent options for Mockito. Omitted automatically if Mockito is not a dependency. Set to empty to disable.
 
-| `compiler.show.warnings`
+| `compiler.show.warnings` (`maven.compiler.showWarnings`)
 | Whether to show compiler warnings.
 
 | `compiler.deprecation.arg`
-| The compiler argument for deprecation warnings.
+| The compiler argument for deprecation warnings. Set to empty to disable.
 
 | `compiler.unchecked.arg`
-| The compiler argument for unchecked warnings.
+| The compiler argument for unchecked warnings. Set to empty to disable.
 
 | `compiler.parameters.arg`
-| The compiler argument for parameter names.
+| The compiler argument for parameter names. Set to empty to disable.
 
-| `compiler.annotation.processing`
+| `compiler.annotation.processing` (`maven.compiler.proc`)
 | The annotation processing mode for the compiler.
 
 | `junit5.parallel.tests.enabled`
@@ -247,7 +247,7 @@ The `infra-pom` module defines the following properties:
 | `test.run.order`
 | The run order for tests.
 
-| `test.redirect.to.file`
+| `test.redirect.to.file` (`maven.test.redirectTestOutputToFile`)
 | Whether to redirect test output to a file.
 
 | `deploy.at-end`
@@ -274,17 +274,20 @@ The `infra-pom` module defines the following properties:
 | `javadoc.snippet.path.options`
 | The snippet path options for Javadoc.
 
-| `checkstyle.configLocation`
+| `checkstyle.configLocation` (`checkstyle.config.location`)
 | The location of the Checkstyle configuration file.
 
-| `checkstyle.headerLocation`
+| `checkstyle.headerLocation` (`checkstyle.header.file`)
 | The location of the Checkstyle header file.
 
-| `checkstyle.suppressionsLocation`
+| `checkstyle.suppressionsLocation` (`checkstyle.suppressions.location`)
 | The location of the Checkstyle suppressions file.
 
 | `checkstyle.excludes`
 | The files to exclude from Checkstyle.
+
+| `checkstyle.consoleOutput`
+| Whether to print Checkstyle violations to the console.
 
 | `ear.defaultLibBundleDir`
 | The default directory for library bundles in EAR files.
@@ -398,3 +401,6 @@ A: Jacoco is configured to merge both unit tests and integration tests into a si
 
 Q: Why is the build-helper-maven-plugin defined? +
 A: It is defined to add the `src/demo` directory to the source directories. Code in this directory can be used in documentation or as Javadoc snippets. The code is built and tested as part of the project build, but it is not included in the final artifact. This allows you to include example code in your project without affecting the final artifact size or dependencies.
+
+Q: What does the `skinny-war` profile do? +
+A: Activated with `-Dskinny.war`, it builds the WAR without the JARs in `WEB-INF/lib`. The dependencies can then be deployed once to the application server's library directory, so the WAR becomes very small and redeploys quickly during development. Which libraries a server can share is vendor-specific and not guaranteed by the Jakarta EE specification, so this is intended for development rather than production. It is equivalent to `-Dmaven.war.packagingExcludes=WEB-INF/lib/*.jar`. For WARs packaged inside an EAR, use `ear.skinnyWars` instead.
